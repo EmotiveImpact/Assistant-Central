@@ -20,10 +20,12 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Team coordinator](team/README.md) | New rebuilt local owner/task/artifact state machine | 84 tests, including 28 independent review tests |
 | [Consent and protocol foundation](prototypes/consent-v29/README.md) | Recovered v29 prototype; executable source preserved | 948 Python tests and 273 DOM-model checks |
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
+| [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
 
-These suites were rerun locally before this initial import. They are separate
-proofs; their totals do not establish interoperability between the components.
+The imported suites were rerun locally before the initial import. These are
+separate proofs; their totals do not establish end-to-end interoperability. The
+new binding tests cover only the local team-to-proposal boundary described below.
 GitHub Actions runs the same offline checks on pushes and pull requests. Check
 the exact commit's Actions result rather than assuming a local pass means CI passed.
 
@@ -48,6 +50,7 @@ peer-lifecycle experiments and does not claim native-host acceptance.
 ## Repository layout
 
 - `team/`: new team rebuild, tests, examples and provenance.
+- `integration/`: exact team artifact mapping, synthetic in-memory wire demo and tests.
 - `prototypes/consent-v29/`: recovered consent/protocol checkpoint with sanitized evidence paths.
 - `prototypes/synthetic-stdio-r5/`: recovered synthetic stdio checkpoint with sanitized evidence paths.
 - `docs/`: original architecture, security, pilot and integration-readiness material.
@@ -61,7 +64,9 @@ API's owner methods are trusted local harness controls, not cryptographic approv
 Its bound agent facade is not an OS or Python sandbox. One local operator/database
 still controls the fictional team.
 
-The team layer is **not yet wired to v29 or r5**. Persistent human identity,
+The team layer now stages exact accepted artifacts through the recovered r5
+proposal/wire building blocks in memory. It is **not connected to the v29 runtime,
+the standalone r5 launcher or a peer transport**. Persistent human identity,
 protected key custody, authenticated owner controls, distributed recipient
 authority, native-host acceptance, live peer transport and safe wake behavior
 remain separate integration work. Cancellation cannot recall content already read.
