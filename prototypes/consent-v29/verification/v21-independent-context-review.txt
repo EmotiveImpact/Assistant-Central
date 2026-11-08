@@ -1,0 +1,10 @@
+test_cancelled_alias_and_exact_retry_add_no_authority_or_delivery (tests.test_durable_context_review.DurableContextReviewTests.test_cancelled_alias_and_exact_retry_add_no_authority_or_delivery) ... ok
+test_late_third_transition_prevents_partial_inbox_and_owner_output (tests.test_durable_context_review.DurableContextReviewTests.test_late_third_transition_prevents_partial_inbox_and_owner_output) ... ok
+test_open_scope_mismatch_blocks_all_response_entry_points_and_new_alias (tests.test_durable_context_review.DurableContextReviewTests.test_open_scope_mismatch_blocks_all_response_entry_points_and_new_alias) ... ok
+test_reopen_changed_context_fails_and_clean_reopen_preserves_history (tests.test_durable_context_review.DurableContextReviewTests.test_reopen_changed_context_fails_and_clean_reopen_preserves_history) ... ok
+test_request_relative_result_bound_blocks_history_disclosure (tests.test_durable_context_review.DurableContextReviewTests.test_request_relative_result_bound_blocks_history_disclosure) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.225s
+
+OK

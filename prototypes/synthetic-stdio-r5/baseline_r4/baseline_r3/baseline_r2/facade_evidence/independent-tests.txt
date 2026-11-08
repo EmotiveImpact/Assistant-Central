@@ -1,0 +1,16 @@
+test_actual_release_is_not_delivery (test_independent_contract.Contract.test_actual_release_is_not_delivery) ... ok
+test_changed_binding_context_and_peer_key_rejected (test_independent_contract.Contract.test_changed_binding_context_and_peer_key_rejected) ... ok
+test_content_observation_blocks_late_actual_response (test_independent_contract.Contract.test_content_observation_blocks_late_actual_response) ... ok
+test_durable_unknown_without_execution (test_independent_contract.Contract.test_durable_unknown_without_execution) ... ok
+test_failed_save_returns_no_command_and_no_unknown (test_independent_contract.Contract.test_failed_save_returns_no_command_and_no_unknown) ... ok
+test_foreign_header_response_rejected_before_recording (test_independent_contract.Contract.test_foreign_header_response_rejected_before_recording) ... ok
+test_full_history_preserves_decline_and_unknown (test_independent_contract.Contract.test_full_history_preserves_decline_and_unknown) ... ok
+test_mixed_utf8_bound_and_unicode_identity (test_independent_contract.Contract.test_mixed_utf8_bound_and_unicode_identity) ... ok
+test_processed_only_real_endpoint_projection (test_independent_contract.Contract.test_processed_only_real_endpoint_projection) ... ok
+test_unrecorded_release_reconciles_only_content (test_independent_contract.Contract.test_unrecorded_release_reconciles_only_content) ... ok
+test_wrong_response_correlation_leaves_unknown (test_independent_contract.Contract.test_wrong_response_correlation_leaves_unknown) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.041s
+
+OK

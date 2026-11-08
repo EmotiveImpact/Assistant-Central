@@ -1,0 +1,25 @@
+test_bad_manifest_and_fixture_fail_closed (test_launcher.AdapterUnitTests.test_bad_manifest_and_fixture_fail_closed) ... ok
+test_exact_allowlist_precedes_facade_write (test_launcher.AdapterUnitTests.test_exact_allowlist_precedes_facade_write) ... ok
+test_fixed_diagnostics_no_dynamic_content_no_retry (test_launcher.AdapterUnitTests.test_fixed_diagnostics_no_dynamic_content_no_retry) ... ok
+test_guard_denies_external_actions_allows_local_wakeup_shape (test_launcher.AdapterUnitTests.test_guard_denies_external_actions_allows_local_wakeup_shape) ... ok
+test_manifest_and_public_fixture_are_verified (test_launcher.AdapterUnitTests.test_manifest_and_public_fixture_are_verified) ... ok
+test_partial_failure_no_replay (test_launcher.AdapterUnitTests.test_partial_failure_no_replay) ... ok
+test_partial_writes_complete_exactly_once (test_launcher.AdapterUnitTests.test_partial_writes_complete_exactly_once) ... ok
+test_reader_wait_eof_and_contract (test_launcher.AdapterUnitTests.test_reader_wait_eof_and_contract) ... ok
+test_runtime_escape_is_uncertain_not_startup_rejection (test_launcher.AdapterUnitTests.test_runtime_escape_is_uncertain_not_startup_rejection) ... ok
+test_unmanifested_imports_and_symlinks_fail_closed (test_launcher.AdapterUnitTests.test_unmanifested_imports_and_symlinks_fail_closed) ... ok
+test_writer_rejects_bad_counts_and_bad_payloads (test_launcher.AdapterUnitTests.test_writer_rejects_bad_counts_and_bad_payloads) ... ok
+test_arbitrary_text_selectors_owner_tools_rejected (test_launcher.StdioIntegration.test_arbitrary_text_selectors_owner_tools_rejected) ... ok
+test_duplicate_propose_id_does_not_hide_replay_contract (test_launcher.StdioIntegration.test_duplicate_propose_id_does_not_hide_replay_contract) ... ok
+test_fixed_startup_failures (test_launcher.StdioIntegration.test_fixed_startup_failures) ... ok
+test_initialize_three_tools_empty_inbox_propose_replay_status (test_launcher.StdioIntegration.test_initialize_three_tools_empty_inbox_propose_replay_status) ... ok
+test_malformed_utf8_duplicate_keys_and_notification_silence (test_launcher.StdioIntegration.test_malformed_utf8_duplicate_keys_and_notification_silence) ... ok
+test_normal_eof_partial_eof_and_record_budget (test_launcher.StdioIntegration.test_normal_eof_partial_eof_and_record_budget) ... ok
+test_protocol_invalid_duplicate_ids_and_unknown_method (test_launcher.StdioIntegration.test_protocol_invalid_duplicate_ids_and_unknown_method) ... ok
+test_record_bound_and_no_dispatch_after_oversized (test_launcher.StdioIntegration.test_record_bound_and_no_dispatch_after_oversized) ... ok
+test_sdk_stdio_client_session (test_launcher.StdioIntegration.test_sdk_stdio_client_session) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 6.543s
+
+OK

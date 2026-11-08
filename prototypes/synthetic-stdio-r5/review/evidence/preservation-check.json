@@ -1,0 +1,35 @@
+{
+  "source_record": "candidate evidence/preserved-inputs-before.json",
+  "results": [
+    {
+      "target": "/path/to/workspace/agent-network-synthetic-stdio-r5/baseline_r4",
+      "reference": "agent-network-independent-peer-raw-r4",
+      "files": 128,
+      "expected_files": 128,
+      "equal": true,
+      "missing": [],
+      "extra": [],
+      "changed": []
+    },
+    {
+      "target": "/path/to/workspace/agent-network-independent-peer-raw-r4",
+      "reference": "agent-network-independent-peer-raw-r4",
+      "files": 128,
+      "expected_files": 128,
+      "equal": true,
+      "missing": [],
+      "extra": [],
+      "changed": []
+    },
+    {
+      "target": "/path/to/workspace/agent-network-pilot-preparation",
+      "reference": "agent-network-pilot-preparation",
+      "files": 8,
+      "expected_files": 8,
+      "equal": true,
+      "missing": [],
+      "extra": [],
+      "changed": []
+    }
+  ]
+}

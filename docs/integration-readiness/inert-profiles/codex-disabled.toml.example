@@ -1,0 +1,8 @@
+# INACTIVE REVIEW DRAFT. Do not place in an active config or enable without approval.
+# Verify the alias is unused, actual host syntax and protocol behavior first.
+[mcp_servers.agent_network_synthetic]
+enabled = false
+command = "/ABSOLUTE/PATH/TO/EXISTING/PYTHON3.12"
+args = ["-I", "-B", "/ABSOLUTE/PATH/TO/REVIEWED/R5/launcher.py"]
+enabled_tools = ["propose", "proposal_status", "processed_inbox"]
+default_tools_approval_mode = "prompt"

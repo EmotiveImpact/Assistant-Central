@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python3.12",
+    "-I",
+    "-B",
+    "/tmp/r5-review-relocation-1g9ry734/relocated-release/independent_tests/run_checks.py"
+  ],
+  "cwd": "/tmp/r5-review-relocation-1g9ry734/unrelated-cwd",
+  "STDIO_R5_ROOT": "/tmp/r5-review-relocation-1g9ry734/must-not-be-selected",
+  "returncode": 0,
+  "launcher_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+  "claim": "Colocated release wins over invalid explicit environment path; tests loaded by exact colocated file, with unrelated working directory."
+}

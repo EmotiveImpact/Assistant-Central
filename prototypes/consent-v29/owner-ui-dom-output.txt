@@ -1,0 +1,13 @@
+PASS read-only initial render, refresh, owner switch and navigation
+PASS deferred review requires explicit resume and back grants nothing
+PASS approval dialog back and wrong phrase do not mutate; exact target is retained
+PASS double action while first response pending does not repeat mutation
+PASS network failure explicitly preserves uncertainty without retries
+PASS truncated action response explicitly preserves uncertainty without retries
+PASS stale response cannot overwrite a newer owner navigation
+PASS uncertain receipt check never sends or processes
+PASS send confirmation back does not create attempt
+PASS DOM rendering treats review text as text, not HTML instructions
+PASS cleanup uncertainty is explicit and never falls through to an inbox
+PASS discard back is inert; exact confirmation ends UI without retry
+12/12 DOM-model checks passed. These are not browser or visual tests.

@@ -1,0 +1,13 @@
+PASS received navigation reads exact owner and task scope without mutation
+PASS processed request view shows exact inert payload binding and recipient
+PASS processed response references remain text rather than active links
+PASS empty inbox distinguishes processed messages from delivery receipts
+PASS cancelled task preserves processed history without recall claim
+PASS empty result clearly contains no resource items
+PASS refresh and back only issue reads and navigation
+PASS delayed old owner messages cannot appear after owner switch
+PASS same route revisit invalidates earlier delayed read
+PASS read failure is not a delivery failure or permission to retry a send
+PASS wrong response scope or recipient fails closed before exposing contents
+PASS received prompt injection and markup remain literal inert text
+12/12 received message DOM-model checks passed (not browser tests).

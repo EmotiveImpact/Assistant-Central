@@ -1,0 +1,186 @@
+{
+  "create_preview_request": {
+    "operation": "create",
+    "spec": {
+      "group_id": "group-fictional",
+      "label": "Fictional study group",
+      "members": [
+        {
+          "selector": "garden",
+          "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+        }
+      ]
+    }
+  },
+  "create_preview_response": {
+    "operation": "create",
+    "registry_revision": 0,
+    "group_id": "group-fictional",
+    "label": "Fictional study group",
+    "revision": 1,
+    "members": [
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "review_digest": "8720f3a90360f8f0059534eb0d8b51c335026c5a2ae2d6abaffb1a05bfb602a7"
+  },
+  "create_commit_request": {
+    "action": "relationship_create",
+    "review": {
+      "operation": "create",
+      "registry_revision": 0,
+      "group_id": "group-fictional",
+      "label": "Fictional study group",
+      "revision": 1,
+      "members": [
+        {
+          "selector": "garden",
+          "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+        }
+      ],
+      "review_digest": "8720f3a90360f8f0059534eb0d8b51c335026c5a2ae2d6abaffb1a05bfb602a7"
+    },
+    "confirmation": "CREATE GROUP"
+  },
+  "create_group_row": {
+    "group_id": "group-fictional",
+    "label": "Fictional study group",
+    "revision": 1,
+    "members": [
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "stopped": false,
+    "stop_review": null
+  },
+  "attach_preview_response": {
+    "operation": "attach",
+    "group_id": "group-fictional",
+    "revision": 1,
+    "members": [
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "member": {
+      "selector": "astronomy",
+      "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+    },
+    "review_digest": "063998b376beadf5377ddfba7b120babeb88a355c591c7ab6c07e028a961a856"
+  },
+  "attached_group_row": {
+    "group_id": "group-fictional",
+    "label": "Fictional study group",
+    "revision": 2,
+    "members": [
+      {
+        "selector": "astronomy",
+        "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+      },
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "stopped": false,
+    "stop_review": null
+  },
+  "stop_preview_response": {
+    "operation": "stop",
+    "group_id": "group-fictional",
+    "revision": 2,
+    "members": [
+      {
+        "selector": "astronomy",
+        "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+      },
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "review_digest": "3b94eafc78c58789be2b271ba62603ec45bbaf2bee68422b2de51c26dd32a55c"
+  },
+  "stopped_group_row": {
+    "group_id": "group-fictional",
+    "label": "Fictional study group",
+    "revision": 3,
+    "members": [
+      {
+        "selector": "astronomy",
+        "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+      },
+      {
+        "selector": "garden",
+        "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+      }
+    ],
+    "stopped": true,
+    "stop_review": {
+      "operation": "stop",
+      "group_id": "group-fictional",
+      "revision": 2,
+      "members": [
+        {
+          "selector": "astronomy",
+          "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+        },
+        {
+          "selector": "garden",
+          "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+        }
+      ],
+      "review_digest": "3b94eafc78c58789be2b271ba62603ec45bbaf2bee68422b2de51c26dd32a55c"
+    }
+  },
+  "stopped_task_row": {
+    "selector": "garden",
+    "task": "synthetic-resource-shortlist",
+    "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc",
+    "requester": "alice",
+    "responder": "bob",
+    "phase": "not_created",
+    "fictional": true,
+    "temporary": true,
+    "local_work_stopped": true,
+    "relationship_groups": [
+      {
+        "group_id": "group-fictional",
+        "label": "Fictional study group",
+        "revision": 3,
+        "members": [
+          {
+            "selector": "astronomy",
+            "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+          },
+          {
+            "selector": "garden",
+            "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+          }
+        ],
+        "stopped": true,
+        "stop_review": {
+          "operation": "stop",
+          "group_id": "group-fictional",
+          "revision": 2,
+          "members": [
+            {
+              "selector": "astronomy",
+              "context": "1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac"
+            },
+            {
+              "selector": "garden",
+              "context": "9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc"
+            }
+          ],
+          "review_digest": "3b94eafc78c58789be2b271ba62603ec45bbaf2bee68422b2de51c26dd32a55c"
+        }
+      }
+    ]
+  }
+}

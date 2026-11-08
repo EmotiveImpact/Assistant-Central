@@ -1,0 +1,7 @@
+PASS mixed batch scope mismatch hides every row before rendering
+PASS delayed failure cannot replace next owner successful view
+PASS delayed response cannot overwrite same owner other task
+PASS refresh delayed response cannot overwrite back navigation
+PASS hostile result URLs and text never become active elements
+PASS invalid envelope task hides content despite matching outer scope
+6/6 independent received message DOM-model checks passed (not browser tests).

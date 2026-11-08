@@ -1,0 +1,24 @@
+test_cross_capability_proposal_rejected (test_bounded_text_exchange.TextProcessTests.test_cross_capability_proposal_rejected) ... ok
+test_decline_withdrawal_cancel_preserve_exact_history (test_bounded_text_exchange.TextProcessTests.test_decline_withdrawal_cancel_preserve_exact_history) ... ok
+test_full_lifecycle_terminal_history_and_messages (test_bounded_text_exchange.TextProcessTests.test_full_lifecycle_terminal_history_and_messages) ... ok
+test_limits_before_staging_review_and_signing (test_bounded_text_exchange.TextProcessTests.test_limits_before_staging_review_and_signing) ... ok
+test_maximum_escaped_unicode_both_directions (test_bounded_text_exchange.TextProcessTests.test_maximum_escaped_unicode_both_directions) ... ok
+test_preview_pure_no_tools_and_stale_preparation (test_bounded_text_exchange.TextProcessTests.test_preview_pure_no_tools_and_stale_preparation) ... ok
+test_closed_schema_and_bounds (test_bounded_text_exchange.TextValidationTests.test_closed_schema_and_bounds) ... ok
+test_exact_composition_and_no_migration (test_bounded_text_exchange.TextValidationTests.test_exact_composition_and_no_migration) ... ok
+test_projection_scope_linkage_and_terminal (test_bounded_text_exchange.TextValidationTests.test_projection_scope_linkage_and_terminal) ... ok
+test_restricted_schema_matches_text_without_new_methods (test_bounded_text_exchange.TextValidationTests.test_restricted_schema_matches_text_without_new_methods) ... ok
+test_exact_composition_response_delivery_and_received_history (test_bounded_text_http.TextHTTPTests.test_exact_composition_response_delivery_and_received_history) ... ok
+test_duplicate_startup_keys_and_boolean_bounds_fail_closed (test_text_exchange_review.IndependentTextReview.test_duplicate_startup_keys_and_boolean_bounds_fail_closed) ... ok
+test_every_spec_field_commits_context_and_review (test_text_exchange_review.IndependentTextReview.test_every_spec_field_commits_context_and_review) ... ok
+test_legacy_exact_hashes_from_unmodified_v20 (test_text_exchange_review.IndependentTextReview.test_legacy_exact_hashes_from_unmodified_v20) ... ok
+test_operation_and_closed_schema_rejected_before_projection (test_text_exchange_review.IndependentTextReview.test_operation_and_closed_schema_rejected_before_projection) ... ok
+test_projection_detaches_inert_text_and_rejects_replay (test_text_exchange_review.IndependentTextReview.test_projection_detaches_inert_text_and_rejects_replay) ... ok
+test_request_relative_limit_not_just_global_limit (test_text_exchange_review.IndependentTextReview.test_request_relative_limit_not_just_global_limit) ... ok
+test_result_validation_checks_scope_route_linkage_and_bounds (test_text_exchange_review.IndependentTextReview.test_result_validation_checks_scope_route_linkage_and_bounds) ... ok
+test_signer_rejects_wrong_linkage_even_when_digest_matches_modified_envelope (test_text_exchange_review.IndependentTextReview.test_signer_rejects_wrong_linkage_even_when_digest_matches_modified_envelope) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 3.681s
+
+OK

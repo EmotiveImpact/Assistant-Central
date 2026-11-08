@@ -1,0 +1,55 @@
+{
+  "warning": "CONSPICUOUSLY SYNTHETIC. NEVER for real signing/encryption/identity use. Public test vectors have publicly known private counterparts; none are included here.",
+  "actor": "alice",
+  "fictional_task_label": "SYNTHETIC purple-moon paper garden",
+  "task": {
+    "id": "00000000000000000000000000000001",
+    "context": "ea89ec525fbb043b7a0f0a8a7681ae389933336c34bf2029b7a9ec582ac9a7fa",
+    "capability": "fictional-answer/1"
+  },
+  "public": {
+    "alice": {
+      "actor": "alice",
+      "signing": "PUAXw+hDiVqStwqnTRt+vJyYLM8uxJaMwM1V8Sr0Zgw=",
+      "encryption": "hSDwCYkwp1R0i33ctD73Wg2/Og0mOBr066SpjqqbTmo=",
+      "incarnation": "11111111111111111111111111111111"
+    },
+    "bob": {
+      "actor": "bob",
+      "signing": "/FHNjmIYoaONpH7QAjDwWAgW7RO6MwOsXeuRFUiQgCU=",
+      "encryption": "3p7bfXt9wbTTW2HC7OQ1Nz+DQ8hbeGdNrfx+FG+IK08=",
+      "incarnation": "22222222222222222222222222222222"
+    }
+  },
+  "proposal_text": "SYNTHETIC ONLY: Count three paper moons in the fictional garden. Do not send anything.",
+  "provenance": [
+    {
+      "descriptor": "alice",
+      "signing": {
+        "url": "https://www.rfc-editor.org/rfc/rfc8032.txt",
+        "section": "7.1 Test 2",
+        "public_hex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c"
+      },
+      "encryption": {
+        "url": "https://www.rfc-editor.org/rfc/rfc7748.txt",
+        "section": "6.1 Alice public key",
+        "public_hex": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a"
+      },
+      "verification": "Read official RFC Editor plaintext through web read tool; only PUBLIC KEY values transcribed. No ownership, identity, security or private possession asserted."
+    },
+    {
+      "descriptor": "bob",
+      "signing": {
+        "url": "https://www.rfc-editor.org/rfc/rfc8032.txt",
+        "section": "7.1 Test 3",
+        "public_hex": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025"
+      },
+      "encryption": {
+        "url": "https://www.rfc-editor.org/rfc/rfc7748.txt",
+        "section": "6.1 Bob public key",
+        "public_hex": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f"
+      },
+      "verification": "Read official RFC Editor plaintext through web read tool; only PUBLIC KEY values transcribed. No ownership, identity, security or private possession asserted."
+    }
+  ]
+}

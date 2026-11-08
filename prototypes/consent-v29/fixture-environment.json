@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14",
+  "dependencies": {
+    "coincurve": "21.0.0",
+    "bech32": "1.2.0",
+    "cryptography": "50.0.0",
+    "pydantic": "2.13.4"
+  },
+  "scope": "offline fictional fixtures only",
+  "live_relay_tested": false,
+  "real_owner_identity_tested": false
+}

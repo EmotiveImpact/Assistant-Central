@@ -1,0 +1,8 @@
+{
+  "EVIDENCE.md": "d777b229eec4c9efebf5e5ee00a7a3fcd5a394c8dd52b039254907808d0ab5eb",
+  "README.md": "9032af66ff3fdbac79d37b217e27aa34a44ed85f990cf4b7e646f9f183a6c8b3",
+  "launcher.py": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+  "public_fixture.json": "2a6d3fef6cb8e9f88838a0cdd42cb4822d9e46311b113d85205f75e3eac37869",
+  "run_checks.py": "3fac9cedcf46dc8b710b914b48b13f0108a1211368d419873d9b3c49f483eb28",
+  "tests/test_launcher.py": "20a76b2c1dbcb18d020f06a48b098b71928f1405b61c637639447bbdbcbac0bb"
+}

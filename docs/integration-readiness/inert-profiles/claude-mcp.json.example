@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "agent_network_synthetic": {
+      "type": "stdio",
+      "command": "/ABSOLUTE/PATH/TO/EXISTING/PYTHON3.12",
+      "args": ["-I", "-B", "/ABSOLUTE/PATH/TO/REVIEWED/R5/launcher.py"]
+    }
+  }
+}

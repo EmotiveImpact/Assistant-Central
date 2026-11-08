@@ -1,0 +1,9 @@
+test_committed_enqueue_lost_ipc_response_kills_child_and_never_replays (test_cross_layer_consent_review.CrossLayerReview.test_committed_enqueue_lost_ipc_response_kills_child_and_never_replays) ... ok
+test_lost_receipt_then_stop_allows_evidence_not_disclosure_or_alias (test_cross_layer_consent_review.CrossLayerReview.test_lost_receipt_then_stop_allows_evidence_not_disclosure_or_alias) ... ok
+test_owner_successor_sends_but_agent_alias_preserves_withdrawn_original (test_cross_layer_consent_review.CrossLayerReview.test_owner_successor_sends_but_agent_alias_preserves_withdrawn_original) ... ok
+test_stop_allows_withdrawal_but_fences_successor_and_old_unsigned_approval (test_cross_layer_consent_review.CrossLayerReview.test_stop_allows_withdrawal_but_fences_successor_and_old_unsigned_approval) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.260s
+
+OK

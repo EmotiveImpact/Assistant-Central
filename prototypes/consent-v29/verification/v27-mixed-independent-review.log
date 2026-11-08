@@ -1,0 +1,19 @@
+test_both_clients_reject_malformed_response_envelopes_directly (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_both_clients_reject_malformed_response_envelopes_directly) ... ok
+test_mixed_both_roles_and_default_exact_processed_roundtrips (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_mixed_both_roles_and_default_exact_processed_roundtrips) ... ok
+test_node_bad_utf8_and_oversize_reply_fail_without_report (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_bad_utf8_and_oversize_reply_fail_without_report) ... ok
+test_node_closed_control_and_owner_command_rejection (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_closed_control_and_owner_command_rejection) ... ok
+test_node_commonjs_handshake_inside_ambient_module_package (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_commonjs_handshake_inside_ambient_module_package) ... ok
+test_node_fragmented_utf8_reply_and_coalesced_control (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_fragmented_utf8_reply_and_coalesced_control) ... ok
+test_node_handshake_version_and_id_failure_never_advance (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_handshake_version_and_id_failure_never_advance) ... ok
+test_node_launch_empty_env_and_only_intended_passed_descriptors (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_launch_empty_env_and_only_intended_passed_descriptors) ... ok
+test_node_non_bmp_newline_and_inert_owner_commands_preserve_bytes (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_non_bmp_newline_and_inert_owner_commands_preserve_bytes) ... ok
+test_node_post_commit_response_loss_never_replays (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_post_commit_response_loss_never_replays) ... ok
+test_node_preflight_failure_has_no_pipes_no_child_and_closes_session (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_preflight_failure_has_no_pipes_no_child_and_closes_session) ... ok
+test_node_scope_injections_do_not_dispatch (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_node_scope_injections_do_not_dispatch) ... ok
+test_root_javascript_is_frozen_and_symlinks_are_rejected (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_root_javascript_is_frozen_and_symlinks_are_rejected) ... ok
+test_simulation_rejects_one_wrong_processed_envelope (tests.test_mixed_peer_review.MixedPeerIndependentReview.test_simulation_rejects_one_wrong_processed_envelope) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.355s
+
+OK

@@ -1,0 +1,7 @@
+PASS same task leave-and-return fences old approval callback by generation
+PASS same task leave-and-return fences old mutation response by generation
+PASS malformed navigation stays inert rather than silently selecting or creating
+PASS owner switch invalidates prior owner buttons even within same task
+PASS binding confirmation title body phrase and action all name target owner
+PASS HTTP error body without usable JSON is uncertainty, never automatic retry
+6/6 independent DOM-model checks passed (not browser tests).

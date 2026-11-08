@@ -1,0 +1,50 @@
+V12 generic separated owner workflow verification
+Dependency path: /path/to/workspace/.agent-network-offline-deps
+
+Full suite: python -m unittest discover -s tests -q
+----------------------------------------------------------------------
+Ran 400 tests in 54.225s
+
+OK
+
+Generic subprocess/console subset: python -m unittest discover -s tests -p test_generic_owner_processes.py -q
+----------------------------------------------------------------------
+Ran 15 tests in 12.377s
+
+OK
+
+DOM-model checks: node tests/owner_ui_dom_check.js
+PASS read-only initial render, refresh, owner switch and navigation
+PASS deferred review requires explicit resume and back grants nothing
+PASS approval dialog back and wrong phrase do not mutate; exact target is retained
+PASS double action while first response pending does not repeat mutation
+PASS network failure explicitly preserves uncertainty without retries
+PASS truncated action response explicitly preserves uncertainty without retries
+PASS stale response cannot overwrite a newer owner navigation
+PASS uncertain receipt check never sends or processes
+PASS send confirmation back does not create attempt
+PASS DOM rendering treats review text as text, not HTML instructions
+PASS expired review replacement requires an explicit typed choice and grants no approval
+PASS superseded review links to successor without creating or approving work
+PASS missing pairing is opened for its exact owner only after typed choice
+PASS pairing review returns to source send without mutation and deferred stays paused
+PASS unused withdrawal needs typed owner confirmation and explains its combined action
+PASS withdrawn authorization has no submit or approval and fresh review is separate
+PASS withdrawn source opens exact successor read-only without reviving original
+PASS cleanup uncertainty is explicit and never falls through to an inbox
+PASS discard back is inert; exact confirmation ends UI without retry
+19/19 DOM-model checks passed. These are not browser or visual tests.
+
+Generic console simulations: python owner_console.py --workflow generic --simulate --scenario SCENARIO
+generic-owner-decline-v12.txt
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 0, "task_state": "created", "transitions": 0}
+generic-owner-defer-v12.txt
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 2, "task_state": "completed", "transitions": 2}
+generic-owner-lost-receipt-v12.txt
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 2, "task_state": "completed", "transitions": 2}
+generic-owner-normal-v12.txt
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 2, "task_state": "completed", "transitions": 2}
+generic-owner-uncertain-v12.txt
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 0, "task_state": "created", "transitions": 0}
+
+No browser or visual QA, live provider interoperability, real human authentication, resource retrieval, or tool execution claimed. Reopen tests keep live disposable keys; quitting destroys fixture state.

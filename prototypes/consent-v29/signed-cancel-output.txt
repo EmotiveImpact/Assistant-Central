@@ -1,0 +1,90 @@
+FICTIONAL OFFLINE FIXTURE. No live identity, relay, calendar or account.
+SIMULATED OWNER CONFIRMATIONS.
+Signing keys are disposable, process-local and never exported or saved.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}; meeting friday-four.
+Owner bob: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}; meeting friday-four.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "bob", "ttl": 3600}; meeting friday-four.
+Owner charlie: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}; meeting friday-four.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "charlie", "ttl": 3600}; meeting friday-four.
+Owner dana: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}; meeting friday-four.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "dana", "ttl": 3600}; meeting friday-four.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 220571d79945214fadac47459e241921083577a2b559280593f6e7bc526e9ccb
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 644ab58b47df213412ce853436afa91acb3161ca2109fc9e493cfa4fb90f6db0
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: d4ae13951219a04be693843dce34308a0022378cc92038f34656658015c60100
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 933a08c429304f317e9f097257355af5d07c208a53548edb0912c01d18fe3bdd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Owner bob: cancel; exact target {"meeting": "friday-four"}; meeting friday-four.
+Cancelled by fictional owner Bob after 5 locally processed messages.
+Cancellation fixture complete. No remote cancellation notification exists.
+All disposable signer processes stopped; no signing keys saved.

@@ -1,0 +1,12 @@
+test_maximum_spec_roundtrip_with_explicit_empty_result (test_composer_response_review.IndependentMaximumCompositionLifecycle.test_maximum_spec_roundtrip_with_explicit_empty_result) ... ok
+test_constructor_rejects_unbounded_or_malformed_limit_before_launch (test_composer_response_review.IndependentResponseFraming.test_constructor_rejects_unbounded_or_malformed_limit_before_launch) ... ok
+test_custom_response_cap_does_not_expand_input_frame (test_composer_response_review.IndependentResponseFraming.test_custom_response_cap_does_not_expand_input_frame) ... ok
+test_exact_response_limit_and_one_over (test_composer_response_review.IndependentResponseFraming.test_exact_response_limit_and_one_over) ... ok
+test_input_exact_limit_is_allowed_without_response_bound_leak (test_composer_response_review.IndependentResponseFraming.test_input_exact_limit_is_allowed_without_response_bound_leak) ... ok
+test_missing_newline_empty_and_invalid_json_denied (test_composer_response_review.IndependentResponseFraming.test_missing_newline_empty_and_invalid_json_denied) ... ok
+test_timeout_kills_process (test_composer_response_review.IndependentResponseFraming.test_timeout_kills_process) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.384s
+
+OK

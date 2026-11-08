@@ -1,0 +1,19 @@
+PASS default capability keeps legacy six-field wire shape
+PASS text selector emits exact seven-field spec and swaps controls
+PASS switching back restores exact legacy shape
+PASS empty and oversized text prompts never post previews
+PASS reply character limit is integral and bounded
+PASS 512 astral characters survive prompt unchanged
+PASS editing text capability requires fresh preview and fences old confirmation
+PASS detached capability input cannot alter reviewed snapshot
+PASS text response exposes only inert bounded field and no item controls
+PASS empty and oversize responses fail before preview post
+PASS maximal Unicode response survives pure preview and unsigned preparation
+PASS response snapshot stays frozen and edit restores text
+PASS stale text response confirmation cannot cross owner
+PASS lost text preparation is not repeated
+PASS late text preview cannot replace later task
+PASS received text result stays literal with exact binding and digest
+PASS received text request stays literal with exact binding and digest
+PASS cancelled text messages preserve processed history
+18/18 text exchange DOM-model checks passed (not browser tests).

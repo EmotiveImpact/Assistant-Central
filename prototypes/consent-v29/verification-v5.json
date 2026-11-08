@@ -1,0 +1,52 @@
+{
+  "checkpoint": "v5",
+  "date": "2026-11-07",
+  "python": "3.12.14",
+  "test_command": "python -m unittest discover -s tests -v",
+  "tests_passed": 213,
+  "test_log": "test-results-v5.txt",
+  "compile_command": "python -m compileall -q .",
+  "compile_passed": true,
+  "fresh_archive_extraction_full_suite_passed": true,
+  "review": "Separate read-only code review exercised receipt tampering, retry boundaries, transaction faults and IPC validation. Not a cryptographic or production security audit.",
+  "demos": {
+    "encrypted-demo-output.txt": {
+      "receiver_receipts": 12,
+      "transitions": 12,
+      "agreed": true
+    },
+    "encrypted-lost-receipt-output.txt": {
+      "receiver_receipts": 12,
+      "transitions": 12,
+      "agreed": true,
+      "first_delivery_attempts": 1
+    },
+    "encrypted-cancel-before-output.txt": {
+      "receiver_receipts": 0,
+      "transitions": 0,
+      "state": "blocked",
+      "attempts": 0
+    },
+    "encrypted-cancel-after-output.txt": {
+      "receiver_receipts": 1,
+      "transitions": 0,
+      "state": "received_blocked"
+    },
+    "key-free-recovery-output.txt": {
+      "state": "processed",
+      "attempts": 1,
+      "private_keys_written": false,
+      "private_keys_loaded": false,
+      "scope": "Existing receipt evidence only, no new delivery or identity recovery in the keyless reader demo."
+    }
+  },
+  "preserved_checkpoints": {
+    "agent-network-prototype-v3.zip": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "agent-network-prototype-v4.zip": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658"
+  },
+  "live_relay_tested": false,
+  "real_owner_identity_tested": false,
+  "calendar_accessed": false,
+  "persistent_credentials_created": false,
+  "remote_publication": false
+}

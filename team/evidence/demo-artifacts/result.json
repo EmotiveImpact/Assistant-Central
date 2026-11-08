@@ -1,0 +1,90 @@
+{
+  "simulation": true,
+  "human_approval_claimed": false,
+  "external_calls": 0,
+  "new_rebuild": true,
+  "artifact_count": 5,
+  "snapshot": {
+    "context": "b1ed345677de7d14da8c135b1e5daa82cbcee3983fb8dcd08d31aa77b08692e0",
+    "lead": "accepted",
+    "tasks": [
+      {
+        "id": "copy",
+        "state": "completed",
+        "request_id": "start-6d100ab844de838756843f1dd16fd16553ec61ab02171260",
+        "artifact_id": "copy-v1",
+        "source_scope": null,
+        "reason": null
+      },
+      {
+        "id": "pr",
+        "state": "completed",
+        "request_id": "start-9d337ecefff8e036ceef358da120bbac2b7e61b33e0921af",
+        "artifact_id": "pr-v1",
+        "source_scope": "bob-exact-work",
+        "reason": null
+      },
+      {
+        "id": "research",
+        "state": "completed",
+        "request_id": "start-24cd6a03626261ee2a5960bf115e1b2f0b87935476fa9b22",
+        "artifact_id": "research-v1",
+        "source_scope": "bob-exact-work",
+        "reason": null
+      },
+      {
+        "id": "slides",
+        "state": "completed",
+        "request_id": "start-1e342c340104e04b644d1da36fb150866afc46c3aa13cb2e",
+        "artifact_id": "slides-v1",
+        "source_scope": null,
+        "reason": null
+      },
+      {
+        "id": "website",
+        "state": "completed",
+        "request_id": "start-7a11d6d26878ab2c5e3511da1842e1ca9d0bbed1e4e3ab26",
+        "artifact_id": "website-v1",
+        "source_scope": null,
+        "reason": null
+      }
+    ],
+    "locks": []
+  },
+  "bob_scope": {
+    "scope_id": "bob-exact-work",
+    "state": "active",
+    "uses": 2,
+    "max_uses": 2,
+    "expires": 1500.0,
+    "scope": {
+      "context": "b1ed345677de7d14da8c135b1e5daa82cbcee3983fb8dcd08d31aa77b08692e0",
+      "domain": "offline-team-work-scope/rebuilt-r1",
+      "expires": 1500,
+      "max_uses": 2,
+      "owner": "bob",
+      "tasks": [
+        {
+          "assignee": "researcher",
+          "dependencies": [],
+          "id": "research",
+          "objective": "Summarize fictional public community needs",
+          "output_kind": "research",
+          "resources": []
+        },
+        {
+          "assignee": "developer",
+          "dependencies": [
+            "website"
+          ],
+          "id": "pr",
+          "objective": "Prepare a PR draft describing the accepted website",
+          "output_kind": "pr-draft",
+          "resources": [
+            "draft-workspace"
+          ]
+        }
+      ]
+    }
+  }
+}

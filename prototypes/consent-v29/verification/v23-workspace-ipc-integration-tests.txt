@@ -1,0 +1,7 @@
+test_partial_child_response_releases_lock_before_group_stop_commits (test_workspace_ipc_deadlines.WorkspaceDeadlineIntegration.test_partial_child_response_releases_lock_before_group_stop_commits) ... ok
+test_startup_timeout_cleans_owned_child_but_preserves_uncertain_slot (test_workspace_ipc_deadlines.WorkspaceDeadlineIntegration.test_startup_timeout_cleans_owned_child_but_preserves_uncertain_slot) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.674s
+
+OK

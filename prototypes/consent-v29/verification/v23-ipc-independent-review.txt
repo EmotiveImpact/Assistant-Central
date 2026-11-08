@@ -1,0 +1,25 @@
+test_blocked_write_and_partial_write_timeout (test_fixture_ipc_deadlines.FixtureDeadlines.test_blocked_write_and_partial_write_timeout) ... ok
+test_broken_streams_and_exit (test_fixture_ipc_deadlines.FixtureDeadlines.test_broken_streams_and_exit) ... ok
+test_close_kills_hung_child_and_reaps_already_exited_child (test_fixture_ipc_deadlines.FixtureDeadlines.test_close_kills_hung_child_and_reaps_already_exited_child) ... ok
+test_exact_launch_surface_and_limits (test_fixture_ipc_deadlines.FixtureDeadlines.test_exact_launch_surface_and_limits) ... ok
+test_external_kill_and_repeated_cleanup_leave_no_fds_or_threads (test_fixture_ipc_deadlines.FixtureDeadlines.test_external_kill_and_repeated_cleanup_leave_no_fds_or_threads) ... ok
+test_fragmented_utf8_and_buffered_frames (test_fixture_ipc_deadlines.FixtureDeadlines.test_fragmented_utf8_and_buffered_frames) ... ok
+test_frame_bound_counts_utf8_bytes (test_fixture_ipc_deadlines.FixtureDeadlines.test_frame_bound_counts_utf8_bytes) ... ok
+test_invalid_utf8_json_and_nonfinite (test_fixture_ipc_deadlines.FixtureDeadlines.test_invalid_utf8_json_and_nonfinite) ... ok
+test_partial_frames_do_not_defeat_deadline (test_fixture_ipc_deadlines.FixtureDeadlines.test_partial_frames_do_not_defeat_deadline) ... ok
+test_short_writes_and_eagain (test_fixture_ipc_deadlines.FixtureDeadlines.test_short_writes_and_eagain) ... ok
+test_stderr_flood_can_finish_or_timeout_without_retention (test_fixture_ipc_deadlines.FixtureDeadlines.test_stderr_flood_can_finish_or_timeout_without_retention) ... ok
+test_timeout_does_not_imply_no_side_effect_or_restart (test_fixture_ipc_deadlines.FixtureDeadlines.test_timeout_does_not_imply_no_side_effect_or_restart) ... ok
+test_write_and_read_share_one_deadline (test_fixture_ipc_deadlines.FixtureDeadlines.test_write_and_read_share_one_deadline) ... ok
+test_cleanup_reap_timeout_is_reported_and_retryable (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_cleanup_reap_timeout_is_reported_and_retryable) ... ok
+test_closed_stderr_does_not_disrupt_multiple_requests (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_closed_stderr_does_not_disrupt_multiple_requests) ... ok
+test_continuous_stdout_progress_cannot_extend_deadline (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_continuous_stdout_progress_cannot_extend_deadline) ... ok
+test_early_response_does_not_skip_blocked_request_write (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_early_response_does_not_skip_blocked_request_write) ... ok
+test_exact_ascii_frame_bounds_include_newline (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_exact_ascii_frame_bounds_include_newline) ... ok
+test_preflight_rejections_do_not_submit_or_close_child (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_preflight_rejections_do_not_submit_or_close_child) ... ok
+test_real_pipe_backpressure_and_response_share_deadline (test_fixture_ipc_independent_review.IndependentFixtureIPCReview.test_real_pipe_backpressure_and_response_share_deadline) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 2.436s
+
+OK

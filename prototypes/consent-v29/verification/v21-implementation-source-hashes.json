@@ -1,0 +1,13 @@
+{
+  "generic_capabilities.py": "9e48a7ef9fe072424d0fce99a42fa5e360bb5d1340e9c9b38773037c4254307f",
+  "generic_protocol.py": "7cdccb75e3a7d9b3611b49733124d2d95597babe8180c295646ed08c484c5a05",
+  "generic_session.py": "d12691baa314a7e827428e305ac9431a47a681cae8de0e4194325dcee0e77a06",
+  "task_composer.py": "c8d724a4e93555d6d2915797a27b97b2fcc75d320ba91f3486f873f0394a04a5",
+  "owner_responses.py": "870d7f0d75a8b3c5ee2ce116268c21154d44d56206723bc40167320858c6bf4e",
+  "restricted_host_protocol.py": "153c043d67eb947b29f100dd5419a2db9b0ffd0d800f98c5cd7039cd9226c2b4",
+  "workspace_ui/app.js": "221b68c2612e588e917339c7fcdca1a5e41876b2c47b6278d2d5bc9d7bf115a9",
+  "tests/test_bounded_text_exchange.py": "08c9af42e8ae9a369fd26ca74c5940946ef182a34e74662bf6ef93ed3c24869a",
+  "tests/test_bounded_text_http.py": "020df256a0b0551faa5bb8051e3f6857d1c565db338837210b3d6e92fe84f32e",
+  "tests/workspace_text_exchange_dom_check.js": "fb66dd09f7da53b40a33eabf57de01cf0d04f0552b538edc46c4104b49ed0d96",
+  "TEXT_EXCHANGE.md": "efc2317890492239b03ecc3e57c98a5e2d65f2d554c44df21c574ea1a57fa2d9"
+}

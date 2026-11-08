@@ -1,0 +1,148 @@
+{
+  "repository": "https://github.com/a4a-network/a4a",
+  "revision": "6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e",
+  "license": "MIT",
+  "files": [
+    {
+      "local": "vendor/a4a/LICENSE",
+      "upstream": "LICENSE",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/LICENSE",
+      "sha256": "a5b0cb04d9a96a514c2435f0a1be60f9a08983a2549b3980bcede116b39d64ed",
+      "modified": false,
+      "git_blob_sha1": "3befcd749eda29547c4135ef82ab887c47bec816"
+    },
+    {
+      "local": "vendor/a4a/THIRD_PARTY_LICENSES.md",
+      "upstream": "THIRD_PARTY_LICENSES.md",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/THIRD_PARTY_LICENSES.md",
+      "sha256": "682537eec9fa0473418cd9a9d115a632ef458c1a052335f23edeec8e6c698c4d",
+      "modified": false,
+      "git_blob_sha1": "aa1f2c028c180d5289cb24290197c128492731b3"
+    },
+    {
+      "local": "vendor/a4a/sanitize.py",
+      "upstream": "sdk-python/a4a/sanitize.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/sanitize.py",
+      "sha256": "bcdf5bea44d3d927d41ceb78fef22628e5ec6522a386557ad96fa667bb45cfa7",
+      "modified": false,
+      "git_blob_sha1": "7c9762022a0ffe316f0d771bab5794f2ac25fa16"
+    },
+    {
+      "local": "vendor/a4a/test_sanitize_original.py",
+      "upstream": "sdk-python/tests/test_sanitize.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/tests/test_sanitize.py",
+      "sha256": "5846653fd12e8383c57bfc440e19a523df0f648abed3da8adeec2eca83e0736e",
+      "modified": false,
+      "git_blob_sha1": "70d63d252ee71dbec51c295f13ecf23851be2e81"
+    },
+    {
+      "local": "vendor/a4a_sdk/crypto.py",
+      "upstream": "sdk-python/a4a/crypto.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/crypto.py",
+      "sha256": "b030f6c420098034e3afc0ce5fe8c23ff29e218fd72fd3e160d54d98e9a93cb4",
+      "modified": false,
+      "git_blob_sha1": "aa66b99b5b9e7eee4391cf02e6918c75fb0f476f"
+    },
+    {
+      "local": "vendor/a4a_sdk/event.py",
+      "upstream": "sdk-python/a4a/event.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/event.py",
+      "sha256": "c9002f0e28b941dcc4cfa23041cec2eca619a5021ab9e01753d2981148558bd3",
+      "modified": false,
+      "git_blob_sha1": "8635d117d2f545a6f30d67aa07ab1e2d47e62572"
+    },
+    {
+      "local": "vendor/a4a_sdk/keys.py",
+      "upstream": "sdk-python/a4a/keys.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/keys.py",
+      "sha256": "ae9971393757287b2c39ad3905eff1c8642f4e35c5cbc5968148a91c23f54380",
+      "modified": false,
+      "git_blob_sha1": "048ae55043253fb6ab97ed2cf3f29b2664e71bb5"
+    },
+    {
+      "local": "vendor/a4a_sdk/nip44.py",
+      "upstream": "sdk-python/a4a/nip44.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/nip44.py",
+      "sha256": "09dfaf7e6d20ff62a741eefdf46ff7126050de564621039844ea68c13f067656",
+      "modified": false,
+      "git_blob_sha1": "ccf995c0e04c104cfb06409dc581da6d39e53f46"
+    },
+    {
+      "local": "vendor/a4a_sdk/giftwrap.py",
+      "upstream": "sdk-python/a4a/giftwrap.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/giftwrap.py",
+      "sha256": "0412b4fd55b6ca6b59eac731fa6a7899ab3a397292cd1fd5acd0dd32aa4e1c84",
+      "modified": false,
+      "git_blob_sha1": "0814f48a9b633b7da2b2b253c6339f2634a7d4b5"
+    },
+    {
+      "local": "vendor/a4a_sdk/pyproject.toml",
+      "upstream": "sdk-python/pyproject.toml",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/pyproject.toml",
+      "sha256": "9a528d38406d8e991a0a27f4fda18508209be3baf67d3ee6f706b250d0c520eb",
+      "modified": false,
+      "git_blob_sha1": "532565492636fd81890a3de69aafa42c9564fde6"
+    },
+    {
+      "local": "vendor/a4a_sdk/test_event_original.py",
+      "upstream": "sdk-python/tests/test_event.py",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/tests/test_event.py",
+      "sha256": "7751c5f74342f60c8c106354ad12d9e44d0e3e06d2dad5475f9dc81dfd7b7d56",
+      "modified": false,
+      "git_blob_sha1": "45661cbc9a98454ad562deb19f6b9c3d57a4a7f7"
+    },
+    {
+      "local": "vendor/a4a_sdk/nip44_vectors.json",
+      "upstream": "sdk-python/tests/nip44_vectors.json",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/tests/nip44_vectors.json",
+      "sha256": "269ed0f69e4c192512cc779e78c555090cebc7c785b609e338a62afc3ce25040",
+      "modified": false,
+      "git_blob_sha1": "8be2b7b5508144a0c507f7584972a887ad5cb171"
+    },
+    {
+      "local": "vendor/a4a_sdk/nip44_vectors.LICENSE.txt",
+      "upstream": "sdk-python/tests/nip44_vectors.LICENSE.txt",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/tests/nip44_vectors.LICENSE.txt",
+      "sha256": "f0510d3b9d1223c45e8fdd2b49270ec8734fff491c7f7d1b948ee70162e1ceff",
+      "modified": false,
+      "git_blob_sha1": "3c577b03e4bdf5bb5419c424394cb9b502a8ed62"
+    }
+  ],
+  "adapted_sources": [
+    {
+      "path": "sdk-python/a4a/types.py",
+      "git_blob_sha1": "a2ea2fe1a5c708349d4259734f40f3d53c574418",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/types.py",
+      "used_by": "a4a_adapter.py",
+      "copied_verbatim": false
+    },
+    {
+      "path": "sdk-python/a4a/event.py",
+      "git_blob_sha1": "8635d117d2f545a6f30d67aa07ab1e2d47e62572",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/event.py",
+      "used_by": "a4a_adapter.py",
+      "copied_verbatim": false
+    },
+    {
+      "path": "sdk-python/a4a/agent.py",
+      "git_blob_sha1": "ad4111b25ad285e1a0fd02bd14c6d3143bb4b6f8",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/agent.py",
+      "used_by": "a4a_adapter.py",
+      "copied_verbatim": false
+    },
+    {
+      "path": "sdk-python/a4a/giftwrap.py",
+      "git_blob_sha1": "0814f48a9b633b7da2b2b253c6339f2634a7d4b5",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/a4a/giftwrap.py",
+      "used_by": "a4a_adapter.py",
+      "copied_verbatim": false
+    },
+    {
+      "path": "sdk-python/tests/test_nip44.py",
+      "git_blob_sha1": "bd2fb024a05c845a844007ba3bd5bd8e8abc145c",
+      "url": "https://github.com/a4a-network/a4a/blob/6b111e3fb6fdf61f0e790ae84e2db86c5bb86b7e/sdk-python/tests/test_nip44.py",
+      "used_by": "tests/test_sdk_vectors.py",
+      "copied_verbatim": false
+    }
+  ]
+}

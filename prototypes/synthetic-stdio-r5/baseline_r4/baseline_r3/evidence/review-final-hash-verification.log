@@ -1,0 +1,10 @@
+agent-network-independent-peer-mcp-r3/bridge_tests/__init__.py: OK
+agent-network-independent-peer-mcp-r3/bridge_tests/test_bridge.py: OK
+agent-network-independent-peer-mcp-r3/mcp_bridge/__init__.py: OK
+agent-network-independent-peer-mcp-r3/mcp_bridge/bridge.py: OK
+agent-network-independent-peer-mcp-r3/mcp_bridge/local.py: OK
+agent-network-independent-peer-mcp-r3/START_HERE_R3.md: OK
+agent-network-independent-peer-mcp-r3/DESIGN.md: OK
+agent-network-independent-peer-mcp-r3/EVIDENCE.md: OK
+agent-network-independent-peer-mcp-r3/run_demo.py: OK
+agent-network-independent-peer-mcp-r3/run_bridge_checks.py: OK

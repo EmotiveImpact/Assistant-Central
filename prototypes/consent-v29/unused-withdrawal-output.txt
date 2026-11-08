@@ -1,0 +1,7 @@
+Original authorization: authorized / expired
+Explicit owner-signed withdrawal: withdrawn
+Original signature replay: blocked by local execution fence
+Outbox entries: 0
+Separate fresh review: pending
+Same exact message: True
+Fresh approval, submission and dispatch still required; nothing recalled.

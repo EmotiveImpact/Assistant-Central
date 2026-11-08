@@ -1,0 +1,6 @@
+wrapper_poisoned True child_still_alive True
+peer_delivery_after_poison True
+database_exists_before_close True
+child_reaped_after_close True
+database_exists_after_peer_close True
+database_exists_after_temp_cleanup False

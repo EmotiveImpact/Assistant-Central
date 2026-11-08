@@ -1,0 +1,10 @@
+SYNTHETIC OFFLINE REVIEW-REPLACEMENT PROOF. No real identity or external message.
+Original review: expired
+Read-only guide retained original: True
+Explicit replacement: pending
+Exact message preserved: True
+Original history: superseded
+No delivery created: True
+Retry returns same new review: True
+Guide now offers replacement: True
+Separate fresh owner approval, submission and dispatch are still required.

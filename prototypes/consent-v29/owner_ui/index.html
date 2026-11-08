@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Agent meeting workspace · local fixture</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<header><div class="brand"><span class="brandmark" aria-hidden="true">a</span><div><strong>Agent meeting workspace</strong><span class="subtitle">Human decisions. Clear delivery status.</span></div></div><span class="pill">LOCAL FICTIONAL FIXTURE</span></header>
+<div class="notice"><strong>One operator, four fictional roles.</strong> Owner selection is not authentication. No real calendars, accounts or external messages. Keep the launcher running; stopping it discards this fixture’s records and keys.</div>
+<main>
+<aside><h2>Workspace</h2><label for="owner">Viewing as</label><select id="owner"><option value="alice">Alice · coordinator</option><option value="bob">Bob</option><option value="charlie">Charlie</option><option value="dana">Dana</option></select><p class="muted">Changing this role grants no permission.</p><button id="inboxButton" class="navbutton">Owner inbox</button><button id="nextButton" class="primary">Prepare next review</button><div id="summary" class="summary" aria-live="polite"></div><hr><p class="eyebrow">REVIEW FIRST</p><button id="cancelButton" class="quiet danger">Review cancellation</button><label for="peer">Pairing to revoke</label><select id="peer"><option value="alice">Alice</option><option value="bob">Bob</option><option value="charlie">Charlie</option><option value="dana">Dana</option></select><button id="revokeButton" class="quiet">Review revocation</button><hr><button id="closeButton" class="quiet">Discard fixture</button><p class="muted small">Closing this tab keeps the local launcher alive. Discarding the fixture cannot be undone.</p></aside>
+<section class="workspace"><div id="message" role="status" aria-live="polite"></div><div id="error" role="alert" hidden></div><div id="content"></div></section>
+</main>
+<dialog id="confirmDialog" aria-labelledby="dialogTitle" aria-describedby="dialogBody"><h2 id="dialogTitle"></h2><p id="dialogBody"></p><label for="confirmation" id="confirmationLabel"></label><input id="confirmation" autocomplete="off" spellcheck="false"><div class="actions"><button id="dialogCancel">Back</button><button id="dialogConfirm" class="primary">Confirm</button></div></dialog>
+<footer>Offline application-layer prototype · v7 · No calendar booking is created.</footer>
+</body></html>

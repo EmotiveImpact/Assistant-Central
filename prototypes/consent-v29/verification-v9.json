@@ -1,0 +1,34 @@
+{
+  "checkpoint": "v9",
+  "date": "2026-11-07",
+  "python_tests_passed": 339,
+  "dom_model_tests_passed": 16,
+  "new_python_tests": 30,
+  "new_dom_tests": 2,
+  "python_log": "test-results-v9.txt",
+  "dom_log": "owner-ui-dom-v9-output.txt",
+  "compile_passed": true,
+  "javascript_syntax_passed": true,
+  "fresh_archive_extraction_tests_passed": true,
+  "fixed": "Missing bilateral pairing now has an explicit one-owner-at-a-time review path for blocked unsigned sends, followed by a separate fresh send review.",
+  "preparation_grants_pairing": false,
+  "pairing_grants_create_delivery": false,
+  "review": "Independent reviewer found and verified a fix for older unresolved/refused pairing history hidden by a newer submitted grant. 22 core +4 process/adapter tests independently passed before the last four added core regression cases.",
+  "real_browser_passed": false,
+  "visual_review_performed": false,
+  "browser_blocker_unchanged": true,
+  "remaining_limits": [
+    "Temporary single-operator fictional fixture only.",
+    "Expired identity and already-authorized/uncertain operations cannot use pairing recovery.",
+    "Real browser acceptance remains blocked."
+  ],
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d",
+    "v6": "b1ec7f4cfe8f79c00b47abdd0b13488e76ff88ab87d09c385aca282eef448a16",
+    "v7": "2b223e688613f3c1d767c975e6bad7cdb9792f5a042bc2e5d4f30dad1c20deea",
+    "v8": "0dab3e621732494e076c70b8efd64ca43fbedc8431e6535465f3891da64be31b"
+  },
+  "live_services_accounts_credentials_publication": false
+}

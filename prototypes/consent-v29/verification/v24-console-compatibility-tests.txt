@@ -1,0 +1,19 @@
+test_console_demo_and_quit (test_owner_workspace.CatalogTests.test_console_demo_and_quit) ... ok
+test_exact_full_task_and_detached_payloads (test_owner_workspace.CatalogTests.test_exact_full_task_and_detached_payloads) ... ok
+test_startup_failure_tombstones_slot (test_owner_workspace.CatalogTests.test_startup_failure_tombstones_slot) ... ok
+test_adapter_cannot_list_switch_or_follow_navigation (test_owner_workspace.WorkspaceTests.test_adapter_cannot_list_switch_or_follow_navigation) ... ok
+test_capacity_a_does_not_consume_b (test_owner_workspace.WorkspaceTests.test_capacity_a_does_not_consume_b) ... ok
+test_cleanup_failure_attempts_every_service_and_stays_fenced (test_owner_workspace.WorkspaceTests.test_cleanup_failure_attempts_every_service_and_stays_fenced) ... ok
+test_console_discovers_imports_proposal_without_approval (test_owner_workspace.WorkspaceTests.test_console_discovers_imports_proposal_without_approval) ... ok
+test_controls_decline_withdraw_uncertainty_leave_other_task_operational (test_owner_workspace.WorkspaceTests.test_controls_decline_withdraw_uncertainty_leave_other_task_operational) ... ok
+test_creation_has_no_authority_and_isolated_processes_keys_directories (test_owner_workspace.WorkspaceTests.test_creation_has_no_authority_and_isolated_processes_keys_directories) ... ok
+test_cross_context_actions_envelopes_ids_and_signatures_fail (test_owner_workspace.WorkspaceTests.test_cross_context_actions_envelopes_ids_and_signatures_fail) ... ok
+test_cross_task_receipt_rejected_without_mutation (test_owner_workspace.WorkspaceTests.test_cross_task_receipt_rejected_without_mutation) ... ok
+test_interleaved_adapters_same_ids_and_explicit_approvals (test_owner_workspace.WorkspaceTests.test_interleaved_adapters_same_ids_and_explicit_approvals) ... ok
+test_uncertain_a_reopen_no_retry_b_completes (test_owner_workspace.WorkspaceTests.test_uncertain_a_reopen_no_retry_b_completes) ... ok
+test_withdrawal_cross_task_rejected_and_b_continues (test_owner_workspace.WorkspaceTests.test_withdrawal_cross_task_rejected_and_b_continues) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 8.353s
+
+OK

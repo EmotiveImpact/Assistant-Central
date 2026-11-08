@@ -1,0 +1,29 @@
+test_duplicate_aliases_nested_and_quoted_braces (__main__.CodecReview.test_duplicate_aliases_nested_and_quoted_braces) ... ok
+test_exact_output_byte_cap_including_lf (__main__.CodecReview.test_exact_output_byte_cap_including_lf) ... ok
+test_id_types_and_envelope_strictness (__main__.CodecReview.test_id_types_and_envelope_strictness) ... ok
+test_limit_before_decode_and_parse (__main__.CodecReview.test_limit_before_decode_and_parse) ... ok
+test_postparse_bounds_and_normalized_size (__main__.CodecReview.test_postparse_bounds_and_normalized_size) ... ok
+test_scalar_unicode_numeric_vectors (__main__.CodecReview.test_scalar_unicode_numeric_vectors) ... ok
+test_silent_shape_is_exact (__main__.CodecReview.test_silent_shape_is_exact) ... ok
+test_admission_fact_is_not_persistence (__main__.StreamReview.test_admission_fact_is_not_persistence) ... ok
+test_bad_input_contract (__main__.StreamReview.test_bad_input_contract) ... ok
+test_cancellation_during_output_is_uncertain_and_single_use (__main__.StreamReview.test_cancellation_during_output_is_uncertain_and_single_use) ... ok
+test_exact_1024_byte_text_and_no_owner_authority (__main__.StreamReview.test_exact_1024_byte_text_and_no_owner_authority) ... ok
+test_exact_record_cap_crlf_and_overflow (__main__.StreamReview.test_exact_record_cap_crlf_and_overflow) ... ok
+test_fragmentation_and_coalescing (__main__.StreamReview.test_fragmentation_and_coalescing) ... ok
+test_input_cancellation_does_not_claim_output_uncertainty (__main__.StreamReview.test_input_cancellation_does_not_claim_output_uncertainty) ... ok
+test_invalid_ids_cannot_persist_and_null_is_not_notification (__main__.StreamReview.test_invalid_ids_cannot_persist_and_null_is_not_notification) ... ok
+test_output_rejection_is_redacted (__main__.StreamReview.test_output_rejection_is_redacted) ... ok
+test_oversize_not_drained (__main__.StreamReview.test_oversize_not_drained) ... ok
+test_partial_eof_not_dispatched_and_prior_facts_remain (__main__.StreamReview.test_partial_eof_not_dispatched_and_prior_facts_remain) ... ok
+test_partial_writer_return_and_late_reader_exception (__main__.StreamReview.test_partial_writer_return_and_late_reader_exception) ... ok
+test_processed_inbox_requires_explicit_owner_and_publication (__main__.StreamReview.test_processed_inbox_requires_explicit_owner_and_publication) ... ok
+test_raw_errors_consume_ids_but_parse_failures_do_not (__main__.StreamReview.test_raw_errors_consume_ids_but_parse_failures_do_not) ... ok
+test_record_and_id_budgets (__main__.StreamReview.test_record_and_id_budgets) ... ok
+test_silent_raw_rejections_and_malformed_version_replies (__main__.StreamReview.test_silent_raw_rejections_and_malformed_version_replies) ... ok
+test_writer_failure_preserves_proposal_without_retry (__main__.StreamReview.test_writer_failure_preserves_proposal_without_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.213s
+
+OK

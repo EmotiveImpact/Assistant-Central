@@ -1,0 +1,35 @@
+test_actual_response_narrow_and_correlated (test_facade.FacadeTests.test_actual_response_narrow_and_correlated) ... ok
+test_bad_response_remains_unknown (test_facade.FacadeTests.test_bad_response_remains_unknown) ... ok
+test_binding_task_actor_and_both_incarnations (test_facade.FacadeTests.test_binding_task_actor_and_both_incarnations) ... ok
+test_cancel_and_reopen_preserves_publication (test_facade.FacadeTests.test_cancel_and_reopen_preserves_publication) ... ok
+test_command_mutation_does_not_change_stored_commitment (test_facade.FacadeTests.test_command_mutation_does_not_change_stored_commitment) ... ok
+test_detached_inputs_outputs (test_facade.FacadeTests.test_detached_inputs_outputs) ... ok
+test_finite_history_no_eviction (test_facade.FacadeTests.test_finite_history_no_eviction) ... ok
+test_grant_signature_and_scope_validation (test_facade.FacadeTests.test_grant_signature_and_scope_validation) ... ok
+test_identity_repeat_decline_reopen (test_facade.FacadeTests.test_identity_repeat_decline_reopen) ... ok
+test_known_rejection_never_retry (test_facade.FacadeTests.test_known_rejection_never_retry) ... ok
+test_no_normalization_or_trimming (test_facade.FacadeTests.test_no_normalization_or_trimming) ... ok
+test_only_processed_projection_exposed (test_facade.FacadeTests.test_only_processed_projection_exposed) ... ok
+test_proposal_has_no_endpoint_or_callbacks (test_facade.FacadeTests.test_proposal_has_no_endpoint_or_callbacks) ... FAIL
+test_review_digest_and_grant_must_match (test_facade.FacadeTests.test_review_digest_and_grant_must_match) ... ok
+test_snapshot_absence_cannot_clear_unknown_after_cancel (test_facade.FacadeTests.test_snapshot_absence_cannot_clear_unknown_after_cancel) ... ok
+test_snapshot_bound_identity_and_actor (test_facade.FacadeTests.test_snapshot_bound_identity_and_actor) ... ok
+test_snapshot_commit_not_release (test_facade.FacadeTests.test_snapshot_commit_not_release) ... ok
+test_strict_scalar_and_utf8_bounds (test_facade.FacadeTests.test_strict_scalar_and_utf8_bounds) ... ok
+test_three_exact_methods (test_facade.FacadeTests.test_three_exact_methods) ... ok
+test_unknown_before_command_return_survives_exception_reopen (test_facade.FacadeTests.test_unknown_before_command_return_survives_exception_reopen) ... ok
+test_unprocessed_or_extra_fields_rejected (test_facade.FacadeTests.test_unprocessed_or_extra_fields_rejected) ... ok
+test_normal_two_process_roundtrip (test_facade.SequentialDemoTests.test_normal_two_process_roundtrip) ... ok
+
+======================================================================
+FAIL: test_proposal_has_no_endpoint_or_callbacks (test_facade.FacadeTests.test_proposal_has_no_endpoint_or_callbacks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-independent-peer-facade-r2/facade_tests/test_facade.py", line 213, in test_proposal_has_no_endpoint_or_callbacks
+    self.assertFalse(any(callable(v) for v in vars(self.store).values()))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.151s
+
+FAILED (failures=1)

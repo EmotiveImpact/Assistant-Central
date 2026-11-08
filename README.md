@@ -18,8 +18,8 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | Component | Status | Evidence |
 | --- | --- | --- |
 | [Team coordinator](team/README.md) | New rebuilt local owner/task/artifact state machine | 84 tests, including 28 independent review tests |
-| [Consent and protocol foundation](prototypes/consent-v29/README.md) | Recovered v29 prototype, preserved unchanged | 948 Python tests and 273 DOM-model checks |
-| [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher, preserved unchanged | 39 targeted local stdio checks |
+| [Consent and protocol foundation](prototypes/consent-v29/README.md) | Recovered v29 prototype; executable source preserved | 948 Python tests and 273 DOM-model checks |
+| [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
 
 These suites were rerun locally before this initial import. They are separate
@@ -47,12 +47,11 @@ peer-lifecycle experiments and does not claim native-host acceptance.
 
 ## Repository layout
 
-- `team/`: new team rebuild, tests, examples, provenance and preserved baseline ZIPs.
-- `prototypes/consent-v29/`: exact recovered consent/protocol checkpoint.
-- `prototypes/synthetic-stdio-r5/`: exact recovered synthetic stdio checkpoint.
+- `team/`: new team rebuild, tests, examples and provenance.
+- `prototypes/consent-v29/`: recovered consent/protocol checkpoint with sanitized evidence paths.
+- `prototypes/synthetic-stdio-r5/`: recovered synthetic stdio checkpoint with sanitized evidence paths.
 - `docs/`: original architecture, security, pilot and integration-readiness material.
-- `tools/verify_import.py`: checks published source against the original archive
-  content and validates the preserved team manifest.
+- `tools/verify_import.py`: checks the public import manifest and validates the team manifest.
 - `.github/workflows/offline-checks.yml`: read-only-permission offline CI.
 
 ## Important boundaries
@@ -72,3 +71,9 @@ unavailable. It does not claim to recover or reproduce that commit. See
 [provenance](PROVENANCE.md). Product distribution and the license for original
 project code remain undecided. Existing third-party licenses and notices are
 preserved; see [license status](LICENSE_STATUS.md).
+
+## Architecture research
+
+See the [orchestration landscape and reuse plan](docs/research/orchestration-landscape.md)
+for current framework, transport and licensing comparisons, and the
+[roadmap](ROADMAP.md) for integration gates and a measured evaluation of Rust.

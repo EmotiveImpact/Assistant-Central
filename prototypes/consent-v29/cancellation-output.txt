@@ -1,0 +1,204 @@
+$ python demo.py --simulate --state-directory <temporary fictional state> --stop-after 5
+LOCAL SIMULATION. Fictional people and calendars; no network or calendar writes.
+SIMULATED APPROVALS, NOT HUMAN AUTHORIZATION.
+Meeting: friday-four Participants: alice, bob, charlie, dana
+Candidate 0: 2026-11-06T13:00:00Z – 2026-11-06T13:30:00Z
+Candidate 1: 2026-11-06T14:00:00Z – 2026-11-06T14:30:00Z
+Candidate 2: 2026-11-06T15:00:00Z – 2026-11-06T15:30:00Z
+Candidate 3: 2026-11-06T16:00:00Z – 2026-11-06T16:30:00Z
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+Review exact message: {
+  "version": 1,
+  "type": "availability",
+  "meeting": "friday-four",
+  "context": "c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac",
+  "sender": "alice",
+  "recipient": "alice",
+  "payload": {
+    "candidate_indices": [
+      0,
+      1,
+      2,
+      3
+    ]
+  }
+}
+This shares only the data shown above with alice
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 220571d79945214fadac47459e241921083577a2b559280593f6e7bc526e9ccb
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+Review exact message: {
+  "version": 1,
+  "type": "availability",
+  "meeting": "friday-four",
+  "context": "c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac",
+  "sender": "bob",
+  "recipient": "alice",
+  "payload": {
+    "candidate_indices": [
+      1,
+      2
+    ]
+  }
+}
+This shares only the data shown above with alice
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 644ab58b47df213412ce853436afa91acb3161ca2109fc9e493cfa4fb90f6db0
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+Review exact message: {
+  "version": 1,
+  "type": "availability",
+  "meeting": "friday-four",
+  "context": "c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac",
+  "sender": "charlie",
+  "recipient": "alice",
+  "payload": {
+    "candidate_indices": [
+      2,
+      3
+    ]
+  }
+}
+This shares only the data shown above with alice
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: d4ae13951219a04be693843dce34308a0022378cc92038f34656658015c60100
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+Review exact message: {
+  "version": 1,
+  "type": "availability",
+  "meeting": "friday-four",
+  "context": "c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac",
+  "sender": "dana",
+  "recipient": "alice",
+  "payload": {
+    "candidate_indices": [
+      2
+    ]
+  }
+}
+This shares only the data shown above with alice
+
+Coordinator's proposed slot: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 933a08c429304f317e9f097257355af5d07c208a53548edb0912c01d18fe3bdd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+
+Review exact message: {
+  "version": 1,
+  "type": "proposal",
+  "meeting": "friday-four",
+  "context": "c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac",
+  "sender": "alice",
+  "recipient": "alice",
+  "payload": {
+    "candidate_index": 2
+  }
+}
+This shares only the data shown above with alice
+Paused after 5 new messages. Committed state is preserved.
+Fictional inbox and consent records preserved at: <temporary fictional state>/demo.sqlite3
+
+$ python demo.py --simulate --state-directory <temporary fictional state> --resume --cancel-as bob
+LOCAL SIMULATION. Fictional people and calendars; no network or calendar writes.
+SIMULATED APPROVALS, NOT HUMAN AUTHORIZATION.
+Meeting: friday-four Participants: alice, bob, charlie, dana
+Candidate 0: 2026-11-06T13:00:00Z – 2026-11-06T13:30:00Z
+Candidate 1: 2026-11-06T14:00:00Z – 2026-11-06T14:30:00Z
+Candidate 2: 2026-11-06T15:00:00Z – 2026-11-06T15:30:00Z
+Candidate 3: 2026-11-06T16:00:00Z – 2026-11-06T16:30:00Z
+Cancellation stops this local workflow permanently and invalidates unused approvals.
+It cannot recall shared information. No remote message or calendar cancellation is sent.
+Meeting cancelled by bob . No messages sent.
+Fictional inbox and consent records preserved at: <temporary fictional state>/demo.sqlite3
+
+$ python demo.py --simulate --state-directory <temporary fictional state> --resume
+LOCAL SIMULATION. Fictional people and calendars; no network or calendar writes.
+SIMULATED APPROVALS, NOT HUMAN AUTHORIZATION.
+Meeting: friday-four Participants: alice, bob, charlie, dana
+Candidate 0: 2026-11-06T13:00:00Z – 2026-11-06T13:30:00Z
+Candidate 1: 2026-11-06T14:00:00Z – 2026-11-06T14:30:00Z
+Candidate 2: 2026-11-06T15:00:00Z – 2026-11-06T15:30:00Z
+Candidate 3: 2026-11-06T16:00:00Z – 2026-11-06T16:30:00Z
+This session is cancelled. No messages replayed or sent. Create a new meeting to start again.
+Fictional inbox and consent records preserved at: <temporary fictional state>/demo.sqlite3
+
+$ python demo.py --simulate --state-directory <temporary fictional state> --resume --cancel-as dana
+LOCAL SIMULATION. Fictional people and calendars; no network or calendar writes.
+SIMULATED APPROVALS, NOT HUMAN AUTHORIZATION.
+Meeting: friday-four Participants: alice, bob, charlie, dana
+Candidate 0: 2026-11-06T13:00:00Z – 2026-11-06T13:30:00Z
+Candidate 1: 2026-11-06T14:00:00Z – 2026-11-06T14:30:00Z
+Candidate 2: 2026-11-06T15:00:00Z – 2026-11-06T15:30:00Z
+Candidate 3: 2026-11-06T16:00:00Z – 2026-11-06T16:30:00Z
+Cancellation stops this local workflow permanently and invalidates unused approvals.
+It cannot recall shared information. No remote message or calendar cancellation is sent.
+Meeting cancelled by bob . No messages sent.
+Fictional inbox and consent records preserved at: <temporary fictional state>/demo.sqlite3
+

@@ -1,0 +1,40 @@
+{
+  "release": "experimental-r2",
+  "date": "2026-11-08",
+  "scope": "Offline additive local proposal facade; no host integration or restricted audit clearance.",
+  "tests": {
+    "total": 91,
+    "preserved_r1": 55,
+    "facade_implementation": 25,
+    "independent_facade": 11,
+    "skips": 0
+  },
+  "demos": [
+    "preserved independent-peer r1",
+    "new sequential two-process facade"
+  ],
+  "fresh_archive_validation": {
+    "passed": true,
+    "warnings": "ResourceWarning as error",
+    "source_files": 32,
+    "source_manifest_sha256": "1d95b43e1edf9bbd3a8d5d1fed98bf98a8de99e5956f4b2ace2a30a1fdfa1697"
+  },
+  "preserved": {
+    "r1_all_files": 39,
+    "r1_frozen_sources": 20,
+    "v29_frozen_sources": 153,
+    "prior_archives_including_r1": 29
+  },
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14",
+  "crypto": "50.0.0",
+  "uncompleted": [
+    "Additional concurrent-shutdown/descriptor-lifecycle review",
+    "Native host acceptance",
+    "Live transport",
+    "Real owner/identity enrollment",
+    "Persistent key recovery",
+    "Production acceptance"
+  ],
+  "source_changes": "Additions only; all r1 files preserved byte-identically."
+}

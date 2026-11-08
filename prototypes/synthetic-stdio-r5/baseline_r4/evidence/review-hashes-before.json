@@ -1,0 +1,14 @@
+{
+  "DESIGN.md": "f8167da8fe7930399ee6c57810814c703a268d1e36e6c0618f0f90245489bf4d",
+  "EVIDENCE.md": "f12de4ef55045393d1730df88622462b94c2d84fd8980aaa99feaa110c7e3e76",
+  "START_HERE_R4.md": "e0c998a3ce9f3ee764a82c67632a1668b30cf3000e8cf064da466e2965bc7334",
+  "baseline_r3/mcp_bridge/bridge.py": "d213216fd5b1d7f3e9927e2e0b511bae89919bfbdc0180f475e3520b60f50110",
+  "bootstrap.py": "3e55a95a86d1bb766a18995ff551ec6e128aabf1ff8c2330d512172844ecd913",
+  "raw_bridge/__init__.py": "94b765174ab9871f7b6e7b8bead40e03345e7211748fb879303beeeb48af0eb7",
+  "raw_bridge/codec.py": "716e90179b6db1f3233dd74cae9131764b30f1a516d07a3163580ec4cdb3005b",
+  "raw_bridge/memory.py": "39f4ec2fd625bfd76656bc0eeab7fc95210f8bb43dcd47a7c164f41fb67cd5cf",
+  "raw_bridge/transport.py": "3fdab45ececcbcf3b4a85392ab0c283edc7b0b8d29c4b474ef7bf1f98ddc4694",
+  "raw_tests/test_raw.py": "fdea8fe016cd9c36a6f797eeff79e3e74fbe8ba6624f5389d390318ad97d92ad",
+  "run_demo.py": "64a9a95db42abde7d117206d559ef4e227b110f3bad68f7c7183b88e9692be8d",
+  "run_raw_checks.py": "c7b7320ec71267f22bb2d99c4b2e90a1313a3f2cd329f7c729c25d3ee8a20bc8"
+}

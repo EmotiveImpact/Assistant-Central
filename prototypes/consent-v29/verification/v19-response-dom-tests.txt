@@ -1,0 +1,18 @@
+PASS only custom responder with processed request gets enabled response control
+PASS opening response reads exact scope and grants no authority
+PASS local add/remove respects received item cap without sending and permits empty result
+PASS preview captures exact owner request digest scope and inert result payload
+PASS preparing needs exact phrase and only creates unsigned review
+PASS cancel and Back preserve no authority
+PASS detached fields cannot modify exact reviewed response
+PASS edit restores values but requires a fresh preview
+PASS switching owner invalidates saved response confirmation
+PASS raw hash change before handler fences response preparation
+PASS delayed processed request cannot overwrite another task view
+PASS delayed response preview cannot overwrite later navigation
+PASS lost response preview stays read-only and cannot create review
+PASS lost preparation response disables duplicate attempt and points to inbox
+PASS rapid duplicate confirmation only prepares once
+PASS hostile incoming and outgoing contents stay literal text
+PASS edited response preview rebuilds usable owner navigation
+17/17 response composer DOM-model checks passed (not browser tests).

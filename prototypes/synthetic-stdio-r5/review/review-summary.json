@@ -1,0 +1,36 @@
+{
+  "reviewed_launcher_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+  "verdict": "No blocking defect found in the allowed ordinary application/stdio review. Local synthetic stage only; native-host acceptance remains separate.",
+  "builder_checks": {
+    "tests": 20,
+    "passed": 20,
+    "exit_code": 0,
+    "seconds": 9.007
+  },
+  "independent_checks": {
+    "tests": 19,
+    "passed": 19,
+    "exit_code": 0,
+    "seconds": 9.058
+  },
+  "distinct_tests": 39,
+  "relocation_rerun": {
+    "tests": 19,
+    "passed": 19,
+    "exit_code": 0,
+    "seconds": 7.55,
+    "additional_distinct_tests": 0
+  },
+  "candidate_source_modified_by_reviewer": false,
+  "excluded_lifecycle_audit_performed": false,
+  "native_host_acceptance_performed": false,
+  "installation_or_configuration_performed": false,
+  "preservation_counts": {
+    "candidate_baseline": 128,
+    "original_r4": 128,
+    "original_preparation": 8
+  },
+  "report": "REVIEW.md",
+  "test_directory": "independent_tests",
+  "evidence_directory": "evidence"
+}

@@ -1,0 +1,30 @@
+PASS initial catalog and task navigation never create services or mutate
+PASS explicit create targets only captured task/context and does not bind
+PASS all task-specific reads carry exact selector context and owner
+PASS binding typed exact digest and owner; cancellation mutates nothing
+PASS Bob binding from Alice view consistently identifies Bob in confirmation
+PASS approval shows exact task recipient review token; wrong phrase and Back do nothing
+PASS navigation cancels pending confirmation and saved confirm callback cannot approve
+PASS raw hash changed before hashchange event also prevents stale confirmation
+PASS detached old task button cannot act after switching
+PASS rapid duplicate confirmation and action clicks produce one mutation
+PASS rapid prepare clicks while response pending cannot duplicate
+PASS delayed old-task read cannot overwrite new task view
+PASS delayed mutation response cannot navigate new task or render old result
+PASS old-task error cannot overwrite current task
+PASS lost action response explicitly uncertain with no automatic retry
+PASS truncated response is uncertain, not failed or safe to resend
+PASS hostile review and proposal URLs are text only, no image or hyperlink
+PASS proposal import explicit and unsigned, exact ID scope and history wording
+PASS close only selected task requires phrase, leaves other task available
+PASS cleanup and startup uncertainty block every affected mutation control
+PASS failed startup refreshes metadata and blocks recreation without retry
+PASS close cleanup failure refreshes metadata to blocked state without retry
+PASS deferred stays paused until explicit local resume, no permission granted
+PASS replacement and withdrawal preserve exact review tokens and typed actions
+PASS pairing direction remains exact and separate from source send
+PASS delivery uncertainty and receipt-only action distinct from send and process
+PASS send exact recipient task and cancellation followed by typed confirmation
+PASS back/hash navigation is read-only and task controls contain no meeting assumptions
+PASS model-testable responsive and focus controls have explicit labels and CSS rules
+29/29 workspace DOM-model checks passed (not browser tests).
