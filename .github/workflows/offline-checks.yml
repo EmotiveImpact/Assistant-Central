@@ -34,10 +34,16 @@ jobs:
         run: python -B tools/verify_import.py
       - name: Check team coordinator
         run: python -B team/run_checks.py
+      - name: Check durable synthetic execution boundary
+        run: python -B execution/run_checks.py
+      - name: Exercise synthetic execution restart and disclosure demo
+        run: python -B execution/demo.py
       - name: Check exact team-to-proposal mapping
         run: python -B integration/run_checks.py
       - name: Exercise fictional team-to-proposal wire demo
         run: python -B integration/demo.py
+      - name: Check execution result to unsigned proposal composition
+        run: python -B execution/check_composition.py
       - name: Check consent and protocol prototype
         run: python -B prototypes/consent-v29/verify_checkpoint.py --full
       - name: Check targeted synthetic stdio path
