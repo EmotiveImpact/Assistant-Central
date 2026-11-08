@@ -1,0 +1,21 @@
+{
+  "python": {
+    "passed": 620,
+    "log": "text-final-tests.txt"
+  },
+  "dom_model": {
+    "passed": 133,
+    "suites": 10,
+    "logs": "validation-text-exchange/"
+  },
+  "syntax": "node --check workspace_ui/app.js passed",
+  "backward_compatibility": "text-backward-compatible-hashes.json matches frozen v20 catalog contexts/request/results and old composition preview",
+  "source_manifest": "text-changed-paths.json",
+  "limitations": [
+    "Offline fictional fixture only",
+    "No browser or native-dialog verification",
+    "HTTP handler tests do not open sockets",
+    "No OS sandbox or real identity/provider authentication",
+    "No package or upload produced"
+  ]
+}

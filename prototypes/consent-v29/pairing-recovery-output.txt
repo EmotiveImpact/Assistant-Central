@@ -1,0 +1,9 @@
+Expired pairing directions: bob to alice, alice to bob
+First recovery review: bob pending
+Delivery after preparation: 0
+After Bob alone: alice still needs separate review
+Original send after both pairing grants: expired
+Delivery after both pairing grants: 0
+Explicit fresh send review: pending
+Exact message preserved: True
+Fresh send approval, submission and dispatch still required.

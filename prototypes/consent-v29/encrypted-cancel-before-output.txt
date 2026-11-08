@@ -1,0 +1,46 @@
+V5 OFFLINE FIXTURE. Fictional people, owner identities, transport keys and calendars.
+SIMULATED OWNER CONFIRMATIONS.
+Four separate owner signers; one verification/execution process; separate receiver databases.
+Bind alice to fixture transport key ef436a63b1725ad8f8f89a19e8fe55f5807a4500679a2d783ad4f450e95d1c9c; receive only from alice, bob, charlie, dana; exact meeting friday-four.
+Bind bob to fixture transport key 188de2d40a9c07976674cc8ebff6cb75c3a47cbcadbb02f3369cdbbaa4dd45de; receive only from alice; exact meeting friday-four.
+Bind charlie to fixture transport key c64696de4a76913e082017d9e7988d06e5347510c8317e63ad925e7c408f8cfa; receive only from alice; exact meeting friday-four.
+Bind dana to fixture transport key 744fa66e6a99c5152a3561b54eb796388e6becb4023f6ccc343da6475e6b64d0; receive only from alice; exact meeting friday-four.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner bob: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner alice: pair; exact target {"contact_version": 0, "peer": "bob", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner charlie: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner alice: pair; exact target {"contact_version": 0, "peer": "charlie", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner dana: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+Owner alice: pair; exact target {"contact_version": 0, "peer": "dana", "ttl": 3600}.
+Decision expires at Unix time: 1794083338
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: ba229fd430db9a0602c58fb6a6483b384be430783ca8bf1e28ca9a890e0a3cde
+Decision expires at Unix time: 1794083338
+Delivery stage: queued (no receipt or scheduling transition yet)
+Owner charlie: cancel; exact target {"meeting": "friday-four"}.
+Decision expires at Unix time: 1794083338
+After cancellation: blocked ; attempts: 0
+Summary: {"agreed": false, "receiver_receipts": 0, "transitions": 0}
+Cancellation scenario finished; no new dispatches were attempted.
+Fixture processes stopped; generated private keys were not saved or exported.

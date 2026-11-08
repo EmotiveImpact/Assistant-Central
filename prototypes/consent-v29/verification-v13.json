@@ -1,0 +1,61 @@
+{
+  "checkpoint": "v13",
+  "date": "2026-11-07",
+  "python_tests_passed": 428,
+  "dom_model_tests_passed": 19,
+  "new_python_tests": 28,
+  "implementation_python_tests": 21,
+  "independent_python_tests": 7,
+  "dom_log": "owner-ui-dom-v13-output.txt",
+  "compile_passed": true,
+  "javascript_syntax_passed": true,
+  "fresh_archive_extraction_tests_passed": true,
+  "implemented": "Closed actor/task-bound proposal, redacted status and processed-recipient inbox; trusted-only bounded discovery/import; exact historical deduplication.",
+  "independent_review": {
+    "document": "REVIEW_V13.md",
+    "boundary_tests_passed": 28,
+    "legacy_regressions_passed": 82,
+    "repeated_race_fault_tests_passed": 70,
+    "blocking_findings": 0,
+    "production_unchanged": true
+  },
+  "agent_methods": [
+    "propose",
+    "proposal_status",
+    "inbox"
+  ],
+  "trusted_owner_methods": [
+    "list_owner_proposals",
+    "prepare_owner_review"
+  ],
+  "owner_discovery_limit": 20,
+  "owner_discovery_pagination": false,
+  "agent_commands_grant_or_execute": false,
+  "inbox_requires_processed_transition": true,
+  "processed_history_retained_after_revocation_or_cancellation": true,
+  "provider_routing_is_trusted_fixture_only": true,
+  "real_human_authentication": false,
+  "os_isolation_proven": false,
+  "live_provider_interoperability": false,
+  "resource_retrieval_or_tool_execution": false,
+  "real_browser_passed": false,
+  "visual_review_performed": false,
+  "browser_blocker_unchanged": true,
+  "copied_upstream_files_hash_verified": 13,
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d",
+    "v6": "b1ec7f4cfe8f79c00b47abdd0b13488e76ff88ab87d09c385aca282eef448a16",
+    "v7": "2b223e688613f3c1d767c975e6bad7cdb9792f5a042bc2e5d4f30dad1c20deea",
+    "v8": "0dab3e621732494e076c70b8efd64ca43fbedc8431e6535465f3891da64be31b",
+    "v9": "936e0c17f9ee03bdebfc7ad1c824a36fec61e8d341e4e2e4c1a2352d71359bf8",
+    "v10": "5e0685699fe0263289cd971c0edd673b86c61c421b36dac8030f4c8eba8896b3",
+    "v11": "78767b6c0b97fca9ec61d58780d86f91b7ed8ad1c060f0e0b14985ebeda5117d",
+    "v12": "d34643437718b10ee4ea710ad228422b927e7b9c0b3d76846c8e73f47e994aca"
+  },
+  "live_services_accounts_credentials_publication": false,
+  "implementation_log": "test-results-v13-implementation.txt",
+  "fresh_archive_test_log": "fresh-extraction-tests-v13.txt",
+  "fresh_archive_dom_log": "fresh-dom-tests-v13.txt"
+}

@@ -1,0 +1,244 @@
+V5 OFFLINE FIXTURE. Fictional people, owner identities, transport keys and calendars.
+SIMULATED OWNER CONFIRMATIONS.
+Four separate owner signers; one verification/execution process; separate receiver databases.
+Bind alice to fixture transport key 10b772b63635cc15dda0ee6be6c695cb93947b56ca27774da07f5f1d057c98ed; receive only from alice, bob, charlie, dana; exact meeting friday-four.
+Bind bob to fixture transport key 75434e37a7ab8f96ab952cf546d8182664aff1bcab3b5ed8f997484959ceeee4; receive only from alice; exact meeting friday-four.
+Bind charlie to fixture transport key aaaaedf9fdca93ff510f6737a24e4efa7142618f366c2f441ceb1465187cce79; receive only from alice; exact meeting friday-four.
+Bind dana to fixture transport key 108b1a04bc2f0c5a1744ea3210016ba8f08c1428904a07c7f3e83d413e231ddf; receive only from alice; exact meeting friday-four.
+Owner alice: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner bob: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner alice: pair; exact target {"contact_version": 0, "peer": "bob", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner charlie: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner alice: pair; exact target {"contact_version": 0, "peer": "charlie", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner dana: pair; exact target {"contact_version": 0, "peer": "alice", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+Owner alice: pair; exact target {"contact_version": 0, "peer": "dana", "ttl": 3600}.
+Decision expires at Unix time: 1794083337
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 220571d79945214fadac47459e241921083577a2b559280593f6e7bc526e9ccb
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 644ab58b47df213412ce853436afa91acb3161ca2109fc9e493cfa4fb90f6db0
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: d4ae13951219a04be693843dce34308a0022378cc92038f34656658015c60100
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 933a08c429304f317e9f097257355af5d07c208a53548edb0912c01d18fe3bdd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5eeed7fe1e1690c5bc3cd1d4cd8a4c2052a21e7f1d30d33da710eac8553f9417
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Bob [bob]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 7393930d2c831dccb12b4e038cee1c35101375531532e84995d712bedfd46dfd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: f04963abaf1f615c484608c5d764995c020817207b2db63e1acc8485120917d4
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 85da2ff0695eba6012bb07a16cdab9995bd74db2ef01e6912f087619f6e0bd35
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Charlie [charlie]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 784d801b3fe60f6b1b60069bb16d34bfbba99601bd6b1a29cf6c4312db7213be
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: dfb71c8a2f9079d8cc22531a04e9e25f08eba7e684a708aa89f3447df020061f
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5957fccedf84ad8b6c8ae054eccf8e3e53cb488b0bcf8ea1ba3b3b87b8fa2b74
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Dana [dana]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 82445a17ae1e362edc62ce64c46513ee20189b9fe1bd044d3dedda2339d627e2
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 07c0471141a8cd57010ecee3044cd5579ea8d74d70add2bad12d8a9d84eae407
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 353e7cdf562da256297e1b787834ac52697f247a151efd8bcee588713417c90e
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Approved recipient transport binding: 0f13b54f75681a4781dcc46355f17d5db892ec5e6a34c796ba66daa3dae9c789
+Decision expires at Unix time: 1794083337
+Delivery stage: queued (no receipt or scheduling transition yet)
+Delivery stage: received (verified recipient receipt, not processed yet)
+Delivery stage: processed locally; no calendar booking.
+Final summary: {"agreed": true, "receiver_receipts": 12, "transitions": 12}
+No live relay, real identity enrollment, external message or calendar action occurred.
+Fixture processes stopped; generated private keys were not saved or exported.

@@ -1,0 +1,25 @@
+{
+  "baseline_files": 39,
+  "changed_baseline_files": [],
+  "added_files": [
+    "facade_candidate/DESIGN.md",
+    "facade_candidate/EVIDENCE.md",
+    "facade_candidate/__init__.py",
+    "facade_candidate/demo.py",
+    "facade_candidate/store.py",
+    "facade_evidence/baseline-delta.json",
+    "facade_evidence/demo.json",
+    "facade_evidence/focused-before-corrections.txt",
+    "facade_evidence/focused.txt",
+    "facade_evidence/initial-focused.txt",
+    "facade_evidence/r1-regression.txt",
+    "facade_tests/test_facade.py"
+  ],
+  "protected_runtime_sha256": {
+    "protocol.py": "1b01582e201f7e6b9e6b54d25cb0a080e48fb66fb9e69a9eee727afdba561516",
+    "endpoint.py": "4e2ff7458c0d72fc7133fdda18eea6d4fabb8885a4ad0dda5a5ded16eec49da0",
+    "fixture.py": "73a4baf6a287c9f1b480dc84891cb7ad55582aeeaa611611c96f1406bc49087f",
+    "pipes.py": "4b1f99c793d8638ab537c97517a15ff4e6ab98f07aca87f1696ab7bd5b8922d1",
+    "worker.py": "852417f48477edea7ac0e354777ff057c4e37da299112fd2a26af66f4bfe00be"
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "mode": "full",
+  "checks": {
+    "hashes": {
+      "status": "passed",
+      "checkpoint": "v24",
+      "metadata_file": "verification-v24.json",
+      "source_hash_manifest": "verification/v24-final-source-freeze.sha256",
+      "sources": 128,
+      "vendored_files": 13
+    },
+    "python": {
+      "status": "passed",
+      "version": "3.12.14"
+    },
+    "python_dependencies": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-P",
+        "-c",
+        "import importlib.metadata, json\nimport coincurve, bech32, pydantic\nfrom cryptography.hazmat.primitives.ciphers import Cipher, algorithms\nfrom cryptography.hazmat.primitives.asymmetric import x25519\ncoincurve.PrivateKey(bytes.fromhex('01' * 32)).public_key.format()\nx25519.X25519PrivateKey.from_private_bytes(bytes(32)).public_key()\nCipher(algorithms.ChaCha20(bytes(32), bytes(16)), mode=None).encryptor().update(b'fixture')\nprint(json.dumps({n: importlib.metadata.version(n) for n in\n                 ('coincurve', 'bech32', 'cryptography', 'pydantic')}))\n"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "{\"coincurve\": \"21.0.0\", \"bech32\": \"1.2.0\", \"cryptography\": \"50.0.0\", \"pydantic\": \"2.13.4\"}\n",
+      "output_truncated": false,
+      "versions": {
+        "coincurve": "21.0.0",
+        "bech32": "1.2.0",
+        "cryptography": "50.0.0",
+        "pydantic": "2.13.4"
+      }
+    },
+    "node": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "v24.22.1\n",
+      "output_truncated": false
+    }
+  },
+  "suites": {
+    "python": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "w.IndependentConsoleReviewTests.test_uncertainty_retains_inspection_and_blocks_every_mutation_route) ... ok\ntest_partial_child_response_releases_lock_before_group_stop_commits (test_workspace_ipc_deadlines.WorkspaceDeadlineIntegration.test_partial_child_response_releases_lock_before_group_stop_commits) ... ok\ntest_startup_timeout_cleans_owned_child_but_preserves_uncertain_slot (test_workspace_ipc_deadlines.WorkspaceDeadlineIntegration.test_startup_timeout_cleans_owned_child_but_preserves_uncertain_slot) ... ok\ntest_absolute_urls_wrong_hosts_and_duplicate_hosts_fail (test_workspace_ui.WorkspaceHandlerTests.test_absolute_urls_wrong_hosts_and_duplicate_hosts_fail) ... ok\ntest_body_limits_duplicates_nonfinite_and_truncation_fail (test_workspace_ui.WorkspaceHandlerTests.test_body_limits_duplicates_nonfinite_and_truncation_fail) ... ok\ntest_cleanup_and_lost_response_errors_are_uncertain_and_not_retried (test_workspace_ui.WorkspaceHandlerTests.test_cleanup_and_lost_response_errors_are_uncertain_and_not_retried) ... ok\ntest_explicit_post_routes_wrapper_and_never_shuts_down_workspace (test_workspace_ui.WorkspaceHandlerTests.test_explicit_post_routes_wrapper_and_never_shuts_down_workspace) ... ok\ntest_legacy_handler_routes_unchanged_and_does_not_accept_workspace_scope (test_workspace_ui.WorkspaceHandlerTests.test_legacy_handler_routes_unchanged_and_does_not_accept_workspace_scope) ... ok\ntest_metadata_read_does_not_create_or_select (test_workspace_ui.WorkspaceHandlerTests.test_metadata_read_does_not_create_or_select) ... ok\ntest_missing_duplicate_blank_extra_scope_fields_do_not_route (test_workspace_ui.WorkspaceHandlerTests.test_missing_duplicate_blank_extra_scope_fields_do_not_route) ... ok\ntest_origin_fetch_site_and_json_header_protections (test_workspace_ui.WorkspaceHandlerTests.test_origin_fetch_site_and_json_header_protections) ... ok\ntest_scoped_reads_route_exact_immutable_arguments (test_workspace_ui.WorkspaceHandlerTests.test_scoped_reads_route_exact_immutable_arguments) ... ok\ntest_security_headers_and_static_allowlist_are_inherited (test_workspace_ui.WorkspaceHandlerTests.test_security_headers_and_static_allowlist_are_inherited) ... ok\ntest_unknown_methods_and_routes_do_not_mutate (test_workspace_ui.WorkspaceHandlerTests.test_unknown_methods_and_routes_do_not_mutate) ... ok\ntest_cleanup_uncertainty_is_visible_and_blocks_only_affected_task (test_workspace_ui.WorkspaceUIIntegrationTests.test_cleanup_uncertainty_is_visible_and_blocks_only_affected_task) ... ok\ntest_closed_action_wrapper_schema_and_context_reject_without_effect (test_workspace_ui.WorkspaceUIIntegrationTests.test_closed_action_wrapper_schema_and_context_reject_without_effect) ... ok\ntest_complete_both_tasks_through_in_process_http_handler (test_workspace_ui.WorkspaceUIIntegrationTests.test_complete_both_tasks_through_in_process_http_handler) ... ok\ntest_cross_task_reads_and_review_mutations_are_refused (test_workspace_ui.WorkspaceUIIntegrationTests.test_cross_task_reads_and_review_mutations_are_refused) ... ok\ntest_explicit_create_starts_only_selected_service_without_bindings (test_workspace_ui.WorkspaceUIIntegrationTests.test_explicit_create_starts_only_selected_service_without_bindings) ... ok\ntest_in_process_http_close_is_confirmed_isolated_and_tombstoned (test_workspace_ui.WorkspaceUIIntegrationTests.test_in_process_http_close_is_confirmed_isolated_and_tombstoned) ... ok\ntest_initial_metadata_and_reads_never_create_services (test_workspace_ui.WorkspaceUIIntegrationTests.test_initial_metadata_and_reads_never_create_services) ... ok\ntest_proposal_discovery_and_import_preserve_unsigned_and_declined_history (test_workspace_ui.WorkspaceUIIntegrationTests.test_proposal_discovery_and_import_preserve_unsigned_and_declined_history) ... ok\ntest_startup_failure_is_an_occupied_uncertain_slot_not_success (test_workspace_ui.WorkspaceUIIntegrationTests.test_startup_failure_is_an_occupied_uncertain_slot_not_success) ... ok\ntest_untrusted_adapter_and_raw_process_commands_not_exposed (test_workspace_ui.WorkspaceUIIntegrationTests.test_untrusted_adapter_and_raw_process_commands_not_exposed) ... ok\ntest_all_nonfinite_encodings_rejected_before_service_dispatch (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_all_nonfinite_encodings_rejected_before_service_dispatch) ... ok\ntest_deep_json_array_cannot_create_workspace_service (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_deep_json_array_cannot_create_workspace_service) ... ok\ntest_encoded_duplicate_queries_never_route (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_encoded_duplicate_queries_never_route) ... ok\ntest_exact_context_is_checked_before_every_workspace_operation (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_exact_context_is_checked_before_every_workspace_operation) ... ok\ntest_finite_json_numbers_keep_standard_parser_behavior_in_both_modes (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_finite_json_numbers_keep_standard_parser_behavior_in_both_modes) ... ok\ntest_import_adapter_preserves_actual_card_shape_without_extra_wrapping (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_import_adapter_preserves_actual_card_shape_without_extra_wrapping) ... ok\ntest_invalid_utf8_nested_duplicates_and_integer_limit_fail_closed (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_invalid_utf8_nested_duplicates_and_integer_limit_fail_closed) ... ok\ntest_reads_enforce_origin_and_fetch_site_before_dispatch (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_reads_enforce_origin_and_fetch_site_before_dispatch) ... ok\ntest_task_close_never_returns_legacy_launcher_shutdown_flag (test_workspace_ui_review.WorkspaceUIIndependentReviewTests.test_task_close_never_returns_legacy_launcher_shutdown_flag) ... ok\n\n----------------------------------------------------------------------\nRan 756 tests in 109.018s\n\nOK\nSEQUENCE_PROBES {'read': 209, 'refused': 1545, 'reopened': 166, 'scheduled': 1920}\nOFFLINE TWO-TASK WORKSPACE | FICTIONAL DISPOSABLE IDENTITIES\nOne trusted operator. Every action targets the displayed exact task/context.\n",
+      "output_truncated": true,
+      "tests_run": 756
+    },
+    "owner_ui_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/owner_ui_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS read-only initial render, refresh, owner switch and navigation\nPASS deferred review requires explicit resume and back grants nothing\nPASS approval dialog back and wrong phrase do not mutate; exact target is retained\nPASS double action while first response pending does not repeat mutation\nPASS network failure explicitly preserves uncertainty without retries\nPASS truncated action response explicitly preserves uncertainty without retries\nPASS stale response cannot overwrite a newer owner navigation\nPASS uncertain receipt check never sends or processes\nPASS send confirmation back does not create attempt\nPASS DOM rendering treats review text as text, not HTML instructions\nPASS expired review replacement requires an explicit typed choice and grants no approval\nPASS superseded review links to successor without creating or approving work\nPASS missing pairing is opened for its exact owner only after typed choice\nPASS pairing review returns to source send without mutation and deferred stays paused\nPASS unused withdrawal needs typed owner confirmation and explains its combined action\nPASS withdrawn authorization has no submit or approval and fresh review is separate\nPASS withdrawn source opens exact successor read-only without reviving original\nPASS cleanup uncertainty is explicit and never falls through to an inbox\nPASS discard back is inert; exact confirmation ends UI without retry\n19/19 DOM-model checks passed. These are not browser or visual tests.\n",
+      "output_truncated": false
+    },
+    "workspace_ui_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_ui_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS initial catalog and task navigation never create services or mutate\nPASS explicit create targets only captured task/context and does not bind\nPASS all task-specific reads carry exact selector context and owner\nPASS binding typed exact digest and owner; cancellation mutates nothing\nPASS Bob binding from Alice view consistently identifies Bob in confirmation\nPASS approval shows exact task recipient review token; wrong phrase and Back do nothing\nPASS navigation cancels pending confirmation and saved confirm callback cannot approve\nPASS raw hash changed before hashchange event also prevents stale confirmation\nPASS detached old task button cannot act after switching\nPASS rapid duplicate confirmation and action clicks produce one mutation\nPASS rapid prepare clicks while response pending cannot duplicate\nPASS delayed old-task read cannot overwrite new task view\nPASS delayed mutation response cannot navigate new task or render old result\nPASS old-task error cannot overwrite current task\nPASS lost action response explicitly uncertain with no automatic retry\nPASS truncated response is uncertain, not failed or safe to resend\nPASS hostile review and proposal URLs are text only, no image or hyperlink\nPASS proposal import explicit and unsigned, exact ID scope and history wording\nPASS close only selected task requires phrase, leaves other task available\nPASS cleanup and startup uncertainty block every affected mutation control\nPASS failed startup refreshes metadata and blocks recreation without retry\nPASS close cleanup failure refreshes metadata to blocked state without retry\nPASS deferred stays paused until explicit local resume, no permission granted\nPASS replacement and withdrawal preserve exact review tokens and typed actions\nPASS pairing direction remains exact and separate from source send\nPASS delivery uncertainty and receipt-only action distinct from send and process\nPASS send exact recipient task and cancellation followed by typed confirmation\nPASS back/hash navigation is read-only and task controls contain no meeting assumptions\nPASS model-testable responsive and focus controls have explicit labels and CSS rules\n29/29 workspace DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_ui_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_ui_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS same task leave-and-return fences old approval callback by generation\nPASS same task leave-and-return fences old mutation response by generation\nPASS malformed navigation stays inert rather than silently selecting or creating\nPASS owner switch invalidates prior owner buttons even within same task\nPASS binding confirmation title body phrase and action all name target owner\nPASS HTTP error body without usable JSON is uncertainty, never automatic retry\n6/6 independent DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_composer_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_composer_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS opening composer is read-only with fixed fictional direction and bounded labels\nPASS preview sends exact entered spec without creation or approval\nPASS preview neither trims nor silently repairs owner input\nPASS creation requires exact phrase and shows all reviewed scope and text\nPASS cancel and edit discard pending confirmation without creating task\nPASS detached original form cannot alter confirmed snapshot\nPASS navigation away and back fences saved create confirmation\nPASS raw hash navigation before event prevents creation\nPASS lost preview is not reported as committed action and starts no creation\nPASS delayed preview cannot replace a later task view\nPASS lost creation response fences repeat creation and points to catalog inspection\nPASS duplicate confirmation cannot create twice\nPASS hostile query remains literal text without active elements or links\nPASS edit preserves entries but needs a fresh preview token\nPASS waiting for responder stays visible instead of being cleared by navigation\nPASS edited task preview rebuilds usable catalog navigation\n16/16 composer DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_composer_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_composer_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS late successful creation does not navigate away from a different task\nPASS saved confirmation after editing cannot create an earlier review\nPASS late rejected creation cannot paint an error over another task\n3/3 independent composer DOM-model checks passed.\n",
+      "output_truncated": false
+    },
+    "workspace_response_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_response_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS only custom responder with processed request gets enabled response control\nPASS opening response reads exact scope and grants no authority\nPASS local add/remove respects received item cap without sending and permits empty result\nPASS preview captures exact owner request digest scope and inert result payload\nPASS preparing needs exact phrase and only creates unsigned review\nPASS cancel and Back preserve no authority\nPASS detached fields cannot modify exact reviewed response\nPASS edit restores values but requires a fresh preview\nPASS switching owner invalidates saved response confirmation\nPASS raw hash change before handler fences response preparation\nPASS delayed processed request cannot overwrite another task view\nPASS delayed response preview cannot overwrite later navigation\nPASS lost response preview stays read-only and cannot create review\nPASS lost preparation response disables duplicate attempt and points to inbox\nPASS rapid duplicate confirmation only prepares once\nPASS hostile incoming and outgoing contents stay literal text\nPASS edited response preview rebuilds usable owner navigation\n17/17 response composer DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_response_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_response_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS late prepare success never navigates away from newer task\nPASS late prepare rejection cannot contaminate a new response session\nPASS same route navigation invalidates previous exact confirmation\nPASS preview in flight freezes captured values even when editable DOM changes\nPASS empty response survives edit and explicit repreview without restored default item\nPASS raw hash change fences old preview click before hash event\nPASS modal blocks editing and preview resubmission until cancellation\n7/7 independent response DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_messages_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_messages_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS received navigation reads exact owner and task scope without mutation\nPASS processed request view shows exact inert payload binding and recipient\nPASS processed response references remain text rather than active links\nPASS empty inbox distinguishes processed messages from delivery receipts\nPASS cancelled task preserves processed history without recall claim\nPASS empty result clearly contains no resource items\nPASS refresh and back only issue reads and navigation\nPASS delayed old owner messages cannot appear after owner switch\nPASS same route revisit invalidates earlier delayed read\nPASS read failure is not a delivery failure or permission to retry a send\nPASS wrong response scope or recipient fails closed before exposing contents\nPASS received prompt injection and markup remain literal inert text\n12/12 received message DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_messages_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_messages_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS mixed batch scope mismatch hides every row before rendering\nPASS delayed failure cannot replace next owner successful view\nPASS delayed response cannot overwrite same owner other task\nPASS refresh delayed response cannot overwrite back navigation\nPASS hostile result URLs and text never become active elements\nPASS invalid envelope task hides content despite matching outer scope\n6/6 independent received message DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_text_exchange_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_text_exchange_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS default capability keeps legacy six-field wire shape\nPASS text selector emits exact seven-field spec and swaps controls\nPASS switching back restores exact legacy shape\nPASS empty and oversized text prompts never post previews\nPASS reply character limit is integral and bounded\nPASS 512 astral characters survive prompt unchanged\nPASS editing text capability requires fresh preview and fences old confirmation\nPASS detached capability input cannot alter reviewed snapshot\nPASS text response exposes only inert bounded field and no item controls\nPASS empty and oversize responses fail before preview post\nPASS maximal Unicode response survives pure preview and unsigned preparation\nPASS response snapshot stays frozen and edit restores text\nPASS stale text response confirmation cannot cross owner\nPASS lost text preparation is not repeated\nPASS late text preview cannot replace later task\nPASS received text result stays literal with exact binding and digest\nPASS received text request stays literal with exact binding and digest\nPASS cancelled text messages preserve processed history\n18/18 text exchange DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_text_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_text_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS unknown composer capability cannot fall back to shortlist\nPASS delayed text preview freezes capability and bound at click time\nPASS response edit changes text and needs a new preview before preparation\nPASS raw hash change fences text preparation before navigation event\n4/4 independent text review DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_relationship_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_relationship_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS group navigation and pure preview grant nothing\nPASS exact phrase and group scope without undefined owner\nPASS detached edited membership cannot change frozen review or re-preview\nPASS discard returns to new empty review form\nPASS preview keeps catalog navigation usable\nPASS attach requires fresh full membership review\nPASS membership revision change rejected without retry\nPASS stop commits exact review and has no resume or attach\nPASS saved confirmation and raw hash navigation fence stale commit\nPASS delayed preview cannot overwrite another task\nPASS duplicate commit clicks and lost reply never retry\nPASS malicious labels remain inert text\nPASS overlapping stop fences not-created tasks without global disabling\nPASS stopped task history keeps decline/defer but no new authority\nPASS stopped delivery disables attempt and process but retains receipt checking\nPASS local action gate blocks forbidden direct sends and previews\nPASS state-level stop supersedes catalog and blocks direct composition\nPASS delayed commit cannot redirect a later task view\nPASS lost group preview stays read-only and offers no commit\nPASS stopped binding and proposal routes expose no authority controls\nPASS stopped authorized review permits recovery and unused withdrawal only\nPASS malformed group read fails visibly without review controls\nPASS unknown context in group read is not displayed\nPASS failed group read surfaces error rather than unhandled rejection\n24/24 relationship DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    },
+    "workspace_relationship_review_dom_check.js": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "tests/workspace_relationship_review_dom_check.js"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "PASS reject stop preview with other group before review rendering\nPASS reject stop preview with other operation before review rendering\nPASS reject stop preview with stale revision before review rendering\nPASS reject stop preview with wrong exact context before review rendering\nPASS reject stop preview with other membership before review rendering\nPASS reject stop preview with missing digest before review rendering\nPASS reject attach preview with substituted attachment context\nPASS reject attach preview with substituted attachment selector\nPASS reject attach preview with substituted membership revision\nPASS reject substituted create label before review rendering\nPASS stopped received history remains reachable via controls\nPASS stopped proposal history remains reachable without import\nPASS all forbidden task mutation names fail closed locally after stop\n13/13 independent relationship DOM-model checks passed (not browser tests).\n",
+      "output_truncated": false
+    }
+  },
+  "platform": "linux",
+  "previously_tested_platform": "Linux",
+  "platform_limits": "Portable verifier is not cross-platform fixture acceptance. Subprocess-pipe selector behavior may differ on Windows; no Windows or macOS full-runtime acceptance is claimed.",
+  "limits": "Trusted offline fictional fixtures only. No browser, visual, accessibility, live-provider, real-identity or OS-isolation acceptance. Hashes are not authenticated signatures.",
+  "status": "passed"
+}

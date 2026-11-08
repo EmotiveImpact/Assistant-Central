@@ -1,0 +1,14 @@
+PASS reject stop preview with other group before review rendering
+PASS reject stop preview with other operation before review rendering
+PASS reject stop preview with stale revision before review rendering
+PASS reject stop preview with wrong exact context before review rendering
+PASS reject stop preview with other membership before review rendering
+PASS reject stop preview with missing digest before review rendering
+PASS reject attach preview with substituted attachment context
+PASS reject attach preview with substituted attachment selector
+PASS reject attach preview with substituted membership revision
+PASS reject substituted create label before review rendering
+PASS stopped received history remains reachable via controls
+PASS stopped proposal history remains reachable without import
+PASS all forbidden task mutation names fail closed locally after stop
+13/13 independent relationship DOM-model checks passed (not browser tests).

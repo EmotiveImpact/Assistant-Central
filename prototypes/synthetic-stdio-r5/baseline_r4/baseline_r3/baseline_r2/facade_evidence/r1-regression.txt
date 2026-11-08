@@ -1,0 +1,81 @@
+SYNTHETIC OFFLINE EXPERIMENT CHECKS
+Python: 3.12.14 cryptography: 50.0.0
+Source hashes verified: 20
+test_bob_cannot_send_before_own_processed_request (tests.test_experiment.IndependentProcessTests.test_bob_cannot_send_before_own_processed_request) ... ok
+test_cancel_before_late_result_and_evidence_remains_historical (tests.test_experiment.IndependentProcessTests.test_cancel_before_late_result_and_evidence_remains_historical) ... ok
+test_distinct_processes_stores_and_keys (tests.test_experiment.IndependentProcessTests.test_distinct_processes_stores_and_keys) ... ok
+test_domain_swap_wrong_signature_and_wrong_grant (tests.test_experiment.IndependentProcessTests.test_domain_swap_wrong_signature_and_wrong_grant) ... ok
+test_exact_owner_operation_replay_and_collision (tests.test_experiment.IndependentProcessTests.test_exact_owner_operation_replay_and_collision) ... ok
+test_exact_replay_and_historical_evidence_after_cancel (tests.test_experiment.IndependentProcessTests.test_exact_replay_and_historical_evidence_after_cancel) ... ok
+test_lost_receipt_then_lost_processed_reply_explicit_reconciliation (tests.test_experiment.IndependentProcessTests.test_lost_receipt_then_lost_processed_reply_explicit_reconciliation) ... ok
+test_owner_controls_are_not_peer_routes (tests.test_experiment.IndependentProcessTests.test_owner_controls_are_not_peer_routes) ... ok
+test_receipt_is_not_processing_and_result_reorders_evidence (tests.test_experiment.IndependentProcessTests.test_receipt_is_not_processing_and_result_reorders_evidence) ... ok
+test_refusal_is_terminal_and_does_not_inform_remote_automatically (tests.test_experiment.IndependentProcessTests.test_refusal_is_terminal_and_does_not_inform_remote_automatically) ... ok
+test_restart_existing_store_fails_closed (tests.test_experiment.IndependentProcessTests.test_restart_existing_store_fails_closed) ... ok
+test_result_receipt_without_process_cannot_mark_bob_processed (tests.test_experiment.IndependentProcessTests.test_result_receipt_without_process_cannot_mark_bob_processed) ... ok
+test_revoke_after_receipt_blocks_process_and_result (tests.test_experiment.IndependentProcessTests.test_revoke_after_receipt_blocks_process_and_result) ... ok
+test_revoke_processed_request_blocks_new_result_disclosure (tests.test_experiment.IndependentProcessTests.test_revoke_processed_request_blocks_new_result_disclosure) ... ok
+test_revoke_queued_packet_and_regrant_old_epoch (tests.test_experiment.IndependentProcessTests.test_revoke_queued_packet_and_regrant_old_epoch) ... ok
+test_sender_cancel_cannot_recall_already_released_request (tests.test_experiment.IndependentProcessTests.test_sender_cancel_cannot_recall_already_released_request) ... ok
+test_peer_can_lie_about_own_processing_but_not_invent_alice_request (tests.test_experiment.MaliciousSenderTests.test_peer_can_lie_about_own_processing_but_not_invent_alice_request) ... ok
+test_positive_sender_versions_cannot_override_local_revocation (tests.test_experiment.MaliciousSenderTests.test_positive_sender_versions_cannot_override_local_revocation) ... ok
+test_same_id_changed_body_and_reencrypted_packet_rejected (tests.test_experiment.MaliciousSenderTests.test_same_id_changed_body_and_reencrypted_packet_rejected) ... ok
+test_scope_linkage_and_payload_bounds_rejected_with_valid_sender_signature (tests.test_experiment.MaliciousSenderTests.test_scope_linkage_and_payload_bounds_rejected_with_valid_sender_signature) ... ok
+test_valid_crypto_unsolicited_result_rejected_by_alice_itself (tests.test_experiment.MaliciousSenderTests.test_valid_crypto_unsolicited_result_rejected_by_alice_itself) ... ok
+test_wrong_evidence_binding_validly_signed_by_peer_rejected (tests.test_experiment.MaliciousSenderTests.test_wrong_evidence_binding_validly_signed_by_peer_rejected) ... ok
+test_owner_rollback_has_no_partial_authority_or_idempotency_record (tests.test_experiment.TransactionTests.test_owner_rollback_has_no_partial_authority_or_idempotency_record) ... ok
+test_peer_inbox_rollback_on_sql_abort (tests.test_experiment.TransactionTests.test_peer_inbox_rollback_on_sql_abort) ... ok
+test_send_and_processing_rollback_do_not_leave_partial_commits (tests.test_experiment.TransactionTests.test_send_and_processing_rollback_do_not_leave_partial_commits) ... ok
+test_authenticated_processing_claim_does_not_bypass_local_revocation (tests.test_independent_review.Review.test_authenticated_processing_claim_does_not_bypass_local_revocation) ... ok
+test_cancel_blocks_packet_bearing_owner_operation_replay (tests.test_independent_review.Review.test_cancel_blocks_packet_bearing_owner_operation_replay) ... ok
+test_cancel_replay_is_historical_and_changed_bytes_denied (tests.test_independent_review.Review.test_cancel_replay_is_historical_and_changed_bytes_denied) ... ok
+test_freshly_signed_stale_grant_after_regrant (tests.test_independent_review.Review.test_freshly_signed_stale_grant_after_regrant) ... ok
+test_partial_peer_owner_command_cannot_cross_lane_then_eof (tests.test_independent_review.Review.test_partial_peer_owner_command_cannot_cross_lane_then_eof) ... ok
+test_peer_rejections_do_not_change_dispatch_lane (tests.test_independent_review.Review.test_peer_rejections_do_not_change_dispatch_lane) ... ok
+test_result_commit_is_atomic_across_inbox_and_outbox_evidence (tests.test_independent_review.Review.test_result_commit_is_atomic_across_inbox_and_outbox_evidence) ... ok
+test_timeout_stops_child_and_closes_both_lanes (tests.test_independent_review.Review.test_timeout_stops_child_and_closes_both_lanes) ... ok
+test_unsolicited_valid_signer_cannot_invent_local_request (tests.test_independent_review.Review.test_unsolicited_valid_signer_cannot_invent_local_request) ... ok
+test_valid_signer_wrong_phase_and_context_proofs (tests.test_independent_review.Review.test_valid_signer_wrong_phase_and_context_proofs) ... ok
+test_experiment_cleanup_attempts_every_peer_and_temp_on_failure (tests.test_lifecycle.LifecycleTests.test_experiment_cleanup_attempts_every_peer_and_temp_on_failure) ... ok
+test_historical_allow_replay_does_not_restore_revoked_grant (tests.test_lifecycle.LifecycleTests.test_historical_allow_replay_does_not_restore_revoked_grant) ... ok
+test_idempotent_close_does_not_close_reused_file_descriptors (tests.test_lifecycle.LifecycleTests.test_idempotent_close_does_not_close_reused_file_descriptors) ... ok
+test_init_failure_after_spawn_reaps_started_child (tests.test_lifecycle.LifecycleTests.test_init_failure_after_spawn_reaps_started_child) ... ok
+test_malformed_response_poisons_session (tests.test_lifecycle.LifecycleTests.test_malformed_response_poisons_session) ... ok
+test_no_ambient_environment_inheritance (tests.test_lifecycle.LifecycleTests.test_no_ambient_environment_inheritance) ... ok
+test_packet_bearing_owner_replay_is_fenced_after_cancel (tests.test_lifecycle.LifecycleTests.test_packet_bearing_owner_replay_is_fenced_after_cancel) ... ok
+test_same_lane_concurrency_is_rejected_without_submission (tests.test_lifecycle.LifecycleTests.test_same_lane_concurrency_is_rejected_without_submission) ... ok
+test_ciphertext_nonce_key_header_and_signature_tampering (tests.test_transport.CryptoPacketTests.test_ciphertext_nonce_key_header_and_signature_tampering) ... ok
+test_depth_before_json_construction_and_quoted_braces (tests.test_transport.ParserTests.test_depth_before_json_construction_and_quoted_braces) ... ok
+test_duplicate_keys_nonfinite_floats_and_large_integer (tests.test_transport.ParserTests.test_duplicate_keys_nonfinite_floats_and_large_integer) ... ok
+test_frame_byte_limit_and_base64_canonical_size (tests.test_transport.ParserTests.test_frame_byte_limit_and_base64_canonical_size) ... ok
+test_utf8_only_scalar_unicode (tests.test_transport.ParserTests.test_utf8_only_scalar_unicode) ... ok
+test_client_uncertainty_poisoned_no_automatic_retry (tests.test_transport.PipeTests.test_client_uncertainty_poisoned_no_automatic_retry) ... ok
+test_eof_terminates_and_reaps (tests.test_transport.PipeTests.test_eof_terminates_and_reaps) ... ok
+test_oversized_zero_and_malformed_frames_terminate_without_mutation (tests.test_transport.PipeTests.test_oversized_zero_and_malformed_frames_terminate_without_mutation) ... ok
+test_partial_peer_frame_does_not_block_owner_then_expires (tests.test_transport.PipeTests.test_partial_peer_frame_does_not_block_owner_then_expires) ... ok
+test_postcommit_lost_owner_reply_is_uncertain_not_failure (tests.test_transport.PipeTests.test_postcommit_lost_owner_reply_is_uncertain_not_failure) ... ok
+test_truncated_body_absolute_deadline_not_reset_by_drip (tests.test_transport.PipeTests.test_truncated_body_absolute_deadline_not_reset_by_drip) ... ok
+test_unread_peer_responses_do_not_indefinitely_block_owner (tests.test_transport.PipeTests.test_unread_peer_responses_do_not_indefinitely_block_owner) ... ok
+
+----------------------------------------------------------------------
+Ran 55 tests in 10.906s
+
+OK
+{
+  "label": "SYNTHETIC OFFLINE EXPERIMENT; NOT A LIVE NETWORK",
+  "distinct_pids": [
+    100,
+    101
+  ],
+  "stores": [
+    "alice.sqlite (temporary)",
+    "bob.sqlite (temporary)"
+  ],
+  "receipt_is_not_processed": true,
+  "result_embedded_processed_request_evidence_verified": true,
+  "alice_processed_result": "A moonberry (fictional).",
+  "bob_knows_result_processed": true,
+  "private_keys": "Generated separately inside each child; memory only; not exported.",
+  "cleanup": "Children reaped and temporary state removed on context exit."
+}
+Aggregate checks passed. Experimental only; see docs/DESIGN.md for limits.

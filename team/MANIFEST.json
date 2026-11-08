@@ -1,0 +1,22 @@
+{
+  "format": "public-team-import/1",
+  "files": {
+    "BASELINES.json": "0bfa024e44acf3d037dbe9fab295777162b5a502d3bb3d6ad0bace6cf7aed751",
+    "README.md": "5cd1b777ffbdf7384d73a51057d19e2a1545a461313b994b6bc9bcca8ebb1090",
+    "VERIFICATION.json": "f81baa5c81e889a2e8e59f22e81e59e1b6331bac1c5765638a25e277a061a2df",
+    "demo.py": "fb8466a277552e80da425527d933d72a973e9360a8b372f1f247a906bf3b09c9",
+    "evidence/all-tests.txt": "bed2c21357aba448e4b7c11be10c831a17c3527539c767d8502a2116c9c4bd15",
+    "evidence/demo-artifacts/copy-v1.json": "3fea160dbac3417ce7537a2e81b20088b3f5804b9ee358f1f84ad7450d9ff119",
+    "evidence/demo-artifacts/pr-v1.json": "7da6cc152f095f3c9b0501656821b89090ded83677b31f1db7510c14b95c1b3c",
+    "evidence/demo-artifacts/research-v1.json": "e00867bcc8fc92769b89950ac14c3c54a1fbd8be5c5b4dfa11513b513cab0cb8",
+    "evidence/demo-artifacts/result.json": "dcadf12c78c48a0fc0d266132b3e9a888776d40205cc44f09aaf810c41e18bf8",
+    "evidence/demo-artifacts/slides-v1.json": "10862afea613b5ee29e56dc92c413e5c8e234030c09b79622834c0467a8114b9",
+    "evidence/demo-artifacts/website-v1.json": "609b0045471944ab165986ad60887e158230d96037273c37d5b74556fc34a34d",
+    "evidence/demo.json": "dcadf12c78c48a0fc0d266132b3e9a888776d40205cc44f09aaf810c41e18bf8",
+    "evidence/implementation-tests.txt": "f21cb1393e4698474a9d50323a08bb1eb95c3aba1ccc1d6a5ead01c0da562ce9",
+    "run_checks.py": "6a30ebafa8e1a34ea284e064ff8bf38d9943fff1d313eb1ebe81443cafee6f83",
+    "team_workflow.py": "ad8071a6743c448756e11065f67940d285ba4a20b0bc1fda4bd053d39b9f3246",
+    "tests/test_independent_review.py": "3384b5c4a132b5caa76d840c25eebe5fc9719f7e179bcd4aa40511c8895d2c9b",
+    "tests/test_team_workflow.py": "620b2ab5bda29e375ccd84846b1b13778511705b792749371598ec59664c9e92"
+  }
+}

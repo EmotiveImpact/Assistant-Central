@@ -1,0 +1,15 @@
+{
+  "reviewed_source_manifest_sha256": "46c50ddac36257ec16d55b2a60d96f7bbe432726470de3492de2848a96972013",
+  "files": {
+    "ACCEPTANCE.md": "e7167cdeb97bfc1a3fe0bbc9d77ddf3cfb50e1e230f25b3a495030e0c265a053",
+    "FINAL_REVIEW.md": "7415beb781e413b6880158a9e37a919fe6e2f38edf76da6746af54e276ecc9c6",
+    "final-aggregate.log": "129860f51065e9c759f0d3fbfed8de3fb1f02395618f73ae734ea2816cd3b8f0",
+    "final-manifest-verification.log": "5f84e9a254a07f2832358ce2c2cb4b64bfc1af965aabf322d6985f7a33665c75",
+    "final-probes.log": "8e9cc841f7af889f548e905afcd19168a4344456fd2cca85aeed969cd8961a22",
+    "initial-probes.log": "54f6c6599e74cc0cefb132fcb823b0411dea8fc05b4ff2f1ce201bb319ce083c",
+    "interim-probes.log": "7764c6ab23e4d208ba800a7824322f43eaf5a922751903bef3daa7310747a340",
+    "poison-lifecycle-initial.log": "f4b191416296f17c313f56f4c55debe06db3c645777d8553e4f6771bcb8b1ea4",
+    "probe_poison_lifecycle.py": "b0791efc790f7d5f294aad2d48f46515ae0a87b938eff1f3ed127ee1808036d2",
+    "test_independent_review.py": "fbc3098153ce985ab35be67366e05878ba53d118ba83c13594eda1c20975ee79"
+  }
+}

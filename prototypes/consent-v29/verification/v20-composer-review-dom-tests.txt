@@ -1,0 +1,4 @@
+PASS late successful creation does not navigate away from a different task
+PASS saved confirmation after editing cannot create an earlier review
+PASS late rejected creation cannot paint an error over another task
+3/3 independent composer DOM-model checks passed.

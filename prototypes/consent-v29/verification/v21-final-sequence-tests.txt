@@ -1,0 +1,13 @@
+test_agent_inbox_rejects_corrupt_projection_and_composed_request (test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) ... ok
+test_alias_insertion_requires_coherent_history_not_active_authority (test_state_sequence_campaign.StateSequenceCampaign.test_alias_insertion_requires_coherent_history_not_active_authority) ... ok
+test_corrupted_scope_blocks_response_disclosure_and_authoring (test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) ... ok
+test_processing_transaction_failure_is_recoverable_without_redispatch (test_state_sequence_campaign.StateSequenceCampaign.test_processing_transaction_failure_is_recoverable_without_redispatch) ... ok
+test_real_process_corrupted_context_blocks_both_disclosure_surfaces (test_state_sequence_campaign.StateSequenceCampaign.test_real_process_corrupted_context_blocks_both_disclosure_surfaces) ... ok
+test_seeded_history_failure_and_terminal_schedules (test_state_sequence_campaign.StateSequenceCampaign.test_seeded_history_failure_and_terminal_schedules) ... ok
+test_seeded_interleaved_lifecycle_mutations (test_state_sequence_campaign.StateSequenceCampaign.test_seeded_interleaved_lifecycle_mutations) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 3.768s
+
+OK
+SEQUENCE_PROBES {'read': 209, 'refused': 1545, 'reopened': 166, 'scheduled': 1920}

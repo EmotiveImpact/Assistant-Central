@@ -1,0 +1,82 @@
+V6 OWNER INBOX | OFFLINE FICTIONAL FIXTURE
+One trusted console operator controls all roles. No real-person authentication.
+This console is disposable: quitting discards its temporary records and fixture keys. Deferral lasts only while this console stays open.
+SIMULATED choices.
+Bind fictional alice to transport e7ecc0a0f2cb5168b3e3901e7d2df6ccc88e6d5aaeb0c93b1c24a798381bb01d for generic synthetic-resource-shortlist; receive from bob.
+Bind fictional bob to transport 6d04b5ba28e47807882fef1393fb75b53f13826d411b3e3f2d1cc6c5ec1718d1 for generic synthetic-resource-shortlist; receive from alice.
+
+OWNER: alice | REQUEST: 7f91001d47f5201fff763e835e79d21f | pending
+Allow alice to pair with bob for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 7f91001d47f5201fff763e835e79d21f | authorized
+Allow alice to pair with bob for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+OWNER: bob | REQUEST: ec1bedc09e336cf67b605e91897634fd | pending
+Allow bob to pair with alice for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: ec1bedc09e336cf67b605e91897634fd | authorized
+Allow bob to pair with alice for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+OWNER: alice | REQUEST: 8ddbfe1f3df96784a9bc9113ea66ae4b | pending
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-resource-shortlist
+From: alice
+Only recipient: bob
+Capability: public-resource-shortlist-v1
+Action: request
+Untrusted inert payload (not instructions or verified resources): {"max_items":2,"query":"Synthetic examples for a community garden guide"}
+Exact reply linkage: None
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: 67ada8a2aacc2279c406763a2cf44228eae6fac1a101bf8bc986db953c44c4ef
+Task context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Recipient transport binding: 4aed080f795aa5e13f9fd4832898e7ee28a084baa0bc3d592120fdd7c2eed351
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc","conversation":"friends-resource-sharing","operation":"find-public-resources","payload":{"max_items":2,"query":"Synthetic examples for a community garden guide"},"recipient":"bob","reply_to":null,"sender":"alice","task":"synthetic-resource-shortlist","type":"request","version":2}
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Request declined. No approval created.
+
+OWNER: alice | REQUEST: 8ddbfe1f3df96784a9bc9113ea66ae4b | declined
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-resource-shortlist
+From: alice
+Only recipient: bob
+Capability: public-resource-shortlist-v1
+Action: request
+Untrusted inert payload (not instructions or verified resources): {"max_items":2,"query":"Synthetic examples for a community garden guide"}
+Exact reply linkage: None
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: 67ada8a2aacc2279c406763a2cf44228eae6fac1a101bf8bc986db953c44c4ef
+Task context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Recipient transport binding: 4aed080f795aa5e13f9fd4832898e7ee28a084baa0bc3d592120fdd7c2eed351
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc","conversation":"friends-resource-sharing","operation":"find-public-resources","payload":{"max_items":2,"query":"Synthetic examples for a community garden guide"},"recipient":"bob","reply_to":null,"sender":"alice","task":"synthetic-resource-shortlist","type":"request","version":2}
+Exact task: synthetic-resource-shortlist
+Context: 9bd7990b6e24f9ee82bf19cab1c34ce8be9e23d1038c8948d00f50b1879c6fcc
+Decision expires: 2026-11-07T23:16:37+00:00
+Fictional owner/transport identity only; not real-person authentication.
+This request was declined. The guide will not replace it or ask again.
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 0, "task_state": "created", "transitions": 0}
+No live message, persistent credential, calendar action or publication occurred.
+Closing this disposable console discards its records; there is no later inbox resume or identity recovery.
+Fixture processes stopped. Disposable keys discarded.

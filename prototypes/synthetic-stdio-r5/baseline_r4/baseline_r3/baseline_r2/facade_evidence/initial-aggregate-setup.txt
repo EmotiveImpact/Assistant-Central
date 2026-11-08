@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-independent-peer-facade-r2/run_facade_checks.py", line 63, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/path/to/workspace/agent-network-independent-peer-facade-r2/run_facade_checks.py", line 41, in main
+    full, old = verify()
+                ^^^^^^^^
+  File "/path/to/workspace/agent-network-independent-peer-facade-r2/run_facade_checks.py", line 19, in verify
+    manifest = json.loads((ROOT / 'FACADE_SOURCE_MANIFEST.json').read_text())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/path/to/workspace/agent-network-independent-peer-facade-r2/FACADE_SOURCE_MANIFEST.json'

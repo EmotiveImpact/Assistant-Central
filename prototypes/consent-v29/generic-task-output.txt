@@ -1,0 +1,11 @@
+OFFLINE NON-MEETING TASK | SIMULATED OWNER CHOICES
+Provider labels: provider-one-fixture, provider-two-fixture (not live integrations)
+Bilateral pairing created no message: True
+Exact owner-approved request queued; attempts: 0
+Verified receipt and inert task projection: requested
+Exact owner-approved result queued; attempts: 0
+Verified receipt and inert task projection: completed
+Result linked to exact request: True
+Envelope has no meeting field: True
+{"executed_tools": 0, "live_provider_calls": 0, "receipts": 2, "task_state": "completed", "transitions": 2}
+Temporary fixture records and keys discarded. No live interoperability claimed.

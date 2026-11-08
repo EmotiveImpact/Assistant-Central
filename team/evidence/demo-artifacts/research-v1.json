@@ -1,0 +1,15 @@
+{
+  "artifact_id": "research-v1",
+  "digest": "52bd00523fb009f017687ad00a3fba33484f2d3a81b2ac86ced9a43bcd8a692a",
+  "state": "accepted",
+  "artifact": {
+    "content": "SYNTHETIC RESEARCH: A fictional garden needs a clear volunteer introduction.",
+    "context": "b1ed345677de7d14da8c135b1e5daa82cbcee3983fb8dcd08d31aa77b08692e0",
+    "domain": "offline-team-artifact/rebuilt-r1",
+    "kind": "research",
+    "producer": "researcher",
+    "start_review_digest": "e402eba2a20997a452152d738db497a2181fe54c4445d3db254f8e7fc700ae3c",
+    "task": "research"
+  },
+  "untrusted_content": true
+}

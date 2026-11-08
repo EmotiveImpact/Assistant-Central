@@ -1,0 +1,19 @@
+test_each_wrap_uses_distinct_ephemeral_key_and_ciphertext (test_sdk_fixture.PinnedSdkTests.test_each_wrap_uses_distinct_ephemeral_key_and_ciphertext) ... ok
+test_network_guard_actually_blocks_socket_creation (test_sdk_fixture.PinnedSdkTests.test_network_guard_actually_blocks_socket_creation) ... ok
+test_network_guard_blocks_child_processes (test_sdk_fixture.PinnedSdkTests.test_network_guard_blocks_child_processes) ... ok
+test_nip44_mac_rejects_changed_payload (test_sdk_fixture.PinnedSdkTests.test_nip44_mac_rejects_changed_payload) ... ok
+test_offline_fixture_runs_with_socket_guard_installed (test_sdk_fixture.PinnedSdkTests.test_offline_fixture_runs_with_socket_guard_installed) ... ok
+test_outer_ciphertext_signature_and_identity_tampering_are_rejected (test_sdk_fixture.PinnedSdkTests.test_outer_ciphertext_signature_and_identity_tampering_are_rejected) ... ok
+test_private_fields_and_unsupported_actions_do_not_pass_encryption_boundary (test_sdk_fixture.PinnedSdkTests.test_private_fields_and_unsupported_actions_do_not_pass_encryption_boundary) ... ok
+test_real_sdk_encrypted_round_trip_preserves_exact_message (test_sdk_fixture.PinnedSdkTests.test_real_sdk_encrypted_round_trip_preserves_exact_message) ... ok
+test_seal_inner_signer_substitution_is_rejected_by_upstream (test_sdk_fixture.PinnedSdkTests.test_seal_inner_signer_substitution_is_rejected_by_upstream) ... ok
+test_unknown_kind_and_duplicate_or_wrong_context_tags_are_rejected (test_sdk_fixture.PinnedSdkTests.test_unknown_kind_and_duplicate_or_wrong_context_tags_are_rejected) ... ok
+test_unknown_outer_fields_and_oversize_are_rejected (test_sdk_fixture.PinnedSdkTests.test_unknown_outer_fields_and_oversize_are_rejected) ... ok
+test_unsigned_inner_event_is_rejected (test_sdk_fixture.PinnedSdkTests.test_unsigned_inner_event_is_rejected) ... ok
+test_valid_signature_does_not_authorize_impersonation (test_sdk_fixture.PinnedSdkTests.test_valid_signature_does_not_authorize_impersonation) ... ok
+test_wrong_recipient_and_delivery_are_rejected (test_sdk_fixture.PinnedSdkTests.test_wrong_recipient_and_delivery_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.239s
+
+OK

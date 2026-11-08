@@ -1,0 +1,431 @@
+EXPERIMENTAL R4: OFFLINE UTF-8/LF MCP BYTE BOUNDARY
+Source hashes: 67 ; preserved r3 files: 94
+Python: 3.12.14
+Dependencies: {"mcp": "1.29.0", "anyio": "4.14.2", "pydantic": "2.13.4", "cryptography": "50.0.0"}
+EXPERIMENTAL R3: OFFLINE MCP TOOLS BRIDGE
+Source hashes: 48 ; preserved r2 files: 65
+Python: 3.12.14
+Dependencies: {"mcp": "1.29.0", "anyio": "4.14.2", "pydantic": "2.13.4", "cryptography": "50.0.0"}
+EXPERIMENTAL R2: OFFLINE LOCAL PROPOSAL FACADE
+Python: 3.12.14 cryptography: 50.0.0
+Candidate source hashes: 32 ; preserved r1 source hashes: 20
+test_bob_cannot_send_before_own_processed_request (tests.test_experiment.IndependentProcessTests.test_bob_cannot_send_before_own_processed_request) ... ok
+test_cancel_before_late_result_and_evidence_remains_historical (tests.test_experiment.IndependentProcessTests.test_cancel_before_late_result_and_evidence_remains_historical) ... ok
+test_distinct_processes_stores_and_keys (tests.test_experiment.IndependentProcessTests.test_distinct_processes_stores_and_keys) ... ok
+test_domain_swap_wrong_signature_and_wrong_grant (tests.test_experiment.IndependentProcessTests.test_domain_swap_wrong_signature_and_wrong_grant) ... ok
+test_exact_owner_operation_replay_and_collision (tests.test_experiment.IndependentProcessTests.test_exact_owner_operation_replay_and_collision) ... ok
+test_exact_replay_and_historical_evidence_after_cancel (tests.test_experiment.IndependentProcessTests.test_exact_replay_and_historical_evidence_after_cancel) ... ok
+test_lost_receipt_then_lost_processed_reply_explicit_reconciliation (tests.test_experiment.IndependentProcessTests.test_lost_receipt_then_lost_processed_reply_explicit_reconciliation) ... ok
+test_owner_controls_are_not_peer_routes (tests.test_experiment.IndependentProcessTests.test_owner_controls_are_not_peer_routes) ... ok
+test_receipt_is_not_processing_and_result_reorders_evidence (tests.test_experiment.IndependentProcessTests.test_receipt_is_not_processing_and_result_reorders_evidence) ... ok
+test_refusal_is_terminal_and_does_not_inform_remote_automatically (tests.test_experiment.IndependentProcessTests.test_refusal_is_terminal_and_does_not_inform_remote_automatically) ... ok
+test_restart_existing_store_fails_closed (tests.test_experiment.IndependentProcessTests.test_restart_existing_store_fails_closed) ... ok
+test_result_receipt_without_process_cannot_mark_bob_processed (tests.test_experiment.IndependentProcessTests.test_result_receipt_without_process_cannot_mark_bob_processed) ... ok
+test_revoke_after_receipt_blocks_process_and_result (tests.test_experiment.IndependentProcessTests.test_revoke_after_receipt_blocks_process_and_result) ... ok
+test_revoke_processed_request_blocks_new_result_disclosure (tests.test_experiment.IndependentProcessTests.test_revoke_processed_request_blocks_new_result_disclosure) ... ok
+test_revoke_queued_packet_and_regrant_old_epoch (tests.test_experiment.IndependentProcessTests.test_revoke_queued_packet_and_regrant_old_epoch) ... ok
+test_sender_cancel_cannot_recall_already_released_request (tests.test_experiment.IndependentProcessTests.test_sender_cancel_cannot_recall_already_released_request) ... ok
+test_peer_can_lie_about_own_processing_but_not_invent_alice_request (tests.test_experiment.MaliciousSenderTests.test_peer_can_lie_about_own_processing_but_not_invent_alice_request) ... ok
+test_positive_sender_versions_cannot_override_local_revocation (tests.test_experiment.MaliciousSenderTests.test_positive_sender_versions_cannot_override_local_revocation) ... ok
+test_same_id_changed_body_and_reencrypted_packet_rejected (tests.test_experiment.MaliciousSenderTests.test_same_id_changed_body_and_reencrypted_packet_rejected) ... ok
+test_scope_linkage_and_payload_bounds_rejected_with_valid_sender_signature (tests.test_experiment.MaliciousSenderTests.test_scope_linkage_and_payload_bounds_rejected_with_valid_sender_signature) ... ok
+test_valid_crypto_unsolicited_result_rejected_by_alice_itself (tests.test_experiment.MaliciousSenderTests.test_valid_crypto_unsolicited_result_rejected_by_alice_itself) ... ok
+test_wrong_evidence_binding_validly_signed_by_peer_rejected (tests.test_experiment.MaliciousSenderTests.test_wrong_evidence_binding_validly_signed_by_peer_rejected) ... ok
+test_owner_rollback_has_no_partial_authority_or_idempotency_record (tests.test_experiment.TransactionTests.test_owner_rollback_has_no_partial_authority_or_idempotency_record) ... ok
+test_peer_inbox_rollback_on_sql_abort (tests.test_experiment.TransactionTests.test_peer_inbox_rollback_on_sql_abort) ... ok
+test_send_and_processing_rollback_do_not_leave_partial_commits (tests.test_experiment.TransactionTests.test_send_and_processing_rollback_do_not_leave_partial_commits) ... ok
+test_authenticated_processing_claim_does_not_bypass_local_revocation (tests.test_independent_review.Review.test_authenticated_processing_claim_does_not_bypass_local_revocation) ... ok
+test_cancel_blocks_packet_bearing_owner_operation_replay (tests.test_independent_review.Review.test_cancel_blocks_packet_bearing_owner_operation_replay) ... ok
+test_cancel_replay_is_historical_and_changed_bytes_denied (tests.test_independent_review.Review.test_cancel_replay_is_historical_and_changed_bytes_denied) ... ok
+test_freshly_signed_stale_grant_after_regrant (tests.test_independent_review.Review.test_freshly_signed_stale_grant_after_regrant) ... ok
+test_partial_peer_owner_command_cannot_cross_lane_then_eof (tests.test_independent_review.Review.test_partial_peer_owner_command_cannot_cross_lane_then_eof) ... ok
+test_peer_rejections_do_not_change_dispatch_lane (tests.test_independent_review.Review.test_peer_rejections_do_not_change_dispatch_lane) ... ok
+test_result_commit_is_atomic_across_inbox_and_outbox_evidence (tests.test_independent_review.Review.test_result_commit_is_atomic_across_inbox_and_outbox_evidence) ... ok
+test_timeout_stops_child_and_closes_both_lanes (tests.test_independent_review.Review.test_timeout_stops_child_and_closes_both_lanes) ... ok
+test_unsolicited_valid_signer_cannot_invent_local_request (tests.test_independent_review.Review.test_unsolicited_valid_signer_cannot_invent_local_request) ... ok
+test_valid_signer_wrong_phase_and_context_proofs (tests.test_independent_review.Review.test_valid_signer_wrong_phase_and_context_proofs) ... ok
+test_experiment_cleanup_attempts_every_peer_and_temp_on_failure (tests.test_lifecycle.LifecycleTests.test_experiment_cleanup_attempts_every_peer_and_temp_on_failure) ... ok
+test_historical_allow_replay_does_not_restore_revoked_grant (tests.test_lifecycle.LifecycleTests.test_historical_allow_replay_does_not_restore_revoked_grant) ... ok
+test_idempotent_close_does_not_close_reused_file_descriptors (tests.test_lifecycle.LifecycleTests.test_idempotent_close_does_not_close_reused_file_descriptors) ... ok
+test_init_failure_after_spawn_reaps_started_child (tests.test_lifecycle.LifecycleTests.test_init_failure_after_spawn_reaps_started_child) ... ok
+test_malformed_response_poisons_session (tests.test_lifecycle.LifecycleTests.test_malformed_response_poisons_session) ... ok
+test_no_ambient_environment_inheritance (tests.test_lifecycle.LifecycleTests.test_no_ambient_environment_inheritance) ... ok
+test_packet_bearing_owner_replay_is_fenced_after_cancel (tests.test_lifecycle.LifecycleTests.test_packet_bearing_owner_replay_is_fenced_after_cancel) ... ok
+test_same_lane_concurrency_is_rejected_without_submission (tests.test_lifecycle.LifecycleTests.test_same_lane_concurrency_is_rejected_without_submission) ... ok
+test_ciphertext_nonce_key_header_and_signature_tampering (tests.test_transport.CryptoPacketTests.test_ciphertext_nonce_key_header_and_signature_tampering) ... ok
+test_depth_before_json_construction_and_quoted_braces (tests.test_transport.ParserTests.test_depth_before_json_construction_and_quoted_braces) ... ok
+test_duplicate_keys_nonfinite_floats_and_large_integer (tests.test_transport.ParserTests.test_duplicate_keys_nonfinite_floats_and_large_integer) ... ok
+test_frame_byte_limit_and_base64_canonical_size (tests.test_transport.ParserTests.test_frame_byte_limit_and_base64_canonical_size) ... ok
+test_utf8_only_scalar_unicode (tests.test_transport.ParserTests.test_utf8_only_scalar_unicode) ... ok
+test_client_uncertainty_poisoned_no_automatic_retry (tests.test_transport.PipeTests.test_client_uncertainty_poisoned_no_automatic_retry) ... ok
+test_eof_terminates_and_reaps (tests.test_transport.PipeTests.test_eof_terminates_and_reaps) ... ok
+test_oversized_zero_and_malformed_frames_terminate_without_mutation (tests.test_transport.PipeTests.test_oversized_zero_and_malformed_frames_terminate_without_mutation) ... ok
+test_partial_peer_frame_does_not_block_owner_then_expires (tests.test_transport.PipeTests.test_partial_peer_frame_does_not_block_owner_then_expires) ... ok
+test_postcommit_lost_owner_reply_is_uncertain_not_failure (tests.test_transport.PipeTests.test_postcommit_lost_owner_reply_is_uncertain_not_failure) ... ok
+test_truncated_body_absolute_deadline_not_reset_by_drip (tests.test_transport.PipeTests.test_truncated_body_absolute_deadline_not_reset_by_drip) ... ok
+test_unread_peer_responses_do_not_indefinitely_block_owner (tests.test_transport.PipeTests.test_unread_peer_responses_do_not_indefinitely_block_owner) ... ok
+test_actual_response_narrow_and_correlated (facade_tests.test_facade.FacadeTests.test_actual_response_narrow_and_correlated) ... ok
+test_bad_response_remains_unknown (facade_tests.test_facade.FacadeTests.test_bad_response_remains_unknown) ... ok
+test_binding_task_actor_and_both_incarnations (facade_tests.test_facade.FacadeTests.test_binding_task_actor_and_both_incarnations) ... ok
+test_cancel_and_reopen_preserves_publication (facade_tests.test_facade.FacadeTests.test_cancel_and_reopen_preserves_publication) ... ok
+test_command_mutation_does_not_change_stored_commitment (facade_tests.test_facade.FacadeTests.test_command_mutation_does_not_change_stored_commitment) ... ok
+test_constructor_binding_failure_closes_local_connection (facade_tests.test_facade.FacadeTests.test_constructor_binding_failure_closes_local_connection) ... ok
+test_detached_inputs_outputs (facade_tests.test_facade.FacadeTests.test_detached_inputs_outputs) ... ok
+test_finite_history_no_eviction (facade_tests.test_facade.FacadeTests.test_finite_history_no_eviction) ... ok
+test_grant_signature_and_scope_validation (facade_tests.test_facade.FacadeTests.test_grant_signature_and_scope_validation) ... ok
+test_identity_repeat_decline_reopen (facade_tests.test_facade.FacadeTests.test_identity_repeat_decline_reopen) ... ok
+test_known_rejection_never_retry (facade_tests.test_facade.FacadeTests.test_known_rejection_never_retry) ... ok
+test_no_normalization_or_trimming (facade_tests.test_facade.FacadeTests.test_no_normalization_or_trimming) ... ok
+test_only_processed_projection_exposed (facade_tests.test_facade.FacadeTests.test_only_processed_projection_exposed) ... ok
+test_other_actor_cannot_read_local_proposal (facade_tests.test_facade.FacadeTests.test_other_actor_cannot_read_local_proposal) ... ok
+test_proposal_has_no_endpoint_or_callbacks (facade_tests.test_facade.FacadeTests.test_proposal_has_no_endpoint_or_callbacks) ... ok
+test_release_packet_shape_and_binding_rejections (facade_tests.test_facade.FacadeTests.test_release_packet_shape_and_binding_rejections) ... ok
+test_review_digest_and_grant_must_match (facade_tests.test_facade.FacadeTests.test_review_digest_and_grant_must_match) ... ok
+test_snapshot_absence_cannot_clear_unknown_after_cancel (facade_tests.test_facade.FacadeTests.test_snapshot_absence_cannot_clear_unknown_after_cancel) ... ok
+test_snapshot_bound_identity_and_actor (facade_tests.test_facade.FacadeTests.test_snapshot_bound_identity_and_actor) ... ok
+test_snapshot_commit_not_release (facade_tests.test_facade.FacadeTests.test_snapshot_commit_not_release) ... ok
+test_strict_scalar_and_utf8_bounds (facade_tests.test_facade.FacadeTests.test_strict_scalar_and_utf8_bounds) ... ok
+test_three_exact_methods (facade_tests.test_facade.FacadeTests.test_three_exact_methods) ... ok
+test_unknown_before_command_return_survives_exception_reopen (facade_tests.test_facade.FacadeTests.test_unknown_before_command_return_survives_exception_reopen) ... ok
+test_unprocessed_or_extra_fields_rejected (facade_tests.test_facade.FacadeTests.test_unprocessed_or_extra_fields_rejected) ... ok
+test_normal_two_process_roundtrip (facade_tests.test_facade.SequentialDemoTests.test_normal_two_process_roundtrip) ... ok
+test_actual_release_is_not_delivery (facade_tests.test_independent_contract.Contract.test_actual_release_is_not_delivery) ... ok
+test_changed_binding_context_and_peer_key_rejected (facade_tests.test_independent_contract.Contract.test_changed_binding_context_and_peer_key_rejected) ... ok
+test_content_observation_blocks_late_actual_response (facade_tests.test_independent_contract.Contract.test_content_observation_blocks_late_actual_response) ... ok
+test_durable_unknown_without_execution (facade_tests.test_independent_contract.Contract.test_durable_unknown_without_execution) ... ok
+test_failed_save_returns_no_command_and_no_unknown (facade_tests.test_independent_contract.Contract.test_failed_save_returns_no_command_and_no_unknown) ... ok
+test_foreign_header_response_rejected_before_recording (facade_tests.test_independent_contract.Contract.test_foreign_header_response_rejected_before_recording) ... ok
+test_full_history_preserves_decline_and_unknown (facade_tests.test_independent_contract.Contract.test_full_history_preserves_decline_and_unknown) ... ok
+test_mixed_utf8_bound_and_unicode_identity (facade_tests.test_independent_contract.Contract.test_mixed_utf8_bound_and_unicode_identity) ... ok
+test_processed_only_real_endpoint_projection (facade_tests.test_independent_contract.Contract.test_processed_only_real_endpoint_projection) ... ok
+test_unrecorded_release_reconciles_only_content (facade_tests.test_independent_contract.Contract.test_unrecorded_release_reconciles_only_content) ... ok
+test_wrong_response_correlation_leaves_unknown (facade_tests.test_independent_contract.Contract.test_wrong_response_correlation_leaves_unknown) ... ok
+
+----------------------------------------------------------------------
+Ran 91 tests in 11.176s
+
+OK
+{
+  "preserved_r1_demo": {
+    "label": "SYNTHETIC OFFLINE EXPERIMENT; NOT A LIVE NETWORK",
+    "distinct_pids": [
+      101,
+      102
+    ],
+    "stores": [
+      "alice.sqlite (temporary)",
+      "bob.sqlite (temporary)"
+    ],
+    "receipt_is_not_processed": true,
+    "result_embedded_processed_request_evidence_verified": true,
+    "alice_processed_result": "A moonberry (fictional).",
+    "bob_knows_result_processed": true,
+    "private_keys": "Generated separately inside each child; memory only; not exported.",
+    "cleanup": "Children reaped and temporary state removed on context exit."
+  },
+  "facade_demo": {
+    "label": "OFFLINE SYNTHETIC PROPOSAL FACADE; NO HOST ISOLATION",
+    "independent_proposal_stores": true,
+    "distinct_endpoint_pids": [
+      103,
+      104
+    ],
+    "request_status": {
+      "command_digest": "2f472d02a194fc40083fae1c25b422e2a73bf6e6e86944f354fbf7c576494ed1",
+      "content_digest": "3f8fe40e5bbcef381a476335b4fe8930ab20a9309ca9842f984a9345138ecf9a",
+      "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+      "message_digest": "ed10ecf6d1ccaf1403dc684c81c7272ce344a987aa63258913a29555c0d80185",
+      "message_id": "c16c41b69aac32343f32c93d791c2d7a",
+      "operation_id": "23aa153331ce74936ac1f173f098bf0f",
+      "packet_digest": "344261697f9f7659e7bbf2afeff8f42c46b11508ae94396b529f2fbc56d3ca44",
+      "proposal_id": "f4317646f9dabc2d8e38890bd9b1b7f1189a0a76c8df78d432ffde01c079615f",
+      "state": "released"
+    },
+    "result_status": {
+      "command_digest": "24a45e8a602417b57f4d8ed7290fd758ff9650118d101d1e6b3cc7f3aeb996a7",
+      "content_digest": "7b16d4ca6e4ad91ba368936597c886eab966477be0c20ed9b3111f0bcd37094b",
+      "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+      "message_digest": "04781e5e9907e88b6664a79fe629620ba0b54956c10a3dfcc522a3729b3062b5",
+      "message_id": "b85ea1c9b79b3c12fa452be2de35349e",
+      "operation_id": "89d5e7ad4d0cec0e3555a2046bcafd34",
+      "packet_digest": "bc50be134edadb5987a6df192d3e6e89e25c076985035da41901c1ba411f4601",
+      "proposal_id": "285697ac26171f44de21122053af4baa77605eac37c408b0a5d45746b8e6c735",
+      "state": "released"
+    },
+    "alice_processed_inbox": {
+      "items": [
+        {
+          "id": "b85ea1c9b79b3c12fa452be2de35349e",
+          "kind": "result",
+          "message_digest": "04781e5e9907e88b6664a79fe629620ba0b54956c10a3dfcc522a3729b3062b5",
+          "payload": "A moonberry (fictional)."
+        }
+      ],
+      "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+      "publication": 1
+    },
+    "bob_processed_inbox": {
+      "items": [
+        {
+          "id": "c16c41b69aac32343f32c93d791c2d7a",
+          "kind": "request",
+          "message_digest": "ed10ecf6d1ccaf1403dc684c81c7272ce344a987aa63258913a29555c0d80185",
+          "payload": "Name one imaginary blue fruit."
+        }
+      ],
+      "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+      "publication": 2
+    }
+  }
+}
+Reruns existing regressions and new sequential application checks only.
+Additional concurrent-shutdown/descriptor-lifecycle review remains uncompleted.
+No native host, real identity, live transport, or production acceptance.
+test_actor_scope_and_processed_publication (bridge_tests.test_bridge.BridgeTests.test_actor_scope_and_processed_publication) ... ok
+test_argument_bounds_and_redacted_errors (bridge_tests.test_bridge.BridgeTests.test_argument_bounds_and_redacted_errors) ... ok
+test_decoded_bounds_and_output_redaction (bridge_tests.test_bridge.BridgeTests.test_decoded_bounds_and_output_redaction) ... ok
+test_escape_heavy_exact_text_and_malformed_initialize (bridge_tests.test_bridge.BridgeTests.test_escape_heavy_exact_text_and_malformed_initialize) ... ok
+test_exact_declined_and_unknown_replay (bridge_tests.test_bridge.BridgeTests.test_exact_declined_and_unknown_replay) ... ok
+test_gate_message_depth_and_metadata_size (bridge_tests.test_bridge.BridgeTests.test_gate_message_depth_and_metadata_size) ... ok
+test_inert_client_metadata (bridge_tests.test_bridge.BridgeTests.test_inert_client_metadata) ... ok
+test_legacy_versions_and_initialized_barrier (bridge_tests.test_bridge.BridgeTests.test_legacy_versions_and_initialized_barrier) ... ok
+test_null_envelope_extra_rejected_before_serialization (bridge_tests.test_bridge.BridgeTests.test_null_envelope_extra_rejected_before_serialization) ... ok
+test_ping_preserves_each_protocol_phase (bridge_tests.test_bridge.BridgeTests.test_ping_preserves_each_protocol_phase) ... ok
+test_post_dispatch_error_is_uncertain (bridge_tests.test_bridge.BridgeTests.test_post_dispatch_error_is_uncertain) ... ok
+test_protocol_error_codes_and_malformed_metadata (bridge_tests.test_bridge.BridgeTests.test_protocol_error_codes_and_malformed_metadata) ... ok
+test_request_count_and_strict_params (bridge_tests.test_bridge.BridgeTests.test_request_count_and_strict_params) ... ok
+test_sdk_handshake_list_call_and_no_endpoint_authority (bridge_tests.test_bridge.BridgeTests.test_sdk_handshake_list_call_and_no_endpoint_authority) ... ok
+test_sdk_optional_arguments (bridge_tests.test_bridge.BridgeTests.test_sdk_optional_arguments) ... ok
+test_single_use_and_no_callback_constructor (bridge_tests.test_bridge.BridgeTests.test_single_use_and_no_callback_constructor) ... ok
+test_state_duplicate_ids_and_unsupported_protocol (bridge_tests.test_bridge.BridgeTests.test_state_duplicate_ids_and_unsupported_protocol) ... ok
+test_unknown_tools_and_selectors (bridge_tests.test_bridge.BridgeTests.test_unknown_tools_and_selectors) ... ok
+test_64_record_history_no_eviction_and_exact_declined_replay (bridge_tests.test_independent_bridge.IndependentTests.test_64_record_history_no_eviction_and_exact_declined_replay) ... ok
+test_bounded_tree_scalars_keys_nodes_and_escape_expansion (bridge_tests.test_independent_bridge.IndependentTests.test_bounded_tree_scalars_keys_nodes_and_escape_expansion) ... ok
+test_exact_text_unicode_normalization_and_escaping (bridge_tests.test_independent_bridge.IndependentTests.test_exact_text_unicode_normalization_and_escaping) ... ok
+test_integer_and_string_ids_distinct_and_reuse_consumed (bridge_tests.test_independent_bridge.IndependentTests.test_integer_and_string_ids_distinct_and_reuse_consumed) ... ok
+test_malformed_initialized_metadata_does_not_open_gate (bridge_tests.test_independent_bridge.IndependentTests.test_malformed_initialized_metadata_does_not_open_gate) ... ok
+test_metadata_cannot_create_authority_or_change_exact_text (bridge_tests.test_independent_bridge.IndependentTests.test_metadata_cannot_create_authority_or_change_exact_text) ... ok
+test_null_extra_selectors_are_not_erased (bridge_tests.test_independent_bridge.IndependentTests.test_null_extra_selectors_are_not_erased) ... ok
+test_original_initialization_validation_rejects_nested_shapes (bridge_tests.test_independent_bridge.IndependentTests.test_original_initialization_validation_rejects_nested_shapes) ... ok
+test_original_supported_metadata_shapes_validated (bridge_tests.test_independent_bridge.IndependentTests.test_original_supported_metadata_shapes_validated) ... ok
+test_ping_all_phases_preserves_initialization_gate (bridge_tests.test_independent_bridge.IndependentTests.test_ping_all_phases_preserves_initialization_gate) ... ok
+test_post_persist_handler_exception_is_redacted_uncertainty (bridge_tests.test_independent_bridge.IndependentTests.test_post_persist_handler_exception_is_redacted_uncertainty) ... ok
+test_post_persist_real_outer_json_bound_is_uncertain (bridge_tests.test_independent_bridge.IndependentTests.test_post_persist_real_outer_json_bound_is_uncertain) ... ok
+test_preinitialized_and_unsupported_methods_have_no_side_effect (bridge_tests.test_independent_bridge.IndependentTests.test_preinitialized_and_unsupported_methods_have_no_side_effect) ... ok
+test_standard_error_codes_preserve_redaction (bridge_tests.test_independent_bridge.IndependentTests.test_standard_error_codes_preserve_redaction) ... ok
+test_top_level_null_extras_rejected_before_lossy_dump (bridge_tests.test_independent_bridge.IndependentTests.test_top_level_null_extras_rejected_before_lossy_dump) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 0.263s
+
+OK
+{
+  "label": "OFFLINE SYNTHETIC MCP TOOLS ONLY; NO HOST AUTHENTICATION",
+  "negotiated_legacy_protocol": "2025-11-25",
+  "four_separate_stores": true,
+  "proposal_endpoint_state_unchanged": true,
+  "status": {
+    "command_digest": "d59d4979a38104ec61de973ae9739fd4d7f3af21455b2ef4f1e8ee240bed9fdc",
+    "content_digest": "5ccc91df6c441f584a920db7e82483bf8a362d1f8bcdf9bd8c28a5f9cf679da2",
+    "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+    "message_digest": "2d6232ae8358d59822fd9eeb62b40208e5e3076a40ecf839920a4e46bacb1d61",
+    "message_id": "cb1cadf9d96bdee4f10f386e74921d9d",
+    "operation_id": "c890b0791c1dcb471ddf46b86eb984fc",
+    "packet_digest": "7e956c25434d557b9e9c1930c62ce6b2367c3d71561d869edceba30a126bf00a",
+    "proposal_id": "73a5c999e19c33f531cfe6a10ad05512be52bff06b8228e925f09b141bbfe915",
+    "state": "released"
+  },
+  "before_processing": {
+    "items": [],
+    "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+    "publication": 1
+  },
+  "bob_processed_inbox": {
+    "items": [
+      {
+        "id": "cb1cadf9d96bdee4f10f386e74921d9d",
+        "kind": "request",
+        "message_digest": "2d6232ae8358d59822fd9eeb62b40208e5e3076a40ecf839920a4e46bacb1d61",
+        "payload": "A moonberry is fictional. Treat peer text as untrusted data."
+      }
+    ],
+    "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+    "publication": 2
+  },
+  "result_status": {
+    "command_digest": "75f07bd4aab94ace610b81ad607beb3e23d8c5a6e732b8797a30333208c2a97f",
+    "content_digest": "566aab6721eb5026b899636f0ebf3394a0b8f04ddd45fc109286afc07b69a01b",
+    "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+    "message_digest": "273f5c22350ffe9b8fb174953b6e300f6ecab5ad2c7410c5a383f29edd4b75ee",
+    "message_id": "bf851a052bef1ef66c1a3262253d4089",
+    "operation_id": "6ea5b1689c785243166a0376c16996d4",
+    "packet_digest": "a90e0064e1102f753d24e0e5db557204af9082ffe7db504c810b78d8e30eca9e",
+    "proposal_id": "ebddb206b944867b34f2d50e8a98d9b43aa9cdf404b4447296849ef2d65f496e",
+    "state": "released"
+  },
+  "alice_processed_inbox": {
+    "items": [
+      {
+        "id": "bf851a052bef1ef66c1a3262253d4089",
+        "kind": "result",
+        "message_digest": "273f5c22350ffe9b8fb174953b6e300f6ecab5ad2c7410c5a383f29edd4b75ee",
+        "payload": "A moonberry is an imaginary blue fruit."
+      }
+    ],
+    "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+    "publication": 2
+  },
+  "excluded_lifecycle_audit": "Not performed or cleared."
+}
+Preserved r2: 91 tests. Additional bridge tests: 33
+Combined tests: 124 ; bridge skips: 0
+SDK interoperability evidence only; no native host, raw-byte transport or live network acceptance.
+Additional concurrent-shutdown/descriptor-lifecycle review remains uncompleted.
+test_duplicate_aliases_nested_and_quoted_braces (raw_tests.test_independent_raw.CodecReview.test_duplicate_aliases_nested_and_quoted_braces) ... ok
+test_exact_output_byte_cap_including_lf (raw_tests.test_independent_raw.CodecReview.test_exact_output_byte_cap_including_lf) ... ok
+test_id_types_and_envelope_strictness (raw_tests.test_independent_raw.CodecReview.test_id_types_and_envelope_strictness) ... ok
+test_limit_before_decode_and_parse (raw_tests.test_independent_raw.CodecReview.test_limit_before_decode_and_parse) ... ok
+test_postparse_bounds_and_normalized_size (raw_tests.test_independent_raw.CodecReview.test_postparse_bounds_and_normalized_size) ... ok
+test_scalar_unicode_numeric_vectors (raw_tests.test_independent_raw.CodecReview.test_scalar_unicode_numeric_vectors) ... ok
+test_silent_shape_is_exact (raw_tests.test_independent_raw.CodecReview.test_silent_shape_is_exact) ... ok
+test_admission_fact_is_not_persistence (raw_tests.test_independent_raw.StreamReview.test_admission_fact_is_not_persistence) ... ok
+test_bad_input_contract (raw_tests.test_independent_raw.StreamReview.test_bad_input_contract) ... ok
+test_cancellation_during_output_is_uncertain_and_single_use (raw_tests.test_independent_raw.StreamReview.test_cancellation_during_output_is_uncertain_and_single_use) ... ok
+test_exact_1024_byte_text_and_no_owner_authority (raw_tests.test_independent_raw.StreamReview.test_exact_1024_byte_text_and_no_owner_authority) ... ok
+test_exact_record_cap_crlf_and_overflow (raw_tests.test_independent_raw.StreamReview.test_exact_record_cap_crlf_and_overflow) ... ok
+test_fragmentation_and_coalescing (raw_tests.test_independent_raw.StreamReview.test_fragmentation_and_coalescing) ... ok
+test_input_cancellation_does_not_claim_output_uncertainty (raw_tests.test_independent_raw.StreamReview.test_input_cancellation_does_not_claim_output_uncertainty) ... ok
+test_invalid_ids_cannot_persist_and_null_is_not_notification (raw_tests.test_independent_raw.StreamReview.test_invalid_ids_cannot_persist_and_null_is_not_notification) ... ok
+test_output_rejection_is_redacted (raw_tests.test_independent_raw.StreamReview.test_output_rejection_is_redacted) ... ok
+test_oversize_not_drained (raw_tests.test_independent_raw.StreamReview.test_oversize_not_drained) ... ok
+test_partial_eof_not_dispatched_and_prior_facts_remain (raw_tests.test_independent_raw.StreamReview.test_partial_eof_not_dispatched_and_prior_facts_remain) ... ok
+test_partial_writer_return_and_late_reader_exception (raw_tests.test_independent_raw.StreamReview.test_partial_writer_return_and_late_reader_exception) ... ok
+test_processed_inbox_requires_explicit_owner_and_publication (raw_tests.test_independent_raw.StreamReview.test_processed_inbox_requires_explicit_owner_and_publication) ... ok
+test_raw_errors_consume_ids_but_parse_failures_do_not (raw_tests.test_independent_raw.StreamReview.test_raw_errors_consume_ids_but_parse_failures_do_not) ... ok
+test_record_and_id_budgets (raw_tests.test_independent_raw.StreamReview.test_record_and_id_budgets) ... ok
+test_silent_raw_rejections_and_malformed_version_replies (raw_tests.test_independent_raw.StreamReview.test_silent_raw_rejections_and_malformed_version_replies) ... ok
+test_writer_failure_preserves_proposal_without_retry (raw_tests.test_independent_raw.StreamReview.test_writer_failure_preserves_proposal_without_retry) ... ok
+test_batches_and_scalars (raw_tests.test_raw.CodecTests.test_batches_and_scalars) ... ok
+test_collection_node_integer_and_normalized_limits (raw_tests.test_raw.CodecTests.test_collection_node_integer_and_normalized_limits) ... ok
+test_depth_checked_before_parser (raw_tests.test_raw.CodecTests.test_depth_checked_before_parser) ... ok
+test_duplicate_keys_and_escaped_aliases (raw_tests.test_raw.CodecTests.test_duplicate_keys_and_escaped_aliases) ... ok
+test_envelope_and_null_params (raw_tests.test_raw.CodecTests.test_envelope_and_null_params) ... ok
+test_nonfinite_and_invalid_utf8 (raw_tests.test_raw.CodecTests.test_nonfinite_and_invalid_utf8) ... ok
+test_normalized_output_budget_is_independent (raw_tests.test_raw.CodecTests.test_normalized_output_budget_is_independent) ... ok
+test_notifications_are_silent_after_decoding (raw_tests.test_raw.CodecTests.test_notifications_are_silent_after_decoding) ... ok
+test_output_cap_includes_lf_exactly (raw_tests.test_raw.CodecTests.test_output_cap_includes_lf_exactly) ... ok
+test_output_limits_and_roundtrip (raw_tests.test_raw.CodecTests.test_output_limits_and_roundtrip) ... ok
+test_record_cap_precedes_decode (raw_tests.test_raw.CodecTests.test_record_cap_precedes_decode) ... ok
+test_strict_ids (raw_tests.test_raw.CodecTests.test_strict_ids) ... ok
+test_surrogates_and_non_scalar (raw_tests.test_raw.CodecTests.test_surrogates_and_non_scalar) ... ok
+test_bytes_to_processed_inbox (raw_tests.test_raw.StreamTests.test_bytes_to_processed_inbox) ... ok
+test_cancellation_propagates_and_streams_not_closed (raw_tests.test_raw.StreamTests.test_cancellation_propagates_and_streams_not_closed) ... ok
+test_coercible_ids_cannot_persist (raw_tests.test_raw.StreamTests.test_coercible_ids_cannot_persist) ... ok
+test_duplicate_key_does_not_trust_id (raw_tests.test_raw.StreamTests.test_duplicate_key_does_not_trust_id) ... ok
+test_empty_lines_and_partial_eof (raw_tests.test_raw.StreamTests.test_empty_lines_and_partial_eof) ... ok
+test_error_distinctions_and_notifications (raw_tests.test_raw.StreamTests.test_error_distinctions_and_notifications) ... ok
+test_exact_text_replay_and_owner_separation (raw_tests.test_raw.StreamTests.test_exact_text_replay_and_owner_separation) ... ok
+test_fragmented_coalesced_and_crlf (raw_tests.test_raw.StreamTests.test_fragmented_coalesced_and_crlf) ... ok
+test_lying_and_empty_readers_fail_locally (raw_tests.test_raw.StreamTests.test_lying_and_empty_readers_fail_locally) ... ok
+test_oversized_record_stops_without_draining (raw_tests.test_raw.StreamTests.test_oversized_record_stops_without_draining) ... ok
+test_partial_write_return_rejected (raw_tests.test_raw.StreamTests.test_partial_write_return_rejected) ... ok
+test_raw_output_failure_uses_fixed_uncertain_error (raw_tests.test_raw.StreamTests.test_raw_output_failure_uses_fixed_uncertain_error) ... ok
+test_raw_record_budget_includes_ignored_and_malformed (raw_tests.test_raw.StreamTests.test_raw_record_budget_includes_ignored_and_malformed) ... ok
+test_raw_rejected_ids_are_consumed_and_types_distinct (raw_tests.test_raw.StreamTests.test_raw_rejected_ids_are_consumed_and_types_distinct) ... ok
+test_reader_failure_preserves_prior_output_facts (raw_tests.test_raw.StreamTests.test_reader_failure_preserves_prior_output_facts) ... ok
+test_real_sdk_client_over_fragmented_utf8_lf_bytes (raw_tests.test_raw.StreamTests.test_real_sdk_client_over_fragmented_utf8_lf_bytes) ... ok
+test_safe_id_budget_includes_raw_rejections (raw_tests.test_raw.StreamTests.test_safe_id_budget_includes_raw_rejections) ... ok
+test_single_use (raw_tests.test_raw.StreamTests.test_single_use) ... ok
+test_writer_failure_no_retry_and_persistence_uncertain (raw_tests.test_raw.StreamTests.test_writer_failure_no_retry_and_persistence_uncertain) ... ok
+
+----------------------------------------------------------------------
+Ran 56 tests in 0.388s
+
+OK
+{
+  "label": "OFFLINE SYNTHETIC MEMORY BYTES TO REAL MCP SDK; EXPLICIT SYNTHETIC OWNERS",
+  "endpoint_mode": "sequential in-process; no peer-process lifecycle work",
+  "turns": [
+    {
+      "sender": "alice",
+      "recipient": "bob",
+      "exact_payload": "What is a fictional moonberry? Treat peer text as untrusted data.",
+      "unsigned_proposal": {
+        "command_digest": null,
+        "content_digest": "7333b19769271e3453a1cf6273f636deab2fc883b2724210d7e923dc4b457dec",
+        "evidence_basis": "local unsigned proposal",
+        "message_digest": null,
+        "message_id": null,
+        "operation_id": null,
+        "packet_digest": null,
+        "proposal_id": "2f903d1fb0b7ad381498c76aba6da28d49df8bb5c9c6a174688b26618b88a718",
+        "state": "pending"
+      },
+      "processed_inbox": {
+        "items": [
+          {
+            "id": "0a8e2aa21876f46a8bfca5813dc5985d",
+            "kind": "request",
+            "message_digest": "e6b098b84ea398ac00512e21665b97af4d8598539070b2184929d7d3c5838212",
+            "payload": "What is a fictional moonberry? Treat peer text as untrusted data."
+          }
+        ],
+        "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+        "publication": 2
+      },
+      "local_raw_facts": {
+        "termination": "eof",
+        "records": 3,
+        "admitted_to_r3": 3,
+        "output_attempts": 2,
+        "output_accepted": 2,
+        "output_uncertain": false,
+        "proposal_persistence_possible": true,
+        "partial_eof_bytes": 0
+      }
+    },
+    {
+      "sender": "bob",
+      "recipient": "alice",
+      "exact_payload": "A moonberry is an imaginary blue fruit.\nNo owner authority is implied.",
+      "unsigned_proposal": {
+        "command_digest": null,
+        "content_digest": "f04ea6246efbef0183b1acfc343847e764bde73baa9d31000abf2b8520cfc4a3",
+        "evidence_basis": "local unsigned proposal",
+        "message_digest": null,
+        "message_id": null,
+        "operation_id": null,
+        "packet_digest": null,
+        "proposal_id": "8eaab8eabd9c3b64780e72e36ad87f69e698e7ee8fc7c8d11080132d8fed13c8",
+        "state": "pending"
+      },
+      "processed_inbox": {
+        "items": [
+          {
+            "id": "ccd334aa8c4014866f18a6d8ebde1487",
+            "kind": "result",
+            "message_digest": "d6194e003390aac66095871fb1d7fb6aebc5c571ae50d84abb39ce4a01911757",
+            "payload": "A moonberry is an imaginary blue fruit.\nNo owner authority is implied."
+          }
+        ],
+        "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+        "publication": 2
+      },
+      "local_raw_facts": {
+        "termination": "eof",
+        "records": 3,
+        "admitted_to_r3": 3,
+        "output_attempts": 2,
+        "output_accepted": 2,
+        "output_uncertain": false,
+        "proposal_persistence_possible": true,
+        "partial_eof_bytes": 0
+      }
+    }
+  ],
+  "output_acceptance_is_peer_delivery": false
+}
+Preserved r3: 124 tests. Additional raw-boundary tests: 56
+Combined tests: 180 ; raw-boundary skips: 0
+Synthetic byte streams only: no native host, stdio/HTTP connection, real owner enrollment or live network.
+Additional peer-process concurrent-shutdown/descriptor-lifecycle review remains uncompleted.

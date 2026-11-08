@@ -1,0 +1,18 @@
+{
+  "acceptance_cases": "ALL NOT RUN",
+  "active_configuration_written": false,
+  "codex_disabled": true,
+  "exact_three_tools": true,
+  "files": {
+    "PILOT_DECISION.md": "ecf0142d577e7255b0f6da50fbff2d671e09820933c18814168b35f63c959024",
+    "acceptance-record.json": "954c50f453534b12d43e1f7525caf8dbdcc20570bff1eaa7ca479915582114da",
+    "inert-profiles/claude-mcp.json.example": "58b754b2ff46293a055048d20bc50f2040fc3042e6d46fdeb65f8a4c67b686be",
+    "inert-profiles/claude-permissions.json.example": "0047f6c641fe319490af026077c815072d2782f18b6548713d6a4b41e2afde55",
+    "inert-profiles/codex-disabled.toml.example": "1649731cffbb71cf6ddd2b40d1c4a27621943465843ad0730e2abbd6ccb1ab44"
+  },
+  "host_schema_or_runtime_validation": "NOT PERFORMED",
+  "json_toml_syntax": "parsed",
+  "network_or_host_calls": false,
+  "placeholder_executable_paths_exist": false,
+  "status": "STATIC DRAFT VALIDATION ONLY"
+}

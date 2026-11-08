@@ -1,0 +1,57 @@
+{
+  "release": "experimental-r3",
+  "date": "2026-11-08",
+  "scope": "Offline already-decoded MCP SDK tools bridge, not native or live-host acceptance.",
+  "tests": {
+    "total": 124,
+    "preserved_r2": 91,
+    "bridge_implementation": 18,
+    "independent_bridge": 15,
+    "skips": 0
+  },
+  "demos": [
+    "preserved independent-peer r1",
+    "preserved local proposal facade r2",
+    "full SDK proposal/request/result roundtrip r3"
+  ],
+  "fresh_archive_validation": {
+    "passed": true,
+    "warnings": "ResourceWarning as error",
+    "source_files": 48,
+    "source_manifest_sha256": "49a5f960c026a2f8dab10c2e293b5d49e3ad5d74f328cb40993892600e66e901"
+  },
+  "preserved": {
+    "all_r2_files": 65,
+    "v29_frozen_sources": 153,
+    "prior_archives": 30
+  },
+  "sdk_protocol_negotiation": [
+    "2024-11-05",
+    "2025-03-26",
+    "2025-06-18",
+    "2025-11-25"
+  ],
+  "sdk_client_roundtrip_protocol": "2025-11-25",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "dependencies": {
+    "mcp": "1.29.0",
+    "anyio": "4.14.2",
+    "pydantic": "2.13.4",
+    "pydantic-core": "2.46.4",
+    "jsonschema": "4.26.0",
+    "cryptography": "50.0.0",
+    "httpx": "0.28.1"
+  },
+  "uncompleted": [
+    "Additional peer-process concurrent-shutdown/descriptor-lifecycle review",
+    "SDK/embedding logging confidentiality",
+    "Raw-byte transport validation",
+    "Native host acceptance",
+    "MCP2026/full conformance testing",
+    "Live network/real owner enrollment",
+    "Persistent key recovery",
+    "Hard synchronous SQLite preemption and lossless output-drain guarantees"
+  ],
+  "source_changes": "Additive modules only, complete nested r2 preserved byte-identically."
+}

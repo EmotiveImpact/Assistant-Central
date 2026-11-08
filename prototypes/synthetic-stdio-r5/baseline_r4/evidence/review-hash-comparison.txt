@@ -1,0 +1,13 @@
+Compared 12 reviewed source/document files.
+UNCHANGED DESIGN.md
+UNCHANGED EVIDENCE.md
+UNCHANGED START_HERE_R4.md
+UNCHANGED baseline_r3/mcp_bridge/bridge.py
+UNCHANGED bootstrap.py
+UNCHANGED raw_bridge/__init__.py
+UNCHANGED raw_bridge/codec.py
+UNCHANGED raw_bridge/memory.py
+UNCHANGED raw_bridge/transport.py
+UNCHANGED raw_tests/test_raw.py
+UNCHANGED run_demo.py
+UNCHANGED run_raw_checks.py

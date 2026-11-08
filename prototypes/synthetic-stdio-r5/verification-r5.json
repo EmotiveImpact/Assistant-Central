@@ -1,0 +1,29 @@
+{
+  "checks": {
+    "additional_peer_lifecycle_review": "UNCOMPLETED AND EXCLUDED",
+    "builder": 20,
+    "distinct_total": 39,
+    "independent": 19,
+    "inherited_peer_suites": "NOT RUN",
+    "native_host": "NOT RUN",
+    "provider": "NOT RUN"
+  },
+  "date_utc": "2026-11-08",
+  "format": "synthetic-stdio-r5/1",
+  "launcher_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+  "preservation": {
+    "baseline_r4_files": 128,
+    "original_preparation_files": 8,
+    "original_r4_files": 128,
+    "prior_archive_hashes": {
+      "agent-network-independent-peers-experimental-r1.zip": "9a6fb0140c6b1edb6ccfd30a3a98e7983f5bec12e0615b1aad1d1a765d279a14",
+      "agent-network-independent-peers-experimental-r2.zip": "1c7dc0bffde1b9a5e06113394e17a3a1948d95e3721d094f06fbdeb557358413",
+      "agent-network-independent-peers-experimental-r3.zip": "b4f0b6b5b84c19b8c1fba05f4df7ecd1bd05fbddb47427cfa95b1be547b99a94",
+      "agent-network-independent-peers-experimental-r4.zip": "27176f8b69dbfec478327c40b8574ddd973258ea48a8b9542127725e0b80ac67",
+      "agent-network-minimal-real-pilot-plan.zip": "2d92492e20ff93d1cf8a835f618a3c09821816719183693ef39b51d6c3c772d4",
+      "agent-network-prototype-v29.zip": "efa40404e4e998e39faa3001feb7596d3c3524d3e9c130134d87a69507be450d"
+    }
+  },
+  "runtime": "Existing Python3.12.14/POSIX Linux; mcp1.29.0; anyio4.14.2; pydantic2.13.4; cryptography50.0.0; not full dependency lock.",
+  "scope": "Actual local synthetic stdio client and SDK client; no native host or provider acceptance."
+}

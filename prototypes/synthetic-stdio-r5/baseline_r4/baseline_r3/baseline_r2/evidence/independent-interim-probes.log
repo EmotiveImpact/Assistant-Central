@@ -1,0 +1,13 @@
+test_authenticated_processing_claim_does_not_bypass_local_revocation (test_independent_review.Review.test_authenticated_processing_claim_does_not_bypass_local_revocation) ... ok
+test_cancel_replay_is_historical_and_changed_bytes_denied (test_independent_review.Review.test_cancel_replay_is_historical_and_changed_bytes_denied) ... ok
+test_freshly_signed_stale_grant_after_regrant (test_independent_review.Review.test_freshly_signed_stale_grant_after_regrant) ... ok
+test_partial_peer_owner_command_cannot_cross_lane_then_eof (test_independent_review.Review.test_partial_peer_owner_command_cannot_cross_lane_then_eof) ... ok
+test_peer_rejections_do_not_change_dispatch_lane (test_independent_review.Review.test_peer_rejections_do_not_change_dispatch_lane) ... ok
+test_result_commit_is_atomic_across_inbox_and_outbox_evidence (test_independent_review.Review.test_result_commit_is_atomic_across_inbox_and_outbox_evidence) ... ok
+test_unsolicited_valid_signer_cannot_invent_local_request (test_independent_review.Review.test_unsolicited_valid_signer_cannot_invent_local_request) ... ok
+test_valid_signer_wrong_phase_and_context_proofs (test_independent_review.Review.test_valid_signer_wrong_phase_and_context_proofs) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.635s
+
+OK

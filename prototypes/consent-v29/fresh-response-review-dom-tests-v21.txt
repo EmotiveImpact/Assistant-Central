@@ -1,0 +1,8 @@
+PASS late prepare success never navigates away from newer task
+PASS late prepare rejection cannot contaminate a new response session
+PASS same route navigation invalidates previous exact confirmation
+PASS preview in flight freezes captured values even when editable DOM changes
+PASS empty response survives edit and explicit repreview without restored default item
+PASS raw hash change fences old preview click before hash event
+PASS modal blocks editing and preview resubmission until cancellation
+7/7 independent response DOM-model checks passed (not browser tests).

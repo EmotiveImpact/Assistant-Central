@@ -1,0 +1,3856 @@
+{
+  "active_requirement_edges": [
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "3.18",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "trio": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "idna>=2.8",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "anyio",
+      "specifier": ">=2.8",
+      "specifier_satisfied": true,
+      "target": "idna",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": "python_version < \"3.13\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "trio": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "trio"
+      ],
+      "requirement": "typing_extensions>=4.5; python_version < \"3.13\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "anyio",
+      "specifier": ">=4.5",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "3.0",
+      "marker": "implementation_name != \"PyPy\"",
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pycparser; implementation_name != \"PyPy\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "cffi",
+      "specifier": "",
+      "specifier_satisfied": true,
+      "target": "pycparser",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.1.1",
+      "marker": "platform_python_implementation != \"PyPy\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "ssh": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [
+        "ssh"
+      ],
+      "requirement": "cffi>=2.0.0; platform_python_implementation != \"PyPy\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "cryptography",
+      "specifier": ">=2.0.0",
+      "specifier_satisfied": true,
+      "target": "cffi",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2026.10.19",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "asyncio": true,
+        "http2": true,
+        "socks": true,
+        "trio": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "certifi",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpcore",
+      "specifier": "",
+      "specifier_satisfied": true,
+      "target": "certifi",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "asyncio": true,
+        "http2": true,
+        "socks": true,
+        "trio": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "h11>=0.16",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpcore",
+      "specifier": ">=0.16",
+      "specifier_satisfied": true,
+      "target": "h11",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.14.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "brotli": true,
+        "cli": true,
+        "http2": true,
+        "socks": true,
+        "zstd": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "anyio",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpx",
+      "specifier": "",
+      "specifier_satisfied": true,
+      "target": "anyio",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2026.10.19",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "brotli": true,
+        "cli": true,
+        "http2": true,
+        "socks": true,
+        "zstd": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "certifi",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpx",
+      "specifier": "",
+      "specifier_satisfied": true,
+      "target": "certifi",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "1.0.9",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "brotli": true,
+        "cli": true,
+        "http2": true,
+        "socks": true,
+        "zstd": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "httpcore==1.*",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpx",
+      "specifier": "==1.*",
+      "specifier_satisfied": true,
+      "target": "httpcore",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "3.18",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "brotli": true,
+        "cli": true,
+        "http2": true,
+        "socks": true,
+        "zstd": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "idna",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "httpx",
+      "specifier": "",
+      "specifier_satisfied": true,
+      "target": "idna",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "26.1.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "format": true,
+        "format-nongpl": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "attrs>=22.2.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "jsonschema",
+      "specifier": ">=22.2.0",
+      "specifier_satisfied": true,
+      "target": "attrs",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2025.9.1",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "format": true,
+        "format-nongpl": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "jsonschema-specifications>=2023.03.6",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "jsonschema",
+      "specifier": ">=2023.03.6",
+      "specifier_satisfied": true,
+      "target": "jsonschema-specifications",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.37.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "format": true,
+        "format-nongpl": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "referencing>=0.28.4",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "jsonschema",
+      "specifier": ">=0.28.4",
+      "specifier_satisfied": true,
+      "target": "referencing",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2026.6.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "format": true,
+        "format-nongpl": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "rpds-py>=0.25.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "jsonschema",
+      "specifier": ">=0.25.0",
+      "specifier_satisfied": true,
+      "target": "rpds-py",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.37.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "referencing>=0.31.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "jsonschema-specifications",
+      "specifier": ">=0.31.0",
+      "specifier_satisfied": true,
+      "target": "referencing",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.14.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "anyio>=4.5",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=4.5",
+      "specifier_satisfied": true,
+      "target": "anyio",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.4.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "httpx-sse>=0.4",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=0.4",
+      "specifier_satisfied": true,
+      "target": "httpx-sse",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.28.1",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "httpx<1.0.0,>=0.27.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": "<1.0.0,>=0.27.1",
+      "specifier_satisfied": true,
+      "target": "httpx",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.26.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "jsonschema>=4.20.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=4.20.0",
+      "specifier_satisfied": true,
+      "target": "jsonschema",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.15.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pydantic-settings>=2.5.2",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=2.5.2",
+      "specifier_satisfied": true,
+      "target": "pydantic-settings",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.13.4",
+      "marker": "python_version < \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "cli",
+        "rich",
+        "ws"
+      ],
+      "requirement": "pydantic<3.0.0,>=2.11.0; python_version < \"3.14\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": "<3.0.0,>=2.11.0",
+      "specifier_satisfied": true,
+      "target": "pydantic",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.13.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pyjwt[crypto]>=2.10.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=2.10.1",
+      "specifier_satisfied": true,
+      "target": "pyjwt",
+      "target_extras": [
+        "crypto"
+      ]
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.0.32",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "python-multipart>=0.0.9",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=0.0.9",
+      "specifier_satisfied": true,
+      "target": "python-multipart",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "3.4.8",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 11,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "sse-starlette>=1.6.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=1.6.1",
+      "specifier_satisfied": true,
+      "target": "sse-starlette",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "1.6.0",
+      "marker": "python_version < \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 12,
+      "optional_extra_contexts_that_would_select": [
+        "cli",
+        "rich",
+        "ws"
+      ],
+      "requirement": "starlette>=0.27; python_version < \"3.14\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=0.27",
+      "specifier_satisfied": true,
+      "target": "starlette",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 14,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.9.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=4.9.0",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.4.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 15,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-inspection>=0.4.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=0.4.1",
+      "specifier_satisfied": true,
+      "target": "typing-inspection",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.52.1",
+      "marker": "sys_platform != \"emscripten\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "cli": true,
+        "rich": true,
+        "ws": true
+      },
+      "metadata_index": 16,
+      "optional_extra_contexts_that_would_select": [
+        "cli",
+        "rich",
+        "ws"
+      ],
+      "requirement": "uvicorn>=0.31.1; sys_platform != \"emscripten\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "mcp",
+      "specifier": ">=0.31.1",
+      "specifier_satisfied": true,
+      "target": "uvicorn",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.8.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "email": true,
+        "timezone": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "annotated-types>=0.6.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic",
+      "specifier": ">=0.6.0",
+      "specifier_satisfied": true,
+      "target": "annotated-types",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.46.4",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "email": true,
+        "timezone": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pydantic-core==2.46.4",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic",
+      "specifier": "==2.46.4",
+      "specifier_satisfied": true,
+      "target": "pydantic-core",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "email": true,
+        "timezone": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.14.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic",
+      "specifier": ">=4.14.1",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.4.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "email": true,
+        "timezone": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-inspection>=0.4.2",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic",
+      "specifier": ">=0.4.2",
+      "specifier_satisfied": true,
+      "target": "typing-inspection",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.14.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic-core",
+      "specifier": ">=4.14.1",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2.13.4",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "aws-secrets-manager": true,
+        "azure-key-vault": true,
+        "gcp-secret-manager": true,
+        "toml": true,
+        "yaml": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pydantic>=2.7.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic-settings",
+      "specifier": ">=2.7.0",
+      "specifier_satisfied": true,
+      "target": "pydantic",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "1.2.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "aws-secrets-manager": true,
+        "azure-key-vault": true,
+        "gcp-secret-manager": true,
+        "toml": true,
+        "yaml": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "python-dotenv>=0.21.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic-settings",
+      "specifier": ">=0.21.0",
+      "specifier_satisfied": true,
+      "target": "python-dotenv",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.4.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "aws-secrets-manager": true,
+        "azure-key-vault": true,
+        "gcp-secret-manager": true,
+        "toml": true,
+        "yaml": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-inspection>=0.4.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pydantic-settings",
+      "specifier": ">=0.4.0",
+      "specifier_satisfied": true,
+      "target": "typing-inspection",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        "",
+        "crypto"
+      ],
+      "installed_version": "50.0.0",
+      "marker": "extra == \"crypto\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "crypto": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "cryptography>=3.4.0; extra == \"crypto\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "pyjwt",
+      "specifier": ">=3.4.0",
+      "specifier_satisfied": true,
+      "target": "cryptography",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "26.1.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "attrs>=22.2.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "referencing",
+      "specifier": ">=22.2.0",
+      "specifier_satisfied": true,
+      "target": "attrs",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "2026.6.3",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "rpds-py>=0.7.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "referencing",
+      "specifier": ">=0.7.0",
+      "specifier_satisfied": true,
+      "target": "rpds-py",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": "python_version < \"3.13\"",
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.4.0; python_version < \"3.13\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "referencing",
+      "specifier": ">=4.4.0",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "1.6.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "daphne": true,
+        "examples": true,
+        "examples-db": true,
+        "granian": true,
+        "uvicorn": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "starlette>=0.49.1",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "sse-starlette",
+      "specifier": ">=0.49.1",
+      "specifier_satisfied": true,
+      "target": "starlette",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.14.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "daphne": true,
+        "examples": true,
+        "examples-db": true,
+        "granian": true,
+        "uvicorn": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "anyio>=4.7.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "sse-starlette",
+      "specifier": ">=4.7.0",
+      "specifier_satisfied": true,
+      "target": "anyio",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.14.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "full": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "anyio<5,>=3.6.2",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "starlette",
+      "specifier": "<5,>=3.6.2",
+      "specifier_satisfied": true,
+      "target": "anyio",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": "python_version < \"3.13\"",
+      "marker_evaluations_by_extra": {
+        "": true,
+        "full": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "typing-extensions>=4.10.0; python_version < \"3.13\"",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "starlette",
+      "specifier": ">=4.10.0",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "4.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.15.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "typing-inspection",
+      "specifier": ">=4.15.0",
+      "specifier_satisfied": true,
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "8.4.2",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "standard": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "click>=7.0",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "uvicorn",
+      "specifier": ">=7.0",
+      "specifier_satisfied": true,
+      "target": "click",
+      "target_extras": []
+    },
+    {
+      "active": true,
+      "active_extra_contexts": [
+        ""
+      ],
+      "installed_version": "0.16.0",
+      "marker": null,
+      "marker_evaluations_by_extra": {
+        "": true,
+        "standard": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "h11>=0.8",
+      "satisfaction_prereleases_policy": "include prereleases when comparing the observed installed version; this is not candidate selection",
+      "source": "uvicorn",
+      "specifier": ">=0.8",
+      "specifier_satisfied": true,
+      "target": "h11",
+      "target_extras": []
+    }
+  ],
+  "analysis_tooling": {
+    "note": "packaging parses PEP 508 requirements and evaluates PEP 508 markers; it is not added to the runtime snapshot.",
+    "packaging_version": "26.3",
+    "part_of_runtime_closure": false
+  },
+  "artifact_kind": "observed-installed-active-metadata-dependency-closure",
+  "environment": {
+    "dont_write_bytecode": true,
+    "isolated": true,
+    "pep508": {
+      "implementation_name": "cpython",
+      "implementation_version": "3.12.14",
+      "os_name": "posix",
+      "platform_machine": "x86_64",
+      "platform_python_implementation": "CPython",
+      "platform_release": "6.18.57",
+      "platform_system": "Linux",
+      "platform_version": "#1 SMP Tue Oct 20 21:56:04 UTC 2026",
+      "python_full_version": "3.12.14",
+      "python_version": "3.12",
+      "sys_platform": "linux"
+    },
+    "python_executable": "python3.12",
+    "python_version": "3.12.14"
+  },
+  "excluded_requirement_edges": [
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_version < \"3.11\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "trio": false
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "exceptiongroup>=1.0.2; python_version < \"3.11\"",
+      "source": "anyio",
+      "specifier": ">=1.0.2",
+      "target": "exceptiongroup",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"trio\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "trio": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "trio"
+      ],
+      "requirement": "trio>=0.32.0; extra == \"trio\"",
+      "source": "anyio",
+      "specifier": ">=0.32.0",
+      "target": "trio",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "platform_system == \"Windows\"",
+      "marker_evaluations_by_extra": {
+        "": false
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "colorama; platform_system == \"Windows\"",
+      "source": "click",
+      "specifier": "",
+      "target": "colorama",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_full_version < \"3.11\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "ssh": false
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.13.2; python_full_version < \"3.11\"",
+      "source": "cryptography",
+      "specifier": ">=4.13.2",
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"ssh\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "ssh": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "ssh"
+      ],
+      "requirement": "bcrypt>=3.1.5; extra == \"ssh\"",
+      "source": "cryptography",
+      "specifier": ">=3.1.5",
+      "target": "bcrypt",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"asyncio\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "asyncio": true,
+        "http2": false,
+        "socks": false,
+        "trio": false
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "asyncio"
+      ],
+      "requirement": "anyio<5.0,>=4.0; extra == \"asyncio\"",
+      "source": "httpcore",
+      "specifier": "<5.0,>=4.0",
+      "target": "anyio",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"http2\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "asyncio": false,
+        "http2": true,
+        "socks": false,
+        "trio": false
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "http2"
+      ],
+      "requirement": "h2<5,>=3; extra == \"http2\"",
+      "source": "httpcore",
+      "specifier": "<5,>=3",
+      "target": "h2",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"socks\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "asyncio": false,
+        "http2": false,
+        "socks": true,
+        "trio": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "socks"
+      ],
+      "requirement": "socksio==1.*; extra == \"socks\"",
+      "source": "httpcore",
+      "specifier": "==1.*",
+      "target": "socksio",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"trio\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "asyncio": false,
+        "http2": false,
+        "socks": false,
+        "trio": true
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "trio"
+      ],
+      "requirement": "trio<1.0,>=0.22.0; extra == \"trio\"",
+      "source": "httpcore",
+      "specifier": "<1.0,>=0.22.0",
+      "target": "trio",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "platform_python_implementation == \"CPython\" and extra == \"brotli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": true,
+        "cli": false,
+        "http2": false,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "brotli"
+      ],
+      "requirement": "brotli; platform_python_implementation == \"CPython\" and extra == \"brotli\"",
+      "source": "httpx",
+      "specifier": "",
+      "target": "brotli",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "platform_python_implementation != \"CPython\" and extra == \"brotli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": false,
+        "http2": false,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "brotlicffi; platform_python_implementation != \"CPython\" and extra == \"brotli\"",
+      "source": "httpx",
+      "specifier": "",
+      "target": "brotlicffi",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": true,
+        "http2": false,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "click==8.*; extra == \"cli\"",
+      "source": "httpx",
+      "specifier": "==8.*",
+      "target": "click",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": true,
+        "http2": false,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "pygments==2.*; extra == \"cli\"",
+      "source": "httpx",
+      "specifier": "==2.*",
+      "target": "pygments",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": true,
+        "http2": false,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "rich<14,>=10; extra == \"cli\"",
+      "source": "httpx",
+      "specifier": "<14,>=10",
+      "target": "rich",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"http2\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": false,
+        "http2": true,
+        "socks": false,
+        "zstd": false
+      },
+      "metadata_index": 9,
+      "optional_extra_contexts_that_would_select": [
+        "http2"
+      ],
+      "requirement": "h2<5,>=3; extra == \"http2\"",
+      "source": "httpx",
+      "specifier": "<5,>=3",
+      "target": "h2",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"socks\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": false,
+        "http2": false,
+        "socks": true,
+        "zstd": false
+      },
+      "metadata_index": 10,
+      "optional_extra_contexts_that_would_select": [
+        "socks"
+      ],
+      "requirement": "socksio==1.*; extra == \"socks\"",
+      "source": "httpx",
+      "specifier": "==1.*",
+      "target": "socksio",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"zstd\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "brotli": false,
+        "cli": false,
+        "http2": false,
+        "socks": false,
+        "zstd": true
+      },
+      "metadata_index": 11,
+      "optional_extra_contexts_that_would_select": [
+        "zstd"
+      ],
+      "requirement": "zstandard>=0.18.0; extra == \"zstd\"",
+      "source": "httpx",
+      "specifier": ">=0.18.0",
+      "target": "zstandard",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"all\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "all": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [
+        "all"
+      ],
+      "requirement": "ruff>=0.6.2; extra == \"all\"",
+      "source": "idna",
+      "specifier": ">=0.6.2",
+      "target": "ruff",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"all\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "all": true
+      },
+      "metadata_index": 1,
+      "optional_extra_contexts_that_would_select": [
+        "all"
+      ],
+      "requirement": "mypy>=1.11.2; extra == \"all\"",
+      "source": "idna",
+      "specifier": ">=1.11.2",
+      "target": "mypy",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"all\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "all": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "all"
+      ],
+      "requirement": "pytest>=8.3.2; extra == \"all\"",
+      "source": "idna",
+      "specifier": ">=8.3.2",
+      "target": "pytest",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "fqdn; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "fqdn",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "idna; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "idna",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "isoduration; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "isoduration",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "jsonpointer>1.13; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": ">1.13",
+      "target": "jsonpointer",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "rfc3339-validator; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "rfc3339-validator",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 9,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "rfc3987; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "rfc3987",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 10,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "uri-template; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "uri-template",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": true,
+        "format-nongpl": false
+      },
+      "metadata_index": 11,
+      "optional_extra_contexts_that_would_select": [
+        "format"
+      ],
+      "requirement": "webcolors>=1.11; extra == \"format\"",
+      "source": "jsonschema",
+      "specifier": ">=1.11",
+      "target": "webcolors",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 12,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "fqdn; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "fqdn",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 13,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "idna; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "idna",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 14,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "isoduration; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "isoduration",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 15,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "jsonpointer>1.13; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": ">1.13",
+      "target": "jsonpointer",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 16,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "rfc3339-validator; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "rfc3339-validator",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 17,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "rfc3986-validator>0.1.0; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": ">0.1.0",
+      "target": "rfc3986-validator",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 18,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "rfc3987-syntax>=1.1.0; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": ">=1.1.0",
+      "target": "rfc3987-syntax",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 19,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "uri-template; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": "",
+      "target": "uri-template",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"format-nongpl\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "format": false,
+        "format-nongpl": true
+      },
+      "metadata_index": 20,
+      "optional_extra_contexts_that_would_select": [
+        "format-nongpl"
+      ],
+      "requirement": "webcolors>=24.6.0; extra == \"format-nongpl\"",
+      "source": "jsonschema",
+      "specifier": ">=24.6.0",
+      "target": "webcolors",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_version >= \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pydantic<3.0.0,>=2.12.0; python_version >= \"3.14\"",
+      "source": "mcp",
+      "specifier": "<3.0.0,>=2.12.0",
+      "target": "pydantic",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "sys_platform == \"win32\" and python_version < \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 9,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pywin32>=310; sys_platform == \"win32\" and python_version < \"3.14\"",
+      "source": "mcp",
+      "specifier": ">=310",
+      "target": "pywin32",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "sys_platform == \"win32\" and python_version >= \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 10,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "pywin32>=311; sys_platform == \"win32\" and python_version >= \"3.14\"",
+      "source": "mcp",
+      "specifier": ">=311",
+      "target": "pywin32",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_version >= \"3.14\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 13,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "starlette>=0.48.0; python_version >= \"3.14\"",
+      "source": "mcp",
+      "specifier": ">=0.48.0",
+      "target": "starlette",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": true,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 17,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "python-dotenv>=1.0.0; extra == \"cli\"",
+      "source": "mcp",
+      "specifier": ">=1.0.0",
+      "target": "python-dotenv",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": true,
+        "rich": false,
+        "ws": false
+      },
+      "metadata_index": 18,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "typer>=0.16.0; extra == \"cli\"",
+      "source": "mcp",
+      "specifier": ">=0.16.0",
+      "target": "typer",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"rich\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": true,
+        "ws": false
+      },
+      "metadata_index": 19,
+      "optional_extra_contexts_that_would_select": [
+        "rich"
+      ],
+      "requirement": "rich>=13.9.4; extra == \"rich\"",
+      "source": "mcp",
+      "specifier": ">=13.9.4",
+      "target": "rich",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"ws\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": false,
+        "rich": false,
+        "ws": true
+      },
+      "metadata_index": 20,
+      "optional_extra_contexts_that_would_select": [
+        "ws"
+      ],
+      "requirement": "websockets>=15.0.1; extra == \"ws\"",
+      "source": "mcp",
+      "specifier": ">=15.0.1",
+      "target": "websockets",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"email\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "email": true,
+        "timezone": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "email"
+      ],
+      "requirement": "email-validator>=2.0.0; extra == \"email\"",
+      "source": "pydantic",
+      "specifier": ">=2.0.0",
+      "target": "email-validator",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "(python_version >= \"3.9\" and platform_system == \"Windows\") and extra == \"timezone\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "email": false,
+        "timezone": false
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "tzdata; (python_version >= \"3.9\" and platform_system == \"Windows\") and extra == \"timezone\"",
+      "source": "pydantic",
+      "specifier": "",
+      "target": "tzdata",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"aws-secrets-manager\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": true,
+        "azure-key-vault": false,
+        "gcp-secret-manager": false,
+        "toml": false,
+        "yaml": false
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "aws-secrets-manager"
+      ],
+      "requirement": "boto3>=1.35.0; extra == \"aws-secrets-manager\"",
+      "source": "pydantic-settings",
+      "specifier": ">=1.35.0",
+      "target": "boto3",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"azure-key-vault\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": false,
+        "azure-key-vault": true,
+        "gcp-secret-manager": false,
+        "toml": false,
+        "yaml": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "azure-key-vault"
+      ],
+      "requirement": "azure-identity>=1.16.0; extra == \"azure-key-vault\"",
+      "source": "pydantic-settings",
+      "specifier": ">=1.16.0",
+      "target": "azure-identity",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"azure-key-vault\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": false,
+        "azure-key-vault": true,
+        "gcp-secret-manager": false,
+        "toml": false,
+        "yaml": false
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "azure-key-vault"
+      ],
+      "requirement": "azure-keyvault-secrets>=4.8.0; extra == \"azure-key-vault\"",
+      "source": "pydantic-settings",
+      "specifier": ">=4.8.0",
+      "target": "azure-keyvault-secrets",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"gcp-secret-manager\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": false,
+        "azure-key-vault": false,
+        "gcp-secret-manager": true,
+        "toml": false,
+        "yaml": false
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "gcp-secret-manager"
+      ],
+      "requirement": "google-cloud-secret-manager>=2.23.1; extra == \"gcp-secret-manager\"",
+      "source": "pydantic-settings",
+      "specifier": ">=2.23.1",
+      "target": "google-cloud-secret-manager",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"toml\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": false,
+        "azure-key-vault": false,
+        "gcp-secret-manager": false,
+        "toml": true,
+        "yaml": false
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "toml"
+      ],
+      "requirement": "tomli>=2.0.1; extra == \"toml\"",
+      "source": "pydantic-settings",
+      "specifier": ">=2.0.1",
+      "target": "tomli",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"yaml\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "aws-secrets-manager": false,
+        "azure-key-vault": false,
+        "gcp-secret-manager": false,
+        "toml": false,
+        "yaml": true
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [
+        "yaml"
+      ],
+      "requirement": "pyyaml>=6.0.1; extra == \"yaml\"",
+      "source": "pydantic-settings",
+      "specifier": ">=6.0.1",
+      "target": "pyyaml",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        "",
+        "crypto"
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_version < \"3.11\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "crypto": false
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing_extensions>=4.0; python_version < \"3.11\"",
+      "source": "pyjwt",
+      "specifier": ">=4.0",
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"cli\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "cli": true
+      },
+      "metadata_index": 0,
+      "optional_extra_contexts_that_would_select": [
+        "cli"
+      ],
+      "requirement": "click>=5.0; extra == \"cli\"",
+      "source": "python-dotenv",
+      "specifier": ">=5.0",
+      "target": "click",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"examples\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": true,
+        "examples-db": false,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "examples"
+      ],
+      "requirement": "uvicorn>=0.34.0; extra == \"examples\"",
+      "source": "sse-starlette",
+      "specifier": ">=0.34.0",
+      "target": "uvicorn",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"examples\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": true,
+        "examples-db": false,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "examples"
+      ],
+      "requirement": "fastapi>=0.115.12; extra == \"examples\"",
+      "source": "sse-starlette",
+      "specifier": ">=0.115.12",
+      "target": "fastapi",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"examples\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": true,
+        "examples-db": false,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "examples"
+      ],
+      "requirement": "pydantic>=2; extra == \"examples\"",
+      "source": "sse-starlette",
+      "specifier": ">=2",
+      "target": "pydantic",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"examples-db\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": false,
+        "examples-db": true,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "examples-db"
+      ],
+      "requirement": "sqlalchemy[asyncio]>=2.0.41; extra == \"examples-db\"",
+      "source": "sse-starlette",
+      "specifier": ">=2.0.41",
+      "target": "sqlalchemy",
+      "target_extras": [
+        "asyncio"
+      ]
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"examples-db\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": false,
+        "examples-db": true,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "examples-db"
+      ],
+      "requirement": "aiosqlite>=0.21.0; extra == \"examples-db\"",
+      "source": "sse-starlette",
+      "specifier": ">=0.21.0",
+      "target": "aiosqlite",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"uvicorn\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": false,
+        "examples-db": false,
+        "granian": false,
+        "uvicorn": true
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "uvicorn"
+      ],
+      "requirement": "uvicorn>=0.34.0; extra == \"uvicorn\"",
+      "source": "sse-starlette",
+      "specifier": ">=0.34.0",
+      "target": "uvicorn",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"granian\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": false,
+        "examples": false,
+        "examples-db": false,
+        "granian": true,
+        "uvicorn": false
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [
+        "granian"
+      ],
+      "requirement": "granian>=2.3.1; extra == \"granian\"",
+      "source": "sse-starlette",
+      "specifier": ">=2.3.1",
+      "target": "granian",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"daphne\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "daphne": true,
+        "examples": false,
+        "examples-db": false,
+        "granian": false,
+        "uvicorn": false
+      },
+      "metadata_index": 9,
+      "optional_extra_contexts_that_would_select": [
+        "daphne"
+      ],
+      "requirement": "daphne>=4.2.0; extra == \"daphne\"",
+      "source": "sse-starlette",
+      "specifier": ">=4.2.0",
+      "target": "daphne",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "httpx2>=2.0.0; extra == \"full\"",
+      "source": "starlette",
+      "specifier": ">=2.0.0",
+      "target": "httpx2",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "httpx<0.29.0,>=0.27.0; extra == \"full\"",
+      "source": "starlette",
+      "specifier": "<0.29.0,>=0.27.0",
+      "target": "httpx",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "itsdangerous; extra == \"full\"",
+      "source": "starlette",
+      "specifier": "",
+      "target": "itsdangerous",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "jinja2; extra == \"full\"",
+      "source": "starlette",
+      "specifier": "",
+      "target": "jinja2",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "python-multipart>=0.0.18; extra == \"full\"",
+      "source": "starlette",
+      "specifier": ">=0.0.18",
+      "target": "python-multipart",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"full\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "full": true
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "full"
+      ],
+      "requirement": "pyyaml; extra == \"full\"",
+      "source": "starlette",
+      "specifier": "",
+      "target": "pyyaml",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "marker false on this platform for base and all declared extras",
+      "installed_version_checked": false,
+      "marker": "python_version < \"3.11\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": false
+      },
+      "metadata_index": 2,
+      "optional_extra_contexts_that_would_select": [],
+      "requirement": "typing-extensions>=4.0; python_version < \"3.11\"",
+      "source": "uvicorn",
+      "specifier": ">=4.0",
+      "target": "typing-extensions",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 3,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "httptools>=0.8.0; extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=0.8.0",
+      "target": "httptools",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 4,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "python-dotenv>=0.13; extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=0.13",
+      "target": "python-dotenv",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 5,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "pyyaml>=5.1; extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=5.1",
+      "target": "pyyaml",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "(sys_platform != \"win32\" and (sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\")) and extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 6,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "uvloop>=0.15.1; (sys_platform != \"win32\" and (sys_platform != \"cygwin\" and platform_python_implementation != \"PyPy\")) and extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=0.15.1",
+      "target": "uvloop",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 7,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "watchfiles>=0.20; extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=0.20",
+      "target": "watchfiles",
+      "target_extras": []
+    },
+    {
+      "active": false,
+      "active_extra_contexts": [
+        ""
+      ],
+      "exclusion_reason": "unselected extra on this platform",
+      "installed_version_checked": false,
+      "marker": "extra == \"standard\"",
+      "marker_evaluations_by_extra": {
+        "": false,
+        "standard": true
+      },
+      "metadata_index": 8,
+      "optional_extra_contexts_that_would_select": [
+        "standard"
+      ],
+      "requirement": "websockets>=13.0; extra == \"standard\"",
+      "source": "uvicorn",
+      "specifier": ">=13.0",
+      "target": "websockets",
+      "target_extras": []
+    }
+  ],
+  "extras_notes": {
+    "mandatory_sdk_components": "HTTP, SSE, JWT, and server packages remain where MCP metadata requires them. Their inclusion neither enables nor approves network, host, provider, auth or server use.",
+    "mcp_cli_python_dotenv_overlap": "The cli-marked MCP edge is inactive, but python-dotenv is independently mandatory through pydantic-settings and remains in the snapshot.",
+    "mcp_optional_extras_unselected": [
+      "cli",
+      "rich",
+      "ws"
+    ],
+    "only_activated_extra": "pyjwt[crypto], required by mcp; no optional root extra requested",
+    "optional_dependency_closures": "Unselected optional dependencies are recorded as inactive edges only; their distributions and transitive closures were not resolved or checked."
+  },
+  "frozen_inputs": {
+    "after": [
+      {
+        "expected_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+        "observed_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+        "path": "agent-network-synthetic-stdio-r5/launcher.py"
+      },
+      {
+        "expected_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+        "observed_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+        "path": "agent-network-synthetic-stdio-experimental-r5.zip"
+      }
+    ],
+    "all_match_expected_and_unchanged": true,
+    "before": [
+      {
+        "expected_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+        "observed_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+        "path": "agent-network-synthetic-stdio-r5/launcher.py"
+      },
+      {
+        "expected_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+        "observed_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+        "path": "agent-network-synthetic-stdio-experimental-r5.zip"
+      }
+    ]
+  },
+  "import_evidence": [
+    {
+      "file": "baseline_r4/baseline_r3/baseline_r2/facade_candidate/__init__.py",
+      "imports": [
+        {
+          "level": 1,
+          "line": 2,
+          "module": "store",
+          "names": [
+            "ProposalStore",
+            "AssistantFacade",
+            "OwnerReview",
+            "SnapshotPublisher"
+          ]
+        }
+      ],
+      "sha256": "ff4dad8b7a936ac5fa5c1d49613c6f989bbdc09fe650791c5f2a1b85da4ed3a9"
+    },
+    {
+      "file": "baseline_r4/baseline_r3/baseline_r2/facade_candidate/store.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 2,
+          "module": "json",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 3,
+          "module": "sqlite3",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 5,
+          "module": "independent_peer.protocol",
+          "names": [
+            "Rejected",
+            "canonical",
+            "descriptor",
+            "digest",
+            "exact",
+            "grant_body",
+            "hashid",
+            "hexid",
+            "need",
+            "scope",
+            "task",
+            "token",
+            "verify",
+            "PROTOCOL",
+            "unb64"
+          ]
+        }
+      ],
+      "sha256": "a7586e91b49e2e1d64d973a5b2ffc3ba8f1402b2984bcc5ec91145f9d1e89a54"
+    },
+    {
+      "file": "baseline_r4/baseline_r3/baseline_r2/independent_peer/__init__.py",
+      "imports": [],
+      "sha256": "566a8e42f8de7ae6cd46a31c7bc5c044d48c78a8faab415eeb6c5c61651994bd"
+    },
+    {
+      "file": "baseline_r4/baseline_r3/baseline_r2/independent_peer/protocol.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 2,
+          "module": "base64",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 3,
+          "module": "hashlib",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 4,
+          "module": "json",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 5,
+          "module": "os",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 6,
+          "module": "re",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 8,
+          "module": "cryptography.hazmat.primitives.asymmetric.ed25519",
+          "names": [
+            "Ed25519PrivateKey",
+            "Ed25519PublicKey"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 9,
+          "module": "cryptography.hazmat.primitives.asymmetric.x25519",
+          "names": [
+            "X25519PrivateKey",
+            "X25519PublicKey"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 10,
+          "module": "cryptography.hazmat.primitives.ciphers.aead",
+          "names": [
+            "AESGCM"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 11,
+          "module": "cryptography.hazmat.primitives.hashes",
+          "names": [
+            "SHA256"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 12,
+          "module": "cryptography.hazmat.primitives.kdf.hkdf",
+          "names": [
+            "HKDF"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 13,
+          "module": "cryptography.hazmat.primitives.serialization",
+          "names": [
+            "Encoding",
+            "PublicFormat"
+          ]
+        }
+      ],
+      "sha256": "1b01582e201f7e6b9e6b54d25cb0a080e48fb66fb9e69a9eee727afdba561516"
+    },
+    {
+      "file": "baseline_r4/baseline_r3/mcp_bridge/__init__.py",
+      "imports": [],
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "baseline_r4/baseline_r3/mcp_bridge/bridge.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 2,
+          "module": "json",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 3,
+          "module": "math",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 4,
+          "module": "re",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 5,
+          "module": "importlib.metadata",
+          "names": [
+            "version"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 6,
+          "module": "anyio",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 7,
+          "module": "mcp",
+          "names": [
+            "types"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 8,
+          "module": "mcp.server.lowlevel",
+          "names": [
+            "Server"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 9,
+          "module": "mcp.server.models",
+          "names": [
+            "InitializationOptions"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 10,
+          "module": "mcp.shared.message",
+          "names": [
+            "SessionMessage"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 11,
+          "module": "facade_candidate",
+          "names": [
+            "AssistantFacade"
+          ]
+        }
+      ],
+      "sha256": "d213216fd5b1d7f3e9927e2e0b511bae89919bfbdc0180f475e3520b60f50110"
+    },
+    {
+      "file": "baseline_r4/raw_bridge/__init__.py",
+      "imports": [],
+      "sha256": "94b765174ab9871f7b6e7b8bead40e03345e7211748fb879303beeeb48af0eb7"
+    },
+    {
+      "file": "baseline_r4/raw_bridge/codec.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 2,
+          "module": "json",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 3,
+          "module": "re",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 4,
+          "module": "mcp_bridge.bridge",
+          "names": [
+            "bounded",
+            "MAX_MESSAGE_BYTES",
+            "MAX_OUTPUT_BYTES"
+          ]
+        }
+      ],
+      "sha256": "716e90179b6db1f3233dd74cae9131764b30f1a516d07a3163580ec4cdb3005b"
+    },
+    {
+      "file": "baseline_r4/raw_bridge/transport.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 2,
+          "module": "dataclasses",
+          "names": [
+            "dataclass"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 3,
+          "module": "anyio",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 4,
+          "module": "mcp",
+          "names": [
+            "types"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 5,
+          "module": "mcp.shared.message",
+          "names": [
+            "SessionMessage"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 6,
+          "module": "mcp_bridge.bridge",
+          "names": [
+            "OfflineBridge",
+            "MAX_REQUESTS"
+          ]
+        },
+        {
+          "level": 1,
+          "line": 7,
+          "module": "codec",
+          "names": [
+            "RECORD_CAP",
+            "Rejected",
+            "decode_record",
+            "encode_record",
+            "error_record"
+          ]
+        }
+      ],
+      "sha256": "3fdab45ececcbcf3b4a85392ab0c283edc7b0b8d29c4b474ef7bf1f98ddc4694"
+    },
+    {
+      "file": "launcher.py",
+      "imports": [
+        {
+          "level": 0,
+          "line": 3,
+          "module": "hashlib",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 4,
+          "module": "importlib.abc",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 5,
+          "module": "json",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 6,
+          "module": "logging",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 7,
+          "module": "os",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 8,
+          "module": "pathlib",
+          "names": [
+            "Path"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 9,
+          "module": "stat",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 10,
+          "module": "sys",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 11,
+          "module": "warnings",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 12,
+          "module": "contextlib",
+          "names": [
+            "ExitStack"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 13,
+          "module": "unittest.mock",
+          "names": [
+            "patch"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 216,
+          "module": "importlib.metadata",
+          "names": [
+            "version"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 219,
+          "module": "anyio",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 220,
+          "module": "cryptography.hazmat.primitives.asymmetric.ed25519",
+          "names": [
+            "Ed25519PrivateKey"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 221,
+          "module": "cryptography.hazmat.primitives.asymmetric.x25519",
+          "names": [
+            "X25519PrivateKey"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 226,
+          "module": "independent_peer.protocol",
+          "names": []
+        },
+        {
+          "level": 0,
+          "line": 228,
+          "module": "facade_candidate",
+          "names": [
+            "store"
+          ]
+        },
+        {
+          "level": 0,
+          "line": 231,
+          "module": "raw_bridge.transport",
+          "names": [
+            "RawBridge"
+          ]
+        }
+      ],
+      "sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571"
+    }
+  ],
+  "observation_date": "2026-11-08",
+  "packages": [
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "annotated-types",
+      "name": "annotated-types",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.8.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "trio"
+      ],
+      "metadata_name": "anyio",
+      "name": "anyio",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": true,
+      "unselected_extras": [
+        "trio"
+      ],
+      "version": "4.14.2"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "attrs",
+      "name": "attrs",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "26.1.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "certifi",
+      "name": "certifi",
+      "requires_python": ">=3.7",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2026.10.19"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "cffi",
+      "name": "cffi",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2.1.1"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "click",
+      "name": "click",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "8.4.2"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "ssh"
+      ],
+      "metadata_name": "cryptography",
+      "name": "cryptography",
+      "requires_python": ">=3.9, !=3.9.0, !=3.9.1",
+      "requires_python_satisfied": true,
+      "root": true,
+      "unselected_extras": [
+        "ssh"
+      ],
+      "version": "50.0.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "h11",
+      "name": "h11",
+      "requires_python": ">=3.8",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.16.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "asyncio",
+        "http2",
+        "socks",
+        "trio"
+      ],
+      "metadata_name": "httpcore",
+      "name": "httpcore",
+      "requires_python": ">=3.8",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "asyncio",
+        "http2",
+        "socks",
+        "trio"
+      ],
+      "version": "1.0.9"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "brotli",
+        "cli",
+        "http2",
+        "socks",
+        "zstd"
+      ],
+      "metadata_name": "httpx",
+      "name": "httpx",
+      "requires_python": ">=3.8",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "brotli",
+        "cli",
+        "http2",
+        "socks",
+        "zstd"
+      ],
+      "version": "0.28.1"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "httpx-sse",
+      "name": "httpx-sse",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.4.3"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "all"
+      ],
+      "metadata_name": "idna",
+      "name": "idna",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "all"
+      ],
+      "version": "3.18"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "format",
+        "format-nongpl"
+      ],
+      "metadata_name": "jsonschema",
+      "name": "jsonschema",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "format",
+        "format-nongpl"
+      ],
+      "version": "4.26.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "jsonschema-specifications",
+      "name": "jsonschema-specifications",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2025.9.1"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "cli",
+        "rich",
+        "ws"
+      ],
+      "metadata_name": "mcp",
+      "name": "mcp",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": true,
+      "unselected_extras": [
+        "cli",
+        "rich",
+        "ws"
+      ],
+      "version": "1.29.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "pycparser",
+      "name": "pycparser",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "3.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "email",
+        "timezone"
+      ],
+      "metadata_name": "pydantic",
+      "name": "pydantic",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "email",
+        "timezone"
+      ],
+      "version": "2.13.4"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "pydantic_core",
+      "name": "pydantic-core",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2.46.4"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "aws-secrets-manager",
+        "azure-key-vault",
+        "gcp-secret-manager",
+        "toml",
+        "yaml"
+      ],
+      "metadata_name": "pydantic-settings",
+      "name": "pydantic-settings",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "aws-secrets-manager",
+        "azure-key-vault",
+        "gcp-secret-manager",
+        "toml",
+        "yaml"
+      ],
+      "version": "2.15.0"
+    },
+    {
+      "active_extras": [
+        "crypto"
+      ],
+      "declared_extras": [
+        "crypto"
+      ],
+      "metadata_name": "PyJWT",
+      "name": "pyjwt",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2.13.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "cli"
+      ],
+      "metadata_name": "python-dotenv",
+      "name": "python-dotenv",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "cli"
+      ],
+      "version": "1.2.2"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "python-multipart",
+      "name": "python-multipart",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.0.32"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "referencing",
+      "name": "referencing",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.37.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "rpds-py",
+      "name": "rpds-py",
+      "requires_python": ">=3.11",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "2026.6.3"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "daphne",
+        "examples",
+        "examples-db",
+        "granian",
+        "uvicorn"
+      ],
+      "metadata_name": "sse-starlette",
+      "name": "sse-starlette",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "daphne",
+        "examples",
+        "examples-db",
+        "granian",
+        "uvicorn"
+      ],
+      "version": "3.4.8"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "full"
+      ],
+      "metadata_name": "starlette",
+      "name": "starlette",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "full"
+      ],
+      "version": "1.6.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "typing_extensions",
+      "name": "typing-extensions",
+      "requires_python": ">=3.9",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "4.16.0"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [],
+      "metadata_name": "typing-inspection",
+      "name": "typing-inspection",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [],
+      "version": "0.4.3"
+    },
+    {
+      "active_extras": [],
+      "declared_extras": [
+        "standard"
+      ],
+      "metadata_name": "uvicorn",
+      "name": "uvicorn",
+      "requires_python": ">=3.10",
+      "requires_python_satisfied": true,
+      "root": false,
+      "unselected_extras": [
+        "standard"
+      ],
+      "version": "0.52.1"
+    }
+  ],
+  "reproduction_limits": [
+    "Version pins do not identify wheel or sdist bytes, index provenance, build inputs or installation artifacts.",
+    "The exact interpreter build, Python standard library, operating-system libraries, native extension ABI and bundled or linked crypto dependencies are outside this metadata inventory.",
+    "Markers evaluated for this Linux x86_64 CPython 3.12.14 environment must be reevaluated for a selected target.",
+    "The current installed environment may be globally inconsistent outside this 29-distribution closure; unrelated packages were not inventoried.",
+    "Installed metadata may differ from current repository metadata; no remote resolution or clean environment was attempted.",
+    "The launcher -I -B contract does not remove trust in interpreter startup hooks and installed package bytes."
+  ],
+  "schema_version": 1,
+  "scope": {
+    "definition": "All installed Requires-Dist requirements reachable from the roots whose PEP 508 markers evaluate true for this environment and propagated requested extras; not a minimal trace of modules executed by the pilot.",
+    "excluded_source_reviews": [
+      "fixture.py",
+      "pipes.py",
+      "worker.py",
+      "endpoint.py"
+    ],
+    "metadata_access": "Only target distributions METADATA through importlib.metadata.distribution; no direct_url.json, package cache, credential files, environment values, pip, network or install.",
+    "not_claimed": [
+      "wheel-hash lock",
+      "package provenance or supply-chain attestation",
+      "clean installation",
+      "resolver result or resolver reproducibility",
+      "portable or target-machine lock",
+      "native host or provider acceptance",
+      "runtime behavior or import smoke test"
+    ],
+    "platform_only": true,
+    "release": "frozen synthetic-only stdio r5",
+    "root_distributions": [
+      "anyio",
+      "cryptography",
+      "mcp"
+    ],
+    "root_extras": {
+      "anyio": [],
+      "cryptography": [],
+      "mcp": []
+    },
+    "root_import_verification": "Static AST import trace of launcher and reachable permitted local modules, including package initializers; no local runtime or third-party runtime imports executed."
+  },
+  "validation": {
+    "active_edge_count": 47,
+    "active_metadata_closure_consistent": true,
+    "active_specifier_conflict_count": 0,
+    "all_active_specifiers_satisfied": true,
+    "all_requires_python_satisfied": true,
+    "distribution_count": 29,
+    "excluded_edge_count": 76,
+    "missing_distribution_count": 0,
+    "problems": [],
+    "url_or_uncertain_metadata_count": 0
+  }
+}

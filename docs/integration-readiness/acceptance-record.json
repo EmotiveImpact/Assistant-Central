@@ -1,0 +1,38 @@
+{
+  "status": "NOT RUN. TEMPLATE ONLY. NO APPROVAL OR ACTIVE CONFIGURATION.",
+  "host_product": null,
+  "host_build": null,
+  "machine_and_os": null,
+  "provider_label_no_credentials": null,
+  "approved_configuration_scope": null,
+  "approved_synthetic_interaction_reference": null,
+  "runtime_and_dependency_inventory": null,
+  "archive_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+  "launcher_sha256": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+  "server_alias_draft": "agent_network_synthetic",
+  "negotiated_protocol": null,
+  "same_server_instance_evidence": null,
+  "cases": {
+    "exact_three_tools": "NOT RUN",
+    "no_unexpected_callbacks_or_wrappers": "NOT RUN",
+    "never_published_empty_inbox": "NOT RUN",
+    "human_approved_exact_text_pending_only": "NOT RUN",
+    "same_store_status_and_replay": "NOT RUN",
+    "invalid_text_and_owner_operation_rejected": "NOT RUN",
+    "human_denial_before_dispatch": "NOT RUN",
+    "no_input_in_diagnostics": "NOT RUN",
+    "host_restart_and_reconnect_behavior": "NOT RUN",
+    "exact_entry_rollback": "NOT RUN"
+  },
+  "uncertain_outcomes": [],
+  "unverified_cases": [],
+  "native_acceptance_result": "NOT RUN",
+  "does_not_establish": [
+    "real owner identity",
+    "signing authority",
+    "peer delivery",
+    "relationship network",
+    "wake",
+    "excluded peer-process lifecycle properties"
+  ]
+}

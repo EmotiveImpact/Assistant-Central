@@ -1,0 +1,1 @@
+{"offline_only": true, "socket_operations": "denied", "pinned_sdk_encrypted_round_trip": "passed", "live_relay_tested": false, "real_owner_identity_tested": false, "private_keys_saved_or_exported": false}

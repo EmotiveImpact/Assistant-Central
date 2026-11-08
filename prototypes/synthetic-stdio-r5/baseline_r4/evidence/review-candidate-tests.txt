@@ -1,0 +1,37 @@
+test_batches_and_scalars (test_raw.CodecTests.test_batches_and_scalars) ... ok
+test_collection_node_integer_and_normalized_limits (test_raw.CodecTests.test_collection_node_integer_and_normalized_limits) ... ok
+test_depth_checked_before_parser (test_raw.CodecTests.test_depth_checked_before_parser) ... ok
+test_duplicate_keys_and_escaped_aliases (test_raw.CodecTests.test_duplicate_keys_and_escaped_aliases) ... ok
+test_envelope_and_null_params (test_raw.CodecTests.test_envelope_and_null_params) ... ok
+test_nonfinite_and_invalid_utf8 (test_raw.CodecTests.test_nonfinite_and_invalid_utf8) ... ok
+test_normalized_output_budget_is_independent (test_raw.CodecTests.test_normalized_output_budget_is_independent) ... ok
+test_notifications_are_silent_after_decoding (test_raw.CodecTests.test_notifications_are_silent_after_decoding) ... ok
+test_output_cap_includes_lf_exactly (test_raw.CodecTests.test_output_cap_includes_lf_exactly) ... ok
+test_output_limits_and_roundtrip (test_raw.CodecTests.test_output_limits_and_roundtrip) ... ok
+test_record_cap_precedes_decode (test_raw.CodecTests.test_record_cap_precedes_decode) ... ok
+test_strict_ids (test_raw.CodecTests.test_strict_ids) ... ok
+test_surrogates_and_non_scalar (test_raw.CodecTests.test_surrogates_and_non_scalar) ... ok
+test_bytes_to_processed_inbox (test_raw.StreamTests.test_bytes_to_processed_inbox) ... ok
+test_cancellation_propagates_and_streams_not_closed (test_raw.StreamTests.test_cancellation_propagates_and_streams_not_closed) ... ok
+test_coercible_ids_cannot_persist (test_raw.StreamTests.test_coercible_ids_cannot_persist) ... ok
+test_duplicate_key_does_not_trust_id (test_raw.StreamTests.test_duplicate_key_does_not_trust_id) ... ok
+test_empty_lines_and_partial_eof (test_raw.StreamTests.test_empty_lines_and_partial_eof) ... ok
+test_error_distinctions_and_notifications (test_raw.StreamTests.test_error_distinctions_and_notifications) ... ok
+test_exact_text_replay_and_owner_separation (test_raw.StreamTests.test_exact_text_replay_and_owner_separation) ... ok
+test_fragmented_coalesced_and_crlf (test_raw.StreamTests.test_fragmented_coalesced_and_crlf) ... ok
+test_lying_and_empty_readers_fail_locally (test_raw.StreamTests.test_lying_and_empty_readers_fail_locally) ... ok
+test_oversized_record_stops_without_draining (test_raw.StreamTests.test_oversized_record_stops_without_draining) ... ok
+test_partial_write_return_rejected (test_raw.StreamTests.test_partial_write_return_rejected) ... ok
+test_raw_output_failure_uses_fixed_uncertain_error (test_raw.StreamTests.test_raw_output_failure_uses_fixed_uncertain_error) ... ok
+test_raw_record_budget_includes_ignored_and_malformed (test_raw.StreamTests.test_raw_record_budget_includes_ignored_and_malformed) ... ok
+test_raw_rejected_ids_are_consumed_and_types_distinct (test_raw.StreamTests.test_raw_rejected_ids_are_consumed_and_types_distinct) ... ok
+test_reader_failure_preserves_prior_output_facts (test_raw.StreamTests.test_reader_failure_preserves_prior_output_facts) ... ok
+test_real_sdk_client_over_fragmented_utf8_lf_bytes (test_raw.StreamTests.test_real_sdk_client_over_fragmented_utf8_lf_bytes) ... ok
+test_safe_id_budget_includes_raw_rejections (test_raw.StreamTests.test_safe_id_budget_includes_raw_rejections) ... ok
+test_single_use (test_raw.StreamTests.test_single_use) ... ok
+test_writer_failure_no_retry_and_persistence_uncertain (test_raw.StreamTests.test_writer_failure_no_retry_and_persistence_uncertain) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.198s
+
+OK

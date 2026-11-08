@@ -1,0 +1,18 @@
+{
+  "normalized_evidence_files": [
+    "prototypes/consent-v29/test-results-v12.txt",
+    "prototypes/synthetic-stdio-r5/review/evidence/preservation-check.json",
+    "prototypes/synthetic-stdio-r5/review/evidence/relocated-result.json",
+    "prototypes/synthetic-stdio-r5/review/evidence/reviewed-inputs-after.json",
+    "prototypes/synthetic-stdio-r5/review/evidence/COMMANDS.md",
+    "prototypes/synthetic-stdio-r5/review/evidence/reviewed-inputs-before.json",
+    "prototypes/synthetic-stdio-r5/baseline_r4/baseline_r3/baseline_r2/facade_evidence/initial-aggregate-setup.txt",
+    "prototypes/synthetic-stdio-r5/baseline_r4/baseline_r3/baseline_r2/facade_evidence/initial-focused.txt",
+    "prototypes/consent-v29/verification/v15-pre-freeze-text-edit.log",
+    "prototypes/consent-v29/verification/v21-sequence-inbox-initial.txt",
+    "prototypes/consent-v29/verification/v21-sequence-initial.txt",
+    "docs/integration-readiness/runtime-dependencies/dependency-inventory.json"
+  ],
+  "removed": "Private artifact references and redundant original backup ZIPs; all three baseline trees are expanded in the repository.",
+  "unchanged": "Runtime Python/JavaScript/UI code and upstream licensing notices."
+}

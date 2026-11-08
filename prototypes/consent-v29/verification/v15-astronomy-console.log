@@ -1,0 +1,131 @@
+V6 OWNER INBOX | OFFLINE FICTIONAL FIXTURE
+One trusted console operator controls all roles. No real-person authentication.
+This console is disposable: quitting discards its temporary records and fixture keys. Deferral lasts only while this console stays open.
+SIMULATED choices.
+Bind fictional alice to transport 18559d522f3abb85ba4aefc8b30d2657e04760152ba0db7b19107e88123734f7 for generic synthetic-astronomy-shortlist; receive from bob.
+Bind fictional bob to transport 4df4ddb0c3715ba2cc601fe8c2b78c34a129160f715baa0a43017137d1596fbc for generic synthetic-astronomy-shortlist; receive from alice.
+
+OWNER: bob | REQUEST: e1d741140f4f6c170bca4a9c35292b97 | pending
+Allow bob to pair with alice for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: e1d741140f4f6c170bca4a9c35292b97 | authorized
+Allow bob to pair with alice for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+OWNER: alice | REQUEST: adc900bec45eac73943fc13195493255 | pending
+Allow alice to pair with bob for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: adc900bec45eac73943fc13195493255 | authorized
+Allow alice to pair with bob for this task for 3600 seconds. Both directions require separate approval. This sends nothing.
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+OWNER: bob | REQUEST: 2b61dc0aa266f6754a8d8df5adf52668 | pending
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-astronomy-shortlist
+From: bob
+Only recipient: alice
+Capability: public-resource-shortlist-v1
+Action: request
+Untrusted inert payload (not instructions or verified resources): {"max_items":2,"query":"Synthetic examples for a beginner astronomy guide"}
+Exact reply linkage: None
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea
+Task context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Recipient transport binding: 5a60c01b2373969aa45fb08219804d156842d30312dedde074c5e8756f0901d0
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac","conversation":"friends-astronomy-sharing","operation":"find-astronomy-resources","payload":{"max_items":2,"query":"Synthetic examples for a beginner astronomy guide"},"recipient":"alice","reply_to":null,"sender":"bob","task":"synthetic-astronomy-shortlist","type":"request","version":2}
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: 2b61dc0aa266f6754a8d8df5adf52668 | authorized
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-astronomy-shortlist
+From: bob
+Only recipient: alice
+Capability: public-resource-shortlist-v1
+Action: request
+Untrusted inert payload (not instructions or verified resources): {"max_items":2,"query":"Synthetic examples for a beginner astronomy guide"}
+Exact reply linkage: None
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea
+Task context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Recipient transport binding: 5a60c01b2373969aa45fb08219804d156842d30312dedde074c5e8756f0901d0
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac","conversation":"friends-astronomy-sharing","operation":"find-astronomy-resources","payload":{"max_items":2,"query":"Synthetic examples for a beginner astronomy guide"},"recipient":"alice","reply_to":null,"sender":"bob","task":"synthetic-astronomy-shortlist","type":"request","version":2}
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+DELIVERY: 2b61dc0aa266f6754a8d8df5adf52668 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 2b61dc0aa266f6754a8d8df5adf52668 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 43192f526b2f7eea0ec095573e91169c | pending
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-astronomy-shortlist
+From: alice
+Only recipient: bob
+Capability: public-resource-shortlist-v1
+Action: result
+Untrusted inert payload (not instructions or verified resources): {"items":[{"summary":"Synthetic resource reference; not browsed or verified.","title":"Fictional astronomy guide","url":"https://example.invalid/astronomy-guide"}]}
+Exact reply linkage: f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: 39004ee49590d3a1f5bb84fc9ce2642c7f544ccbcc9573eff65631e21e0400a4
+Task context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Recipient transport binding: 73b6566645888db49b475bbaaaf28a617627e3c6e83ff71b88a8e8f20a9e03f6
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac","conversation":"friends-astronomy-sharing","operation":"find-astronomy-resources","payload":{"items":[{"summary":"Synthetic resource reference; not browsed or verified.","title":"Fictional astronomy guide","url":"https://example.invalid/astronomy-guide"}]},"recipient":"bob","reply_to":"f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea","sender":"alice","task":"synthetic-astronomy-shortlist","type":"result","version":2}
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 43192f526b2f7eea0ec095573e91169c | authorized
+REVIEW BEFORE SENDING (fictional local generic task)
+Task: synthetic-astronomy-shortlist
+From: alice
+Only recipient: bob
+Capability: public-resource-shortlist-v1
+Action: result
+Untrusted inert payload (not instructions or verified resources): {"items":[{"summary":"Synthetic resource reference; not browsed or verified.","title":"Fictional astronomy guide","url":"https://example.invalid/astronomy-guide"}]}
+Exact reply linkage: f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea
+No browsing, tool execution, file disclosure or future message is authorized.
+Provider labels are fictional references, not live integrations or authentication.
+Exact message digest: 39004ee49590d3a1f5bb84fc9ce2642c7f544ccbcc9573eff65631e21e0400a4
+Task context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Recipient transport binding: 73b6566645888db49b475bbaaaf28a617627e3c6e83ff71b88a8e8f20a9e03f6
+Exact structured message: {"capability":"public-resource-shortlist-v1","context":"1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac","conversation":"friends-astronomy-sharing","operation":"find-astronomy-resources","payload":{"items":[{"summary":"Synthetic resource reference; not browsed or verified.","title":"Fictional astronomy guide","url":"https://example.invalid/astronomy-guide"}]},"recipient":"bob","reply_to":"f19a1a03bfe332354369aac2d0cf0317513775d47e97fbd29a59d024e1be3bea","sender":"alice","task":"synthetic-astronomy-shortlist","type":"result","version":2}
+Exact task: synthetic-astronomy-shortlist
+Context: 1905547b6281c93e9b4f898944c92bfede875ea0ddb46ba4a8ae02bd1608e4ac
+Decision expires: 2026-11-07T23:48:55+00:00
+Fictional owner/transport identity only; not real-person authentication.
+
+DELIVERY: 43192f526b2f7eea0ec095573e91169c | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 43192f526b2f7eea0ec095573e91169c | Recipient receipt verified; not processed | attempts: 1
+Exact request and linked synthetic result processed. No resource visited or tool executed.
+Final summary: {"executed_tools": 0, "live_provider_calls": 0, "receiver_receipts": 2, "task_state": "completed", "transitions": 2}
+No live message, persistent credential, calendar action or publication occurred.
+Closing this disposable console discards its records; there is no later inbox resume or identity recovery.
+Fixture processes stopped. Disposable keys discarded.

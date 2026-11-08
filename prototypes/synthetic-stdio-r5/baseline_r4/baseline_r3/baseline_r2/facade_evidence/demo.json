@@ -1,0 +1,54 @@
+{
+  "label": "OFFLINE SYNTHETIC PROPOSAL FACADE; NO HOST ISOLATION",
+  "independent_proposal_stores": true,
+  "distinct_endpoint_pids": [
+    10,
+    11
+  ],
+  "request_status": {
+    "command_digest": "e6a61ae8c13e85a411cd0a8291ef6f5244ecc3e6635b5aa8296578f5fda5eda8",
+    "content_digest": "3f8fe40e5bbcef381a476335b4fe8930ab20a9309ca9842f984a9345138ecf9a",
+    "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+    "message_digest": "64e8b0582a46c05761aa306c549628b8110a852ff8ca575d4709ef48258f554c",
+    "message_id": "6b4169cbb3beec26fa0dab390bc559d4",
+    "operation_id": "097b2f0c10304075a5ed12622d60aa62",
+    "packet_digest": "cafc3c4377f50b7d50cddaba985a47daeba276756334c9bb062e664739e8d2ec",
+    "proposal_id": "f994d04235f11f5986a36d6acdfeda3e80312ae315b0d2a64d9a8f4ec60ca75a",
+    "state": "released"
+  },
+  "result_status": {
+    "command_digest": "5da3e2e481bbfc7663dc9fe5b2c3bd8a61d63821ad353c5b79e25841f80d9078",
+    "content_digest": "7b16d4ca6e4ad91ba368936597c886eab966477be0c20ed9b3111f0bcd37094b",
+    "evidence_basis": "trusted caller recorded actual endpoint release response; delivery unknown",
+    "message_digest": "9f04c773f07c5eb0889d9daffab466995856ba63f2323d7087a9e4c78406cc43",
+    "message_id": "916a87bb94b5ed438800059fe26cc2dc",
+    "operation_id": "7b407946f994af86181538de2394dd26",
+    "packet_digest": "14e2f358f8fff918cab8053f5d2a4a6177407b28821dcc627f9e63b1af34aee5",
+    "proposal_id": "08c8d2fc3a9bbd51767c2032f46ac90d84544abf3a7f6cd40d5d6337e45a7c28",
+    "state": "released"
+  },
+  "alice_processed_inbox": {
+    "items": [
+      {
+        "id": "916a87bb94b5ed438800059fe26cc2dc",
+        "kind": "result",
+        "message_digest": "9f04c773f07c5eb0889d9daffab466995856ba63f2323d7087a9e4c78406cc43",
+        "payload": "A moonberry (fictional)."
+      }
+    ],
+    "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+    "publication": 1
+  },
+  "bob_processed_inbox": {
+    "items": [
+      {
+        "id": "6b4169cbb3beec26fa0dab390bc559d4",
+        "kind": "request",
+        "message_digest": "64e8b0582a46c05761aa306c549628b8110a852ff8ca575d4709ef48258f554c",
+        "payload": "Name one imaginary blue fruit."
+      }
+    ],
+    "knowledge": "Last trusted-published local knowledge; not fresh network truth or proof of human/model work.",
+    "publication": 2
+  }
+}

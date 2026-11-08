@@ -1,0 +1,20 @@
+{
+  "recorded_utc": "2026-11-08T05:38:33.045806+00:00",
+  "selected_root": "/path/to/workspace/agent-network-synthetic-stdio-r5",
+  "files": {
+    "launcher.py": "4df94f7f454989f864ac327da182b1054fff8952e4288915cb988fe891529571",
+    "public_fixture.json": "2a6d3fef6cb8e9f88838a0cdd42cb4822d9e46311b113d85205f75e3eac37869",
+    "run_checks.py": "3fac9cedcf46dc8b710b914b48b13f0108a1211368d419873d9b3c49f483eb28",
+    "tests/test_launcher.py": "20a76b2c1dbcb18d020f06a48b098b71928f1405b61c637639447bbdbcbac0bb",
+    "README.md": "9032af66ff3fdbac79d37b217e27aa34a44ed85f990cf4b7e646f9f183a6c8b3",
+    "EVIDENCE.md": "d777b229eec4c9efebf5e5ee00a7a3fcd5a394c8dd52b039254907808d0ab5eb",
+    "SETUP_AND_ROLLBACK.md": "f90ef8fd264e47e5882b39c5b4a5353ee3c45c75c896a71f0d0ef1cdc96494b2",
+    "baseline_r4/RAW_SOURCE_MANIFEST.json": "ded41439c7fe7a35370019b30fcbb6a773bcd82e67de1f406a98104c2fb7d71c",
+    "baseline_r4/raw_bridge/codec.py": "716e90179b6db1f3233dd74cae9131764b30f1a516d07a3163580ec4cdb3005b",
+    "baseline_r4/raw_bridge/transport.py": "3fdab45ececcbcf3b4a85392ab0c283edc7b0b8d29c4b474ef7bf1f98ddc4694",
+    "baseline_r4/baseline_r3/mcp_bridge/bridge.py": "d213216fd5b1d7f3e9927e2e0b511bae89919bfbdc0180f475e3520b60f50110",
+    "baseline_r4/baseline_r3/baseline_r2/facade_candidate/store.py": "a7586e91b49e2e1d64d973a5b2ffc3ba8f1402b2984bcc5ec91145f9d1e89a54"
+  },
+  "all_reviewed_files_unchanged": true,
+  "generated_bytecode": []
+}

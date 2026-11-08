@@ -1,0 +1,8 @@
+{
+  "facade_candidate/store.py": "a7586e91b49e2e1d64d973a5b2ffc3ba8f1402b2984bcc5ec91145f9d1e89a54",
+  "facade_candidate/demo.py": "03d516ccdd20f5ba0ed24e192c291a704e1f19e3b6e05c320d99f6b70cd5cdd2",
+  "facade_candidate/DESIGN.md": "633f5f73687925f93e4cc14fd8429ce7dbf75fd181d522a4d4e8ad063c67f67a",
+  "facade_tests/test_facade.py": "eeba32daf4cd19f349b2a67aed0c01a9d38a0720528f1f3b56b566b9d525bb88",
+  "independent_peer/endpoint.py": "4e2ff7458c0d72fc7133fdda18eea6d4fabb8885a4ad0dda5a5ded16eec49da0",
+  "independent_peer/protocol.py": "1b01582e201f7e6b9e6b54d25cb0a080e48fb66fb9e69a9eee727afdba561516"
+}

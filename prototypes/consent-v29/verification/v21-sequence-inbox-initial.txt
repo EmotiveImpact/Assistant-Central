@@ -1,0 +1,76 @@
+test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) ... 
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='alice') ... FAIL
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='bob') ... FAIL
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=1, owner='alice') ... FAIL
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=1, owner='bob') ... FAIL
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='alice') ... FAIL
+  test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='bob') ... FAIL
+test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) ... FAIL
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='alice')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='bob')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=1, owner='alice')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=1, owner='bob')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='alice')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request) (scope='task-inbox0', mutation=2, owner='bob')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 254, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.subTest(scope=h.task.id,mutation=seq,owner=owner),self.assertRaises(Denied):h.boundaries[owner].dispatch({'method':'inbox'})
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_agent_inbox_rejects_corrupt_projection_and_composed_request (tests.test_state_sequence_campaign.StateSequenceCampaign.test_agent_inbox_rejects_corrupt_projection_and_composed_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 260, in test_agent_inbox_rejects_corrupt_projection_and_composed_request
+    with self.assertRaises(Denied):h.boundaries[h.task.responder].dispatch({'method':'inbox'})
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.042s
+
+FAILED (failures=7)

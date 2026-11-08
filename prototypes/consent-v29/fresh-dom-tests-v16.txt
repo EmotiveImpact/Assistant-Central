@@ -1,0 +1,20 @@
+PASS read-only initial render, refresh, owner switch and navigation
+PASS deferred review requires explicit resume and back grants nothing
+PASS approval dialog back and wrong phrase do not mutate; exact target is retained
+PASS double action while first response pending does not repeat mutation
+PASS network failure explicitly preserves uncertainty without retries
+PASS truncated action response explicitly preserves uncertainty without retries
+PASS stale response cannot overwrite a newer owner navigation
+PASS uncertain receipt check never sends or processes
+PASS send confirmation back does not create attempt
+PASS DOM rendering treats review text as text, not HTML instructions
+PASS expired review replacement requires an explicit typed choice and grants no approval
+PASS superseded review links to successor without creating or approving work
+PASS missing pairing is opened for its exact owner only after typed choice
+PASS pairing review returns to source send without mutation and deferred stays paused
+PASS unused withdrawal needs typed owner confirmation and explains its combined action
+PASS withdrawn authorization has no submit or approval and fresh review is separate
+PASS withdrawn source opens exact successor read-only without reviving original
+PASS cleanup uncertainty is explicit and never falls through to an inbox
+PASS discard back is inert; exact confirmation ends UI without retry
+19/19 DOM-model checks passed. These are not browser or visual tests.

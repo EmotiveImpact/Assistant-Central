@@ -1,0 +1,3 @@
+# Optional SDK adapter only. Existing Python-only fixture needs no MCP SDK.
+-r requirements-offline.txt
+mcp==1.29.0

@@ -1,0 +1,6 @@
+# Verified fixture versions. Install in a dedicated venv, not a global environment.
+# No SDK installation, relay, server or real owner/account setup is performed.
+coincurve==21.0.0
+bech32==1.2.0
+cryptography==50.0.0
+pydantic==2.13.4

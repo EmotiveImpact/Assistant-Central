@@ -1,0 +1,20 @@
+test_64_record_history_no_eviction_and_exact_declined_replay (__main__.IndependentTests.test_64_record_history_no_eviction_and_exact_declined_replay) ... ok
+test_bounded_tree_scalars_keys_nodes_and_escape_expansion (__main__.IndependentTests.test_bounded_tree_scalars_keys_nodes_and_escape_expansion) ... ok
+test_exact_text_unicode_normalization_and_escaping (__main__.IndependentTests.test_exact_text_unicode_normalization_and_escaping) ... ok
+test_integer_and_string_ids_distinct_and_reuse_consumed (__main__.IndependentTests.test_integer_and_string_ids_distinct_and_reuse_consumed) ... ok
+test_malformed_initialized_metadata_does_not_open_gate (__main__.IndependentTests.test_malformed_initialized_metadata_does_not_open_gate) ... ok
+test_metadata_cannot_create_authority_or_change_exact_text (__main__.IndependentTests.test_metadata_cannot_create_authority_or_change_exact_text) ... ok
+test_null_extra_selectors_are_not_erased (__main__.IndependentTests.test_null_extra_selectors_are_not_erased) ... ok
+test_original_initialization_validation_rejects_nested_shapes (__main__.IndependentTests.test_original_initialization_validation_rejects_nested_shapes) ... ok
+test_original_supported_metadata_shapes_validated (__main__.IndependentTests.test_original_supported_metadata_shapes_validated) ... ok
+test_ping_all_phases_preserves_initialization_gate (__main__.IndependentTests.test_ping_all_phases_preserves_initialization_gate) ... ok
+test_post_persist_handler_exception_is_redacted_uncertainty (__main__.IndependentTests.test_post_persist_handler_exception_is_redacted_uncertainty) ... ok
+test_post_persist_real_outer_json_bound_is_uncertain (__main__.IndependentTests.test_post_persist_real_outer_json_bound_is_uncertain) ... ok
+test_preinitialized_and_unsupported_methods_have_no_side_effect (__main__.IndependentTests.test_preinitialized_and_unsupported_methods_have_no_side_effect) ... ok
+test_standard_error_codes_preserve_redaction (__main__.IndependentTests.test_standard_error_codes_preserve_redaction) ... ok
+test_top_level_null_extras_rejected_before_lossy_dump (__main__.IndependentTests.test_top_level_null_extras_rejected_before_lossy_dump) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.116s
+
+OK

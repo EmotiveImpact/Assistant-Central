@@ -1,0 +1,32 @@
+{
+  "checkpoint": "v10",
+  "date": "2026-11-07",
+  "python_tests_passed": 361,
+  "dom_model_tests_passed": 19,
+  "new_python_tests": 22,
+  "new_dom_tests": 3,
+  "python_log": "test-results-v10.txt",
+  "dom_log": "owner-ui-dom-v10-output.txt",
+  "compile_passed": true,
+  "javascript_syntax_passed": true,
+  "fresh_archive_extraction_tests_passed": true,
+  "fixed": "Fresh owner-signed withdrawal of a provably unused authorization permanently fences original signature in local execution and allows a separate fresh unsigned review.",
+  "withdrawal_creates_delivery": false,
+  "withdrawal_recalls_messages": false,
+  "signature_fence_scope": "Both local gateway apply and encrypted enqueue, across reopened retained records; not remote cryptographic revocation.",
+  "independent_review": "22 withdrawal tests and 24 additional two-connection control-vs-withdraw races passed; no blocking issue. Explicit guide may also prepare an unsigned draft after withdrawal, without reviving old authority.",
+  "real_browser_passed": false,
+  "visual_review_performed": false,
+  "browser_blocker_unchanged": true,
+  "product_scope": "Broad cross-provider relationship assistant network; scheduling is an example. Generic conversation/task extraction is next and not claimed in this checkpoint.",
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d",
+    "v6": "b1ec7f4cfe8f79c00b47abdd0b13488e76ff88ab87d09c385aca282eef448a16",
+    "v7": "2b223e688613f3c1d767c975e6bad7cdb9792f5a042bc2e5d4f30dad1c20deea",
+    "v8": "0dab3e621732494e076c70b8efd64ca43fbedc8431e6535465f3891da64be31b",
+    "v9": "936e0c17f9ee03bdebfc7ad1c824a36fec61e8d341e4e2e4c1a2352d71359bf8"
+  },
+  "live_services_accounts_credentials_publication": false
+}

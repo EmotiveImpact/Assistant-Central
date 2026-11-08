@@ -1,0 +1,200 @@
+RUN tests/owner_ui_dom_check.js
+PASS read-only initial render, refresh, owner switch and navigation
+PASS deferred review requires explicit resume and back grants nothing
+PASS approval dialog back and wrong phrase do not mutate; exact target is retained
+PASS double action while first response pending does not repeat mutation
+PASS network failure explicitly preserves uncertainty without retries
+PASS truncated action response explicitly preserves uncertainty without retries
+PASS stale response cannot overwrite a newer owner navigation
+PASS uncertain receipt check never sends or processes
+PASS send confirmation back does not create attempt
+PASS DOM rendering treats review text as text, not HTML instructions
+PASS expired review replacement requires an explicit typed choice and grants no approval
+PASS superseded review links to successor without creating or approving work
+PASS missing pairing is opened for its exact owner only after typed choice
+PASS pairing review returns to source send without mutation and deferred stays paused
+PASS unused withdrawal needs typed owner confirmation and explains its combined action
+PASS withdrawn authorization has no submit or approval and fresh review is separate
+PASS withdrawn source opens exact successor read-only without reviving original
+PASS cleanup uncertainty is explicit and never falls through to an inbox
+PASS discard back is inert; exact confirmation ends UI without retry
+19/19 DOM-model checks passed. These are not browser or visual tests.
+RUN tests/workspace_composer_dom_check.js
+PASS opening composer is read-only with fixed fictional direction and bounded labels
+PASS preview sends exact entered spec without creation or approval
+PASS preview neither trims nor silently repairs owner input
+PASS creation requires exact phrase and shows all reviewed scope and text
+PASS cancel and edit discard pending confirmation without creating task
+PASS detached original form cannot alter confirmed snapshot
+PASS navigation away and back fences saved create confirmation
+PASS raw hash navigation before event prevents creation
+PASS lost preview is not reported as committed action and starts no creation
+PASS delayed preview cannot replace a later task view
+PASS lost creation response fences repeat creation and points to catalog inspection
+PASS duplicate confirmation cannot create twice
+PASS hostile query remains literal text without active elements or links
+PASS edit preserves entries but needs a fresh preview token
+PASS waiting for responder stays visible instead of being cleared by navigation
+PASS edited task preview rebuilds usable catalog navigation
+16/16 composer DOM-model checks passed (not browser tests).
+RUN tests/workspace_composer_review_dom_check.js
+PASS late successful creation does not navigate away from a different task
+PASS saved confirmation after editing cannot create an earlier review
+PASS late rejected creation cannot paint an error over another task
+3/3 independent composer DOM-model checks passed.
+RUN tests/workspace_messages_dom_check.js
+PASS received navigation reads exact owner and task scope without mutation
+PASS processed request view shows exact inert payload binding and recipient
+PASS processed response references remain text rather than active links
+PASS empty inbox distinguishes processed messages from delivery receipts
+PASS cancelled task preserves processed history without recall claim
+PASS empty result clearly contains no resource items
+PASS refresh and back only issue reads and navigation
+PASS delayed old owner messages cannot appear after owner switch
+PASS same route revisit invalidates earlier delayed read
+PASS read failure is not a delivery failure or permission to retry a send
+PASS wrong response scope or recipient fails closed before exposing contents
+PASS received prompt injection and markup remain literal inert text
+12/12 received message DOM-model checks passed (not browser tests).
+RUN tests/workspace_messages_review_dom_check.js
+PASS mixed batch scope mismatch hides every row before rendering
+PASS delayed failure cannot replace next owner successful view
+PASS delayed response cannot overwrite same owner other task
+PASS refresh delayed response cannot overwrite back navigation
+PASS hostile result URLs and text never become active elements
+PASS invalid envelope task hides content despite matching outer scope
+6/6 independent received message DOM-model checks passed (not browser tests).
+RUN tests/workspace_relationship_dom_check.js
+PASS group navigation and pure preview grant nothing
+PASS exact phrase and group scope without undefined owner
+PASS detached edited membership cannot change frozen review or re-preview
+PASS discard returns to new empty review form
+PASS preview keeps catalog navigation usable
+PASS attach requires fresh full membership review
+PASS membership revision change rejected without retry
+PASS stop commits exact review and has no resume or attach
+PASS saved confirmation and raw hash navigation fence stale commit
+PASS delayed preview cannot overwrite another task
+PASS duplicate commit clicks and lost reply never retry
+PASS malicious labels remain inert text
+PASS overlapping stop fences not-created tasks without global disabling
+PASS stopped task history keeps decline/defer but no new authority
+PASS stopped delivery disables attempt and process but retains receipt checking
+PASS local action gate blocks forbidden direct sends and previews
+PASS state-level stop supersedes catalog and blocks direct composition
+PASS delayed commit cannot redirect a later task view
+PASS lost group preview stays read-only and offers no commit
+PASS stopped binding and proposal routes expose no authority controls
+PASS stopped authorized review permits recovery and unused withdrawal only
+PASS malformed group read fails visibly without review controls
+PASS unknown context in group read is not displayed
+PASS failed group read surfaces error rather than unhandled rejection
+24/24 relationship DOM-model checks passed (not browser tests).
+RUN tests/workspace_relationship_review_dom_check.js
+PASS reject stop preview with other group before review rendering
+PASS reject stop preview with other operation before review rendering
+PASS reject stop preview with stale revision before review rendering
+PASS reject stop preview with wrong exact context before review rendering
+PASS reject stop preview with other membership before review rendering
+PASS reject stop preview with missing digest before review rendering
+PASS reject attach preview with substituted attachment context
+PASS reject attach preview with substituted attachment selector
+PASS reject attach preview with substituted membership revision
+PASS reject substituted create label before review rendering
+PASS stopped received history remains reachable via controls
+PASS stopped proposal history remains reachable without import
+PASS all forbidden task mutation names fail closed locally after stop
+13/13 independent relationship DOM-model checks passed (not browser tests).
+RUN tests/workspace_response_dom_check.js
+PASS only custom responder with processed request gets enabled response control
+PASS opening response reads exact scope and grants no authority
+PASS local add/remove respects received item cap without sending and permits empty result
+PASS preview captures exact owner request digest scope and inert result payload
+PASS preparing needs exact phrase and only creates unsigned review
+PASS cancel and Back preserve no authority
+PASS detached fields cannot modify exact reviewed response
+PASS edit restores values but requires a fresh preview
+PASS switching owner invalidates saved response confirmation
+PASS raw hash change before handler fences response preparation
+PASS delayed processed request cannot overwrite another task view
+PASS delayed response preview cannot overwrite later navigation
+PASS lost response preview stays read-only and cannot create review
+PASS lost preparation response disables duplicate attempt and points to inbox
+PASS rapid duplicate confirmation only prepares once
+PASS hostile incoming and outgoing contents stay literal text
+PASS edited response preview rebuilds usable owner navigation
+17/17 response composer DOM-model checks passed (not browser tests).
+RUN tests/workspace_response_review_dom_check.js
+PASS late prepare success never navigates away from newer task
+PASS late prepare rejection cannot contaminate a new response session
+PASS same route navigation invalidates previous exact confirmation
+PASS preview in flight freezes captured values even when editable DOM changes
+PASS empty response survives edit and explicit repreview without restored default item
+PASS raw hash change fences old preview click before hash event
+PASS modal blocks editing and preview resubmission until cancellation
+7/7 independent response DOM-model checks passed (not browser tests).
+RUN tests/workspace_text_exchange_dom_check.js
+PASS default capability keeps legacy six-field wire shape
+PASS text selector emits exact seven-field spec and swaps controls
+PASS switching back restores exact legacy shape
+PASS empty and oversized text prompts never post previews
+PASS reply character limit is integral and bounded
+PASS 512 astral characters survive prompt unchanged
+PASS editing text capability requires fresh preview and fences old confirmation
+PASS detached capability input cannot alter reviewed snapshot
+PASS text response exposes only inert bounded field and no item controls
+PASS empty and oversize responses fail before preview post
+PASS maximal Unicode response survives pure preview and unsigned preparation
+PASS response snapshot stays frozen and edit restores text
+PASS stale text response confirmation cannot cross owner
+PASS lost text preparation is not repeated
+PASS late text preview cannot replace later task
+PASS received text result stays literal with exact binding and digest
+PASS received text request stays literal with exact binding and digest
+PASS cancelled text messages preserve processed history
+18/18 text exchange DOM-model checks passed (not browser tests).
+RUN tests/workspace_text_review_dom_check.js
+PASS unknown composer capability cannot fall back to shortlist
+PASS delayed text preview freezes capability and bound at click time
+PASS response edit changes text and needs a new preview before preparation
+PASS raw hash change fences text preparation before navigation event
+4/4 independent text review DOM-model checks passed (not browser tests).
+RUN tests/workspace_ui_dom_check.js
+PASS initial catalog and task navigation never create services or mutate
+PASS explicit create targets only captured task/context and does not bind
+PASS all task-specific reads carry exact selector context and owner
+PASS binding typed exact digest and owner; cancellation mutates nothing
+PASS Bob binding from Alice view consistently identifies Bob in confirmation
+PASS approval shows exact task recipient review token; wrong phrase and Back do nothing
+PASS navigation cancels pending confirmation and saved confirm callback cannot approve
+PASS raw hash changed before hashchange event also prevents stale confirmation
+PASS detached old task button cannot act after switching
+PASS rapid duplicate confirmation and action clicks produce one mutation
+PASS rapid prepare clicks while response pending cannot duplicate
+PASS delayed old-task read cannot overwrite new task view
+PASS delayed mutation response cannot navigate new task or render old result
+PASS old-task error cannot overwrite current task
+PASS lost action response explicitly uncertain with no automatic retry
+PASS truncated response is uncertain, not failed or safe to resend
+PASS hostile review and proposal URLs are text only, no image or hyperlink
+PASS proposal import explicit and unsigned, exact ID scope and history wording
+PASS close only selected task requires phrase, leaves other task available
+PASS cleanup and startup uncertainty block every affected mutation control
+PASS failed startup refreshes metadata and blocks recreation without retry
+PASS close cleanup failure refreshes metadata to blocked state without retry
+PASS deferred stays paused until explicit local resume, no permission granted
+PASS replacement and withdrawal preserve exact review tokens and typed actions
+PASS pairing direction remains exact and separate from source send
+PASS delivery uncertainty and receipt-only action distinct from send and process
+PASS send exact recipient task and cancellation followed by typed confirmation
+PASS back/hash navigation is read-only and task controls contain no meeting assumptions
+PASS model-testable responsive and focus controls have explicit labels and CSS rules
+29/29 workspace DOM-model checks passed (not browser tests).
+RUN tests/workspace_ui_review_dom_check.js
+PASS same task leave-and-return fences old approval callback by generation
+PASS same task leave-and-return fences old mutation response by generation
+PASS malformed navigation stays inert rather than silently selecting or creating
+PASS owner switch invalidates prior owner buttons even within same task
+PASS binding confirmation title body phrase and action all name target owner
+PASS HTTP error body without usable JSON is uncertainty, never automatic retry
+6/6 independent DOM-model checks passed (not browser tests).

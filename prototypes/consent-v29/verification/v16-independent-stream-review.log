@@ -1,0 +1,11 @@
+test_every_single_split_is_framing_equivalent (test_host_stream_review.HostStreamIndependentReview.test_every_single_split_is_framing_equivalent) ... ok
+test_flush_backpressure_prevents_next_callback (test_host_stream_review.HostStreamIndependentReview.test_flush_backpressure_prevents_next_callback) ... ok
+test_input_failure_after_effect_does_not_imply_rollback (test_host_stream_review.HostStreamIndependentReview.test_input_failure_after_effect_does_not_imply_rollback) ... ok
+test_partial_write_failure_stops_coalesced_callbacks (test_host_stream_review.HostStreamIndependentReview.test_partial_write_failure_stops_coalesced_callbacks) ... ok
+test_read1_preference_writer_lookup_failure_and_cleanup (test_host_stream_review.HostStreamIndependentReview.test_read1_preference_writer_lookup_failure_and_cleanup) ... ok
+test_size_boundary_matrix_counts_cr_and_partial_eof (test_host_stream_review.HostStreamIndependentReview.test_size_boundary_matrix_counts_cr_and_partial_eof) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.418s
+
+OK

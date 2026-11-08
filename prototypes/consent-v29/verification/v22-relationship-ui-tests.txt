@@ -1,0 +1,25 @@
+PASS group navigation and pure preview grant nothing
+PASS exact phrase and group scope without undefined owner
+PASS detached edited membership cannot change frozen review or re-preview
+PASS discard returns to new empty review form
+PASS preview keeps catalog navigation usable
+PASS attach requires fresh full membership review
+PASS membership revision change rejected without retry
+PASS stop commits exact review and has no resume or attach
+PASS saved confirmation and raw hash navigation fence stale commit
+PASS delayed preview cannot overwrite another task
+PASS duplicate commit clicks and lost reply never retry
+PASS malicious labels remain inert text
+PASS overlapping stop fences not-created tasks without global disabling
+PASS stopped task history keeps decline/defer but no new authority
+PASS stopped delivery disables attempt and process but retains receipt checking
+PASS local action gate blocks forbidden direct sends and previews
+PASS state-level stop supersedes catalog and blocks direct composition
+PASS delayed commit cannot redirect a later task view
+PASS lost group preview stays read-only and offers no commit
+PASS stopped binding and proposal routes expose no authority controls
+PASS stopped authorized review permits recovery and unused withdrawal only
+PASS malformed group read fails visibly without review controls
+PASS unknown context in group read is not displayed
+PASS failed group read surfaces error rather than unhandled rejection
+24/24 relationship DOM-model checks passed (not browser tests).

@@ -1,0 +1,10 @@
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  agent-network-independent-peer-mcp-r3/bridge_tests/__init__.py
+5beb449ca4875c40c188c64312bb5094eb3fb87f5aa13f57bd2b4676b0739031  agent-network-independent-peer-mcp-r3/bridge_tests/test_bridge.py
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  agent-network-independent-peer-mcp-r3/mcp_bridge/__init__.py
+d213216fd5b1d7f3e9927e2e0b511bae89919bfbdc0180f475e3520b60f50110  agent-network-independent-peer-mcp-r3/mcp_bridge/bridge.py
+f2f05e4f504c52ee9b23adcb98d694165c724d971c4d14b901d56db0ff6471ce  agent-network-independent-peer-mcp-r3/mcp_bridge/local.py
+1e28283222564da513aa4e1947ad66e87ef0e0e22fb0b69a9d73ae71149ea519  agent-network-independent-peer-mcp-r3/START_HERE_R3.md
+1ca67ca2eff2bbe43fcf5e6e2ab474d79002ac2b7dd0c07c9abd7bd2a36d92ad  agent-network-independent-peer-mcp-r3/DESIGN.md
+0f4cffdcdb0d7c68dac613d52510f349f91a574fae86cab183eeb39a0892ab67  agent-network-independent-peer-mcp-r3/EVIDENCE.md
+c72911dc09398c4230fe4b08ed5b39f1a6c505001f40823e4f6b745b8e57950d  agent-network-independent-peer-mcp-r3/run_demo.py
+d4bdf33e1896d73fe4553899754a10fb7b67157103aeca8778711c2af7114ecc  agent-network-independent-peer-mcp-r3/run_bridge_checks.py

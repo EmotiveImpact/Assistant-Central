@@ -1,0 +1,15 @@
+{
+  "artifact_id": "pr-v1",
+  "digest": "fb48a0edcaeb2414c20d9ee20303d395ecb84ab727a1c32f7cdbb6cf00205207",
+  "state": "accepted",
+  "artifact": {
+    "content": "SYNTHETIC PR DRAFT: Add the reviewed garden website draft. No repository or pull request was created.",
+    "context": "b1ed345677de7d14da8c135b1e5daa82cbcee3983fb8dcd08d31aa77b08692e0",
+    "domain": "offline-team-artifact/rebuilt-r1",
+    "kind": "pr-draft",
+    "producer": "developer",
+    "start_review_digest": "a746d8e635164702d937949141df96edd6698f87397d1b6a5b22404fba1623b1",
+    "task": "pr"
+  },
+  "untrusted_content": true
+}

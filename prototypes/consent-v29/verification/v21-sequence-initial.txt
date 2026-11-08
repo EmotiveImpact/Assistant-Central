@@ -1,0 +1,246 @@
+test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) ... 
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing') ... FAIL
+  test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing') ... FAIL
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='public-resource-shortlist-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='alice', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='changed')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+======================================================================
+FAIL: test_corrupted_scope_blocks_response_disclosure_and_authoring (tests.test_state_sequence_campaign.StateSequenceCampaign.test_corrupted_scope_blocks_response_disclosure_and_authoring) (capability='bounded-text-exchange-v1', owner='bob', corruption='missing')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/path/to/workspace/agent-network-fault-work/tests/test_state_sequence_campaign.py", line 93, in test_corrupted_scope_blocks_response_disclosure_and_authoring
+    with self.subTest(capability=h.task.capability,owner=h.task.requester,corruption=corruption),self.assertRaises(Denied):operation()
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Denied not raised
+
+----------------------------------------------------------------------
+Ran 1 test in 0.096s
+
+FAILED (failures=24)

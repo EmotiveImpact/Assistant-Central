@@ -1,0 +1,53 @@
+{
+  "checkpoint": "v6",
+  "date": "2026-11-07",
+  "python": "3.12.14",
+  "tests_passed": 258,
+  "test_log": "test-results-v6.txt",
+  "test_command": "python -m unittest discover -s tests -v",
+  "compile_command": "python -m compileall -q .",
+  "compile_passed": true,
+  "fresh_archive_extraction_full_suite_passed": true,
+  "added_tests": {
+    "owner_workflow": 29,
+    "workflow_process_and_console": 16
+  },
+  "demos": {
+    "normal": {
+      "receipts": 12,
+      "transitions": 12
+    },
+    "defer": {
+      "receipts": 12,
+      "transitions": 12
+    },
+    "lost-receipt": {
+      "receipts": 12,
+      "transitions": 12,
+      "first_attempts": 1
+    },
+    "decline": {
+      "receipts": 0,
+      "transitions": 0
+    },
+    "uncertain": {
+      "receipts": 0,
+      "transitions": 0,
+      "attempts": 1,
+      "automatic_retry": false
+    }
+  },
+  "review": "Separate read-only code review and focused probes; reported recovery/deferral/cancellation visibility and invalid early-process issues fixed. Not an independent production/cryptographic security audit.",
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d"
+  },
+  "limits": [
+    "Fictional fixture identities; trusted console role selection is not authentication.",
+    "Console exit discards temporary records and generated fixture keys; no later console resume.",
+    "Underlying journal reopen uses unchanged live fixture identities; key-free recovery is existing evidence only.",
+    "A committed in-flight attempt or disclosed information cannot be recalled.",
+    "No live account, relay, calendar, external communication, persistent credential/access, push or deployment."
+  ]
+}

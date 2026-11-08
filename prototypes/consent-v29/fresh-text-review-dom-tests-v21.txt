@@ -1,0 +1,5 @@
+PASS unknown composer capability cannot fall back to shortlist
+PASS delayed text preview freezes capability and bound at click time
+PASS response edit changes text and needs a new preview before preparation
+PASS raw hash change fences text preparation before navigation event
+4/4 independent text review DOM-model checks passed (not browser tests).

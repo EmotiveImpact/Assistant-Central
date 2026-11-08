@@ -1,0 +1,119 @@
+{
+  "mode": "preflight",
+  "checks": {
+    "hashes": {
+      "status": "passed",
+      "checkpoint": "v28",
+      "metadata_file": "verification-v28.json",
+      "source_hash_manifest": "verification/v28-final-source-freeze.sha256",
+      "sources": 149,
+      "vendored_files": 13
+    },
+    "python": {
+      "status": "passed",
+      "version": "3.12.14"
+    },
+    "python_dependencies": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+        "-P",
+        "-c",
+        "import importlib.metadata, json\nimport coincurve, bech32, pydantic, mcp\nfrom mcp import ClientSession\nfrom mcp.server.lowlevel import Server\nfrom cryptography.hazmat.primitives.ciphers import Cipher, algorithms\nfrom cryptography.hazmat.primitives.asymmetric import x25519\ncoincurve.PrivateKey(bytes.fromhex('01' * 32)).public_key.format()\nx25519.X25519PrivateKey.from_private_bytes(bytes(32)).public_key()\nCipher(algorithms.ChaCha20(bytes(32), bytes(16)), mode=None).encryptor().update(b'fixture')\nprint(json.dumps({n: importlib.metadata.version(n) for n in\n                 ('coincurve', 'bech32', 'cryptography', 'pydantic', 'mcp')}))\n"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "{\"coincurve\": \"21.0.0\", \"bech32\": \"1.2.0\", \"cryptography\": \"50.0.0\", \"pydantic\": \"2.13.4\", \"mcp\": \"1.29.0\"}\n",
+      "output_truncated": false,
+      "versions": {
+        "coincurve": "21.0.0",
+        "bech32": "1.2.0",
+        "cryptography": "50.0.0",
+        "pydantic": "2.13.4",
+        "mcp": "1.29.0"
+      }
+    },
+    "node": {
+      "status": "passed",
+      "argv": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "--version"
+      ],
+      "exit_code": 0,
+      "reason": null,
+      "output_tail": "v24.22.1\n",
+      "output_truncated": false
+    }
+  },
+  "suites": {
+    "python": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "owner_ui_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_ui_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_ui_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_composer_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_composer_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_response_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_response_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_messages_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_messages_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_text_exchange_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_text_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_relationship_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_relationship_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_continuity_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    },
+    "workspace_continuity_review_dom_check.js": {
+      "status": "not-run",
+      "reason": "Not requested; use --full"
+    }
+  },
+  "platform": "linux",
+  "previously_tested_platform": "Linux",
+  "platform_limits": "Portable verifier is not cross-platform fixture acceptance. Subprocess-pipe selector behavior may differ on Windows; no Windows or macOS full-runtime acceptance is claimed.",
+  "limits": "Trusted offline fictional fixtures only. No browser, visual, accessibility, live-provider, real-identity or OS-isolation acceptance. Hashes are not authenticated signatures.",
+  "status": "passed"
+}

@@ -1,0 +1,61 @@
+{
+  "release": "experimental-r4",
+  "date": "2026-11-08",
+  "scope": "Synthetic UTF-8/LF byte streams to legacy MCP SDK tools; no native or live transport.",
+  "tests": {
+    "total": 180,
+    "preserved_r3": 124,
+    "raw_implementation": 32,
+    "independent_raw": 24,
+    "skips": 0
+  },
+  "demos": [
+    "preserved independent-peer r1",
+    "preserved proposal facade r2",
+    "preserved two-process SDK request/result r3",
+    "new raw-byte sequential in-process request/result r4"
+  ],
+  "fresh_archive_validation": {
+    "passed": true,
+    "warnings": "ResourceWarning as error",
+    "source_files": 67,
+    "source_manifest_sha256": "ded41439c7fe7a35370019b30fcbb6a773bcd82e67de1f406a98104c2fb7d71c",
+    "colocated_imports_checked": true,
+    "external_test_root_override_did_not_redirect_checks": true
+  },
+  "preserved": {
+    "all_r3_files": 94,
+    "v29_frozen_sources": 153,
+    "prior_archives": 31
+  },
+  "raw_sdk_client_protocol": "2025-11-25",
+  "python": "3.12.14",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "dependencies": {
+    "mcp": "1.29.0",
+    "anyio": "4.14.2",
+    "pydantic": "2.13.4",
+    "pydantic-core": "2.46.4",
+    "jsonschema": "4.26.0",
+    "cryptography": "50.0.0",
+    "httpx": "0.28.1"
+  },
+  "limits": {
+    "input_record_bytes_excluding_lf": 16384,
+    "output_record_bytes_including_lf": 32768,
+    "raw_record_budget": 160,
+    "safe_id_budget": 128,
+    "read_chunk_bytes": 4096
+  },
+  "uncompleted": [
+    "Additional peer-process concurrent-shutdown/descriptor-lifecycle review",
+    "SDK/embedding logging confidentiality",
+    "Native host or actual stdio/HTTP acceptance",
+    "MCP2026/full conformance testing",
+    "Live networking/real owner enrollment",
+    "Persistent key recovery",
+    "Hard operation preemption, whole-process resource isolation and lossless drain guarantees"
+  ],
+  "review_packaging": "Reviewed runtime unchanged; independent test bodies unchanged; portable import setup adjusted and verified in final aggregate. See PACKAGING_NOTES.md.",
+  "source_changes": "Additive only; complete nested r3 preserved byte-identically."
+}

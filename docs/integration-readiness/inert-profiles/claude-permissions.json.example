@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "ask": [
+      "mcp__agent_network_synthetic__propose",
+      "mcp__agent_network_synthetic__proposal_status",
+      "mcp__agent_network_synthetic__processed_inbox"
+    ]
+  }
+}

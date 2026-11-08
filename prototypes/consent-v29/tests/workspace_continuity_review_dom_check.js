@@ -1,0 +1,50 @@
+/* Independent offline modeled-DOM review. No browser, socket, signer or network. */
+'use strict';
+const assert=require('node:assert/strict'), fs=require('node:fs'), vm=require('node:vm'), path=require('node:path');
+const fixture=fs.readFileSync(path.join(__dirname,'workspace_continuity_dom_check.js'),'utf8');
+const ctx={require,__dirname,console,setImmediate,URL,URLSearchParams}; vm.createContext(ctx);
+vm.runInContext(fixture.slice(0,fixture.indexOf('\nconst tests=[];'))+'\nglobalThis.fixture={harness,state,identity,anchor,historical,preview,tick,hex};',ctx);
+const {harness,state,identity,anchor,historical,preview,tick,hex}=ctx.fixture;
+const copy=x=>JSON.parse(JSON.stringify(x));
+const tests=[]; const test=(name,run)=>tests.push([name,run]);
+const noControls=h=>{assert(!h.find('Preview continuity enrollment'));assert(!h.find('Preview exact continuity association'));assert.equal(h.posts.length,0);assert(!h.ids.error.hidden);};
+for(const [name,change] of [
+ ['duplicate identity',s=>s.identities.push(copy(s.identities[0]))],
+ ['duplicate association',s=>s.associations.push(copy(s.associations[0]))],
+ ['foreign incarnation',s=>s.identities[0].anchor.incarnation=hex('e')],
+ ['partial active anchor',s=>{delete s.identities[0].anchor.continuity_root;delete s.identities[0].anchor.fingerprint;}],
+ ['one missing anchor field',s=>delete s.identities[0].anchor.fingerprint],
+ ['active disposed signer',s=>s.identities[0].cleanup='disposed'],
+ ['foreign actor',s=>s.associations[0].review.body.actor='mallory'],
+ ['foreign selector',s=>s.associations[0].review.body.selector='other'],
+ ['association incarnation',s=>s.associations[0].review.body.incarnation=hex('e')],
+ ['association version',s=>s.associations[0].review.body.identity_version=2],
+ ['fractional generation',s=>s.associations[0].review.body.generation=1.5],
+ ['unsafe timestamp',s=>s.associations[0].review.body.issued_at=Number.MAX_SAFE_INTEGER+1],
+ ['string active flag',s=>s.associations[0].active='true'],
+ ['uncertain certificate',s=>{s.associations[0].status='uncertain';s.associations[0].active=false;}],
+ ['extra certificate key',s=>s.associations[0].certificate.permission=true],
+ ['certificate expires at review expiry',s=>{s.associations[0].review.body.certificate_expires_at=s.associations[0].review.body.review_expires_at;s.associations[0].certificate.body.certificate_expires_at=s.associations[0].review.body.review_expires_at;}],
+ ['certificate expires before review expiry',s=>{s.associations[0].review.body.certificate_expires_at=s.associations[0].review.body.review_expires_at-1;s.associations[0].certificate.body.certificate_expires_at=s.associations[0].review.body.review_expires_at-1;}],
+ ['extra aggregate key',s=>s.permission=true]
+])test('closed read rejects '+name,async()=>{const s=state();s.associations=[historical()];change(s);const h=harness({state:s});await h.start();noControls(h);});
+for(const phase of ['closed','cleanup_uncertain','startup_failed_cleanup_uncertain'])test('historical certificate remains readable for '+phase,async()=>{const s=state();s.associations=[historical()];const h=harness({state:s});h.rows[0].phase=phase;await h.start();assert(h.ids.error.hidden);assert.match(h.ids.content.textContent,/proof-one · closed/);assert.match(h.ids.content.textContent,/not live possession or permission/);assert.equal(h.posts.length,0);});
+test('active history downgrades for local stop',async()=>{const s=state();s.associations=[historical()];const h=harness({state:s});h.rows[0].local_work_stopped=true;await h.start();assert.match(h.ids.content.textContent,/proof-one · stopped/);});
+test('retirement dominates closed stopped and elapsed certificate',async()=>{const s=state();s.identities[0].phase='retired';s.identities[0].cleanup='disposed';s.associations=[historical()];const h=harness({state:s});h.rows[0].phase='closed';h.rows[0].local_work_stopped=true;h.context.Date={now:()=>Date.now()+86401000};await h.start();assert.match(h.ids.content.textContent,/proof-one · retired/);assert(!h.find('Preview retirement fictional-one'));});
+test('duplicate association ID preview cannot expose commit',async()=>{const s=state();s.associations=[historical()];const h=harness({state:s});await h.associate();assert(!h.find('Confirm reviewed continuity associate'));assert.equal(h.posts.length,1);});
+test('occupied enrollment ID cannot expose commit',async()=>{const h=harness();await h.start();h.field('continuityIdentity').value='fictional-one';await h.find('Preview continuity enrollment').click();assert(!h.find('Confirm reviewed continuity enroll'));assert.equal(h.posts.length,1);});
+test('partial uncertain anchor retirement must not gain invented root',async()=>{const s=state();s.identities[0]={anchor:{incarnation:hex('a'),identity_id:'fictional-one',identity_version:1},phase:'uncertain',cleanup:'uncertain'};const h=harness({state:s,change:p=>{p.continuity_root=hex('b');p.fingerprint=hex('c');}});await h.retire();assert(!h.find('Confirm reviewed continuity retire'));assert.equal(h.posts.length,1);});
+for(const operation of ['enroll','retire','associate'])test(operation+' real backend response shape triggers read-only inspection',async()=>{let writes=0;const h=harness({post:(req,r,s)=>{if(req.operation)return r(preview(req,s));writes++;if(operation==='associate')return r(historical());const result=copy(s);delete result.enabled;return r(result);}});await h[operation]();await h.find('Confirm reviewed continuity '+operation).click();await h.confirm(operation.toUpperCase()+' CONTINUITY '+hex('d'));assert.equal(writes,1);assert.equal(h.gets.filter(x=>x==='/api/continuity').length,2);assert(h.find('Preview continuity enrollment'));});
+test('changing input while preview is pending preserves requested snapshot',async()=>{let release;const h=harness({post:req=>new Promise(r=>release=r)});await h.start();h.field('continuityAssociation').value='proof-one';await h.find('Preview exact continuity association').click();h.field('continuityAssociation').value='proof-two';h.field('continuityAnchor').value='other';release(h.response(preview(h.posts[0],state())));await tick();assert(h.find('Confirm reviewed continuity associate'));assert.match(h.ids.content.textContent,/proof-one/);assert(!h.ids.content.textContent.includes('proof-two'));});
+test('truncated commit reply is uncertain and cannot be repeated',async()=>{const h=harness({post:(req,r,s)=>req.operation?r(preview(req,s)):Promise.resolve({ok:true,json:async()=>{throw Error('truncated');}})});await h.retire();const b=h.find('Confirm reviewed continuity retire');await b.click();await h.confirm('RETIRE CONTINUITY '+hex('d'));await b.click();assert.equal(h.posts.length,2);assert.match(h.ids.error.textContent,/outcome is uncertain/);assert(h.find('Inspect continuity without retry'));});
+test('stale failed preview does not surface error on a new task',async()=>{let reject;const h=harness({post:()=>new Promise((_,r)=>reject=r)});await h.enroll();await h.hash('garden/alice/inbox');reject(Error('lost'));await tick();assert(h.ids.error.hidden);assert.match(h.ids.content.textContent,/garden-task/);assert.equal(h.posts.length,1);});
+test('stale metadata error does not overwrite a new task',async()=>{let reject;const h=harness({read:()=>new Promise((_,r)=>reject=r)});await h.start();await h.hash('garden/alice/inbox');reject(Error('late'));await tick();assert(h.ids.error.hidden);assert.match(h.ids.content.textContent,/garden-task/);});
+test('no HTML sink anywhere in workspace UI',async()=>{const code=fs.readFileSync(path.join(__dirname,'../workspace_ui/app.js'),'utf8');assert(!/innerHTML|outerHTML|insertAdjacentHTML|document\.write/.test(code));});
+// The backend proof contract allows certificate lifetimes shorter than 24h.
+// Its current preview producer chooses 24h; this checks forward-compatible reads.
+test('valid shorter certificate lifetime remains readable',async()=>{const s=state();s.associations=[historical()];for(const b of [s.associations[0].review.body,s.associations[0].certificate.body])b.certificate_expires_at=b.issued_at+3600;const h=harness({state:s});await h.start();assert(h.ids.error.hidden,'A one-hour certificate satisfies the backend <=24h proof contract');assert.match(h.ids.content.textContent,/proof-one · active/);});
+for(const seconds of [121,3600,86400])test('association preview accepts certificate lifetime '+seconds+' seconds',async()=>{const h=harness({change:p=>p.body.certificate_expires_at=p.body.issued_at+seconds});await h.associate();assert(h.find('Confirm reviewed continuity associate'),'Valid bounded certificate lifetime must be reviewable');await h.find('Confirm reviewed continuity associate').click();await h.confirm('ASSOCIATE CONTINUITY '+hex('d'));assert.equal(h.posts[1].review.body.certificate_expires_at,h.posts[1].review.body.issued_at+seconds);});
+for(const seconds of [0,119,120,86401])test('association preview rejects certificate lifetime '+seconds+' seconds',async()=>{const h=harness({change:p=>p.body.certificate_expires_at=p.body.issued_at+seconds});await h.associate();assert(!h.find('Confirm reviewed continuity associate'));assert.equal(h.posts.length,1);});
+for(const seconds of [30,120])test('association preview accepts review window '+seconds+' seconds',async()=>{const h=harness({change:p=>p.body.review_expires_at=p.body.issued_at+seconds});await h.associate();assert(h.find('Confirm reviewed continuity associate'));assert.equal(h.posts.length,1);});
+for(const seconds of [0,-1,121])test('association preview rejects review window '+seconds+' seconds',async()=>{const h=harness({change:p=>p.body.review_expires_at=p.body.issued_at+seconds});await h.associate();assert(!h.find('Confirm reviewed continuity associate'));assert.equal(h.posts.length,1);});
+(async()=>{let failed=0;for(const[n,f]of tests){try{await f();console.log('PASS '+n);}catch(e){failed++;console.error('FAIL '+n+'\n'+e.stack);}}console.log(`${tests.length-failed}/${tests.length} independent continuity DOM-model checks passed (not browser tests).`);if(failed)process.exitCode=1;})();

@@ -1,0 +1,15 @@
+test_catalog_request_result_and_cross_task_isolation (tests.test_owner_messages.CatalogMessageTests.test_catalog_request_result_and_cross_task_isolation) ... ok
+test_legacy_meeting_interface_unchanged (tests.test_owner_messages.CatalogMessageTests.test_legacy_meeting_interface_unchanged) ... ok
+test_blocked_received_after_cancel_and_stopped_uncertain_hidden (tests.test_owner_messages.OwnerMessageTests.test_blocked_received_after_cancel_and_stopped_uncertain_hidden) ... ok
+test_cancellation_preserves_processed_history (tests.test_owner_messages.OwnerMessageTests.test_cancellation_preserves_processed_history) ... ok
+test_corrupted_scope_and_protocol_history_fail_closed (tests.test_owner_messages.OwnerMessageTests.test_corrupted_scope_and_protocol_history_fail_closed) ... ok
+test_failed_before_receipt_uncertain_hidden (tests.test_owner_messages.OwnerMessageTests.test_failed_before_receipt_uncertain_hidden) ... ok
+test_no_durable_mutation_or_proposal_tables_on_any_read (tests.test_owner_messages.OwnerMessageTests.test_no_durable_mutation_or_proposal_tables_on_any_read) ... ok
+test_request_and_response_only_after_processing_detached_and_reopened (tests.test_owner_messages.OwnerMessageTests.test_request_and_response_only_after_processing_detached_and_reopened) ... ok
+test_scope_readiness_closed_uncertain_and_trusted_pipe_schema (tests.test_owner_messages.OwnerMessageTests.test_scope_readiness_closed_uncertain_and_trusted_pipe_schema) ... ok
+test_uncertain_dispatch_and_unprocessed_lost_receipt_are_hidden (tests.test_owner_messages.OwnerMessageTests.test_uncertain_dispatch_and_unprocessed_lost_receipt_are_hidden) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 4.678s
+
+OK

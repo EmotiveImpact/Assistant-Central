@@ -1,0 +1,21 @@
+{
+  "format": "agent-network-integration-readiness/1",
+  "date_utc": "2026-11-08",
+  "frozen_runtime_archive": "agent-network-synthetic-stdio-experimental-r5.zip",
+  "frozen_runtime_sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+  "scope": "Static security, runtime metadata and inactive profile preparation. No native acceptance or deployment.",
+  "files": {
+    "PILOT_DECISION.md": "ecf0142d577e7255b0f6da50fbff2d671e09820933c18814168b35f63c959024",
+    "README.md": "48aaa18342b0ec71a9618d76aef33b2c8b7f4b83a03fafe03e006abbc92ba7d0",
+    "acceptance-record.json": "954c50f453534b12d43e1f7525caf8dbdcc20570bff1eaa7ca479915582114da",
+    "agent-network-peer-security-readiness-inputs.sha256": "e36ea0110067035338264344f2e58ab619eb40482dce8496187e4d747ff2d274",
+    "agent-network-peer-security-readiness.md": "df058f45308827bf5a88b22950f32e73d478818f5c973e77f400ad28f4c92358",
+    "draft-validation.json": "3eb645ec4b6b9bc999903968b191b7976863bf19e9c3c49b21af8d0e11f6ce30",
+    "inert-profiles/claude-mcp.json.example": "58b754b2ff46293a055048d20bc50f2040fc3042e6d46fdeb65f8a4c67b686be",
+    "inert-profiles/claude-permissions.json.example": "0047f6c641fe319490af026077c815072d2782f18b6548713d6a4b41e2afde55",
+    "inert-profiles/codex-disabled.toml.example": "1649731cffbb71cf6ddd2b40d1c4a27621943465843ad0730e2abbd6ccb1ab44",
+    "runtime-dependencies/README.md": "6166aa655ffd4e5ada971a4b5a724ab8dcdf232b48d7c1abc819824a6fbbb6f3",
+    "runtime-dependencies/dependency-inventory.json": "53ef982ece131feea755527ddbf0592879ff0920afa54067063176283281367c",
+    "runtime-dependencies/requirements-observed-linux-py312.txt": "72288103b1f5609a3f8e564779c6196a8af12d751dd7969bd1bc350144e6c263"
+  }
+}

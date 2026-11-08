@@ -1,0 +1,3 @@
+{"phase": "prepare", "sender_state": "dispatched", "private_keys_written": false, "receiver_committed": true}
+{"phase": "recover", "state": "processed", "attempts": 1, "private_keys_loaded": false, "new_delivery_possible": false, "scope": "existing signed receipt only; identity recovery not implemented"}
+Preparation process exited before recovery. No generated private keys were persisted.

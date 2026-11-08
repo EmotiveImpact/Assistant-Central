@@ -1,0 +1,683 @@
+V6 OWNER INBOX | OFFLINE FICTIONAL FIXTURE
+One trusted console operator controls all roles. No real-person authentication.
+This console is disposable: quitting discards its temporary records and fixture keys. Deferral lasts only while this console stays open.
+SIMULATED choices.
+Bind fictional alice to transport a8d095e303156f2927101b2dce0505d52992bbd789aefb1bc973026e8525ca81 for meeting friday-four; receive from alice, bob, charlie, dana.
+Bind fictional bob to transport 8a8d5767e2da138bea33093954e423951722fedab544ee28b7df625bc60ff2e5 for meeting friday-four; receive from alice.
+Bind fictional charlie to transport 24438397ec93e74cb2cf80ede3d22022b84a7d56e7ada5ee2e556f90ddfbcde8 for meeting friday-four; receive from alice.
+Bind fictional dana to transport 2634c1dd3d42bde25ddcf984f9605c031273b77b2c1943d199581679160e46d4 for meeting friday-four; receive from alice.
+
+OWNER: alice | REQUEST: f49eed4c46280f9d3fe37a6d124fd357 | pending
+Allow Alice [alice] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: f49eed4c46280f9d3fe37a6d124fd357 | authorized
+Allow Alice [alice] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: bob | REQUEST: c38a0850335c3a9bb8c9989ebc7c0931 | pending
+Allow Bob [bob] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: c38a0850335c3a9bb8c9989ebc7c0931 | authorized
+Allow Bob [bob] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: alice | REQUEST: 4aed302660241831baf5c3c09c7676a2 | pending
+Allow Alice [alice] to pair with Bob [bob] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 4aed302660241831baf5c3c09c7676a2 | authorized
+Allow Alice [alice] to pair with Bob [bob] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: charlie | REQUEST: 7b370f61dcbe6e78406cd3ca59d0afbb | pending
+Allow Charlie [charlie] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: charlie | REQUEST: 7b370f61dcbe6e78406cd3ca59d0afbb | authorized
+Allow Charlie [charlie] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: alice | REQUEST: 2b6a7ca21d032950b6eb84efdc8b0456 | pending
+Allow Alice [alice] to pair with Charlie [charlie] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 2b6a7ca21d032950b6eb84efdc8b0456 | authorized
+Allow Alice [alice] to pair with Charlie [charlie] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: dana | REQUEST: 25eb3b9899f9ee8ba3c952900fb966de | pending
+Allow Dana [dana] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: dana | REQUEST: 25eb3b9899f9ee8ba3c952900fb966de | authorized
+Allow Dana [dana] to pair with Alice [alice] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: alice | REQUEST: 6d581597111e1cf1148ab21e78614292 | pending
+Allow Alice [alice] to pair with Dana [dana] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 6d581597111e1cf1148ab21e78614292 | authorized
+Allow Alice [alice] to pair with Dana [dana] for this meeting for 3600 seconds.
+Both owners must pair. This permits no message or calendar disclosure.
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+OWNER: alice | REQUEST: 1bc3d06d7fcd2c8bbe4bf0bb21073df6 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[0,1,2,3]},"recipient":"alice","sender":"alice","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 1bc3d06d7fcd2c8bbe4bf0bb21073df6 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 81fba14d11d7c2d345d30213df1f438ce6dfac7492f40a1b3b4d7841f9eb00ad
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[0,1,2,3]},"recipient":"alice","sender":"alice","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 1bc3d06d7fcd2c8bbe4bf0bb21073df6 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 1bc3d06d7fcd2c8bbe4bf0bb21073df6 | Outcome uncertain; check receipt before any retry | attempts: 1
+Receipt check only: Recipient receipt verified; not processed | attempts: 1
+
+DELIVERY: 1bc3d06d7fcd2c8bbe4bf0bb21073df6 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: bob | REQUEST: 03103f7089d4d1927916b916e7922cb9 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 220571d79945214fadac47459e241921083577a2b559280593f6e7bc526e9ccb
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[1,2]},"recipient":"alice","sender":"bob","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: 03103f7089d4d1927916b916e7922cb9 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 220571d79945214fadac47459e241921083577a2b559280593f6e7bc526e9ccb
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[1,2]},"recipient":"alice","sender":"bob","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 03103f7089d4d1927916b916e7922cb9 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 03103f7089d4d1927916b916e7922cb9 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: charlie | REQUEST: 0a2f5b7bccaf03d5aa540794f2547ea0 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 644ab58b47df213412ce853436afa91acb3161ca2109fc9e493cfa4fb90f6db0
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[2,3]},"recipient":"alice","sender":"charlie","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: charlie | REQUEST: 0a2f5b7bccaf03d5aa540794f2547ea0 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 644ab58b47df213412ce853436afa91acb3161ca2109fc9e493cfa4fb90f6db0
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[2,3]},"recipient":"alice","sender":"charlie","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 0a2f5b7bccaf03d5aa540794f2547ea0 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 0a2f5b7bccaf03d5aa540794f2547ea0 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: dana | REQUEST: 2784101961dac8aa503c34838e6c957f | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: d4ae13951219a04be693843dce34308a0022378cc92038f34656658015c60100
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[2]},"recipient":"alice","sender":"dana","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: dana | REQUEST: 2784101961dac8aa503c34838e6c957f | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: share availability for the candidate times below.
+Omitted candidates mean not available for that whole candidate slot.
+  2026-11-06T13:00:00Z to 2026-11-06T13:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T14:00:00Z to 2026-11-06T14:30:00Z (UTC): NOT AVAILABLE
+  2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC): AVAILABLE
+  2026-11-06T16:00:00Z to 2026-11-06T16:30:00Z (UTC): NOT AVAILABLE
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: d4ae13951219a04be693843dce34308a0022378cc92038f34656658015c60100
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_indices":[2]},"recipient":"alice","sender":"dana","type":"availability","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 2784101961dac8aa503c34838e6c957f | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 2784101961dac8aa503c34838e6c957f | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 8b2a4a12a1c3b0814d3f28f8e6b1f292 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 933a08c429304f317e9f097257355af5d07c208a53548edb0912c01d18fe3bdd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 8b2a4a12a1c3b0814d3f28f8e6b1f292 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 933a08c429304f317e9f097257355af5d07c208a53548edb0912c01d18fe3bdd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 8b2a4a12a1c3b0814d3f28f8e6b1f292 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 8b2a4a12a1c3b0814d3f28f8e6b1f292 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 7b606d1fc4205c6367926dfa0369b3b2 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5eeed7fe1e1690c5bc3cd1d4cd8a4c2052a21e7f1d30d33da710eac8553f9417
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"alice","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 7b606d1fc4205c6367926dfa0369b3b2 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5eeed7fe1e1690c5bc3cd1d4cd8a4c2052a21e7f1d30d33da710eac8553f9417
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"alice","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 7b606d1fc4205c6367926dfa0369b3b2 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 7b606d1fc4205c6367926dfa0369b3b2 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 3f4e6d1c22026f1356076abdaedb611c | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Bob [bob]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 7393930d2c831dccb12b4e038cee1c35101375531532e84995d712bedfd46dfd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: bb11487033e69fabfdcb3d505cc678a25574e3305201d69b1fa578879835c248
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"bob","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 3f4e6d1c22026f1356076abdaedb611c | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Bob [bob]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 7393930d2c831dccb12b4e038cee1c35101375531532e84995d712bedfd46dfd
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: bb11487033e69fabfdcb3d505cc678a25574e3305201d69b1fa578879835c248
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"bob","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 3f4e6d1c22026f1356076abdaedb611c | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 3f4e6d1c22026f1356076abdaedb611c | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: bob | REQUEST: ba8d0032af815e79afe5d6170cdc0c1e | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 85da2ff0695eba6012bb07a16cdab9995bd74db2ef01e6912f087619f6e0bd35
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"bob","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: bob | REQUEST: ba8d0032af815e79afe5d6170cdc0c1e | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Bob [bob]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 85da2ff0695eba6012bb07a16cdab9995bd74db2ef01e6912f087619f6e0bd35
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"bob","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: ba8d0032af815e79afe5d6170cdc0c1e | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: ba8d0032af815e79afe5d6170cdc0c1e | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 11b08f202be8b8e77f0838dbda42bf6a | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Charlie [charlie]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 784d801b3fe60f6b1b60069bb16d34bfbba99601bd6b1a29cf6c4312db7213be
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 862a087ac781f82a0c75ec5b289cfc5df2a0b10afa05d3c46513f930cad6f57b
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"charlie","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 11b08f202be8b8e77f0838dbda42bf6a | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Charlie [charlie]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 784d801b3fe60f6b1b60069bb16d34bfbba99601bd6b1a29cf6c4312db7213be
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 862a087ac781f82a0c75ec5b289cfc5df2a0b10afa05d3c46513f930cad6f57b
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"charlie","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 11b08f202be8b8e77f0838dbda42bf6a | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 11b08f202be8b8e77f0838dbda42bf6a | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: charlie | REQUEST: 0ff262032ac797d52143a771efe8d9c0 | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5957fccedf84ad8b6c8ae054eccf8e3e53cb488b0bcf8ea1ba3b3b87b8fa2b74
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"charlie","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: charlie | REQUEST: 0ff262032ac797d52143a771efe8d9c0 | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Charlie [charlie]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 5957fccedf84ad8b6c8ae054eccf8e3e53cb488b0bcf8ea1ba3b3b87b8fa2b74
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"charlie","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 0ff262032ac797d52143a771efe8d9c0 | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 0ff262032ac797d52143a771efe8d9c0 | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: alice | REQUEST: 08ba3f1159b7f2554294d8a56744799c | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Dana [dana]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 82445a17ae1e362edc62ce64c46513ee20189b9fe1bd044d3dedda2339d627e2
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 467d7895d6911d3e3bc71906ba46160246b5bc951b7ed49ce1d1fe67757111ca
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"dana","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: alice | REQUEST: 08ba3f1159b7f2554294d8a56744799c | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Alice [alice]
+Only recipient of this message: Dana [dana]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: send a proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 82445a17ae1e362edc62ce64c46513ee20189b9fe1bd044d3dedda2339d627e2
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 467d7895d6911d3e3bc71906ba46160246b5bc951b7ed49ce1d1fe67757111ca
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"dana","sender":"alice","type":"proposal","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 08ba3f1159b7f2554294d8a56744799c | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 08ba3f1159b7f2554294d8a56744799c | Recipient receipt verified; not processed | attempts: 1
+
+OWNER: dana | REQUEST: 381bc8194a5774dc8fca0739d8bce27a | pending
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 353e7cdf562da256297e1b787834ac52697f247a151efd8bcee588713417c90e
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"dana","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+Owner signature saved. This alone did not execute or dispatch anything.
+
+OWNER: dana | REQUEST: 381bc8194a5774dc8fca0739d8bce27a | authorized
+REVIEW BEFORE SENDING (fictional local simulation)
+Meeting: friday-four
+From: Dana [dana]
+Only recipient of this message: Alice [alice]
+Meeting participants: Alice [alice], Bob [bob], Charlie [charlie], Dana [dana]
+Action: accept the proposed time.
+Exact time: 2026-11-06T15:00:00Z to 2026-11-06T15:30:00Z (UTC)
+This discloses scheduling information. No titles, reasons, private chats or files are sent.
+This does not create a calendar booking or authorize later messages.
+Exact message digest: 353e7cdf562da256297e1b787834ac52697f247a151efd8bcee588713417c90e
+Meeting context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Recipient transport binding: 885744f2a26090372e9d1e56fee537d56e3e1149d12103901521f5988f63c233
+Exact structured message: {"context":"c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac","meeting":"friday-four","payload":{"candidate_index":2},"recipient":"alice","sender":"dana","type":"accept","version":1}
+Exact meeting: friday-four
+Context: c9ef4a9a4bfcb2a1e1ca3f92165f8f45df792c536838e5534bdcee0665a864ac
+Decision expires: 2026-11-07T20:43:25+00:00
+Fictional owner/transport identity only; this is not real-person authentication.
+
+DELIVERY: 381bc8194a5774dc8fca0739d8bce27a | Approved and queued; not dispatched | attempts: 0
+
+DELIVERY: 381bc8194a5774dc8fca0739d8bce27a | Recipient receipt verified; not processed | attempts: 1
+All four accepted; no calendar booking.
+Final summary: {"agreed": true, "receiver_receipts": 12, "transitions": 12}
+No live message, persistent credential, calendar action or publication occurred.
+Closing this disposable console discards its records; there is no later inbox resume or identity recovery.
+Fixture processes stopped. Disposable keys discarded.

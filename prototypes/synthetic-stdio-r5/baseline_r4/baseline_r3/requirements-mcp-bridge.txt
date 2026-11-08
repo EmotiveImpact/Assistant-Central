@@ -1,0 +1,3 @@
+# Recorded offline test dependencies, not an instruction to install or configure a host.
+-r baseline_r2/requirements-experiment.txt
+mcp==1.29.0

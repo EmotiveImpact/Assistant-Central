@@ -1,0 +1,29 @@
+{
+  "checkpoint": "v8",
+  "date": "2026-11-07",
+  "python_tests_passed": 309,
+  "dom_model_tests_passed": 14,
+  "new_python_tests": 30,
+  "new_dom_tests": 2,
+  "python_log": "test-results-v8.txt",
+  "dom_log": "owner-ui-dom-v8-output.txt",
+  "compile_passed": true,
+  "javascript_syntax_passed": true,
+  "fresh_archive_extraction_tests_passed": true,
+  "fixed": "Expired unsigned review could indefinitely block the guide; explicit replacement now creates a fresh unsigned request while retaining the old request and exact action scope.",
+  "replacement_grants_approval": false,
+  "replacement_creates_delivery": false,
+  "review": "Read-only independent core review plus adversarial race/retry probes; no blocking issue. Process/adapter/DOM checks added and passed separately.",
+  "real_browser_passed": false,
+  "visual_review_performed": false,
+  "browser_blocker_unchanged": true,
+  "remaining_limit": "Expired/revoked pairing and expired transport identity are not restored. A separate explicit pairing-restoration workflow is still needed.",
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d",
+    "v6": "b1ec7f4cfe8f79c00b47abdd0b13488e76ff88ab87d09c385aca282eef448a16",
+    "v7": "2b223e688613f3c1d767c975e6bad7cdb9792f5a042bc2e5d4f30dad1c20deea"
+  },
+  "live_services_accounts_credentials_publication": false
+}

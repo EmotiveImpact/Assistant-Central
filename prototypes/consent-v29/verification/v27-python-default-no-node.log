@@ -1,0 +1,32 @@
+SIMULATED OWNER CHOICES: synthetic reproducibility only, not human consent
+EXPLICIT SYNTHETIC TASK SELECTION custom-peer fccaefe8df8570ba696cef96cdafb74d1120317f7efc95677cb6102514970c6c
+SIMULATED OWNER DECISION bind
+SIMULATED OWNER DECISION bind
+{"clients": {"alice": 9, "bob": 10}, "owner_authority": false, "scope": {"context": "fccaefe8df8570ba696cef96cdafb74d1120317f7efc95677cb6102514970c6c", "fictional": true, "local_work_stopped": false, "phase": "open", "relationship_groups": [], "requester": "alice", "responder": "bob", "selector": "custom-peer", "task": "peer-text", "temporary": true}, "scripted": true}
+CLIENT alice discovered propose, proposal_status, inbox
+CLIENT bob discovered propose, proposal_status, inbox
+PROPOSAL ONLY {"delivery_state": null, "envelope_digest": "def51d938f6da798f1a59831cb518fdc478c21679251d8e56d9ca0931f3a597c", "proposal_id": "peer-alice", "state": "awaiting_owner_review"}
+SIMULATED OWNER DECISION next
+SIMULATED OWNER DECISION approve
+SIMULATED OWNER DECISION submit
+SIMULATED OWNER DECISION next
+SIMULATED OWNER DECISION approve
+SIMULATED OWNER DECISION submit
+OWNER IMPORT unsigned review
+SIMULATED OWNER DECISION approve
+SIMULATED OWNER DECISION submit
+SIMULATED OWNER DECISION attempt
+DELIVERY RECEIPT present; recipient processed inbox still empty
+SIMULATED OWNER DECISION process
+PROCESSING bob inbox contains exact request
+PROPOSAL ONLY bob fixed result
+OWNER IMPORT unsigned review
+SIMULATED OWNER DECISION approve
+SIMULATED OWNER DECISION submit
+SIMULATED OWNER DECISION attempt
+DELIVERY RECEIPT present; recipient processed inbox still empty
+SIMULATED OWNER DECISION process
+PROCESSING alice inbox contains exact result
+OFFLINE ROUNDTRIP COMPLETE: two scripted clients, separate synthetic owner decisions
+Clients reaped; temporary workspace discarded. No live interoperability claimed.
+PASS Python-only default made no Node discovery calls

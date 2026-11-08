@@ -1,0 +1,19 @@
+test_actor_scope_and_processed_publication (test_bridge.BridgeTests.test_actor_scope_and_processed_publication) ... ok
+test_argument_bounds_and_redacted_errors (test_bridge.BridgeTests.test_argument_bounds_and_redacted_errors) ... ok
+test_decoded_bounds_and_output_redaction (test_bridge.BridgeTests.test_decoded_bounds_and_output_redaction) ... ok
+test_escape_heavy_exact_text_and_malformed_initialize (test_bridge.BridgeTests.test_escape_heavy_exact_text_and_malformed_initialize) ... ok
+test_exact_declined_and_unknown_replay (test_bridge.BridgeTests.test_exact_declined_and_unknown_replay) ... ok
+test_gate_message_depth_and_metadata_size (test_bridge.BridgeTests.test_gate_message_depth_and_metadata_size) ... ok
+test_inert_client_metadata (test_bridge.BridgeTests.test_inert_client_metadata) ... ok
+test_legacy_versions_and_initialized_barrier (test_bridge.BridgeTests.test_legacy_versions_and_initialized_barrier) ... ok
+test_post_dispatch_error_is_uncertain (test_bridge.BridgeTests.test_post_dispatch_error_is_uncertain) ... ok
+test_request_count_and_strict_params (test_bridge.BridgeTests.test_request_count_and_strict_params) ... ok
+test_sdk_handshake_list_call_and_no_endpoint_authority (test_bridge.BridgeTests.test_sdk_handshake_list_call_and_no_endpoint_authority) ... ok
+test_single_use_and_no_callback_constructor (test_bridge.BridgeTests.test_single_use_and_no_callback_constructor) ... ok
+test_state_duplicate_ids_and_unsupported_protocol (test_bridge.BridgeTests.test_state_duplicate_ids_and_unsupported_protocol) ... ok
+test_unknown_tools_and_selectors (test_bridge.BridgeTests.test_unknown_tools_and_selectors) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.146s
+
+OK

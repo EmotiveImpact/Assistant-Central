@@ -1,0 +1,24 @@
+import os,tempfile
+from independent_peer.fixture import PeerProcess, UncertainOutcome
+from independent_peer.protocol import Identity,CAPABILITY,digest,token,scope,seal,open_packet
+with tempfile.TemporaryDirectory() as directory:
+ p=PeerProcess('alice',directory)
+ try:
+  pub=p.owner('describe')['descriptor']; bad=Identity('bob')
+  task={'id':token(),'context':'0'*64,'capability':CAPABILITY}
+  p.owner('configure',task=task,peer=bad.descriptor); incoming=p.owner('allow_receive')['grant']
+  grant=bad.sign('grant',{'scope':scope(task,'alice','bob','request'),'nonce':token(),'epoch':1,'sender_binding':digest(pub),'recipient_binding':digest(bad.descriptor)})
+  sent=p.owner('approve_send',payload='fiction',grant=grant); body=open_packet(bad,pub,sent['packet'])
+  proof=bad.sign('processed',{'scope':body['scope'],'id':body['id'],'message_digest':digest(body),'packet_digest':digest(sent['packet']),'grant_digest':digest(grant),'processor_binding':digest(bad.descriptor),'status':'processed'})
+  result={'id':token(),'scope':scope(task,'bob','alice','result'),'grant':incoming,'request':{'id':body['id'],'digest':digest(body),'processed':proof},'payload':'fiction'}
+  try: p.call('owner',{'op':'inspect'},timeout=0)
+  except UncertainOutcome: pass
+  print('wrapper_poisoned',p.broken,'child_still_alive',p.process.poll() is None)
+  # Real remote ingress survives client-wrapper poison; explicit low-level test only.
+  response=p._io(p.peer_r,p.peer_w,{'op':'deliver','value':seal(bad,pub,bad.sign('message',result))},3)
+  print('peer_delivery_after_poison',response['ok'])
+  print('database_exists_before_close',os.path.exists(p.database))
+ finally: p.close()
+ print('child_reaped_after_close',p.process.poll() is not None)
+ print('database_exists_after_peer_close',os.path.exists(p.database))
+print('database_exists_after_temp_cleanup',os.path.exists(p.database))

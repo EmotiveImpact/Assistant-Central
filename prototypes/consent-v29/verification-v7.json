@@ -1,0 +1,35 @@
+{
+  "checkpoint": "v7",
+  "date": "2026-11-07",
+  "python": "3.12.14",
+  "node": "v24.22.1",
+  "python_tests_passed": 279,
+  "new_service_http_tests": 21,
+  "python_log": "test-results-v7.txt",
+  "dom_model_tests_passed": 12,
+  "dom_model_log": "owner-ui-dom-output.txt",
+  "dom_model_is_real_browser_test": false,
+  "compile_passed": true,
+  "javascript_syntax_passed": true,
+  "fresh_archive_extraction_python_and_dom_tests_passed": true,
+  "loopback_http_end_to_end": {
+    "receiver_receipts": 12,
+    "processed_transitions": 12,
+    "explicit_cleanup_tested": true
+  },
+  "real_browser_status": "blocked before browser could launch",
+  "real_browser_passed": false,
+  "visual_review_performed": false,
+  "mobile_layout_verified": false,
+  "browser_blocker": "Installed Chromium process_singleton socket creation failed with Operation not permitted; two launch attempts failed before page access.",
+  "portable_browser_check": "browser_ui_check.py provided for an authorized capable environment; not passed here",
+  "review": "Separate read-only code review and focused probes; cleanup, truncated-response uncertainty and exceptional cleanup screen findings fixed. Not a production security audit.",
+  "preserved_archive_sha256": {
+    "v3": "90e3cdc599e0d28e731e85e9f52a24fec37b04038dd8313c3ec7d9e5f36bffb0",
+    "v4": "74a3084d137dcb353c74d93e2b02a136d3d598e35cea408aee53ef34ac61e658",
+    "v5": "394e477515f3f90e96c687dcd20ba541eb0fca05e6605f1fc58cbc98c96cb67d",
+    "v6": "b1ec7f4cfe8f79c00b47abdd0b13488e76ff88ab87d09c385aca282eef448a16"
+  },
+  "scope": "Fictional trusted-local-host fixture; no real authentication, accounts, external services, persistent credentials, publication or deployment.",
+  "next_required_verification": "Run real-browser interaction checks and visual/accessibility review in an authorized environment that permits Chromium local IPC before expanding product scope."
+}

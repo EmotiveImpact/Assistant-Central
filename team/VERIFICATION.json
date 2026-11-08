@@ -1,0 +1,33 @@
+{
+  "checkpoint": "team-rebuilt-r1",
+  "date_utc": "2026-11-08",
+  "new_replacement_implementation": true,
+  "python_tests": 84,
+  "implementation_tests": 56,
+  "independent_tests": 28,
+  "test_command": "python -B run_checks.py",
+  "network_and_subprocess_audit_guard": true,
+  "five_artifact_demo": "passed",
+  "syntax_parse": "passed",
+  "baseline_reruns": {
+    "v29": {
+      "python_tests": 948,
+      "dom_suites": 15,
+      "dom_model_checks": 273,
+      "source_hashes": 153,
+      "upstream_hashes": 13,
+      "status": "passed"
+    },
+    "r5": {
+      "targeted_synthetic_stdio_tests": 39,
+      "status": "passed"
+    }
+  },
+  "limits": [
+    "Trusted fictional owner controls, not human authentication or signature authority",
+    "Inert local artifacts; no agent/provider/tool/transport integration",
+    "Python API boundaries are not an OS sandbox",
+    "No browser or visual acceptance",
+    "Independent suites are not one combined interoperability suite"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "recovered_baselines": [
+    {
+      "name": "agent-network-prototype-v29.zip",
+      "sha256": "efa40404e4e998e39faa3001feb7596d3c3524d3e9c130134d87a69507be450d",
+      "unchanged": false,
+      "published_directory": "prototypes/consent-v29",
+      "publication_note": "Executable source preserved. Evidence paths normalized; see PROVENANCE.md. Original archive not included."
+    },
+    {
+      "name": "agent-network-synthetic-stdio-experimental-r5.zip",
+      "sha256": "050d8d91a06f683a40d7ef7b9ab76e7f46238e2db8313b106bf6b353abef2d88",
+      "unchanged": false,
+      "published_directory": "prototypes/synthetic-stdio-r5",
+      "publication_note": "Executable source preserved. Evidence paths normalized; see PROVENANCE.md. Original archive not included."
+    },
+    {
+      "name": "agent-network-integration-readiness.zip",
+      "sha256": "35b1fb116ebe2cf36b6aa60c18f10185010c768745b77f80a46885ebf7ecf7ca",
+      "unchanged": false,
+      "published_directory": "docs/integration-readiness",
+      "publication_note": "Executable source preserved. Evidence paths normalized; see PROVENANCE.md. Original archive not included."
+    }
+  ],
+  "missing_original_commit": "538a77b4fd2a93abb73968dfa3dffa3060b5e6d8",
+  "original_source_recovered": false,
+  "integration_with_baseline_protocols": "not implemented"
+}
