@@ -4,13 +4,16 @@
 
 Python remains the current orchestration and experimentation language. The team
 coordinator, consent/protocol prototype and synthetic MCP stdio launcher are
-separately tested. Their presence in one repository does not make them integrated.
+separately tested. The new [offline binding](integration/README.md) maps exact
+accepted team artifacts to unsigned local proposals through recovered wire
+building blocks. It is not an end-to-end connected network.
 
 ## Next engineering gates
 
-1. Define a stable mapping between team task/artifact digests and the existing
-   consent/protocol messages. Test scope, disclosure and recipient authority
-   independently, including revoked, declined, expired and uncertain outcomes.
+1. Extend the tested local task/artifact-to-proposal mapping into an explicit
+   release and receiver-owned acceptance boundary. Preserve exact scope and
+   disclosure checks, terminal decisions, expiry and uncertain-outcome handling;
+   local staging is not release, delivery or recipient authority.
 2. Bind one authenticated local owner control and one narrowly scoped agent/tool
    route. A lead must never mint another owner's grants. Keep private local
    sessions separate from explicitly shared outcomes.

@@ -13,9 +13,10 @@ Fresh local checks on Linux/Python 3.12 and Node 24, November 8, 2026:
 | Public import integrity | 673 imported files and 17 team-manifest entries verified |
 | Source preservation | 215 runtime/test/UI files match recovered input bytes |
 
-The suites are separate. They do not prove the team layer interoperates with v29
-or r5. No native host, real provider account, real owner credentials or production
-transport was exercised. Inherited r4 peer-lifecycle experiments were not rerun
+The imported suites are separate. The new integration suite below covers only
+local team-to-proposal composition, not an end-to-end v29/r5 network. No native
+host, real provider account, real owner credentials or production transport was
+exercised. Inherited r4 peer-lifecycle experiments were not rerun
 or included in the r5 result.
 
 Source integrity checks establish consistency, not authenticity or security.
@@ -40,6 +41,8 @@ prototype setup instructions, then run:
 python -B tools/verify_import.py
 python -B team/run_checks.py
 python -B team/demo.py
+python -B integration/run_checks.py
+python -B integration/demo.py
 python -B prototypes/consent-v29/verify_checkpoint.py --full
 python -I -B "$PWD/prototypes/synthetic-stdio-r5/run_all_checks.py"
 ```
@@ -56,3 +59,16 @@ path in the mixed-language tests. CI now creates a private temporary copy of the
 same setup-node runtime and compares the bytes before adding it to PATH. The
 prototype's executable/ancestor permission check remains unchanged; no runner
 cache or system permissions are relaxed or modified.
+
+## Team-to-proposal integration
+
+All 58 new `integration/` checks passed locally on November 8, 2026. The suite
+tests the trusted mapping separately from the frozen imports. It covers exact artifact/recipient/purpose authority, same-owner disclosure,
+revocation and competing connections, immutable reopening, historical terminal
+states, uncertain commits, redacted errors and fragmented recovered wire parsing.
+The [integration README](../integration/README.md) documents expiry semantics,
+protocol role mapping and the remaining authentication and transport boundaries.
+
+The demo must end with one unsigned pending proposal, an empty inbox and the
+recipient task still planned. No owner command, release, message or recipient
+processing is exercised. Existing prototype source and import hashes are unchanged.
