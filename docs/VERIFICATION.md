@@ -50,3 +50,9 @@ their recorded digests. Do not silently update a failed integrity check.
 
 GitHub Actions runs these offline checks separately. A local pass is not a CI pass;
 inspect the Actions result for the exact commit.
+
+The first GitHub run correctly rejected the runner's world-writable Node cache
+path in the mixed-language tests. CI now creates a private temporary copy of the
+same setup-node runtime and compares the bytes before adding it to PATH. The
+prototype's executable/ancestor permission check remains unchanged; no runner
+cache or system permissions are relaxed or modified.

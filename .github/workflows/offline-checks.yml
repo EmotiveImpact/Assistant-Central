@@ -18,6 +18,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - name: Isolate the trusted Node runtime from the writable runner cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_node="$(command -v node)"
+          runtime_dir="$(mktemp -d "$HOME/.assistant-central-node.XXXXXX")"
+          install -m 700 -- "$source_node" "$runtime_dir/node"
+          cmp -- "$source_node" "$runtime_dir/node"
+          "$runtime_dir/node" --version
+          printf '%s\n' "$runtime_dir" >> "$GITHUB_PATH"
       - name: Install pinned fixture dependencies
         run: python -m pip install -r prototypes/consent-v29/requirements-mcp-offline.txt
       - name: Verify public import
