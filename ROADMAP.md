@@ -7,6 +7,9 @@ coordinator, consent/protocol prototype and synthetic MCP stdio launcher are
 separately tested. The new [offline binding](integration/README.md) maps exact
 accepted team artifacts to unsigned local proposals through recovered wire
 building blocks. It is not an end-to-end connected network.
+The [execution ledger](execution/README.md) now binds one started team task to one
+synthetic dispatch claim, retains uncertainty across restart, and reconciles an
+original result into the existing artifact review gate. It makes no provider calls.
 
 ## Next engineering gates
 
@@ -25,6 +28,9 @@ building blocks. It is not an end-to-end connected network.
    security review before real personal data or production use.
 5. Exercise idempotent outbox/inbox behavior and bounded wake/cancellation semantics.
    Do not reinterpret timeouts as permission to resend or assign work elsewhere.
+   The local execution ledger proves a single-attempt fence and original-result
+   recovery; transport retries, independently controlled runtimes and provider
+   cancellation still need their own reviewed contracts and acceptance tests.
 6. Measure realistic workloads and failure modes before making scale, throughput
    or reliability claims. Keep compatibility, observability and operational
    complexity visible alongside performance.

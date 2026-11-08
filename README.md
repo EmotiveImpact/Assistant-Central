@@ -21,11 +21,14 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Consent and protocol foundation](prototypes/consent-v29/README.md) | Recovered v29 prototype; executable source preserved | 948 Python tests and 273 DOM-model checks |
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
+| [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
 
 The imported suites were rerun locally before the initial import. These are
 separate proofs; their totals do not establish end-to-end interoperability. The
 new binding tests cover only the local team-to-proposal boundary described below.
+The execution ledger preserves uncertain attempts across restart without retrying
+them; it does not invoke providers or grant authority to external tools.
 GitHub Actions runs the same offline checks on pushes and pull requests. Check
 the exact commit's Actions result rather than assuming a local pass means CI passed.
 
@@ -51,6 +54,7 @@ peer-lifecycle experiments and does not claim native-host acceptance.
 
 - `team/`: new team rebuild, tests, examples and provenance.
 - `integration/`: exact team artifact mapping, synthetic in-memory wire demo and tests.
+- `execution/`: synthetic dispatch ledger, crash/revocation checks and restart demo.
 - `prototypes/consent-v29/`: recovered consent/protocol checkpoint with sanitized evidence paths.
 - `prototypes/synthetic-stdio-r5/`: recovered synthetic stdio checkpoint with sanitized evidence paths.
 - `docs/`: original architecture, security, pilot and integration-readiness material.
