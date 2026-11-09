@@ -11,6 +11,7 @@ Run with Python 3.11+ and no dependencies:
 ```sh
 python -B execution/run_checks.py
 python -B execution/provider_demo.py
+python -B execution/lineage_demo.py
 ```
 
 The runner and demo install the existing socket/subprocess audit guard. This is a
@@ -23,6 +24,10 @@ Trusted composition creates `ProviderGate(ExecutionLedger(workflow))`, then bind
 a facade to the task's exact assignee. Only an already-prepared, already-started
 execution can propose a route. There is one immutable request per run, and one
 run per task. Repeating the proposal returns metadata, not data or a new grant.
+This is provider-gate version 2. It rejects version 1 databases rather than
+silently reusing approvals that omitted inherited owners. There is no migration
+or safe-redispatch claim: preserve the old database/history and use its reviewed
+version for existing history. Never discard an uncertain attempt to upgrade.
 
 The `ProviderRoute` binds an exact provider label matching the assigned agent,
 account reference, model reference, and bounded data-policy text. They are
@@ -39,8 +44,8 @@ A request constructs one explicit minimal payload:
 - Explicit synthetic-only, untrusted-content and no-external-actions fields;
   an empty tool permission list and zero spending limit.
 
-The task owner must approve their task text. **Every input artifact's producer
-owner** must separately approve that artifact's onward disclosure. When one owner
+The task owner must approve their task text. **Every direct and upstream artifact
+producer owner** must separately approve onward use of their contribution. When one owner
 has several roles or inputs, one exact review enumerates all their data. Sharing
 an owner or provider label does not remove approval; sharing an owner does not
 provide sibling agents access. The nominated lead can approve only data they
@@ -60,6 +65,38 @@ review. Approval requires an explicit finite expiry within one hour. The expiry
 limits the initial local release, not a later retained original-result receipt.
 It cannot be extended or renewed. Revocation can be recorded before approval or
 after release. Status reports expired grants as expired, without erasing history.
+
+## Inherited owner authority
+
+A summary, draft or slide outline does not reset its sources' approval rights.
+The gate reconstructs each direct input's complete dependency ancestry from the
+retained artifact body, exact start-review digest and immutable task plan. It
+checks each artifact digest, producer, selected accepted output, task state and
+recorded dependency selector. It also rechecks every source-to-derived-agent
+input disclosure, including edges to tasks that have already completed. All
+checks run under the same transaction at proposal, approval and final release.
+
+Every ancestor producer owner joins the required approval set. Shared ancestry
+is deduplicated across branches and merged work. Sharing an owner does not remove
+review, but one exact decision enumerates all of that owner's contributions.
+No agent-supplied ancestry labels, claimed redaction or assertion that a source
+was unused can remove an owner from the retained dependency graph.
+
+An upstream owner's review shows only their own original artifact text and the
+hashes/IDs of outgoing artifacts influenced by that source. Another producer's
+derived text remains hidden. The review explicitly says that the extra source
+preview is **not additional provider payload**, and that foreign derived text is
+not shown. Their decision approves onward use of their contribution in those
+exact derived artifact hashes, not a claim that they inspected every output byte.
+The provider payload still contains only the original direct task inputs; raw
+ancestor content and the ancestry graph are not appended to it.
+
+Revoking an original source task or historical dependency disclosure blocks a
+new onward release even when intermediate tasks were already completed. The
+completed artifacts remain historical facts. A release that committed first
+stays uncertain and cannot be repeated; an original receipt can still be retained.
+This is conservative gating of new provider release, not global deletion,
+retroactive recall or revocation of every separate team-local permission.
 
 ## Atomic release and recovery
 
@@ -104,10 +141,11 @@ permission. Historical release and current withdrawal are reported separately.
 - **Trusted local operator.** One operator and SQLite file control this fixture.
   Labels, Python facades and hashes are neither human authentication nor isolation
   from arbitrary code in the process. Do not expose these owner methods remotely.
-- **Direct artifact ownership only.** Owners come from the immutable team plan and
-  the current artifact producer. The fixture does not infer data provenance inside
-  text or transfer third-party rights. Derived content and embedded personal data
-  need an explicit provenance/authority model before real use.
+- **Dependency provenance, not semantic tracing.** Ancestry comes from the exact
+  approved input artifacts, not a model's claims about what it used. All recorded
+  ancestors conservatively contribute authority. This cannot discover private
+  context, copied text outside declared inputs, third-party rights or identities
+  absent from the plan. Real content needs independent provenance controls.
 - **Stored synthetic content.** Requests and owner previews retain exact text in
   the same local database. Status and audit events omit raw text, routes and
   receipts. There is no encryption, retention/deletion service or backup rollback
@@ -119,4 +157,7 @@ permission. Historical release and current withdrawal are reported separately.
 Tests cover missing and crossed approvals, source/task/lead/scope withdrawal,
 expiry, minimal owner previews, route changes, separate output disclosure,
 transaction rollback, concurrent release/revocation, restart and lost receipts.
+Ancestry tests additionally cover multihop/diamond dependencies, a dense legal
+20-task plan, same-owner roles, retained-record mismatches, hidden derived text,
+completed-intermediary withdrawal, and refusal to upgrade version 1 grants.
 They exercise the existing team and execution contracts, not a live provider.

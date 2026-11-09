@@ -22,7 +22,7 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
 | [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
-| [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from every data owner; atomic one-shot local release | 49 provider disclosure checks, including 14 independently written adversarial tests |
+| [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from direct and upstream data owners; atomic one-shot local release | Provider and ancestry checks, including independent privacy, concurrency and withdrawal tests |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
 
 The imported suites were rerun locally before the initial import. These are
