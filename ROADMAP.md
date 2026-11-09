@@ -12,8 +12,11 @@ synthetic dispatch claim, retains uncertainty across restart, and reconciles an
 original result into the existing artifact review gate. It makes no provider calls.
 The [provider disclosure rehearsal](execution/PROVIDER_DISCLOSURE.md) additionally
 binds an exact synthetic destination and separate approvals from the task owner
-and each input owner, atomically with that execution fence. Those fictional local
-controls are not authenticated owner approval or live provider authority.
+and each direct/upstream input owner, atomically with that execution fence.
+Retained task-input ancestry now preserves original owners across derived
+artifacts and rechecks historical disclosure withdrawal. Those fictional local
+controls are not authenticated owner approval, semantic data tracking or live
+provider authority.
 
 ## Next engineering gates
 

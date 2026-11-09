@@ -40,6 +40,8 @@ jobs:
         run: python -B execution/demo.py
       - name: Exercise owner-specific provider disclosure rehearsal
         run: python -B execution/provider_demo.py
+      - name: Exercise inherited source-owner disclosure rehearsal
+        run: python -B execution/lineage_demo.py
       - name: Check exact team-to-proposal mapping
         run: python -B integration/run_checks.py
       - name: Exercise fictional team-to-proposal wire demo

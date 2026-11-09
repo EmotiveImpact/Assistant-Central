@@ -9,9 +9,10 @@ import json
 
 from .bootstrap import Denied, bounded_text, canonical, digest, identifier
 from .ledger import ExecutionLedger
+from .lineage import collect_lineage, affected_inputs
 
 
-VERSION = "offline-provider-disclosure/1"
+VERSION = "offline-provider-disclosure/2"
 
 
 @dataclass(frozen=True)
@@ -104,11 +105,13 @@ class ProviderGate:
         claim = self._ledger._claim_body_locked(actor, self._ledger._run(actor, run_id))
         if route.provider != claim["agent"]["provider"]:
             raise Denied("Provider route must match the exact assigned agent")
+        lineage = collect_lineage(w, claim)
+        by_id = {node["artifact_id"]: node for node in lineage["artifacts"]}
         inputs, input_owners = [], []
         for item in claim["inputs"]:
             inputs.append({"artifact_id": item["artifact_id"], "content": item["artifact"]["content"]})
             input_owners.append({"artifact_id": item["artifact_id"], "digest": item["digest"],
-                                 "owner": w.agents[item["artifact"]["producer"]].owner})
+                                 "owner": by_id[item["artifact_id"]]["owner"]})
         payload = {"domain": VERSION + "/payload", "context": w.context, "run_id": run_id,
                    "recipient": route.to_dict(), "task_id": claim["task"]["id"],
                    "output_kind": claim["task"]["output_kind"],
@@ -116,7 +119,12 @@ class ProviderGate:
                    "synthetic_only": True, "external_actions_allowed": False,
                    "untrusted_content": True, "tool_permissions": [], "spend_limit": 0}
         return {"domain": VERSION, "claim_digest": digest(claim), "payload": payload,
-                "task_owner": claim["agent"]["owner"], "input_owners": input_owners}
+                "task_owner": claim["agent"]["owner"], "input_owners": input_owners,
+                "lineage": lineage}
+
+    @staticmethod
+    def _required_owners(body):
+        return sorted({body["task_owner"], *(item["owner"] for item in body["lineage"]["artifacts"])})
 
     @staticmethod
     def _review(body, owner):
@@ -125,13 +133,22 @@ class ProviderGate:
         owned_data = {"inputs": [item for item in payload["inputs"] if item["artifact_id"] in own_ids]}
         if owner == body["task_owner"]:
             owned_data["task_text"] = payload["task_text"]
+        lineage = body["lineage"]
+        direct_ids = {item["artifact_id"] for item in payload["inputs"]}
+        source_data = [{"artifact_id": node["artifact_id"], "digest": node["digest"],
+                        "content": node["content"]} for node in lineage["artifacts"]
+                       if node["owner"] == owner and node["artifact_id"] not in direct_ids]
         # Other owners' text is not part of this owner's preview. Shared metadata
         # and full-payload hashes bind all decisions to one immutable request.
         common = {key: value for key, value in payload.items() if key not in ("task_text", "inputs")}
         return {"domain": VERSION + "/owner-review", "owner": owner,
                 "request_digest": digest(body), "payload_digest": digest(payload),
                 "common_metadata": common, "owned_data": owned_data,
-                "scope": "This owner's listed data, once, for this exact synthetic task and route",
+                "lineage_digest": digest(lineage), "upstream_source_data": source_data,
+                "affected_payload_inputs": affected_inputs(lineage, owner),
+                "upstream_source_data_is_extra_payload": False,
+                "other_owners_derived_text_is_shown": False,
+                "scope": "This owner's listed data and its contributions to the exact derived input hashes, once, for this synthetic task and route",
                 "human_authentication": False, "live_provider_permission": False}
 
     def _current_locked(self, request):
@@ -172,7 +189,7 @@ class ProviderGate:
             body = self._body_locked(actor, run_id, route)
             w.db.execute("INSERT INTO provider_requests VALUES(?,?,?,?,'pending',NULL)",
                          (run_id, actor, canonical(body), digest(body)))
-            owners = sorted({body["task_owner"], *(item["owner"] for item in body["input_owners"])})
+            owners = self._required_owners(body)
             for owner in owners:
                 review = self._review(body, owner)
                 w.db.execute("INSERT INTO provider_decisions VALUES(?,?,?,?,'pending',NULL)",
@@ -235,7 +252,7 @@ class ProviderGate:
                 raise Denied("Payload may already be released; never redispatch")
             body = self._current_locked(request)
             now = w._now()
-            for owner in sorted({body["task_owner"], *(item["owner"] for item in body["input_owners"])}):
+            for owner in self._required_owners(body):
                 row = self._owner_row(owner, run_id)
                 if (row["state"] != "approved" or row["expires"] <= now
                         or row["review"] != canonical(self._review(body, owner))
