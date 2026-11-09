@@ -22,13 +22,16 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
 | [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
+| [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from every data owner; atomic one-shot local release | 49 provider disclosure checks, including 14 independently written adversarial tests |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
 
 The imported suites were rerun locally before the initial import. These are
 separate proofs; their totals do not establish end-to-end interoperability. The
 new binding tests cover only the local team-to-proposal boundary described below.
 The execution ledger preserves uncertain attempts across restart without retrying
-them; it does not invoke providers or grant authority to external tools.
+them; it does not invoke providers or grant authority to external tools. The new
+provider disclosure rehearsal adds separate owner-specific data reviews and an
+atomic local payload release, without making any live provider call.
 GitHub Actions runs the same offline checks on pushes and pull requests. Check
 the exact commit's Actions result rather than assuming a local pass means CI passed.
 

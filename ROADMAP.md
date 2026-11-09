@@ -10,6 +10,10 @@ building blocks. It is not an end-to-end connected network.
 The [execution ledger](execution/README.md) now binds one started team task to one
 synthetic dispatch claim, retains uncertainty across restart, and reconciles an
 original result into the existing artifact review gate. It makes no provider calls.
+The [provider disclosure rehearsal](execution/PROVIDER_DISCLOSURE.md) additionally
+binds an exact synthetic destination and separate approvals from the task owner
+and each input owner, atomically with that execution fence. Those fictional local
+controls are not authenticated owner approval or live provider authority.
 
 ## Next engineering gates
 

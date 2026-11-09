@@ -114,6 +114,10 @@ review, scope use limits and terminal task state.
   helpers. It does not modify frozen team/protocol sources or the separate
   team-protocol-binding lane. Re-review on any team schema/API change.
 
-The next useful execution milestone is a conformance-tested adapter that combines
-this dispatch fence with independently authenticated, provider-specific owner
-approval. Do not count different fixture provider labels as cross-provider proof.
+The [provider disclosure rehearsal](PROVIDER_DISCLOSURE.md) now composes this
+dispatch fence with exact route reviews from each data owner, still entirely
+local and synthetic. Run `python -B execution/provider_demo.py` for the bounded
+example. Its owner controls remain unauthenticated, and it grants no live access.
+The next useful milestone is independently authenticated owner control and a
+conformance-tested adapter. Do not count different fixture provider labels as
+cross-provider proof.
