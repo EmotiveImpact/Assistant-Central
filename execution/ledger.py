@@ -130,6 +130,46 @@ class ExecutionLedger:
             w._event("execution_prepared", run=run_id, task=task_id, actor=actor)
             return self._status(self._run(actor, run_id))
 
+    def _claim_body_locked(self, actor, row):
+        """Preview exact inert bytes inside the caller's write transaction.
+
+        This private seam lets another trusted local gate review and commit its
+        own narrower release in the same transaction. It grants no access itself.
+        """
+        w = self._w
+        if not w.db.in_transaction:
+            raise Denied("Claim composition requires an active transaction")
+        if row["actor"] != actor or row["state"] != "prepared":
+            raise Denied("Execution already claimed or belongs to another agent")
+        task = self._current(row)
+        inputs = []
+        for item in w._inputs(task):
+            artifact = w._artifact(item["artifact_id"])
+            inputs.append({**item, "artifact": json.loads(artifact["body"]),
+                           "untrusted_content": True})
+        return {"domain": VERSION, "context": w.context, "run_id": row["id"],
+                "agent": w.agents[actor].to_dict(), "task": task.to_dict(),
+                "request_id": row["request_id"], "start_review_digest": row["start_digest"],
+                "artifact_id": row["artifact_id"], "inputs": inputs,
+                "synthetic_only": True, "external_actions_allowed": False,
+                "untrusted_content": True}
+
+    def _claim_locked(self, actor, run_id):
+        """Stage a claim; the trusted caller must commit before exposing it."""
+        w = self._w
+        row = self._run(actor, run_id)
+        body = self._claim_body_locked(actor, row)
+        for item in body["inputs"]:
+            if actor != item["artifact"]["producer"]:
+                w.db.execute("""UPDATE disclosures SET reads=reads+1
+                    WHERE artifact_id=? AND recipient=? AND purpose=?""",
+                    (item["artifact_id"], actor, "task:" + row["task_id"]))
+        encoded, commitment = canonical(body), digest(body)
+        w.db.execute("UPDATE execution_runs SET state='uncertain',claim=?,claim_digest=? WHERE id=?",
+                     (encoded, commitment, run_id))
+        w._event("execution_claimed", run=run_id, task=row["task_id"], digest=commitment)
+        return ExecutionClaim(encoded, commitment)
+
     def _claim(self, actor, run_id):
         """Commit uncertainty BEFORE returning inputs. Never reissue a claim.
 
@@ -137,32 +177,9 @@ class ExecutionLedger:
         ledger cannot distinguish that from a lost response; neither permits a
         second dispatch. A retained original result may be reconciled instead.
         """
-        w = self._w
-        with w._transaction():
-            row = self._run(actor, run_id)
-            if row["state"] != "prepared":
-                raise Denied("Execution already claimed; reconcile, never redispatch")
-            task = self._current(row)
-            inputs = []
-            for item in w._inputs(task):
-                artifact = w._artifact(item["artifact_id"])
-                inputs.append({**item, "artifact": json.loads(artifact["body"]),
-                               "untrusted_content": True})
-                if actor != artifact["producer"]:
-                    w.db.execute("""UPDATE disclosures SET reads=reads+1
-                        WHERE artifact_id=? AND recipient=? AND purpose=?""",
-                        (artifact["id"], actor, "task:" + task.id))
-            body = {"domain": VERSION, "context": w.context, "run_id": run_id,
-                    "agent": w.agents[actor].to_dict(), "task": task.to_dict(),
-                    "request_id": row["request_id"], "start_review_digest": row["start_digest"],
-                    "artifact_id": row["artifact_id"], "inputs": inputs,
-                    "synthetic_only": True, "external_actions_allowed": False,
-                    "untrusted_content": True}
-            encoded, commitment = canonical(body), digest(body)
-            w.db.execute("UPDATE execution_runs SET state='uncertain',claim=?,claim_digest=? WHERE id=?",
-                         (encoded, commitment, run_id))
-            w._event("execution_claimed", run=run_id, task=task.id, digest=commitment)
-        return ExecutionClaim(encoded, commitment)
+        with self._w._transaction():
+            claim = self._claim_locked(actor, run_id)
+        return claim
 
     def _record_result(self, actor, run_id, claim_digest, content):
         """Record an original result, even after revocation, without publishing it.
