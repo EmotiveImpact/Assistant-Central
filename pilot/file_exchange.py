@@ -189,7 +189,8 @@ def main(argv=None):
     auth = runtime = None
     try:
         # Do not initialise a mistaken path, or prompt while the service owns it.
-        require((Path(args.directory) / 'auth.sqlite').is_file())
+        require(all((Path(args.directory) / name).is_file()
+                    for name in ('auth.sqlite', 'runtime.sqlite')))
         with private_parent(Path(args.directory) / 'auth.sqlite'):
             pass
         auth = LocalOwnerAuth(args.directory)

@@ -217,6 +217,17 @@ class FileExchangeTests(unittest.TestCase):
         self.assertNotIn('SYNTHETIC PRIVATE TEXT', output.getvalue())
         self.assertNotIn('fictional-password', output.getvalue())
 
+    def test_cli_missing_runtime_does_not_prompt_or_initialise(self):
+        directory = self.root/'provisioned-only'
+        auth = LocalOwnerAuth(directory)
+        auth.bootstrap('fictional-third', 'third-assistant', 'fictional-third-password')
+        auth.close()
+        with patch('pilot.file_exchange.getpass.getpass') as prompt, contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(['--directory', str(directory), 'export', '--message-id', self.message_id, '--output', str(self.packet)]), 1)
+        prompt.assert_not_called()
+        self.assertFalse((directory/'runtime.sqlite').exists())
+        self.assertFalse(self.packet.exists())
+
     def test_cli_exclusive_lock_and_no_insecure_password_fallback(self):
         with patch('pilot.file_exchange.getpass.getpass') as prompt, contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(main(['--directory', str(self.root/'alice'), 'export', '--message-id', self.message_id, '--output', str(self.packet)]), 1)

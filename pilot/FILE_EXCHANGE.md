@@ -14,7 +14,9 @@ compare and enrol the full peer fingerprints using the existing owner workflow.
 Review and release a synthetic proposal there. Take its exact message ID from
 the authenticated outbox. Stop that owner's server before these commands: the
 CLI takes the same exclusive authentication-store lock and refuses if it is held.
-It never kills a running service. Restart invalidates old sessions. Passwords
+It never kills a running service. Both existing auth and runtime stores are
+required before prompting; a missing runtime is not silently initialised. This
+is not full backup/rollback protection. Restart invalidates old sessions. Passwords
 are entered privately, never accepted in arguments; unavailable private terminal
 input fails closed instead of falling back to echoed input.
 
