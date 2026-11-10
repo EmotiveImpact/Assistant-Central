@@ -255,22 +255,31 @@ class PilotRuntime:
             body['source_permissions'] = self._permissions(body, self._provider(provider_disclosure))
             need(source_permissions is None or source_permissions == body['source_permissions'],
                  'Caller-supplied source rights cannot broaden exact authority')
-            self._validate_body(body, self.identity, recipient, sending=True)
-            item_id = digest(body)
-            old = self.db.execute('SELECT * FROM runtime_items WHERE id=?', (item_id,)).fetchone()
-            if old:
-                return self._status(old)
-            # Do not mint aliases for the same logical task/return in this context.
-            for candidate in self.db.execute("SELECT body FROM runtime_items WHERE direction='outgoing'"):
-                prior = json.loads(candidate['body'])
-                need((prior['kind'],prior['context'],prior['task_id'],prior['parent_id'],fingerprint(prior['recipient'])) !=
-                     (kind,context,task_id,parent_id,peer_id), 'Original task/artifact route is immutable; aliases cannot renew it')
-            need(self.db.execute('SELECT COUNT(*) FROM runtime_items').fetchone()[0] < MAX_ITEMS,
-                 'Runtime item capacity reached')
-            self.db.execute("INSERT INTO runtime_items(id,direction,peer_id,body,kind,created_at,expires,state) VALUES(?,'outgoing',?,?,?,?,?,'draft')",
-                            (item_id, peer_id, canonical(body).decode(), kind, now, expires))
-            self._event('proposal_created', item_id, peer=peer_id, kind=kind)
-            return self._status(self._row(item_id)[0])
+            return self._stage_proposal(body)
+
+    def _stage_proposal(self, body):
+        """Stage one exact inert proposal inside an existing owner transaction."""
+        need(self.db.in_transaction, 'Proposal staging requires an owner transaction')
+        peer_id = fingerprint(body['recipient'])
+        recipient = self.exchange.peer_public(peer_id)
+        kind, context, task_id, parent_id = (body[key] for key in ('kind', 'context', 'task_id', 'parent_id'))
+        now, expires = body['created_at'], body['expires']
+        self._validate_body(body, self.identity, recipient, sending=True)
+        item_id = digest(body)
+        old = self.db.execute('SELECT * FROM runtime_items WHERE id=?', (item_id,)).fetchone()
+        if old:
+            return self._status(old)
+        # Do not mint aliases for the same logical task/return in this context.
+        for candidate in self.db.execute("SELECT body FROM runtime_items WHERE direction='outgoing'"):
+            prior = json.loads(candidate['body'])
+            need((prior['kind'],prior['context'],prior['task_id'],prior['parent_id'],fingerprint(prior['recipient'])) !=
+                 (kind,context,task_id,parent_id,peer_id), 'Original task/artifact route is immutable; aliases cannot renew it')
+        need(self.db.execute('SELECT COUNT(*) FROM runtime_items').fetchone()[0] < MAX_ITEMS,
+             'Runtime item capacity reached')
+        self.db.execute("INSERT INTO runtime_items(id,direction,peer_id,body,kind,created_at,expires,state) VALUES(?,'outgoing',?,?,?,?,?,'draft')",
+                        (item_id, peer_id, canonical(body).decode(), kind, now, expires))
+        self._event('proposal_created', item_id, peer=peer_id, kind=kind)
+        return self._status(self._row(item_id)[0])
 
     def _review(self, row, body):
         commitment = {'domain': VERSION + '/review', 'item_id': row['id'], 'direction': row['direction'],
@@ -354,31 +363,36 @@ class PilotRuntime:
 
     def cancel(self, session, item_id, review_digest):
         with self._transaction(session):
-            row, body = self._row(item_id)
-            self._check_review(row, body, review_digest)
-            if row['cancelled']:
-                return self._status(row)
-            message_id = None
-            try:
-                self.exchange.peer_public(row['peer_id'])
-                peer_active = True
-            except TransportDenied:
-                peer_active = False
-            if (row['direction'] == 'outgoing' and row['state'] == 'draft') or not peer_active:
-                pass  # no peer has been given this draft
-            else:
-                role = 'source' if row['direction'] == 'outgoing' else 'recipient'
-                payload = {'domain': VERSION + '/cancel', 'item_id': item_id, 'role': role,
-                           'context': body['context'], 'artifact_digest': body['artifact_digest'],
-                           'route':{key:body[key] for key in ('kind','task_id','parent_id')}}
-                message_id = 'cancel-' + digest({'payload':payload,'actor':self.fingerprint})
-                packet = self._packet(session, body, 'cancel', payload, message_id, self._now() + 3600)
-                self.exchange.queue(packet)
-            if row['direction'] == 'outgoing' and row['message_id']:
-                self.exchange.cancel(row['message_id'])
-            self.db.execute('UPDATE runtime_items SET cancelled=1,cancel_message_id=? WHERE id=?', (message_id,item_id))
-            self._event('cancellation_requested', item_id, message_id=message_id)
-            return self._status(self._row(item_id)[0])
+            return self._cancel(session, item_id, review_digest)
+
+    def _cancel(self, session, item_id, review_digest):
+        """Cancel inside an existing owner transaction, preserving peer notices."""
+        need(self.db.in_transaction, 'Cancellation requires an owner transaction')
+        row, body = self._row(item_id)
+        self._check_review(row, body, review_digest)
+        if row['cancelled']:
+            return self._status(row)
+        message_id = None
+        try:
+            self.exchange.peer_public(row['peer_id'])
+            peer_active = True
+        except TransportDenied:
+            peer_active = False
+        if (row['direction'] == 'outgoing' and row['state'] == 'draft') or not peer_active:
+            pass  # no peer has been given this draft
+        else:
+            role = 'source' if row['direction'] == 'outgoing' else 'recipient'
+            payload = {'domain': VERSION + '/cancel', 'item_id': item_id, 'role': role,
+                       'context': body['context'], 'artifact_digest': body['artifact_digest'],
+                       'route':{key:body[key] for key in ('kind','task_id','parent_id')}}
+            message_id = 'cancel-' + digest({'payload':payload,'actor':self.fingerprint})
+            packet = self._packet(session, body, 'cancel', payload, message_id, self._now() + 3600)
+            self.exchange.queue(packet)
+        if row['direction'] == 'outgoing' and row['message_id']:
+            self.exchange.cancel(row['message_id'])
+        self.db.execute('UPDATE runtime_items SET cancelled=1,cancel_message_id=? WHERE id=?', (message_id,item_id))
+        self._event('cancellation_requested', item_id, message_id=message_id)
+        return self._status(self._row(item_id)[0])
 
     def prepare_delivery(self, session, message_id):
         with self._transaction(session):
