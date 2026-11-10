@@ -1,0 +1,83 @@
+{
+  "inspected_on": "2026-11-10",
+  "scope": "Static source and primary-documentation research only. No upstream execution, service signup, credentials or live model calls.",
+  "assistant_central_baseline": "55b7df104b12f69336055ca9d5ba0d773d8b10a5",
+  "projects": [
+    {
+      "name": "Parley by Weldra",
+      "official_url": "https://parley.weldra.dev/",
+      "evidence_level": "Official documentation and terms, not independently tested behaviour",
+      "public_repository": null,
+      "repository_search_result": "No public repository verified from official links or targeted GitHub/web queries for Weldra and the exact service domain. This is not proof of absence.",
+      "licence": "No open-source grant verified. Terms section 11 reserves hub and client tooling intellectual property.",
+      "source_imported": false,
+      "source_urls": [
+        "https://parley.weldra.dev/docs",
+        "https://parley.weldra.dev/security",
+        "https://parley.weldra.dev/terms",
+        "https://weldra.dev/"
+      ],
+      "retrieval_limit": "The web reader could not retrieve the documented installer URL; it was not executed. Hosted documentation has no pinned source revision."
+    },
+    {
+      "name": "ericscalibur/Parley",
+      "repository": "https://github.com/ericscalibur/Parley",
+      "commit": "f9f5fb3ce4aa01d50c0efcd99bf4f23e0e51412b",
+      "evidence_level": "Static inspection of the pinned tree; not runtime verification",
+      "licence": {
+        "package_json_spdx_declaration": "ISC",
+        "licence_file_present": false,
+        "copyright_notice_file_present": false,
+        "github_detected_licence": null,
+        "decision": "Conservatively do not republish or adapt implementation until licence and notice provenance is clear. Metadata declares ISC, so do not label it simply unlicensed."
+      },
+      "source_imported": false,
+      "tracked_files": [
+        {
+          "path": ".gitignore",
+          "git_blob": "2752eb92e5922f0f1d60494d1793a54775e0d830",
+          "bytes": 24,
+          "sha256": "6c7d15d2ab1a0b51ebcae7e88b9ad01f0713d0833bc2dbe8f3bcc7a81b66b344"
+        },
+        {
+          "path": "README.md",
+          "git_blob": "ece9491487a3bac2afd85c4b1cf9270606d0367e",
+          "bytes": 6271,
+          "sha256": "0cee8dad0c85767260b8b63b808c95822c757a6b228a7b3e11bc93d6f28eca5c"
+        },
+        {
+          "path": "ROADMAP.md",
+          "git_blob": "09fc12fd9c8c235d6106d86622ea079de38bcca6",
+          "bytes": 3363,
+          "sha256": "9798c93f1d6ad2f6d01b5b06ee6f4345cd4563c4b9f09ac712028ac7b69f7230"
+        },
+        {
+          "path": "client.html",
+          "git_blob": "39cf0bd8a7913740017ae471713526e951ad104d",
+          "bytes": 34036,
+          "sha256": "6f1f64fb872c48a9d5ff7e76bd482c47e5d55f78755648f240c88c478446ad18"
+        },
+        {
+          "path": "package-lock.json",
+          "git_blob": "5fb0b46eb6e75602d36c9b66317f4a48dd6ba960",
+          "bytes": 851,
+          "sha256": "f6b95c06d429b60a7b9616d8710d4325317e32dd7e57144104ead8aac18c135b"
+        },
+        {
+          "path": "package.json",
+          "git_blob": "d668dbec95f7494b137c4974b84d7fb9fce5c0d1",
+          "bytes": 265,
+          "sha256": "0cf3636adfd984dd19ec2c2315c5f0ff4e3561429211676b7320525aa85fedf9"
+        },
+        {
+          "path": "server.js",
+          "git_blob": "4b610f4e3bbb0efd8649be481471c88ed08d0e8f",
+          "bytes": 33353,
+          "sha256": "e39b5017d3b002bd273c39cb50e5b930dd1c1609b0001a305af3d56584883e5d"
+        }
+      ],
+      "dependency_note": "package.json declares ws ^8.21.1; dependency source was not installed or executed.",
+      "test_note": "No test suite among the seven tracked files; package test is a placeholder."
+    }
+  ]
+}

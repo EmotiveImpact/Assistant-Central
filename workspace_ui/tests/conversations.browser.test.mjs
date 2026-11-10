@@ -7,19 +7,19 @@ const require=createRequire(import.meta.url),{chromium}=require('playwright');
 const url=new URL(process.env.CONVERSATION_URL||'');assert.equal(url.protocol,'http:');assert.equal(url.hostname,'127.0.0.1');
 const password=process.env.CONVERSATION_PASSWORD;if(!password)throw new Error('Disposable fixture password required');
 const screenshots=process.env.WORKSPACE_SCREENSHOT_DIR;if(screenshots)await mkdir(screenshots,{recursive:true});
-const browser=await chromium.launch({headless:true});const pages={},errors=[],writes=[],tokens={};
+const browser=await chromium.launch({headless:true});const pages={},errors=[],writes=[],tokens={},responses=[];
 const noOverflow=async p=>assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
 const screenshot=async(p,name)=>{if(screenshots){await p.evaluate(()=>document.fonts.ready.then(()=>undefined));await p.screenshot({path:path.join(screenshots,name),fullPage:true});}};
 async function nav(p){if(await p.locator('#menu-toggle').isVisible())await p.locator('#menu-toggle').click();await p.locator('[data-view=conversations]').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();}
 async function open(p){await p.getByRole('button',{name:/^(Conversation|Group) · thread_1$/}).click();await p.getByLabel('Message to the members shown above').waitFor();}
 async function refresh(p){await p.bringToFront();await p.locator('#refresh').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();await open(p);}
 async function selectOld(p){const article=p.locator('.conversation-history article').filter({hasText:'Only Alice and Bob saw this earlier plan.'});await article.getByRole('checkbox').check();}
-async function review(p){await selectOld(p);await p.getByLabel('Exact recipient',{exact:true}).selectOption({label:'carol · carol_assistant'});await p.getByLabel('Purpose',{exact:true}).fill('Give Carol this exact earlier plan');await p.getByRole('button',{name:'Review exact history share',exact:true}).click();await p.locator('#conversation-dialog').waitFor({state:'visible'});}
+async function review(p){await selectOld(p);const recipient=p.getByLabel('Exact recipient',{exact:true});await recipient.waitFor();assert.equal(await p.getByRole('combobox',{name:'Exact recipient',exact:true}).count(),1);await recipient.selectOption({label:'carol · carol_assistant'});await p.getByLabel('Purpose',{exact:true}).fill('Give Carol this exact earlier plan');await p.getByRole('button',{name:'Review exact history share',exact:true}).click();await p.locator('#conversation-dialog').waitFor({state:'visible'});}
 async function approve(p){await p.locator('#history-confirm').check();await p.getByRole('button',{name:'Approve exact history share',exact:true}).click();}
 try{
   for(const name of ['alice','bob','carol']){
     const context=await browser.newContext({viewport:{width:1440,height:1000}});const p=await context.newPage();pages[name]=p;
-    p.on('response',async r=>{if(new URL(r.url()).pathname==='/api/session'&&r.request().method()==='POST'&&r.ok())tokens[name]=(await r.json()).token;});p.on('pageerror',e=>errors.push(name+': '+e.message));p.on('request',r=>{if(r.method()==='POST'&&!/\/(history|read|context|grant-review|message-outcome)$/.test(new URL(r.url()).pathname))writes.push({name,path:new URL(r.url()).pathname,body:r.postDataJSON()});});
+    p.on('response',async r=>{responses.push({name,path:new URL(r.url()).pathname,method:r.request().method(),status:r.status()});if(new URL(r.url()).pathname==='/api/session'&&r.request().method()==='POST'&&r.ok())tokens[name]=(await r.json()).token;});p.on('pageerror',e=>errors.push(name+': '+e.message));p.on('request',r=>{if(r.method()==='POST'&&!/\/(history|read|context|grant-review|message-outcome)$/.test(new URL(r.url()).pathname))writes.push({name,path:new URL(r.url()).pathname,body:r.postDataJSON()});});
     await p.goto(url.href);await p.locator('#account').fill(name);await p.locator('#password').fill(password);await p.getByRole('button',{name:/Unlock workspace/}).click();await p.locator('#workspace').waitFor({state:'visible'});assert.equal(await p.locator('#owner-name').textContent(),name);await nav(p);
   }
   const {alice,bob,carol}=pages;
@@ -111,5 +111,5 @@ try{
   assert.equal(await bob.locator('.conversation-history article').count(),0);assert.equal(await bob.locator('#owner-name').textContent(),'bob');
   assert.deepEqual(errors,[]);
   console.log('PASS separate real owner sessions, future-only join, inert history, exact source-author grant/revoke, stale membership/review, removed/rejoined owner, exact committed outcome recovery without retry, retryable read failure, inconclusive absence, scoped context, history navigation, hidden DOM, coordinator lock and mobile logout.');
-}catch(error){for(const [name,p]of Object.entries(pages))if(screenshots)await p.screenshot({path:path.join(screenshots,`central-conversations-failure-${name}.png`),fullPage:true}).catch(()=>{});throw error;}
+}catch(error){const notices={};for(const [name,p]of Object.entries(pages)){notices[name]=await p.locator('#notice').textContent().catch(()=>null);if(screenshots)await p.screenshot({path:path.join(screenshots,`central-conversations-failure-${name}.png`),fullPage:true}).catch(()=>{});}console.error('Conversation browser diagnostics',JSON.stringify({errors,notices,responses:responses.slice(-24)}));throw error;}
 finally{await browser.close();}

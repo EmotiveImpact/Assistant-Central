@@ -1,9 +1,9 @@
 # Delivery decisions for review
 
-10 November 2026. This is the product/engineering decision list for the reviewed
-cumulative candidate, not a record of production acceptance. The
-[delivery guide](DELIVERY.md) distinguishes main, published components and the
-unmerged candidate. Each choice below states the reason and the alternative or remaining limit.
+10 November 2026. This is the product/engineering decision list for the integrated
+local pilot, not a record of production acceptance. The
+[delivery guide](DELIVERY.md) records the accepted main revision and the
+remaining functional/live gates. Each choice below states the reason and the alternative or remaining limit.
 
 ## Authority and storage
 
@@ -60,7 +60,7 @@ unmerged candidate. Each choice below states the reason and the alternative or r
 8. **Recover only the original cached receipt.** Missing retained receipt state
    is unavailable/corrupt state, not a reason to mint a new receipt on duplicate
    import. This preserves exact identity and expiry instead of turning recovery
-   into renewed authority. Published #17 supplies the fix; #16 includes it.
+   into renewed authority. The fix is integrated on main through the reviewed transfer composition.
    [Receipt recovery](CACHED_FILE_RECEIPT_RECOVERY.md).
 
 9. **Accept the combined interface, not independently green screens.** Central
@@ -68,8 +68,8 @@ unmerged candidate. Each choice below states the reason and the alternative or r
    operation identities prevent an unrelated refresh or late response from
    clearing a pending/uncertain operation. Navigation and privacy cleanup must
    discard content without treating an interrupted write as cancelled. This is
-   more conservative than queueing writes or silently retrying. Browser checks
-   on the latest composition remain required. [Workspace](../workspace_ui/README.md).
+   more conservative than queueing writes or silently retrying. The accepted composition passed its
+   real Chromium flows; later changes require fresh checks. [Workspace](../workspace_ui/README.md).
 
 10. **Keep three levels of isolation evidence separate.** Shared-loopback
     containers test mount/process/Unix-permission boundaries. Four distinct
@@ -217,6 +217,6 @@ unmerged candidate. Each choice below states the reason and the alternative or r
   recovery/rotation, metadata/retention/deletion policy, backups and incident
   response. Decide how to validate independent-host custody and obtain external
   security review before real data.
-- **Release maintainer:** publish/review the full candidate and require applicable
-  exact-revision hosted/browser/container acceptance before integration. Treat
-  later live deployment as a separate decision.
+- **Release maintainer:** preserve the accepted baseline and require applicable
+  exact-revision hosted/browser/container acceptance for later changes. Treat
+  live deployment as a separate decision.

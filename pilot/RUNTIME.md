@@ -13,8 +13,8 @@ account reading both directories. Use separately controlled OS accounts/devices
 and a reviewed deployment before describing this as independent owner custody.
 No live provider or real personal data was used to verify this runtime. A local
 password session establishes the provisioned account, not a verified real person.
-See [delivery status](../docs/DELIVERY.md) for the distinction between main and the
-newer reviewed cumulative candidate.
+See [delivery status](../docs/DELIVERY.md) for the accepted main revision and
+remaining live-delivery limits.
 
 ## Operations and authority
 
@@ -82,7 +82,7 @@ the retained exact item. The original release cannot be recreated, but delivery
 can explicitly retry the same stored encrypted packet under the transport limit.
 The receiver deduplicates that packet and returns its original receipt. Missing
 retained receipt state must fail closed, never mint a replacement; the reviewed
-cached-receipt fix is included in the published cumulative candidate, not yet main. Duplicate
+cached-receipt fix is included in the accepted main revision. Duplicate
 decisions are metadata-only; an opposite terminal decision is rejected.
 
 SQLite durability does not provide rollback-resistant backup recovery, distributed

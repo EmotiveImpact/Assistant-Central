@@ -1,0 +1,1868 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/munboon/open-agent-bridge",
+  "commit": "b360775cd5e4885e4af538581bb378590edde240",
+  "retrieved_utc_date": "2026-11-10",
+  "snapshot": "source.tar.gz",
+  "snapshot_sha256": "42461fd62d8664c35ae3fe45310800e651c7dbbb58f6d360a031995740575140",
+  "snapshot_bytes": 496427,
+  "source_bytes": 1707361,
+  "tracked_files": 230,
+  "included_files": 222,
+  "omitted_files": 8,
+  "licence_paths": [
+    "LICENSE",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "files": [
+    {
+      "path": ".env.example",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "16f4add6ed4dc7cb55d6a06bd97dd28a9b6b344c",
+      "bytes": 351,
+      "sha256": "e851ce5019f5ccfc485c36e2e12691991a44d5b47dc44fab24f4ddc18a0d4dde"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4b6e93172703f429e66dc3e0ba39434932a447dd",
+      "bytes": 202,
+      "sha256": "0b5283f37a6a20bb62e555382bf17ba130d9059b7d841739c7948acec21f1310"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7e3f3f9576d0329c48a6edd20938a0ba8caea7d2",
+      "bytes": 402,
+      "sha256": "060e2f3280a5b2829e65ae9ee1a5d4577c9b6620c94dcfe34de16b545b0cdc64"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2d3d1f5542c032a076a30bd5439eef1b9c8b379a",
+      "bytes": 193,
+      "sha256": "e78bbe25375329607eda03d8696451eb2962a34bd1457b613ae6483e788da438"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ec293a756495a3cbe70f19ce48fffce2316b8e7b",
+      "bytes": 487,
+      "sha256": "365403bbac08ea9452409625a768718812622b6b4255ee422a2b2e3dd395fac4"
+    },
+    {
+      "path": ".github/pull_request_template.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "64f4a194a14bff9c77f46d1d9b99ed2a40eb539f",
+      "bytes": 324,
+      "sha256": "fc51b5b268698989518ae249d1ac84819033996ef4fe1b3e692b34f194b7c022"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d8886df38fcbf9042395835fc6deb80208a36f04",
+      "bytes": 2872,
+      "sha256": "f6b77b5b7f2eb3ffb85f8d4e26f7f23a8d4a1bd2af1aabc85a664aecdbd5cf9f"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f04ade5858b7de8b67ad187f964c184882df03ed",
+      "bytes": 710,
+      "sha256": "f7e06ceadc081f3b7ee25a433d8aa6267bdb3516cb1aa66fbcc0e01663d8a381"
+    },
+    {
+      "path": ".npmrc",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "cffe8cdef132f31903a4971117f33f60cd9a56e6",
+      "bytes": 16,
+      "sha256": "be85cc462e740587626bbcbb1c3ed1c40b26e62ec072e8cbd2768f23915c28e6"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0b0a455af47694a378eb947049a2bd0db36875e7",
+      "bytes": 2899,
+      "sha256": "589a92319bbc5f9efafe0cb9a49b2c8c3f17b7f162d7741a14dec571705dddbd"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "69bd684498d271da8d2eaad82fd0b3eb2459637b",
+      "bytes": 2474,
+      "sha256": "59d34e3251ef0582d98387074ca804c8141a800353bfbffcfff5909bf26da859"
+    },
+    {
+      "path": "CODE_OF_CONDUCT.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2f2dc88584777a9727bc4ce4cecac5c37b2c64db",
+      "bytes": 752,
+      "sha256": "57c060a74b9787bfa579518d6574e102a671ad8103ba9133aed1535daacb65da"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7fc94f81341a0066e2ec6a57a006cebac35cd186",
+      "bytes": 3591,
+      "sha256": "d80ff8d0cd72b4ee20de36fc598a3c032fb47fb952f99107a6d5933b38e0f013"
+    },
+    {
+      "path": "DESIGN.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4d56efc357c03704f4e51436ed9f4ee406ed456a",
+      "bytes": 13090,
+      "sha256": "d8c2813aa2145620de4f562687cb5d000f106566c9b6230a146df2e84f8e0496"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "NOTICE",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8b023b2e359e9f22f076f28a846f2e98c1c11de3",
+      "bytes": 222,
+      "sha256": "2ce0594745a9fa69b546fcb4660e1469b4e2b39826b15863f2f77ff34f8b1ada"
+    },
+    {
+      "path": "PRODUCT.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3b6b156f9168eb6fee2f860f0af5c0bc76dfb9ae",
+      "bytes": 1806,
+      "sha256": "fe93b7a2de7e985195e4ac66f99b14f2218ced491bf13fa42e87e51de47a8ea3"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "26dc78fc0171ddc2c30de00f698c0b5700f46ed1",
+      "bytes": 16314,
+      "sha256": "d40e8251502fb5ddb7fe1c5ee43e700418982671c4acd4a3caf007c01d63a59a"
+    },
+    {
+      "path": "SECURITY.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "16fdf417b0c81fe8dc6e2c8eb16642ba6976eb1b",
+      "bytes": 1683,
+      "sha256": "d15a5ea78bf687a7782cab098bd6d5840a6d482e5d9b4f836f4a85e69f18de33"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ce5578f4c8a32790523c220af4c64a59e24c9d9e",
+      "bytes": 2874,
+      "sha256": "bf7971a4610b0defb048b5435b859c444118f9eb1f572df0f08cd2e73360ed55"
+    },
+    {
+      "path": "db/001-bridge.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "69082e1ebcca272f1d700aa0fcece947523830af",
+      "bytes": 5056,
+      "sha256": "ca3b273e7c563dbff551cfb911ce8b1433e1bb17239ed094326112bfbe5392f9"
+    },
+    {
+      "path": "db/002-transfers.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "98bb20b387ae77d895beea8b2fee8d5fe25882d5",
+      "bytes": 2184,
+      "sha256": "f118cc8fd03003896ca4b21be1c286a5899a7ae8d9884f764d189985a91b4540"
+    },
+    {
+      "path": "db/003-recovery.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "61c750987c1f8825e22434f0741a4a0aa65469e1",
+      "bytes": 178,
+      "sha256": "51bba1687c1c25324f5762ce6034658ac9e125571c75e36f901e45c74ad35dcb"
+    },
+    {
+      "path": "db/004-retention.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b012668ac4516cd24c710c1da0fd670c5917adc6",
+      "bytes": 403,
+      "sha256": "fa48cf3ed531a1fca8f00a097f3153ceff7e6a71e6ee5664ab7c9749beb15797"
+    },
+    {
+      "path": "db/005-transfer-attempts.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "95fcaa3bcb825eb35635e45c58e9d2b9a5ad6564",
+      "bytes": 524,
+      "sha256": "901d865980666005e84b5091f2d8c24943a7829ebac93d4e070ebd7032b72ab5"
+    },
+    {
+      "path": "db/006-owner-conversations.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f334a4230ab2675ceb5178724f4488f7e3f6cf59",
+      "bytes": 354,
+      "sha256": "a852a2df4be5522525b38718c5d6eabe76463355bb976253dadfbd0458b689eb"
+    },
+    {
+      "path": "db/007-project-pairing.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "00cda59bc154443aa96a4c7a7666f8d0bc4ad0ad",
+      "bytes": 1225,
+      "sha256": "e8abb5941aa958e05e16ff739dd811a5999a728eef7ea4cc73b276c8c135206e"
+    },
+    {
+      "path": "db/008-pending-agent-config.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0e074f958b490bacc175da6a321188c98b20281d",
+      "bytes": 520,
+      "sha256": "89aad5679bfb22b034eb75bd434e37bff57f0ffa1adf0de832c81e7605353a93"
+    },
+    {
+      "path": "db/009-host-metrics.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "609256f4e56865c6d6d81e36db098f9e07b5b8c4",
+      "bytes": 206,
+      "sha256": "914be4bcdd666ca4b9c9c5729af8b499f38056af0854c025eaad48f121749ba0"
+    },
+    {
+      "path": "db/010-pairing-preferences.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2521b7e419d47d6e92f99da71e186a05ab369757",
+      "bytes": 442,
+      "sha256": "5bcd728b920246975a83c422db5d6005f712c426cff041923c4641f0b71b2194"
+    },
+    {
+      "path": "db/011-agent-chat-display.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3e3e6a7a760b18956a62e6d29391e8ecad95acf6",
+      "bytes": 130,
+      "sha256": "c89b0a68250d80e4599c17383f00472a92b364e6102fc0866fab129667e815f9"
+    },
+    {
+      "path": "db/012-agent-work-instructions.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "72ed2e412048eef81fe57b16d713c070c06d9e38",
+      "bytes": 288,
+      "sha256": "9a121e51bad66c102e3f95bae0433cc9a1daf2b50875979c012fab25c6925dc5"
+    },
+    {
+      "path": "db/013-message-retrieval.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "eb58d5dc12cad4fe276cfbd0d31f13a408063fc4",
+      "bytes": 145,
+      "sha256": "e3e0438762ca883c3a2820f95e7b580e143c7a81531c153856f440699731d53c"
+    },
+    {
+      "path": "db/014-portable-agents-packages.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ef2a8c479685d4fe46be4c8e17b65349b41bab21",
+      "bytes": 1797,
+      "sha256": "0b9ed7be177fce082bff783857c484762f02f286164f65df3bfad3e00193c646"
+    },
+    {
+      "path": "db/015-agent-templates.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "cbc12980bbc5fecde960582b2e1203a3dc9a1cc4",
+      "bytes": 296,
+      "sha256": "c3298277c225ae73f5f4802e34f13c436ec318b80823eeb75250fc4219c88078"
+    },
+    {
+      "path": "db/016-one-gib-packages.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7f74fa265df5a90836e25bd68dfc4ee34bdf9f95",
+      "bytes": 385,
+      "sha256": "5f8011cc9f6e4b8efaa8d9c1027b27824b89f6eb72ac28406fca5762fec73f15"
+    },
+    {
+      "path": "db/017-agent-descriptions.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "01cfa643b0a336ab1a07365e3659f2a120ab764d",
+      "bytes": 96,
+      "sha256": "70ea7eeb2fe566d9e7e4ce884405876afecf3ecd6af184899c20f3d01038b1a0"
+    },
+    {
+      "path": "db/018-portal-addresses.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "927784afcb45467181e184becc92802fdfb33ecd",
+      "bytes": 1631,
+      "sha256": "c9b6e949fcc75e47bdda919049bc694beda4b098b9c5cc32468545464c500231"
+    },
+    {
+      "path": "db/019-agent-appearance.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1ad6cb94a69776a8458398e5f0ac4db400e1ec33",
+      "bytes": 189,
+      "sha256": "2adb1098e11ad325b9c1ff04ca20017857a02923b13779f23fed611a5c911d10"
+    },
+    {
+      "path": "db/020-administrators.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "42c1fc329d7f5b648bf71a84d643e689df9e98ea",
+      "bytes": 985,
+      "sha256": "0977c9deb70c9303f7b9d44f7811538695e44ce8c3e2f4530cb8325259f48c07"
+    },
+    {
+      "path": "db/021-device-binding.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "37676c663e4ddc1c3bd0eed038c8a2c021c56051",
+      "bytes": 298,
+      "sha256": "8d73e750faf6d8957665372c613501faae445bc0488028d910097e5da0898e3e"
+    },
+    {
+      "path": "db/022-agent-contact.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8a6b04f1dca7b0977bfe77ce55a67808b44e3f3e",
+      "bytes": 58,
+      "sha256": "cc862a99e86a02bafc321457c4252985ea92c66d879f6dfd9eec2348d429ffa0"
+    },
+    {
+      "path": "db/023-unlimited-agent-access.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fbae86acc811cae52f3fde848aae7497a368e57f",
+      "bytes": 283,
+      "sha256": "2fb75a4921f3c6be4437a639e47a8d5f9a85cac0a6221c03b770f229ee79ce24"
+    },
+    {
+      "path": "db/024-project-board.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "46d92b868be6a1e31fb411d673972467b3e6cf27",
+      "bytes": 1584,
+      "sha256": "f4460a9e6de4098fe1cd2d0b4134b0aa3c96d5931dc1015a04edf715a52eee5d"
+    },
+    {
+      "path": "db/025-board-owner-reads.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b365cd1a27e15265bf8dedabe1b4744070b73200",
+      "bytes": 230,
+      "sha256": "561b4b8f98f4a4f8cb42e971192311cf4aecc940a349a0d5835d2e8fa69f9947"
+    },
+    {
+      "path": "db/026-workflow-reports.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "70c2242786ee505bc093fcb57933c06eaa7c5ddb",
+      "bytes": 821,
+      "sha256": "a69a432d2ef72b5f98445c70cb8b08353630677efbb4a8d9c620715efa1fb174"
+    },
+    {
+      "path": "db/owner-auth.sql",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3a681cad60a4b1ca4599fc1ddb136e4898bd248f",
+      "bytes": 2657,
+      "sha256": "c7042a7072297760af8f6e951564c528e7480914e34ce000d39c8bfbce53a3e9"
+    },
+    {
+      "path": "docs/API.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b5fb46ed4a8820a8717bcdf025bd24a73ed68590",
+      "bytes": 4864,
+      "sha256": "e022f10120835592a461ff311d97705f8ce28121cb4422d3803b2400c0eb6c0b"
+    },
+    {
+      "path": "docs/FIRST-TASK.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "676c4ffb16af9bbdce633c38871ea54144950139",
+      "bytes": 2025,
+      "sha256": "2a6506ba784c8fe18b6226d59f6979717b283130223c7c63186f1b58a9e3da21"
+    },
+    {
+      "path": "docs/INSTALLATION.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "aa6cc5aa47a2903d0a69b161873f1bfe638c783d",
+      "bytes": 5324,
+      "sha256": "8b5ff73e395b6ae3a40cc7eb39ddb38d1f58cf9d93b5ef6101dafcd87a9969de"
+    },
+    {
+      "path": "docs/MESSAGE-TRANSPORTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "78fe9208203ce3a86eb12ea62ac21dbcb2f8ab12",
+      "bytes": 7148,
+      "sha256": "e54831dd543ab2b156ab1b9166e8c6c056b9c4517dd251cb5be43ed08dd2622d"
+    },
+    {
+      "path": "docs/OPERATIONS.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1a050c3a06b6f4600a30414f3f2b143aec4be59f",
+      "bytes": 6527,
+      "sha256": "67ef725455be5561c229557ecd6b746e6dde74afab2973a01e0754d1900724f6"
+    },
+    {
+      "path": "docs/PORTABLE-AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6ba1bdb8f046d7687645eab142dd3bd8f3493dfa",
+      "bytes": 6282,
+      "sha256": "fdd3d62c5f86928c4d14d352dfbf23e540435aabc00ce72b020925b463dc6de1"
+    },
+    {
+      "path": "docs/PROJECT-BOARD.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e8d39eebfb044d15ae7916831f9b8bd47b2ad198",
+      "bytes": 3197,
+      "sha256": "dadc27a56b8bad352d33c89506a59e25df8d7fe5fdc665af6f313379c12372d3"
+    },
+    {
+      "path": "docs/PROMPT-SESSION-NOTIFICATIONS.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2614f2654a403c83b4fa16a14e344b88e8328007",
+      "bytes": 2746,
+      "sha256": "10976b06a6ddb8813fcd401e953a0d521f9f3c83588a2b7100f700bfccee8108"
+    },
+    {
+      "path": "docs/TROUBLESHOOTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a0594997ac281059c1f0104afca1f1aeb5bae706",
+      "bytes": 2681,
+      "sha256": "8a154d86bc0906fdd8d7fc78147ff69819895a02364a5d0984bd337fe41bbb8b"
+    },
+    {
+      "path": "docs/WORKFLOW.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8d960bacce080ea69de0338d0cc9c453a138f91d",
+      "bytes": 4830,
+      "sha256": "107a824994fb3ad77c17fc9f79a646b0cc251eeddf0fd3e5f0735b76bfc87a81"
+    },
+    {
+      "path": "docs/demos/coordination-transcript.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "52549354bedbf3dc06ab5227d9704ba716dc7e16",
+      "bytes": 4974,
+      "sha256": "77cfdedfdd3f42d23a8ee0bff41b7e6fcd28f3853215e54022afd90b58ae8b7b"
+    },
+    {
+      "path": "docs/dependency-licenses.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0853f767cf323018bcf1b1427206f1f47dbf1e84",
+      "bytes": 22951,
+      "sha256": "6ae6f35ccfa98a71790bb02e6049dd99a7c840273257b96ccc463d5e73a0ac59"
+    },
+    {
+      "path": "docs/images/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d8871db3729ccfaebf7f9b68abc74d0ddfd72718",
+      "bytes": 1347,
+      "sha256": "bd246e826358a9e9e539b54e262c7c75df811b480093b8caf464231ab22ce7a7"
+    },
+    {
+      "path": "docs/images/architecture.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fe08ec68e53de7a0ebb73c36fed408eb11435a63",
+      "bytes": 232677,
+      "sha256": "4c3495ff4ef98bec7278c4d1feffaefb5da6245d6e60df56112d4ecf5ebed427"
+    },
+    {
+      "path": "docs/images/diagram-style.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "407eb4d3e954ba738a51d1cf19a570b8256350f8",
+      "bytes": 1753,
+      "sha256": "109edffbac2b1f510a2d3b51450b25ac08d13ed613a3522a9d6f81088f9dc422"
+    },
+    {
+      "path": "helpers/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d3c2d040033a205952869ff44f3dfa002ae40027",
+      "bytes": 11197,
+      "sha256": "b0a42320974c6dee1bd202f23aed91035eccd25c495c911e1f68acb44834af8c"
+    },
+    {
+      "path": "helpers/check_archive.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a97c86726354b001199673de39688e635e5c0770",
+      "bytes": 3832,
+      "sha256": "f8cd696df05be0be189c9143a7cbf23d26459b4012a3d2b7254045dcbb857e20"
+    },
+    {
+      "path": "helpers/transfer_server.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f79bca9908f521f78621c38a66300736b57b3b7f",
+      "bytes": 22925,
+      "sha256": "656354940ceadd38484dc5ac8449325c6f2e0a83d296883efb00280a68368566"
+    },
+    {
+      "path": "helpers/tunnel_process.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9ebe9d4620e4f56145cd7a05e41a963eba096acb",
+      "bytes": 1021,
+      "sha256": "ad50daa8534897b28b51bbcb8a33866a469e9c981b4ce8016d01bf8e06aecf44"
+    },
+    {
+      "path": "next-env.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a419cbe4e3a5e8d4b481b851dbf4ac767de069e6",
+      "bytes": 296,
+      "sha256": "0f70629890b72a0a82e91972cc032c04b658b26c265373cb711cf576bfbf8fcc"
+    },
+    {
+      "path": "next.config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b7f8af6ce04b27fcdf775395bcdc4b60cf303df8",
+      "bytes": 554,
+      "sha256": "2073ddd0bff55c433b5415d57293acaf10cfb1a53cdb5f1ce8db54dfb4fb0925"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "36bc5bed05600947abbe0c0489b68480acffee6c",
+      "bytes": 1118,
+      "sha256": "d1f064954c1d5fa242eb793d98f50a1888204c63bb4754d85fe1445db0f5128b"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "70ea0ede46801c8a896b61475547a58cbeed073c",
+      "bytes": 89569,
+      "sha256": "8d9033090c43a2d5a27aecb3e21754ddc7af063e9e88e56641ff5bdeed7f6988"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "52d195d921dd407616990cece150f884126ebf3a",
+      "bytes": 226,
+      "sha256": "0c2c01dc0a8249126e21a33fd85037969fc562da851bc4fdbae65bb9a969be66"
+    },
+    {
+      "path": "public/art/titanium/bridge-enterprise.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "44cd0ddf72681f5bb47cf3c1f9d66009a6e8e3de",
+      "bytes": 1202,
+      "sha256": "cabb82ff369ede8e480388c06e4d60772da42278e58746567b5119c408c84d05"
+    },
+    {
+      "path": "public/art/titanium/bridge.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6f4a14ca3c4bf578a81724f5e09de9926650aa70",
+      "bytes": 692,
+      "sha256": "3ac4a63c65a8f5b2c3cb76e1b007123b0dee359f5f3aa05278aa744a3220b38a"
+    },
+    {
+      "path": "public/art/titanium/icons.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "716f6462e749ac256b5675250df82b42131fb082",
+      "bytes": 1006,
+      "sha256": "594c05a976a67c7b79fb23be632d61cae04c558ceccac213a1a582058a346f59"
+    },
+    {
+      "path": "public/brand/open-agent-bridge.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d16ff2703d877f36d85c4eca2052009e67a14968",
+      "bytes": 243,
+      "sha256": "7b308eef11ebcf5158a8b1d0a300102921934c22812dd2204e4a4d2f557cc374"
+    },
+    {
+      "path": "scripts/bootstrap-owner.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e2c88fd0743c6dfa8dafe5689e3c8d27fd650ee7",
+      "bytes": 3412,
+      "sha256": "64d8574aaa42c2741d6545700737a3167f21c4fa5b4f24730ecc3218bb3e486e"
+    },
+    {
+      "path": "scripts/bridge-client.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "120b0f2ed2085f26bd59fe22938324174b71bfd0",
+      "bytes": 44428,
+      "sha256": "37a9025a5733f71ec748d7bd1bfd61547ec41d0ae8b47491bba5ae5f7f1abb0e"
+    },
+    {
+      "path": "scripts/check-public-source.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3efa4c3a0c49720075f87fde0ac92fdee2e856ce",
+      "bytes": 6833,
+      "sha256": "2cb0acd6abc44bbd20294234fae4a29d934627dfe2619388dcba7e1247c8a4b9"
+    },
+    {
+      "path": "scripts/dev-postgres.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "428561f355d782c81dfb952734b671f86d68845f",
+      "bytes": 14763,
+      "sha256": "48b9800376a39d52f21d70d9eb82f194bcd540fbb80241e940d7bff18420d328"
+    },
+    {
+      "path": "scripts/dev-postgres.py",
+      "mode": "100755",
+      "type": "blob",
+      "git_blob": "944c2c0c6ccb16ad759176809ff14492cc5b3f58",
+      "bytes": 4142,
+      "sha256": "a52fafa2cb6fd33dbfa9d939fab5cfbf903018a194b0c84adcc37526a138082b"
+    },
+    {
+      "path": "scripts/host-metrics.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "93c6d1fc01e87705cfd8607cfa1e73f990860362",
+      "bytes": 1340,
+      "sha256": "83ec646e74521131a224ee41ab4b7ebfdfd3c72e94f8b191313bce1291d47f14"
+    },
+    {
+      "path": "scripts/install-privacy-hooks.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "797626c2f1f23fc19185d97edbb53adca6d58cbd",
+      "bytes": 1996,
+      "sha256": "ca5cafcee96694d093fcb88e8abac957ed5186c9351ba2e86e9600352fb8db53"
+    },
+    {
+      "path": "scripts/kit-prompts.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8d62427e3ea9b172a22de710f335acdf2b16e395",
+      "bytes": 3101,
+      "sha256": "b085a0f6ea760a83683e2e22a029ea431973ed7f0a8dc2b454108aeeee2d41c8"
+    },
+    {
+      "path": "scripts/kit-tui.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9429bafb7badc0a80a53d76a5a287268a21cbd12",
+      "bytes": 5672,
+      "sha256": "9c1c86ddbddaa6022d7e268825844bef895b65fc3ddc15497abb109f05b88ee5"
+    },
+    {
+      "path": "scripts/kit-workspace.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f1f0295ee45cfef523ded6c484f3976a19e6960a",
+      "bytes": 3002,
+      "sha256": "125811ae407c9dc872214750f75ad0485b0f9037d9e0b5412a3a7c24a970e966"
+    },
+    {
+      "path": "scripts/local-app.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5fa613459f4d789b885afc6e8d568594aa4cdd15",
+      "bytes": 4309,
+      "sha256": "1f8b2da5b039fbb6d46b517b2905e10c7b4b2a40090e41d592373d92db4bfe92"
+    },
+    {
+      "path": "scripts/maintain.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "865772953533b4648b3b3d6a494d85f9270f7518",
+      "bytes": 13631,
+      "sha256": "84b168338273c805e0c51d828276325c6fd03bf81b3c70728e9326468a24595b"
+    },
+    {
+      "path": "scripts/migrate.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "58e7fb628a54f44db6ca540762eef37b9afb3e8a",
+      "bytes": 1374,
+      "sha256": "7e782eee046a41ee28534a55501c89d5dc539ccc293d784b34f2f00d834b4ca6"
+    },
+    {
+      "path": "scripts/package-retention.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a27494822e14a707eae9a80a24b41c6e9e4ddded",
+      "bytes": 2148,
+      "sha256": "1d2493a3b4ec8c050eea1cba6d7da31b1b7ae29be4572a77017bca5c888a9418"
+    },
+    {
+      "path": "scripts/preflight.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "653ed90f72742436f956408ecc2dfe12ac6d4af1",
+      "bytes": 13346,
+      "sha256": "4ebe545864b9472dbf2b25cc838d585e029e34645ef391a5b1765ea7fff82f46"
+    },
+    {
+      "path": "scripts/privacy-hook.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4d61de377371ce4d0b13b940f8ebe7b072d4a5d1",
+      "bytes": 1890,
+      "sha256": "3ffb6539b82e422f235b2f0c7afd7a38ee3f9013b14128b459f340f20f70716b"
+    },
+    {
+      "path": "scripts/quiet-hidden-smoke.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "589f3ed8dc3982611b8f0204f4917e3ec342cf7b",
+      "bytes": 6205,
+      "sha256": "5756901cd57e8f197493565df811ffdd8cba9576ccab2887a7af09561b4d750b"
+    },
+    {
+      "path": "scripts/quiet-pair-smoke.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6b392b4c9c0fd49e5e0067484d13faad824595e4",
+      "bytes": 8204,
+      "sha256": "10a1999d307cbf645b4bf19f7527be6a6c72a94519423f4950ee9bfdb9c35f7e"
+    },
+    {
+      "path": "scripts/quiet-session-smoke.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "76e15b8e7fdc9a2d7e005284eb7f7f69128b0062",
+      "bytes": 6782,
+      "sha256": "41745e66b5ddad76f052d74d82cc0c3f3ca0ddbffc448db21cf8961b1fe5fc67"
+    },
+    {
+      "path": "scripts/quiet-session.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3918c6209c987da5812436f5ed0eaf51be1eb8ce",
+      "bytes": 26972,
+      "sha256": "947b47c601e5543c5c9ed53723d3f5296b8f36c1b4d506d61d7b9df57a641fcb"
+    },
+    {
+      "path": "scripts/quiet-transfer.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "61bc841dd9229c77ad0ce859d4b5b8987567bee2",
+      "bytes": 13377,
+      "sha256": "e052eefe6eec9a5328302793f821331a7b44672c247d6e4129b02cb9436ac5db"
+    },
+    {
+      "path": "scripts/recover-owner.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b929674df2b8c8290800b056cecefcb7dfec30e9",
+      "bytes": 3423,
+      "sha256": "ee18f17bedbc0f85b24d47e85a4b8858d8f3dac9bac705b408882ebfc3172a4a"
+    },
+    {
+      "path": "scripts/restore-drill.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c45e6f9efcfbfc2d45be85a247b6c1ba6a7b0a41",
+      "bytes": 19930,
+      "sha256": "adefab1bedbb49b2a5a4c90b3fb305a3cfdc76a1c14eec53352aa58bb18830be"
+    },
+    {
+      "path": "scripts/server.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fd4489547135d1c5b10b7a7f3d1ff1d6c20c5e7b",
+      "bytes": 1553,
+      "sha256": "04fe9ee36514bd51cef02dbcf0bf0995ff4c8dbe4949935e56181360e60daa4a"
+    },
+    {
+      "path": "scripts/websocket-transport.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "27707ba5d4c0d6392227ab2f0a35aa8d81ac4b73",
+      "bytes": 3211,
+      "sha256": "f8edf18a8795f182b54d81b988b33c8bcd41f2b48437b4ecf892cf5c859d58f4"
+    },
+    {
+      "path": "scripts/with-local-env.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d5e4dc97164e88f2394bd908dbdef067b3ac7577",
+      "bytes": 1036,
+      "sha256": "49a2996ff9137158b7cf5ee3e00f673120c3d4e7fa0a787fb1a5bc0f8fcd28fc"
+    },
+    {
+      "path": "scripts/with-local-env.sh",
+      "mode": "100755",
+      "type": "blob",
+      "git_blob": "6209efb55c463b826b511391b50052a7dbef3d14",
+      "bytes": 685,
+      "sha256": "7d1aae15ecc0c0d208be34f8302ccf8cce9e73fe7c3c510f1d513c494f387dec"
+    },
+    {
+      "path": "scripts/workflow-policy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4408adc3ef5ae00da27bdcc786ed8f62f2213d7c",
+      "bytes": 3793,
+      "sha256": "4492a964774f8549f3c98a527dd227445174b0079817f7e58948d57206ad5599"
+    },
+    {
+      "path": "src/app/account/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4398eba406f42ff39d59ad355964f07114b1bf57",
+      "bytes": 33,
+      "sha256": "af154fb4bef129df318c5a19ac11c79362bc6ecf3ef019e58fbcc32f90b537af"
+    },
+    {
+      "path": "src/app/administration/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4398eba406f42ff39d59ad355964f07114b1bf57",
+      "bytes": 33,
+      "sha256": "af154fb4bef129df318c5a19ac11c79362bc6ecf3ef019e58fbcc32f90b537af"
+    },
+    {
+      "path": "src/app/api/admin/[[...path]]/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5e0a2dcb49276aa6262dc807808a2eff66085c6b",
+      "bytes": 3112,
+      "sha256": "12d19cbb9afdc49a4376f16c15a54b8f147d6e2cc8dd47795e088cc0b9494fbd"
+    },
+    {
+      "path": "src/app/api/agent-client/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2e959bcdea6eb9dc4d403910e0f037cae8866c67",
+      "bytes": 440,
+      "sha256": "f1f6fd1c26a5df2141643f646a0ec0ae0126fa5f92ab383ab04cfb13ae27e169"
+    },
+    {
+      "path": "src/app/api/auth/[...all]/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ad4605bbdc1e7914141a78e2f51d96efdc97479b",
+      "bytes": 332,
+      "sha256": "9618482516317335bbd058c6f2c814db1d5cf068b8389ac1cebd4f481e7cf3f9"
+    },
+    {
+      "path": "src/app/api/health/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ede096ce76523c1ec482401dfcf49cf7ea09d98e",
+      "bytes": 329,
+      "sha256": "ddfaf78912a6aad4afdea7d5171bb656bd39f8808be3cf3b95a8d99917db7287"
+    },
+    {
+      "path": "src/app/api/openapi/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ee66d3137ec31c0ce115acd82b12d7a51479c924",
+      "bytes": 146,
+      "sha256": "a8b03b7efa67a79fceca37c0fc85eaa85d4c2109d9523092eec5931946a1dfa4"
+    },
+    {
+      "path": "src/app/api/ready/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1df6181f03d907f3a3820ce6d08d680ad3513d21",
+      "bytes": 1192,
+      "sha256": "f6fd67450e24b7907e28ae00d960270149c9c2c54b2b333e5e6d8d574b7b80f8"
+    },
+    {
+      "path": "src/app/api/v1/[...path]/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2a2b93444d5adedd0af2ed2a00bbf99de70c54ea",
+      "bytes": 311,
+      "sha256": "90125517f0db8e4f8bae47d7849a6a9e344857ede28b3848ac820a4eb7402317"
+    },
+    {
+      "path": "src/app/enterprise.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0a39555da687a64c8d610ba255be383fb5ca6422",
+      "bytes": 5694,
+      "sha256": "131627626f6626905fa8733692a30687e759e8c04ade492ff27a600dcfe7dbe7"
+    },
+    {
+      "path": "src/app/globals.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3379ebe661e2ab14a11f3cdcb7052c5ec0d97952",
+      "bytes": 122568,
+      "sha256": "190d6d2694e86634e108bdf4489913eeeb46a626785d15ed193e8efe9ac4d722"
+    },
+    {
+      "path": "src/app/layout.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7dbac86e4f57c48080244c5a60bd6b2577a6c337",
+      "bytes": 794,
+      "sha256": "3328b4725a57952eb7d9ebed6b568a510b44d2f72fa24e035a34d26f599f6539"
+    },
+    {
+      "path": "src/app/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7c235837db311bff3c0478092273fa00d0f6f3fc",
+      "bytes": 187,
+      "sha256": "257afcb8a39d073f2005c6290c31d18490d069a81efe27ffaf2c1cacde904d34"
+    },
+    {
+      "path": "src/app/projects/[[...path]]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0044af510336b7fcfc81fbd737500d98281150d0",
+      "bytes": 36,
+      "sha256": "80009601b3bf1db0daa64078c7c528d3a608a54232ec64333574e46846b2b3a0"
+    },
+    {
+      "path": "src/app/titanium-blue.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ca2ca36ec9362b9be9247c3cc9912c0acead867b",
+      "bytes": 40473,
+      "sha256": "110ac61d2a03378bbe42d2ff5321dc5465086fbfb059401183b9dc0bcc74fac8"
+    },
+    {
+      "path": "src/components/AccessDurationFields.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "27b30531ee882d71f78cbf5036a82efc9be5d503",
+      "bytes": 1946,
+      "sha256": "817618be7c15217140d2b691da898d2a1a00e5eb5938a46b8e2bca22eec9bd54"
+    },
+    {
+      "path": "src/components/AdministrationPanel.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "29a8c76f8392a550e90894634761bcb3ea08934b",
+      "bytes": 6527,
+      "sha256": "d1ce2c27e9dbead484d1b9098334c0cb4eb6011b519bf49934006d49d715030f"
+    },
+    {
+      "path": "src/components/AgentAvatar.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "96eab6ccc31c8006daa600b7a2fad7ef1d5a3f6f",
+      "bytes": 540,
+      "sha256": "9740d43a305388acc50bfea3408466e677f5dbc805586ee0021c98769e16e1c3"
+    },
+    {
+      "path": "src/components/AgentContact.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "31a34f0200e12299bc4f55507aa2b050d19878f4",
+      "bytes": 2164,
+      "sha256": "c06ec91ba72b116e90bf976e29b6ee324860cce5d22cc8980c07eba029a11c1c"
+    },
+    {
+      "path": "src/components/AgentControlCenter.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e48677a6c855a242508e111a0912541e31bfe3cd",
+      "bytes": 12371,
+      "sha256": "2108a8b54c5412fa63d9aa40eb9f61ddaa5a338f6a5ee8b03bda418e0592fce3"
+    },
+    {
+      "path": "src/components/AgentInstructionsFields.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ce38bd27ea065790430b86603df1f02cbf12a5c8",
+      "bytes": 2622,
+      "sha256": "3245340b10849425bf99a4529d84fd0ac1ca3b7d962c96eab4a60d36a3ab9f32"
+    },
+    {
+      "path": "src/components/AgentLiveStatus.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b0d3aa7bcdf3f78ccfc64b32f60d60203d500444",
+      "bytes": 4047,
+      "sha256": "d2b3156f61976c32ec320a22a6470473e8d7e571d78553679bb991cadcbed6b7"
+    },
+    {
+      "path": "src/components/AgentPairMap.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "504bc623ffce812af6a6a7bae245b1a4f7381c28",
+      "bytes": 26782,
+      "sha256": "2d8b90f53515090dd4e60fb20d506a59eb41b1fdeac2ee5bc06583a879a4daf3"
+    },
+    {
+      "path": "src/components/AgentPromptPreview.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "36491a90ba5d7381cbb624032eefa9e3b5ac29d2",
+      "bytes": 11818,
+      "sha256": "708499b45db7a10214b910e3e11d7c88c25a80005485bf8fe058ca3bb9ca32b9"
+    },
+    {
+      "path": "src/components/AgentSetupPrompt.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "34a39f93c6f132465f19b5363a7e10a2f4ac220b",
+      "bytes": 3041,
+      "sha256": "522709a3657276ac40b9f527b8b16f7c83c29b5df496f23c3c1e4b39ccf2232b"
+    },
+    {
+      "path": "src/components/AuthGate.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8e2b9efef000b9910e4318e575873f3f58ec0f13",
+      "bytes": 4537,
+      "sha256": "07480bcd68f6d00f3996c2ae3dc36fa2a94966ef5ffa8ab54b05408adb1c9ecb"
+    },
+    {
+      "path": "src/components/BridgeScene.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "27ec3606b79f770568501ad71bbfb5c5ddd244d5",
+      "bytes": 399,
+      "sha256": "963e27eef2cae03355db0e291e516ec3e6b5fd24ca04e53fa26ade13532aecf5"
+    },
+    {
+      "path": "src/components/ConversationPanel.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "582d658b25f9b45ab87a5d45e2e629a8df4568ff",
+      "bytes": 23470,
+      "sha256": "cbaa00f3281350655317b5ead993fefa77c3479b1451c005d11c7460bce86065"
+    },
+    {
+      "path": "src/components/MainBoardPanel.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "19b689860f4d316a327b76e1059e0355bb3b967b",
+      "bytes": 14881,
+      "sha256": "fc9dadb82239f8f9b4256f887f0db14217256a4e98809434614e0f796c03e35b"
+    },
+    {
+      "path": "src/components/OwnerPortal.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c4961fb6d8a4fc514657621ab9d535c5caaef113",
+      "bytes": 53416,
+      "sha256": "ab824e03e5bc324db3f79b47dda7680ed82fb2c56eb559a5182ce71e1b14dc12"
+    },
+    {
+      "path": "src/components/PackageHandoff.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d473f9c82b32cbc0f7a277d0104578adf7583751",
+      "bytes": 2818,
+      "sha256": "6c973e1191a10f96d709844a4254db259f87d3d8f899776b9532bf037ea617e4"
+    },
+    {
+      "path": "src/components/ProjectDirectory.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6f6e37a20d1970ab76181b65cbca33743ea1e8f4",
+      "bytes": 2437,
+      "sha256": "175e0d8cfbf21702a4c31e17712927bd594a47b14e08a24345bb0cb6e0d4880b"
+    },
+    {
+      "path": "src/components/ProjectOverview.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "357df865cb144175fb9ac5517fda02916feadd48",
+      "bytes": 4196,
+      "sha256": "ae33238e6e5b461c871118e7c0ce7c3921734d1958715b07628277be965e04d8"
+    },
+    {
+      "path": "src/components/ProjectSetup.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f2ef07f141a15d1422b97d89bc10f38ddcd5e3c8",
+      "bytes": 6221,
+      "sha256": "3b4d461c5af96a99554ca17b3682ae11667f7eaabfca117ba919a1cf6ef1c359"
+    },
+    {
+      "path": "src/components/TitaniumWorkspace.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "296bcf183f38a222b65a3aa422e32f58d2538e7e",
+      "bytes": 4413,
+      "sha256": "8b32856fc5499a6d679e32c4d20d8e0bf77a9facaaa699c54e037b5d5771cf61"
+    },
+    {
+      "path": "src/components/TransferDetails.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1123d44224f482285c55f9073e296dae3d747a6a",
+      "bytes": 4671,
+      "sha256": "83c0011ee571c76ba705e83641720a6370d6d5148470a049c2f9a73d63a45f26"
+    },
+    {
+      "path": "src/components/WorkspaceBanner.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1a126d4b7ffe71660d94528db0bfbf1d871362f2",
+      "bytes": 957,
+      "sha256": "6cf9862403e8b25a1a5d84a107ae96c13b3ea8b71a265f398678693f34be0b8b"
+    },
+    {
+      "path": "src/components/WorkspaceOverview.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "866bcdecc0b180612de63ae03a0afcbc091a1484",
+      "bytes": 2324,
+      "sha256": "30a3fd99586fdadc5ba6e38fdcaf98436c655f5622e911b69ca4a87850ee3939"
+    },
+    {
+      "path": "src/components/fonts/OFL.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "472064afc4b8dec9079fab03b8ffafb617a1b2d8",
+      "bytes": 4384,
+      "sha256": "e01b637272e0cbdfb240184dd98ea5cc671556d9894dae2668d92ab2c906787c"
+    },
+    {
+      "path": "src/components/ui.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7b5684bcfec4ba9d2ba2aaa229089e532a6b9842",
+      "bytes": 6871,
+      "sha256": "a6e13c00a17d266b62342a5ebd2d0d5181ee788edf073b73ede145f71470ae7e"
+    },
+    {
+      "path": "src/lib/access-duration.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "98d58d649ce888ad2382144dd0a9f4cc3933da25",
+      "bytes": 391,
+      "sha256": "29d00940fef2908a95ac5e78f8ed04811dc541f135c00d4967fa01dc58d30e9b"
+    },
+    {
+      "path": "src/lib/admin-service.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7a786f160852730c70c342cdf089749369e0af68",
+      "bytes": 33261,
+      "sha256": "0d710249d8220434e6cbcdf3168703c9925afbd854af09af19d5a6caa51c3788"
+    },
+    {
+      "path": "src/lib/administrator-service.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3535b87729949709c576bd43ac2bedc26cfcdf6d",
+      "bytes": 6753,
+      "sha256": "3e4852361f02ffae06e33f1ec4da0c3c61dba91b30f95e890b2ad26bcc1d5312"
+    },
+    {
+      "path": "src/lib/agent-api.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "955d7510b309f207f0b46f01280e349767b98871",
+      "bytes": 19641,
+      "sha256": "6b74e588ac435d4e1115b2312e8d3c20023cef0c019049dff277118efe10feb3"
+    },
+    {
+      "path": "src/lib/agent-appearance-schema.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d2909558dc08c5c4460d2b76c7016db2e584a641",
+      "bytes": 686,
+      "sha256": "dd95f6ac4e9ce3bb5dd334af1fe9efbf4cc26576351154172ce8ea2fa80c985c"
+    },
+    {
+      "path": "src/lib/agent-appearance.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ac8454e35516554df7aac17471b2f512861f8d09",
+      "bytes": 444,
+      "sha256": "e94e4071b5f85e9c6273314af6d4771269670ef530394a5e1fb7c9afe99940f5"
+    },
+    {
+      "path": "src/lib/agent-auth.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5eafed07df796f0a436a7f726d0e3aa9e6513e1b",
+      "bytes": 5864,
+      "sha256": "81be5852f96ae67af4c2bca5da49d01f99065a36c9bb8913ac6800c54a5b8049"
+    },
+    {
+      "path": "src/lib/agent-contact-labels.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "560e63b81be70abe33d0bb401fae87f015e716b3",
+      "bytes": 1290,
+      "sha256": "440924e0fc201b35e76219d39e77b7e8157d4f1dcdf58866435a22e5ac149fff"
+    },
+    {
+      "path": "src/lib/agent-contact.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e6d17f76d9f976bd7a7a8d77f271f5fefb7ab21f",
+      "bytes": 2314,
+      "sha256": "5d838b4c4f0781ec255c3b1a18af86dcbb12b6ad445c6d7465d9d684c41cf21b"
+    },
+    {
+      "path": "src/lib/agent-dashboard.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c2bd458cbc3018bb59036f228fccd466a794d47b",
+      "bytes": 1732,
+      "sha256": "8898344dd7a88640114a98a59ece458c85aaa4e5fe910696df892ea80901db81"
+    },
+    {
+      "path": "src/lib/agent-enrollment.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "cdd8bb74ff049f89060e2981e5d05f9696e89343",
+      "bytes": 15912,
+      "sha256": "1eae8d5377f178bf43bf21da8629de2af698bc7aa1190ae64969190906eb9f54"
+    },
+    {
+      "path": "src/lib/agent-guides.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b5acfdfc9e5383fa05c62e3a19d49fc03f9e4ea4",
+      "bytes": 14964,
+      "sha256": "49bceffaed5c17cb027247d740ed1bd90c32338d33fed1c9983bc68bbd98253a"
+    },
+    {
+      "path": "src/lib/agent-instructions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "249d491ba16b40588b67c88dd39062d90835e170",
+      "bytes": 11240,
+      "sha256": "0f7fc6fd7433b5ad2648a8d902dffc6a1c2eed2a832eaf688a9f88f787241b4e"
+    },
+    {
+      "path": "src/lib/agent-kit.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dc53ebddaddf8e6e7f26c18fe12bc33e594e9d69",
+      "bytes": 17702,
+      "sha256": "c41a9feb0152391772496a6128980caa19b05407d4864b71e5a3ed8ca43fb702"
+    },
+    {
+      "path": "src/lib/agent-monitor.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c197a7433889a156e3410c1ebfa23e0655b83a07",
+      "bytes": 1704,
+      "sha256": "95eab67a88326902f6564b4c20b3fd5fa9125083e34456a16d62aeb79286598b"
+    },
+    {
+      "path": "src/lib/agent-status.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "115196e1408313807ca5f00f25756d0fa1d885fa",
+      "bytes": 3641,
+      "sha256": "321880dbee67aaad58c928d56816151993c83b9d63c61535fa7cfb6fc017c36d"
+    },
+    {
+      "path": "src/lib/agent-template-schema.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7929a951c88a46abddf097514ca1524353743cca",
+      "bytes": 524,
+      "sha256": "d7bdd42454c97857db9a24f2619f9763d3542abc86f59c0d53b7876f5fe14808"
+    },
+    {
+      "path": "src/lib/board-cursor.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "14b3a530514d5b58bfd75fb468b52f5d17491c8b",
+      "bytes": 1663,
+      "sha256": "6e0b3edbca455b6724e0ff1e76711cb92c43105580f0edd2ab7036c575c06f44"
+    },
+    {
+      "path": "src/lib/browser-request-key.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2e039f0bc7290505e053573be96733f750688e77",
+      "bytes": 273,
+      "sha256": "0346fe744d2462abcbd416e14dc7e80410039c837f65d472e08c971e24941755"
+    },
+    {
+      "path": "src/lib/chat-threads.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d717695f7a749a6817bea311427c897982f63674",
+      "bytes": 1628,
+      "sha256": "1ea144f3931582f5aa2d4b1e5e25bf9ea7326500b6a4b80c4178f47eef4c8cc9"
+    },
+    {
+      "path": "src/lib/db.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4c207416224d6b124076571f7aa3aa218b0a7ce3",
+      "bytes": 1106,
+      "sha256": "366c457d3e2fa6e7527fcca4157d097b62295c1bc514879c4de9a1d2d5074bd5"
+    },
+    {
+      "path": "src/lib/host-metrics.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7762751d65c89a262fd8b6209ffde300e19ae98d",
+      "bytes": 457,
+      "sha256": "79975d452a9cdf1c6127d77ac44075f6adc2949e29ee5b4f7317a0fd95bbb122"
+    },
+    {
+      "path": "src/lib/hosted-packages.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "655cf921ca970f9d4d850382eb968c91966780fe",
+      "bytes": 11877,
+      "sha256": "934a25c629c961728f0375d0f52681c1ab8fb23333e48ffa64e3d45c6294052e"
+    },
+    {
+      "path": "src/lib/kit-access.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "786cfb73741dc31b7366b86caf622971bdc78816",
+      "bytes": 2038,
+      "sha256": "71072959cd640359fa5e782b874d38f3568ed8c7477daef39dbe7e8ed4bc7277"
+    },
+    {
+      "path": "src/lib/kit-archive.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "19d83aedc8b89aa3817d4188a7ab94f7ca97d3a1",
+      "bytes": 1702,
+      "sha256": "4634c1539f7137a416e9b05b548cc8df208ac9a2dcf5b36220115e58af2b4652"
+    },
+    {
+      "path": "src/lib/messaging.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "28e239a2efd444129d407c80ebba60c56b45a8e2",
+      "bytes": 8047,
+      "sha256": "09165e98bde7332a2fbf711c3201cf64ddbf6a4050eca3c666875b3f10f3df8d"
+    },
+    {
+      "path": "src/lib/openapi.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "19c22b5a3144820e11af440df7e3810539a578e8",
+      "bytes": 30582,
+      "sha256": "2c444a76fe9dc95a8963cb3ce06e83d221712448f115f24a5f1e1eb23c951d08"
+    },
+    {
+      "path": "src/lib/owner-auth.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e3979bc5151c38ba6bdb188b0abfd688a3069cb4",
+      "bytes": 6374,
+      "sha256": "9c484f3a96882de58b143203957daeb341b813dedf39ebef18baf57133149c64"
+    },
+    {
+      "path": "src/lib/owner.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "48fa84ee3b5929368d58561ff824378e1f71dffe",
+      "bytes": 2733,
+      "sha256": "378b28305656dbfcf80d4aec20c0f62263cbeb3a0d513989ac2d593dffffa566"
+    },
+    {
+      "path": "src/lib/portal-location.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5b2a549d1958bd166112f5ab683e3775c48a4c08",
+      "bytes": 1123,
+      "sha256": "562bbb784d0d765b4fea622f8605fcda0025dec8656396459ae735e36d27671f"
+    },
+    {
+      "path": "src/lib/project-board.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "41bdd30dc06fcfa9e45d583e9b6d395a5d95c43b",
+      "bytes": 11059,
+      "sha256": "b6d225d9cfd6ce1dfac7db9780f46e326defa93eb31958492f07e2826b926a02"
+    },
+    {
+      "path": "src/lib/project-kit.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1e3860cc76dd2db4f6ca808ac50710c7d6b8980e",
+      "bytes": 3172,
+      "sha256": "78ff514f492b648914160ce4acf93c31396e517cc86e948cfd6916adb31a5b81"
+    },
+    {
+      "path": "src/lib/protocol.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "60dead0314b4bc12d7b55d558ce0d9c5c2e95523",
+      "bytes": 3194,
+      "sha256": "764e43fa184e3d22123e881c5fbe4b30f69f145548d60479da1983fb779d00b2"
+    },
+    {
+      "path": "src/lib/request-proof.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "76cbee6b55af7ed7a6b18e55645856353361f552",
+      "bytes": 3376,
+      "sha256": "ea384dc78ff3d8e75056fc18591f2d5b6c49fe688ea31e6d229566de0c5d388c"
+    },
+    {
+      "path": "src/lib/role-kits.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "31522427ae242041056b6ed8073209abe56d627f",
+      "bytes": 5094,
+      "sha256": "81bdf2be8558d7471b25e765ba1acb0b6eec6425d380e2d5f8c41117801a5b9a"
+    },
+    {
+      "path": "src/lib/tasks.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "12d46337e49f1553b301d750dad299f2db730e58",
+      "bytes": 9048,
+      "sha256": "b075125429505b3eac10db9022f125f9aed9eef91d30437ef8f187557de0a62f"
+    },
+    {
+      "path": "src/lib/transfers.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c886ed26ded4557a0ebf1e280f157f7a515b1b75",
+      "bytes": 14491,
+      "sha256": "8931199aa7ea6e2975d1fd82f73d4e50947d738ec2b745042e6a35e447b23088"
+    },
+    {
+      "path": "src/lib/workflow-reports.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5b41f69d28e9c63a45999af211d887ddf40f3c97",
+      "bytes": 1674,
+      "sha256": "140db5aa8948aadd367aa076350bdc66d7b458967e951dfa6fb5f3b661d6d5f7"
+    },
+    {
+      "path": "tests/access-duration.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2ffc1586f9c051cb6e343598410f1c69371aec46",
+      "bytes": 3167,
+      "sha256": "0f25846ead2b614fb938b4c9b35dbcd04b919f3376a473475e19377eabf63724"
+    },
+    {
+      "path": "tests/administrators.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d92a80d20b50eaca25d44dc661c8a1e6469325ed",
+      "bytes": 6794,
+      "sha256": "e30c151db409c3791645fdb1ada79cbfda75564b13f550778c8db14137e933b2"
+    },
+    {
+      "path": "tests/age-encryption.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f77c3c3bd85b22a508309e3c6f07b1b747a9cdbf",
+      "bytes": 1994,
+      "sha256": "90a2096a6cd1b466f0c910dd5791297eb2cde01b8833d829ed986d8e5dd68496"
+    },
+    {
+      "path": "tests/agent-appearance.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ab322ededa077e828ca45dc8add354ed0780eca5",
+      "bytes": 1232,
+      "sha256": "46849c5cf889f01cf4da3c26c0016a3e5f71538e7aedfd42e46774b97eff3907"
+    },
+    {
+      "path": "tests/agent-contact.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "01fa2ffa6d0fa502c92cfb9058521e46b92fd22d",
+      "bytes": 2001,
+      "sha256": "c5de85064f6b8bf21c1874ae50b6868e9efe651669223f1d1a2e3f0e5f27d136"
+    },
+    {
+      "path": "tests/agent-dashboard.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0297ede0229776228f69346bc2f17e79cba8b250",
+      "bytes": 1861,
+      "sha256": "08ddc4eeadaa12b7e607139a5c64468a0cd1c95fc78b859841e35199a16c7631"
+    },
+    {
+      "path": "tests/agent-status.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e63ada47d86945bcb5d5fcc89077c0b5c1ff6be2",
+      "bytes": 3311,
+      "sha256": "36dd39defbe8f6678d82cd5598bc1439aa04fc5306cf4867645e04bfb20863cb"
+    },
+    {
+      "path": "tests/archive-safety.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "580d6af95b9978ca0da83ad4f9e76537dca8820d",
+      "bytes": 2025,
+      "sha256": "1ad43ad30d9725d8611a9d377673ca073d6eab6c3cbc3febfbbb87c866b7a071"
+    },
+    {
+      "path": "tests/board-client.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6b9fa5a3d8734f9dabb853b7f52cafc1d4ca5e38",
+      "bytes": 3084,
+      "sha256": "e7d86dc3ed198ea42c368e5917028e2b28f5e9d607f0d290885e549ea5f47258"
+    },
+    {
+      "path": "tests/bridge-boundaries.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c2ca3f9e5ea9f684ddc62084be47605c3cd6c238",
+      "bytes": 54821,
+      "sha256": "717e57b50f1646399a8d0ae146b24666da67fbe492da325325ec772880efeed2"
+    },
+    {
+      "path": "tests/browser-requests.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6b9ab8f9a1c55d23090238b0edfb76381871152a",
+      "bytes": 1597,
+      "sha256": "63099859ca12ccdbf25c9f0dacea32827eb22d6fba8a29b785025d0e5dbb9f4f"
+    },
+    {
+      "path": "tests/chat-threads.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "53febd01f63c4ef08a12ecaa3ad811733e1df52e",
+      "bytes": 1457,
+      "sha256": "fe5116f3bcfa30ccbe8eb2cd9b4431298e4d8d1dbe7efb4331a62bbd8d66ff1e"
+    },
+    {
+      "path": "tests/client-notifications.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5e30edd9fe3bbc0a4e1cb507cf0df83b4ad1ff9f",
+      "bytes": 1676,
+      "sha256": "cfac440326d7cad9562abcdcea31ee02787f9b8abb6d047dcb507f6bc2a68b2a"
+    },
+    {
+      "path": "tests/client-replies.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "276535f2a2d311282f1cf7b5530828505d9bb0fb",
+      "bytes": 3027,
+      "sha256": "050ed728af39f1afba3bc124fc536f53c782e175242425ff9deb880c4bfe2b24"
+    },
+    {
+      "path": "tests/client-storage.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "53109e4a17af9311242a681e5eea5f110a605c7e",
+      "bytes": 2078,
+      "sha256": "5cb70c68e2cfab3b4d7ed810f1c9c876b608a2d74ff663e6416fcda6bf1b4859"
+    },
+    {
+      "path": "tests/host-metrics.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "027c9d9b9dfde2a6c85fbafe76539a98c6d8bcdf",
+      "bytes": 1262,
+      "sha256": "e56654512cbfec8ebc33f0bec85e88db88c77c1f4af57f46ec9b373e2f9a1c28"
+    },
+    {
+      "path": "tests/kit-tui.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "07e15d415340b48d8ead28b17235c88557c17342",
+      "bytes": 3710,
+      "sha256": "bd669562601f6cbd549f09250c1763a9536433f34f0b054b39735c0a293b5d47"
+    },
+    {
+      "path": "tests/kit-workspace.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "aa39525f968a39364d4f2f6c532f2d3a68c4f74d",
+      "bytes": 4124,
+      "sha256": "13efafeaa3693686580fd86c4461006b6ccae6bf90d2a3aea3a8bf826b42d25d"
+    },
+    {
+      "path": "tests/openapi.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4ae16c601104414a68cf0308b672b5c9c6cafcc6",
+      "bytes": 4596,
+      "sha256": "a01dbeaa874c2f16ae5f8b44538e5e257dd90611227ed38c7990dee8c6c0199d"
+    },
+    {
+      "path": "tests/operation-window.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "15431f951b48a0d4c91ac0c3622f278402c182b5",
+      "bytes": 9869,
+      "sha256": "687ad114860fcfe472ec0d11711ef271e9f52c2f6d0eb1c169c7b5e506e94e9e"
+    },
+    {
+      "path": "tests/operations.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e255c494d5f1490127d77a30089989da72eb7246",
+      "bytes": 22229,
+      "sha256": "5b27474b78268a78c986bb3f84cd9b88eab19c06295b17455be006f38ad6798d"
+    },
+    {
+      "path": "tests/owner-auth.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "252dee649b3da49dfa83c2844b27742392a1cef0",
+      "bytes": 15399,
+      "sha256": "1373a9cec19b22544ed44960d78c26f32147bc3bf8d4762e4578f4d11ec4985b"
+    },
+    {
+      "path": "tests/poll-capacity.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1250ab87d71525fc891730ad963c01c9f1b6a6f2",
+      "bytes": 6912,
+      "sha256": "2de72c07825cdc15caa859e251963d05dc8996310137b1f8b44b3c0d9c9b50e0"
+    },
+    {
+      "path": "tests/portable-packages.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9a6a8c412988d78666a63e49974ef841954a977d",
+      "bytes": 34463,
+      "sha256": "a8ee78664516146f0e673ce8cfe53fc7c40f10bc98047c85aed545b6e4667bca"
+    },
+    {
+      "path": "tests/portal-location.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "74e4230818685fc7d1e30f1bf81f674b2d03cc3b",
+      "bytes": 1284,
+      "sha256": "2753327b3110a269e75c3a7d639bb265d6f842479834ac2fc994aebb7deff3b2"
+    },
+    {
+      "path": "tests/preflight.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a6943acd57910a301bf22e8bddac37e503c223ab",
+      "bytes": 2791,
+      "sha256": "ef3e6b960b6b33457bb0d0f02b576fce4175b76791ff194bb224b54b27dcea97"
+    },
+    {
+      "path": "tests/privacy-hooks.test.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a78b12c7948d6210047519f98270c88928568b0a",
+      "bytes": 4989,
+      "sha256": "d931eb0b1f6b969d600cdc6747b51bf24722f3a11a6346e0181dfa5f1c2d6722"
+    },
+    {
+      "path": "tests/project-board.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "66a6a3b1277326168fe09d4df17c4968e8306a91",
+      "bytes": 12163,
+      "sha256": "7ccc5e80ed6eb5dd9068836f94b5addbf2434390112f6328362d6bf4e26afb7d"
+    },
+    {
+      "path": "tests/project-provision.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "46aafe2f4fd8a231f0ee321df79248443ffbaa93",
+      "bytes": 28793,
+      "sha256": "240395cd7d44b45fd381789fb1897643ec042b6e70521131bede51fb081a4dd5"
+    },
+    {
+      "path": "tests/public-source-privacy.test.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2f5bd5e2ff98dd989ee20fdb0fec0b753730c923",
+      "bytes": 1869,
+      "sha256": "a6aeeec1d6b097cd1e37da4011792244a7952acddce5e46e6795fd5bcea1aa05"
+    },
+    {
+      "path": "tests/quiet-session.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "471a98b8a4911a9bb25578d58a249251edf43388",
+      "bytes": 9286,
+      "sha256": "ad81c1549edc1f03ab3a5feb7ff6c0f9a070dc0f4bebe2f4b8df4f8bf881e83a"
+    },
+    {
+      "path": "tests/quiet-transfer.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fddf6f263dc481ea0b5bcb4cbd9f6f3cc0511f27",
+      "bytes": 5623,
+      "sha256": "c8b888fa8060d0a6181fbffadcc23282d4920c54a6b39f94f7b4687e26f54d3a"
+    },
+    {
+      "path": "tests/readiness.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dd98a402c66e8fe7af10d088f4586a485abef8df",
+      "bytes": 2502,
+      "sha256": "868c90cc294771eab0ee93c292f46ba6914350570f38db0d0328c95e847d6050"
+    },
+    {
+      "path": "tests/recovery-regressions.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f9c59149bd7cc3c7bf56f35dc9b27a19d3c32a20",
+      "bytes": 15238,
+      "sha256": "f63c517dddd50a7b6dd1169b26bb77f766711181b0a114d32fd8303479e144d5"
+    },
+    {
+      "path": "tests/transfer-helper.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2e88dfa492c884694fcfbc7ef50d4e3ab89d3d7d",
+      "bytes": 15905,
+      "sha256": "358f2298a0c7e9ed0f6d4a72e3b021471113d56909bc496e4f9b862b630c3c51"
+    },
+    {
+      "path": "tests/unlimited-access.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7d9392baa3a13f51f153ec3dc0d305467ced78bf",
+      "bytes": 13833,
+      "sha256": "1b0595f7cfd989d2096e6a379d1542581e18048360b5f66c6582b03d4ec9ee8d"
+    },
+    {
+      "path": "tests/websocket-transport.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "12a95305be8942625d8c8b95c52ea685fe6b235f",
+      "bytes": 2708,
+      "sha256": "464574443e2c7988236408b10c7bac9b1b441b769093b779c87601e813dd91c4"
+    },
+    {
+      "path": "tests/windows-client-acl.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0767ffee150f329c78ee6bcb8a820e4b57d240c0",
+      "bytes": 2467,
+      "sha256": "3d4aa2115ee8808a8c694e85b8e42fd4e60b588cf813fb460b241cf925842f60"
+    },
+    {
+      "path": "tests/workflow-client.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3ea2fe2af3021dec3f3423eca82068920f8ce823",
+      "bytes": 2562,
+      "sha256": "dbbb3679a5c60df914c262055f29e1029a2a592d77e4313792749d0b2a7ca7cb"
+    },
+    {
+      "path": "tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9f86513079d855aaf938ab5720e6e5922108f925",
+      "bytes": 632,
+      "sha256": "784aaa2536a9f0ab2040bac9cc4c1679b89a90e1edff0c3433bd95ec9f3a9993"
+    },
+    {
+      "path": "vitest.config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "87095f5497aec6a72fd461f74f1fbf27db0ee774",
+      "bytes": 370,
+      "sha256": "3941b2ea883d9a827aa49ca1ab330a0b4f7ec29c73bcb0acb957a4ae41e509ed"
+    }
+  ],
+  "omissions": [
+    {
+      "path": "docs/images/agent-connections.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2c8a0fa2591d10d0ab145d3686e07a99c993ed15",
+      "bytes": 176354,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "docs/images/architecture.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3fbd28de78bbfe56dc380292dad89a79efb523fb",
+      "bytes": 121805,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "docs/images/project.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "48ac4bd7f0d62ba334c6413824702112e4712c76",
+      "bytes": 173951,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "docs/images/workspace.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "22b0c9ca514ec0fc04cc1193f91c5b8ed1e85dc7",
+      "bytes": 375778,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "public/art/titanium/bridge-enterprise.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "535d55c42f38a2003133c1e9e4ec95d868dfc3aa",
+      "bytes": 1401416,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "public/art/titanium/bridge.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b8528f73f0e499bcff040efc3aaa01a5d0687045",
+      "bytes": 1446901,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "public/art/titanium/icons.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "57ea597e41bbff3c42a7c1a83f714502557ef144",
+      "bytes": 385066,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "src/components/fonts/Manrope.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "23dcf5e05a97f19a3567d40ebb3765580a4325f7",
+      "bytes": 165420,
+      "reason": "binary/media/generated asset or terminal recording"
+    }
+  ],
+  "notes": [
+    "Revision-pinned source snapshot, not a complete repository clone or a runnable distribution.",
+    "Upstream files are byte-identical; archive paths have a source/ prefix and modes normalised to 0644.",
+    "No .git history, recursive submodules, dependency installation or upstream code execution.",
+    "All omission reasons and original Git blob IDs are recorded. Credential scan is heuristic, not a security audit."
+  ]
+}

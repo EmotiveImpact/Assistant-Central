@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/PennyroyalTea/gibberlink",
+  "commit": "693ef3e36ee61da7e2323519711c0dfab327c284",
+  "retrieved_utc_date": "2026-11-10",
+  "snapshot": "source.tar.gz",
+  "snapshot_sha256": "a4628add820986fbd059ce21242399dce93fe14869898b4bbd5c30e4e2652dc5",
+  "snapshot_bytes": 137574,
+  "source_bytes": 447187,
+  "tracked_files": 39,
+  "included_files": 35,
+  "omitted_files": 4,
+  "licence_paths": [
+    "LICENSE"
+  ],
+  "files": [
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "001afe01be5536d542115ee8e7509d3a5fc95bbf",
+      "bytes": 1070,
+      "sha256": "fbe20f732f9d605728ed45994601a6f6231243bfb96ad7f22dbb5f8c20730173"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4d5243b6b0a5649a32df051eb27942bd90fc3437",
+      "bytes": 2391,
+      "sha256": "c28730cc00afbb98d00a93d6d2c793dc5b286f67ecc5fad9eaa8d4f01f4283ee"
+    },
+    {
+      "path": "hackathon_demo/eslint.config.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "436a54845da6c1ae7752b771d84ab3d6f4996c67",
+      "bytes": 473,
+      "sha256": "96cde151bfc596aa2d11c0fd781cadb2cffe25a785da76c865e6fd0aac895675"
+    },
+    {
+      "path": "hackathon_demo/example.env",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3fa3e54c8e26bb6821bd7c2f974002a621c3d690",
+      "bytes": 200,
+      "sha256": "d58b8fc4d1b0f471d356a7a9c193901a285caadb1deb4a88004be5134db4f3c6"
+    },
+    {
+      "path": "hackathon_demo/next-env.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1b3be0840f3f6a2bc663b53f4b17d05d2d924df6",
+      "bytes": 211,
+      "sha256": "f2b3bca04d1bfe583daae1e1f798c92ec24bb6693bd88d0a09ba6802dee362a8"
+    },
+    {
+      "path": "hackathon_demo/next.config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4f812a58718db6eb59f0e24c01b18d86f115f3c3",
+      "bytes": 247,
+      "sha256": "631f253b7554816c6845c52c67a751c657cd4181bec83564ec18572f2fef79a5"
+    },
+    {
+      "path": "hackathon_demo/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7cd042333b1857c2faa7596c19e421ff62a4d327",
+      "bytes": 235567,
+      "sha256": "371b0b16ad0effa996b5f3d36447cd3d0114cb3d8c5076d1764bf96dc4594f66"
+    },
+    {
+      "path": "hackathon_demo/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "978834cea97c165044ccc16fc22747a887d75743",
+      "bytes": 985,
+      "sha256": "69b3e973569b1800ee114139551912854d5d6dabd82f12b722d957ab30848a28"
+    },
+    {
+      "path": "hackathon_demo/postcss.config.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1a69fd2a450afc3bf47e08b22c149190df0ffdb4",
+      "bytes": 135,
+      "sha256": "ac31e2a95ef64fe27ceb4124e101675273107aae2e33bc490b01d919e7f03646"
+    },
+    {
+      "path": "hackathon_demo/public/file.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "004145cddf3f9db91b57b9cb596683c8eb420862",
+      "bytes": 391,
+      "sha256": "2b67812c325c199a02536cdbeea0c593a72f707d323b72ee3e08dbab06753bd4"
+    },
+    {
+      "path": "hackathon_demo/public/ggwave/ggwave.js",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c02c3eee28c68cb8431c564a6b3335ecd423e1b5",
+      "bytes": 154375,
+      "sha256": "b0f15dcda2537a43fc67f1298845273c6e0015dca3eca97539616a548513e7e2"
+    },
+    {
+      "path": "hackathon_demo/public/globe.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "567f17b0d7c7fb662c16d4357dd74830caf2dccb",
+      "bytes": 1035,
+      "sha256": "b614b9bf183925957661ac851498fe1d8029fd43a62fbfed86f9e2624a57e7cf"
+    },
+    {
+      "path": "hackathon_demo/public/next.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5174b28c565c285e3e312ec5178be64fbeca8398",
+      "bytes": 1375,
+      "sha256": "55995dfad6ecb4945a1e856ddca03c5e16aa5bf13fd21b4df6a74ae79357bcfc"
+    },
+    {
+      "path": "hackathon_demo/public/vercel.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "77053960334e2e34dc584dea8019925c3b4ccca9",
+      "bytes": 128,
+      "sha256": "f081337b2fee635b455b63275406a3e7f39d6a014e25ad90dab5a67e62a12ac4"
+    },
+    {
+      "path": "hackathon_demo/public/window.svg",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b2b2a44f6ebc70c450043c05a002e7a93ba5d651",
+      "bytes": 385,
+      "sha256": "644768c4aaeb4767bce293344eeb0c125fb804a94d801440424072202d85e3a1"
+    },
+    {
+      "path": "hackathon_demo/src/app/api/chat/_groq_groute.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9c3dcbc8e787066dfed601b8acc429bcab04b7f4",
+      "bytes": 701,
+      "sha256": "79b15b7dfcc4ef883a8cfd24b2ea2830d75cdb5ce51f1ff33f5a583366ab3a5e"
+    },
+    {
+      "path": "hackathon_demo/src/app/api/chat/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9107ec70f00eb2888e318de6a54213b079b100a3",
+      "bytes": 986,
+      "sha256": "4057d06de7bb1e58279f2eb67d5109872e5e7e1215b81bceacb16f88ece0ca97"
+    },
+    {
+      "path": "hackathon_demo/src/app/api/signed-url/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3ef967349b87b1ce5c69c6a9fa49b02612c999fb",
+      "bytes": 1185,
+      "sha256": "b311d5d0f8afb4c8a99868f41fcde78274da78d2d1d0d4893cac05d900525d92"
+    },
+    {
+      "path": "hackathon_demo/src/app/globals.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "70e3724fcc7f3faf86f23569f559423f1af139f5",
+      "bytes": 1990,
+      "sha256": "f94dcb736bc5adb553ff24296142724aefccd67b4180be1b908afb660d62bad4"
+    },
+    {
+      "path": "hackathon_demo/src/app/layout.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "25f03a6e02d118d67757fa36ac42ceb39eb58bcf",
+      "bytes": 1063,
+      "sha256": "5f295322caca43fd2e4faf5bd109363ef53a4387d6d678f119ffe7269a5008c5"
+    },
+    {
+      "path": "hackathon_demo/src/app/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4446e9e82ae00a6dcf3ecdeaaea3cfc8609d8978",
+      "bytes": 578,
+      "sha256": "c3d145977b84f45f5ecba9f1f135c01cd636b040c3408a31936856dbde8f0913"
+    },
+    {
+      "path": "hackathon_demo/src/components/AudioMessenger.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dfec25ef96ac4f9e871db581a4a0c83ef1b54a5b",
+      "bytes": 4113,
+      "sha256": "62274a84097cc7ee3ffeeb67c53a65a573f3aa73f3a56cfd54ae95078651baff"
+    },
+    {
+      "path": "hackathon_demo/src/components/Code.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "54d6bdbb5a9175e3065681b4e09e723d581365f8",
+      "bytes": 215,
+      "sha256": "18a47fbdc69c337fafe585e68d884bff8dadd08d639785607b930d822c90f1a8"
+    },
+    {
+      "path": "hackathon_demo/src/components/ConvAI.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fd079ef20d52434b8e7cc725e97beab7a6b764e4",
+      "bytes": 17528,
+      "sha256": "01da387509e5646db34dd81ed68c1e14a244714bef1b7cc04cce121449f8ff2f"
+    },
+    {
+      "path": "hackathon_demo/src/components/background-wave.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1713efa00ead5bd4a20dee5f2ab239809d7fbd06",
+      "bytes": 336,
+      "sha256": "5dd3482b699db002368ea34af7a20a2f84dc1968a9542e48d0ca3c27e30f60b8"
+    },
+    {
+      "path": "hackathon_demo/src/components/logos.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "649e06bdc4b92550903786338c0c6a1234377c06",
+      "bytes": 5060,
+      "sha256": "195e10668cc4ff0fbb78a9f55e50a565f085ad21e38944e1d31c0602cd5c9128"
+    },
+    {
+      "path": "hackathon_demo/src/components/ui/button.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c29e1412cddc7404c06ed89321609c2e0298eb5f",
+      "bytes": 2224,
+      "sha256": "503f90aa641c3e2eb313d496b50ff4889ae9ef3b4607b2f6ed196ee5412a7383"
+    },
+    {
+      "path": "hackathon_demo/src/components/ui/card.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "cabfbfc59d955db9efc2049783cad4a71db55442",
+      "bytes": 1828,
+      "sha256": "525c4bb2c051987be64df0e92e1d90174912b219bf541e24ffbc4a3406de49e8"
+    },
+    {
+      "path": "hackathon_demo/src/components/ui/radio-group.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a6b84483d4f8d4a73a40e67852404f9975be9a2a",
+      "bytes": 1481,
+      "sha256": "d5da877c5d73f9af27bf1e86bb6f09e6ef9894a4d6310839007cfaa49e9183db"
+    },
+    {
+      "path": "hackathon_demo/src/lib/utils.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bd0c391ddd1088e9067844c48835bf4abcd61783",
+      "bytes": 166,
+      "sha256": "7c8c3dfc0cdd370d44932828eb067ef771c8fe7996693221d5d4b90af6d54f2d"
+    },
+    {
+      "path": "hackathon_demo/src/services/AudioMessengerService.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "hackathon_demo/src/types/ggwave.d.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "89147d3f29fd87f0ed2d18b047f321bfdbadb722",
+      "bytes": 734,
+      "sha256": "58e908aa546e87b467ffed063cbbe25a82bcf7c5d68f1e150040c4d38e583c12"
+    },
+    {
+      "path": "hackathon_demo/src/utils/audioUtils.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b38e37117d65a4bb72e8d42d3103b79c9732c648",
+      "bytes": 7036,
+      "sha256": "b13026f92d4625f35a5c0b3365a4b30731a529b667bfc3f7231c7e36e4f4119a"
+    },
+    {
+      "path": "hackathon_demo/tailwind.config.ts",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "109807be0f73749162de63805d55dd3b669c248d",
+      "bytes": 393,
+      "sha256": "223f2def401123e32ac5664f79c73bdaa8b3a77caf466a304bff919a2a28c16f"
+    },
+    {
+      "path": "hackathon_demo/tsconfig.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c1334095f876a408c10f2357faaced969ec090ab",
+      "bytes": 602,
+      "sha256": "83d292a6930a317ea31ef48e220097d2ca10c6c505f41d5954795acef48ca3b9"
+    }
+  ],
+  "omissions": [
+    {
+      "path": "hackathon_demo/public/.DS_Store",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6087c83936d34cfaf62a2b7b77c49a9bd7d75399",
+      "bytes": 6148,
+      "reason": "binary file detected by NUL bytes"
+    },
+    {
+      "path": "hackathon_demo/public/ggwave/ggwave.wasm",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "475eea8b7e244fc5a8efaacf506839f749f8e9f8",
+      "bytes": 83685,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "hackathon_demo/public/wave-loop.mp4",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "95c99006fdac90c2511df4f40152d3bf84a8621f",
+      "bytes": 11976422,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "hackathon_demo/src/app/favicon.ico",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "718d6fea4835ec2d246af9800eddb7ffb276240c",
+      "bytes": 25931,
+      "reason": "binary/media/generated asset or terminal recording"
+    }
+  ],
+  "notes": [
+    "Revision-pinned source snapshot, not a complete repository clone or a runnable distribution.",
+    "Upstream files are byte-identical; archive paths have a source/ prefix and modes normalised to 0644.",
+    "No .git history, recursive submodules, dependency installation or upstream code execution.",
+    "All omission reasons and original Git blob IDs are recorded. Credential scan is heuristic, not a security audit."
+  ]
+}

@@ -9,21 +9,22 @@ const unknown=message=>Object.assign(new Error(message),{unknown:true});
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 class Element extends EventTarget {
-  constructor(tag){super();this.tagName=tag;this.children=[];this.dataset={};this.open=false;this._text='';this.checked=false;}
+  constructor(tag){super();this.tagName=tag;this.children=[];this.dataset={};this.open=false;this._text='';this.checked=false;this.attributes={};}
   set textContent(value){this._text=String(value);this.children=[];}
   get childElementCount(){return this.children.length;}
   get textContent(){return this._text+this.children.map(c=>c.textContent||'').join('');}
   append(...nodes){this.children.push(...nodes);}
   prepend(...nodes){this.children.unshift(...nodes);}
   replaceChildren(...nodes){this._text='';this.children=[...nodes];}
-  setAttribute(){}
+  setAttribute(name,value){this.attributes[name]=String(value);}
+  getAttribute(name){return this.attributes[name]??null;}
   reportValidity(){return true;}
   close(){this.open=false;this.dispatchEvent(new Event('close'));}
   showModal(){this.open=true;}
   querySelector(selector){return find(this,e=>selector[0]==='.'?e.className?.split(' ').includes(selector.slice(1)):e.tagName===selector);}
 }
 function find(root,predicate){return predicate(root)?root:root.children.map(c=>find(c,predicate)).find(Boolean);}
-function harness({room=false}={}){
+function harness({room=false,otherParticipant=false,historyAuthor='bob',historyReview=null}={}){
   const original=globalThis.document,document=new EventTarget(),dialog=new Element('dialog'),root=new Element('div');
   document.hidden=false;document.body=new Element('body');document.body.append(root,dialog);
   document.createElement=tag=>new Element(tag);document.getElementById=()=>dialog;globalThis.document=document;
@@ -35,8 +36,9 @@ function harness({room=false}={}){
   const request=async(path,options={})=>{
     requests.push({path,actor,options});
     if(path.endsWith('/history')&&historyFailure){historyFailure=false;throw Object.assign(new Error('History unavailable'),{unknown:requestIsMutation(path,options.method,options.readOnly)});}
-    if(path==='/api/conversations/thread/history')return {messages:[{id:'message_'+revision,conversation_id:'thread',author:principals.bob,provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message '+revision,sources:[]}]};
-    if(path==='/api/conversations/thread')return {id:'thread',mode:'direct',admin:principals[actor],binding:{conversation_id:'thread',principal:principals[actor],member_epoch:'epoch_'+actor,policy_generation:policyGeneration},participants:[{principal:principals[actor],epoch:'epoch_'+actor}]};
+    if(path==='/api/conversations/thread/history')return {messages:[{id:'message_'+revision,conversation_id:'thread',author:principals[historyAuthor],provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message '+revision,sources:[]}]};
+    if(path==='/api/conversations/thread')return {id:'thread',mode:'direct',admin:principals[actor],binding:{conversation_id:'thread',principal:principals[actor],member_epoch:'epoch_'+actor,policy_generation:policyGeneration},participants:[{principal:principals[actor],epoch:'epoch_'+actor},...(otherParticipant?[{principal:principals.bob,epoch:'epoch_bob'}]:[])]};
+    if(path.endsWith('/grant-review')&&historyReview)return historyReview;
     if(path.endsWith('/message-outcome')){
       if(outcomeError){const error=outcomeError;outcomeError=null;throw error;}
       if(outcomeWait){const held=outcomeWait;outcomeWait=null;return held.promise;}
@@ -50,7 +52,7 @@ function harness({room=false}={}){
     }
     if(inspectionError){const error=inspectionError;inspectionError=null;throw error;}
     if(path==='/api/state')return {identity:actor};
-    if(path==='/api/conversations')return {local_host_only:true,audience:'local-owner-only',execution_authority:false,principal:principals[actor],actors:[{principal:principals[actor],owner_id:actor,agent_id:actor+'_assistant'}],rooms:room?[{id:'thread',admin:principals[actor],mode:'direct'}]:[],invitations:[]};
+    if(path==='/api/conversations')return {local_host_only:true,audience:'local-owner-only',execution_authority:false,principal:principals[actor],actors:[{principal:principals[actor],owner_id:actor,agent_id:actor+'_assistant'},...(otherParticipant?[{principal:principals.bob,owner_id:'bob',agent_id:'bob_assistant'}]:[])],rooms:room?[{id:'thread',admin:principals[actor],mode:'direct'}]:[],invitations:[]};
     if(path==='/api/host-drafts')return {local_only:true,execution_authority:false,connections:[{id:actor,available:true,items:[{draftId:actor+'_draft',title:actor+' private draft title',state:'awaiting_owner_review'}]}]};
     if(path.endsWith('/review')&&reviewError)throw reviewError;
     if(path.endsWith('/review'))return {draft:{requestId:'request',title:actor+' private draft title',instruction:actor+' private draft content'},status:{draftId:actor+'_draft',state:dismissed?'dismissed':'awaiting_owner_review',ownerConsent:'not_requested',transportReceipt:'none',execution:'not_started'},binding:{ownerId:principals[actor],hostId:'host',sessionId:'host_session',conversationId:'room',recipientId:'fixed_recipient',expiresAt:hostExpiry},digest:reviewDigest||'c'.repeat(64),reviewToken:'token',reviewExpiresAt:Date.now()+30000,decision:dismissed?{decisionId:'decision',decision:'dismissed',digest:reviewDigest||'c'.repeat(64)}:null};
@@ -317,5 +319,39 @@ test('ordinary successful message send keeps its exact request and requires no r
     const {held}=await sendHeldMessage(h,'A normal message');held.resolve(h.message());await flush();await flush();
     assert.equal(h.writes.length,1);assert.equal(h.uncertain(),false);assert.equal(h.failures.length,0);assert.equal(h.requests.filter(r=>r.path.endsWith('/message-outcome')).length,0);
     assert.equal(find(h.root,e=>e.tagName==='textarea').value,'');assert.equal(h.busy(),false);
+  }finally{h.close();}
+});
+
+
+test('conversation selects have fixed accessible labels without option text',async()=>{
+  const h=harness({room:true,otherParticipant:true});
+  try{
+    h.mount('conversations');await flush();h.click('Conversation · thread');await flush();await flush();
+    for(const label of ['Exact recipient','Access expires after']){
+      const wrapper=find(h.root,e=>e.tagName==='label'&&e.textContent.startsWith(label));
+      assert.ok(wrapper,'Missing form label '+label);
+      const select=find(wrapper,e=>e.tagName==='select');assert.ok(select);
+      assert.equal(select.getAttribute('aria-label'),label);
+      assert.notEqual(wrapper.textContent,label,'The wrapping label also contains option text');
+    }
+    const selectedMessage=find(h.root,e=>e.tagName==='input'&&e.type==='checkbox');
+    assert.equal(selectedMessage.getAttribute('aria-label'),'Select message message_0','Preserve the exact existing message selection name');
+    assert.equal(h.writes.length,0,'Rendering labels cannot trigger a mutation');
+  }finally{h.close();}
+});
+
+
+test('exact history review renders its bound digest without mutating authority',async()=>{
+  const review={statement:{domain:'assistant-central-conversation/1/history-grant',id:'history_grant',conversation_id:'thread',issuer:principals.alice,recipient:principals.bob,member_epoch:'epoch_bob',policy_generation:1,events:[{id:'message_0',digest:'d'.repeat(64)}],purpose:'Exact local history review',expires_at:2000000000,audience:'local-owner-only'},review_digest:'e'.repeat(64),execution_authority:false,recipient:{principal:principals.bob},messages:[{id:'message_0',conversation_id:'thread',author:principals.alice,provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message 0',sources:[]}]};
+  const h=harness({room:true,otherParticipant:true,historyAuthor:'alice',historyReview:review});
+  try{
+    h.mount('conversations');await flush();h.click('Conversation · thread');await flush();await flush();
+    const check=find(h.root,e=>e.tagName==='input'&&e.type==='checkbox');check.checked=true;check.dispatchEvent(new Event('change'));
+    find(h.root,e=>e.tagName==='select'&&e.getAttribute('aria-label')==='Exact recipient').value=principals.bob;
+    h.click('Review exact history share');await flush();await flush();
+    assert.deepEqual(h.failures,[]);const dialog=h.document.getElementById('conversation-dialog');
+    assert.equal(dialog.open,true);assert.match(dialog.textContent,/Incoming message 0/);assert.match(dialog.textContent,new RegExp(review.review_digest));
+    assert.match(dialog.textContent,/bob · bob_assistant/);assert.equal(h.writes.length,0,'Preparing the dialog must not approve a grant');
+    assert.equal(h.requests.filter(r=>r.path.endsWith('/grant-review')).length,1);
   }finally{h.close();}
 });

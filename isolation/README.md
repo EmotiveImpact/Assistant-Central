@@ -164,8 +164,8 @@ tested; a green self-test alone is never reported as a container-isolation pass.
 
 This shared-loopback harness is merged on main. The separate
 [distinct-network harness](../network_acceptance/README.md) uses four actual
-containers with separate network namespaces and TLS; it is part of the reviewed,
-published but unmerged product candidate. Neither harness demonstrates independent physical
+containers with separate network namespaces and TLS; it is also merged in the
+accepted main revision. Neither harness demonstrates independent physical
 hosts, real human owners, existing personal assistants or a deployed service.
 See [delivery evidence](../docs/DELIVERY.md#verification-evidence-and-gaps) for the
 exact tested revisions. Older container/browser successes do not accept later

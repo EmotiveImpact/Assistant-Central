@@ -2,21 +2,20 @@
 
 ## Current position
 
-Checked 10 November 2026. Main is `55b7df1` (PRs #6–15). It contains a
-password-authenticated, encrypted local pilot, exact peer reviews, file/HTTPS
-exchange, a synthetic work loop, payload encryption and standalone source grants.
-It is not a deployed platform or a connection to existing personal assistants.
+Checked 10 November 2026. Verified main is `578a665`, tree
+`e2ee8b174fce4f5566f38818ef669775583a1432`. The cumulative PR24 product merge
+passed all eight hosted workflows, including actual separate-owner and combined
+workspace Chromium, container isolation and distinct-network TLS acceptance.
 
-The newer reviewed cumulative product candidate is published on #24 at `2cbf0a0`,
-tree `1e86760db0e51d77f16e6b2914ee26e59eb74e55`, identical to locally tested
-revision `c267fa59`. It combines transfer controls, the
-Central workspace, the official SDK draft bridge, durable local conversations,
-owner controls, shared-proposal approvals, exact message-outcome recovery and an
-inert disclosure-review compiler. The implementation and hardening are published
-but unmerged; fresh cumulative hosted acceptance is running. The pinned research archive is
-separate and is not included in this candidate. See the
-[delivery guide](docs/DELIVERY.md) for exact status, evidence and setup, and the
-[decision record](docs/DECISIONS.md) for choices and alternatives.
+Main combines the authenticated encrypted local pilot, transfer controls, Central
+workspace, official SDK draft bridge, durable local conversations, owner controls,
+shared-proposal approvals, exact message-outcome recovery and inert disclosure
+review preparation. The pinned research archive is also merged. This is a tested
+local pilot, not a deployed service or a proven connection to existing personal
+assistants. Separate visual work and the functional/live gates below remain.
+
+See the [delivery guide](docs/DELIVERY.md) for exact status, evidence and setup,
+and the [decision record](docs/DECISIONS.md) for choices and alternatives.
 
 ## What the building blocks establish
 
@@ -55,11 +54,11 @@ separate and is not included in this candidate. See the
 
 ## Ordered delivery dependencies
 
-1. **Finish cumulative review and acceptance.** Preserve the complete published
-   candidate and dependency history. Verify its applicable hosted
-   checks, real Chromium flows, actual container isolation and distinct-network
-   TLS acceptance. Older green component runs do not accept the latest tree.
-   Keep unrelated visual design work separate.
+1. **Preserve the accepted baseline while integrating visual work.** Compose
+   the remaining design branch with current main, retaining transfer/conversation
+   behaviour and exact owner decisions. Require fresh applicable hosted, Chromium,
+   container and network acceptance for the resulting revision. The accepted
+   baseline is not evidence for later changes.
 2. **Complete owner-facing review.** Build exact shared-proposal and disclosure
    review controls on the reviewed primitives, preserving separate sessions,
    unchanged rosters, source visibility and the executor's distinct decision.

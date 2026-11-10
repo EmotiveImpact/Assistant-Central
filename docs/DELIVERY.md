@@ -10,54 +10,41 @@ assistants, optional exact old-history sharing and bounded, auditable work acros
 supported hosts. The [decision record](DECISIONS.md) explains the choices and
 remaining decisions. This snapshot must be updated after later integration.
 
-## Main, published components and local candidate
+## Verified main and remaining work
 
-**Main:** [`55b7df104b12f69336055ca9d5ba0d773d8b10a5`](https://github.com/EmotiveImpact/Assistant-Central/tree/55b7df104b12f69336055ca9d5ba0d773d8b10a5)
-contains PRs #6–15. It has authenticated local owners, signed/encrypted peer
-packets, separate recipient decisions, password maintenance, a synthetic work
-loop, container isolation, file exchange, HTTPS quarantine/send/import, encrypted
-application payloads and standalone exact source grants. The owner HTTP service
-remains loopback-only. See the [pilot guide](../pilot/README.md),
+**Verified main product:**
+[`578a665fafb550e76c63d2d1a097408e87f8ffda`](https://github.com/EmotiveImpact/Assistant-Central/tree/578a665fafb550e76c63d2d1a097408e87f8ffda),
+tree `e2ee8b174fce4f5566f38818ef669775583a1432`. The cumulative
+[PR24](https://github.com/EmotiveImpact/Assistant-Central/pull/24) merged after all
+eight exact-revision hosted workflows passed. Its accepted product head was
+`bd1f913a5916b2dd6c0217dbd098426c16773e75`; the merged tree is identical.
+
+Main now contains the authenticated local pilot, peer decisions, password
+maintenance, synthetic work loop, file/HTTPS transfer, container/network harnesses,
+encrypted payload storage, standalone source grants, supported-host draft bridge,
+owner draft controls, durable conversations, exact history controls, shared
+proposals, exact message-outcome recovery and inert disclosure-review preparation.
+The owner HTTP service remains loopback-only. The shared-team and execution
+examples remain separate synthetic proofs. See the [pilot guide](../pilot/README.md),
 [storage contract](../pilot/STORAGE.md) and [source grants](../pilot/SOURCE_GRANTS.md).
-The shared-team and execution examples remain separate synthetic proofs.
 
-**Published but unmerged:** these heads have scoped review. Older component
-heads have hosted evidence; fresh acceptance is running for the newer cumulative
-head. They are not features of main, and individual checks do not establish
-acceptance of later changes.
+PRs #16, #17, #18, #20, #22, #23 and #25 were integrated through that cumulative
+merge. The exact #27 proposal head is also in main; its redundant stacked review
+was closed because it contained no additional commits for main. The sixteen
+inert research snapshots were merged separately through
+[PR21](https://github.com/EmotiveImpact/Assistant-Central/pull/21) and are included
+unchanged in the accepted product tree. Research is not dependency adoption or
+execution of upstream software.
 
-| Component | Published head | Scope |
-| --- | --- | --- |
-| [#17 cached receipts](https://github.com/EmotiveImpact/Assistant-Central/pull/17) | `3905cbc` | Recover the original receipt; missing retained state fails closed. |
-| [#16 owner transfers](https://github.com/EmotiveImpact/Assistant-Central/pull/16) | `002d4af` | Exact send/retry/import reviews; includes the #17 fix. |
-| [#18 distinct-network acceptance](https://github.com/EmotiveImpact/Assistant-Central/pull/18) | `b3a96a5` | Actual four-container network/mount/PID separation and TLS 1.3 on one trusted Docker host. |
-| [#20 official SDK bridge](https://github.com/EmotiveImpact/Assistant-Central/pull/20) | `0e0fb92` | OpenAI Agent/Runner with deterministic responses and Cursor/Grok SDK no-model tool invocation through real MCP. Inert draft/status only. |
-| [#21 pinned research](https://github.com/EmotiveImpact/Assistant-Central/pull/21) | `8bb93f6` | Sixteen inert source archives and Parley findings; no upstream integration execution. |
-| [#22 conversation ledger](https://github.com/EmotiveImpact/Assistant-Central/pull/22) | `8a02185` | Durable signed/encrypted local history, history grants and clock fencing. |
-| [#23 composed workspace](https://github.com/EmotiveImpact/Assistant-Central/pull/23) | `96e841f` | Correct composition of #19's refined shell with #16's transfer controls. |
-| [#25 host draft review](https://github.com/EmotiveImpact/Assistant-Central/pull/25) | `0b3417e` | Authenticated inspection/dismissal of inert host drafts, with lock-time expiry and exact-schema hardening. Fresh hosted checks pending. |
-| [#27 shared proposals](https://github.com/EmotiveImpact/Assistant-Central/pull/27) | `63988d9` | Exact revisions and unanimous local-owner decisions. Included in the cumulative candidate. |
-| [#24 cumulative owner workspace](https://github.com/EmotiveImpact/Assistant-Central/pull/24) | `2cbf0a0` | Reviewed product composition with all later source-expiry, operation and exact-message recovery fixes. Fresh hosted checks pending. |
+The ongoing visual-design work in
+[PR19](https://github.com/EmotiveImpact/Assistant-Central/pull/19) is separate from
+this accepted revision. Preserve and reverify the conversation, transfer and
+uncertainty behaviour when composing those changes. This five-file
+[PR26 documentation update](https://github.com/EmotiveImpact/Assistant-Central/pull/26)
+adds no product code or test evidence. The remaining functional, real-host and
+operational gates below are still unfinished.
 
-Use #23's corrected composition rather than applying the original
-[#19 interface](https://github.com/EmotiveImpact/Assistant-Central/pull/19) alone
-after #16. Do not merge the older ledger/workspace intermediate heads alone:
-they omit later source-expiry and recovery fixes. The cumulative #24 candidate
-preserves the published dependency ancestry and includes those fixes together.
-
-**Reviewed cumulative product candidate:** published commit
-[`2cbf0a03cba372140491b18024d9725f999d1063`](https://github.com/EmotiveImpact/Assistant-Central/commit/2cbf0a03cba372140491b18024d9725f999d1063),
-tree `1e86760db0e51d77f16e6b2914ee26e59eb74e55`, is byte-identical to locally
-tested product revision `c267fa59db89d54a7ede015fdfdcd0f295247544`. It composes
-#25 hardening, owner conversation controls, shared proposals, source-expiry fixes,
-combined workspace operation guards, exact message-outcome recovery and the exact
-disclosure-review compiler with the earlier product dependencies.
-It excludes #21's research archive. This separate five-file
-[#26 documentation update](https://github.com/EmotiveImpact/Assistant-Central/pull/26)
-is stacked above that product revision; documentation checks add no product evidence.
-Fresh cumulative hosted acceptance and integration into main remain unfinished.
-
-## What the cumulative candidate adds
+## What the integrated pilot provides
 
 - **Owner conversation workspace:** separate current local-account sessions,
   default-disabled configuration and a separately unlocked coordinating owner.
@@ -96,37 +83,44 @@ Declared-source enforcement cannot discover omitted or copied provenance.
 
 ## Verification evidence and gaps
 
-Local product verification at the exact candidate above has passed 189
-conversation/proposal/disclosure, 378 pilot, 45 actual local HTTP, 87 interface/model
-and 62 bridge tests, strict TypeScript, 673 imported-file checks and 17 manifest
-checks, whitespace checks and both fictional conversation demos. These are
-inherited product results, not tests rerun for this documentation-only update.
+The underlying reviewed product passed 189 conversation/proposal/disclosure,
+378 pilot, 45 actual local HTTP and 62 bridge tests, strict TypeScript,
+673 imported-file checks and 17 manifest checks, plus both fictional conversation
+demos. The final browser fixes increased the interface/model suite to 89 passing
+tests. Independent component review and retained adversarial regressions cover
+source, expiry, identity and uncertainty boundaries.
 
-Independent component review covered the recovery and disclosure boundaries,
-including focused regression tests. The latest component browser scripts are
-prepared but **unrun**: browser execution was unavailable in the local verification
-environment. Eight hosted workflows have now started for the published cumulative
-head, but their outcomes are not yet verified. Do not substitute
-model tests, local HTTP tests or older browser runs for that missing evidence.
+All eight hosted workflows passed on accepted head
+`bd1f913a5916b2dd6c0217dbd098426c16773e75`:
 
-Older, narrower hosted evidence remains useful:
+- [Conversation owner controls](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838370059): actual separate local owner sessions and combined host-draft/conversation desktop/mobile Chromium flows.
+- [Central workspace](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369658): actual authenticated owner HTTP and transfer controls through disposable TLS.
+- [Host draft review](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369653): Chromium and network-disabled official SDK-to-owner HTTP acceptance.
+- [Supported SDK bridge](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369560): real MCP paths using deterministic/no-model official SDK fixtures, without external networking.
+- [Conversation ledger](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369602): durable history, adversarial checks and existing pilot regressions.
+- [Offline aggregate](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369635): component suites, demos, contracts and pilot Chromium.
+- [Container isolation](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369657): actual filesystem/process/Unix-permission boundaries.
+- [Distinct-network HTTPS](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838369632): four separate container network/mount/PID namespaces with actual TLS 1.3 and restart/outage checks.
 
-- Published #25 `9a11c3b` passed seven workflows, including
-  [real Chromium and network-disabled official SDK-to-owner HTTP acceptance](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492371),
-  [workspace browser checks](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492440),
-  [bridge](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492383),
-  [aggregate](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492615),
-  [network](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492713),
-  [isolation](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492389)
-  and [ledger](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42804492631).
-  They do not cover the later hardening, owner controls, proposals or recovery.
-- Published #18 `b3a96a5` passed
-  [actual distinct-container network/TLS acceptance](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42795921004).
-  Shared-loopback isolation and distinct-network TLS are different tests. Neither
-  proves independent physical devices, real owners or personal-assistant access.
+GitHub test merge `804d44018f51096bf0ca11b4da390e6a2f05879f` and the final main
+merge have the same accepted tree. The
+[owner-browser screenshots](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42838370059/artifacts/13774334554)
+were inspected, including the exact history-review dialog and combined mobile
+workspace. Artifact ZIP SHA-256:
+`57aeb97acf12cd1663cc24d72f21e1c47a590985e584be17e640ce2401de24ee`.
+Two real browser defects were reproduced and fixed with regressions: selector
+accessible names including option text, and a shadowed variable preventing the
+history-review dialog from rendering. Failed runs were not skipped or relabelled.
 
-No live account/provider, remote multi-owner service, security certification,
-production deployment or measured scale/reliability claim follows from these tests.
+The unchanged research snapshots were separately reverified under Python -O:
+16 snapshots, 23,322 included source files and 254,536,445 uncompressed bytes;
+all eight verifier fixtures passed. No upstream software was executed.
+
+These are fictional local-account and trusted-container-host tests. They do not
+prove independent physical devices, real human ownership, existing personal
+assistant access, live account/provider operation, security certification,
+production deployment or measured scale/reliability. Documentation-only changes
+add no new product evidence. Repeat applicable checks for later code changes.
 
 ## Safe setup and reproduction
 
@@ -148,7 +142,7 @@ hosting or system trust. For the original browser rehearsal run
 `http://127.0.0.1:8765`. The public fixture password is
 `Fictional browser test password`; never reuse it or expose the fixture publicly.
 
-On a checkout containing the local candidate, follow the
+On a checkout containing the accepted revision, follow the
 [workspace quick start](../workspace_ui/README.md#open-the-fictional-workspace)
 for the refined interface. Explicit host configuration is required for
 [conversations](../workspace_ui/CONVERSATIONS.md#host-setup),
@@ -157,7 +151,7 @@ for the refined interface. Explicit host configuration is required for
 assistant enrolment. Provisioning, peer pinning and account access are separate
 operations, not a side effect of opening the interface.
 
-Candidate checks, after activating the private virtual environment:
+Component checks, after activating the private virtual environment:
 
 ```sh
 python -B tools/verify_import.py
@@ -229,7 +223,7 @@ and can reveal low-entropy content through guessing.
 ## Remaining delivery gates
 
 The [ordered roadmap](../ROADMAP.md#ordered-delivery-dependencies) is the handoff:
-finish cumulative hosted acceptance and integration; build the remaining
+preserve the accepted baseline while integrating remaining visual work; build the remaining
 owner review controls; prove durable supported-host dialogue/recovery; integrate
 source authority atomically with dispatch; demonstrate two independently
 controlled owners/hosts; then approve and verify live operation and its operational
