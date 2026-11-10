@@ -557,5 +557,25 @@ class LedgerCase(unittest.TestCase):
             other.close()
 
 
+    def test_missing_format_and_clock_rows_cannot_reclassify_populated_store(self):
+        self.post('alice')
+        self.ledger.db.execute('DELETE FROM conversation_meta')
+        self.ledger.db.execute('DELETE FROM conversation_clock')
+        self.ledger.close()
+        with self.assertRaises(ConversationDenied):
+            self.open_ledger()
+
+    def test_nonretrieval_operation_retains_final_observed_clock(self):
+        initial = self.now
+        original = self.ledger._audit
+        def delayed(auth, session, kind, data):
+            original(auth, session, kind, data)
+            self.now += 20
+        self.ledger._audit = delayed
+        self.ledger.invite(*self.actor('alice'), 'thread_1', self.keys['carol'])
+        observed = self.ledger.db.execute('SELECT observed FROM conversation_clock').fetchone()[0]
+        self.assertEqual(observed, initial + 20)
+
+
 if __name__ == '__main__':
     unittest.main()

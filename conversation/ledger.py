@@ -108,6 +108,8 @@ class ConversationLedger:
             self.db.row_factory = sqlite3.Row
             self.db.execute('PRAGMA foreign_keys=ON')
             self.db.execute('PRAGMA synchronous=FULL')
+            new_store = self.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").fetchone() is None
             self.storage = _ConversationStorage(self.db, storage_auth, create=True)
             self.db.executescript('''
                 CREATE TABLE IF NOT EXISTS conversation_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version TEXT NOT NULL);
@@ -126,10 +128,11 @@ class ConversationLedger:
                 if old:
                     need(old['version'] == VERSION)
                 else:
+                    need(new_store)
                     self.db.execute('INSERT INTO conversation_meta VALUES(1,?)', (VERSION,))
                 observed = self.db.execute('SELECT observed FROM conversation_clock WHERE singleton=1').fetchone()
                 if observed is None:
-                    need(old is None)  # Never silently reset an existing ledger's clock fence.
+                    need(new_store)  # Never silently reset an existing ledger's clock fence.
                     self.db.execute('INSERT INTO conversation_clock VALUES(1,0)')
                     self._last_time = 0
                 else:
@@ -209,6 +212,7 @@ class ConversationLedger:
                 try:
                     yield auth
                     auth.authenticate(session)  # Expiry/credential changes fail closed.
+                    self._now()
                     for check in checks:
                         check()
                     need(self.storage.auth.status()['unlocked'])
