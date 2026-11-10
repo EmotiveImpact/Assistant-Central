@@ -48,3 +48,8 @@ copy an added private plaintext column. Migration now checks exact reviewed
 column contracts and required table groups, refuses unknown/missing/generated
 columns, and tests optional HTTPS journal preservation. Speculative future
 source-grant tables are refused until their runtime integration is reviewed.
+
+Final lifecycle regression: a wrong-thread normal close can fail while SQLite
+remains open. The runtime now retains its shared lease on close failure so an
+exclusive migration cannot start; a successful owner-thread close releases it.
+Constructor-failure cleanup remains unconditional.

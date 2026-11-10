@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import sqlite3
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -313,6 +314,25 @@ class StorageTests(unittest.TestCase):
         migrate(directory, self.a.auth, self.sa)
         self.restart()
         self.assertEqual([dict(row) for row in self.a.db.execute('SELECT * FROM https_send_attempts')], before)
+
+    def test_failed_runtime_close_keeps_migration_excluded(self):
+        from pilot.storage import StoreLease
+        errors = []
+        def wrong_thread_close():
+            try:
+                self.a.close()
+            except BaseException as error:
+                errors.append(error)
+        thread = threading.Thread(target=wrong_thread_close)
+        thread.start(); thread.join(timeout=5)
+        self.assertFalse(thread.is_alive())
+        self.assertEqual(len(errors), 1)
+        self.assertIsInstance(errors[0], sqlite3.ProgrammingError)
+        self.assertEqual(self.a.db.execute('SELECT 1').fetchone()[0], 1)
+        with self.assertRaises(StorageDenied): StoreLease(self.a.directory, exclusive=True)
+        self.a.close()
+        lease = StoreLease(self.a.directory, exclusive=True)
+        lease.close()
 
     def test_transaction_rollback_leaves_no_plaintext_or_partial_item(self):
         count = self.a.db.execute('SELECT COUNT(*) FROM runtime_items').fetchone()[0]

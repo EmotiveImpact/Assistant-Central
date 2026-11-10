@@ -126,10 +126,10 @@ class PilotRuntime:
             raise
 
     def close(self):
-        try:
-            self.db.close()
-        finally:
-            self._storage_lease.close()
+        # Failed close (for example on the wrong thread) leaves a live SQLite
+        # connection. Keep its shared lease so migration remains excluded.
+        self.db.close()
+        self._storage_lease.close()
 
     def _now(self):
         now = self.clock()
