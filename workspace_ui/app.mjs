@@ -1,7 +1,16 @@
-import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals} from './projections.mjs';
-import {plain,finiteDate,stateLabel,statusClass,isPending,isTerminal,isPeerActive,filteredItems,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,workflowSummary,canPrepareWorkflow,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult} from './model.mjs';
+import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
+import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
 const $ = id => document.getElementById(id);
+const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
+function setNavigation(open,{restoreFocus=false}={}){
+  const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);
+  document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
+  sidebar.setAttribute('aria-hidden',String(sidebar.inert));$('menu-toggle').setAttribute('aria-expanded',String(open));$('menu-toggle').setAttribute('aria-label',open?'Close navigation':'Open navigation');
+  if(open&&!wasOpen)sidebar.querySelector('[data-view]')?.focus();
+  else if(wasOpen&&!open){if(restoreFocus&&mobileNavigation.matches)$('menu-toggle').focus();else if(sidebar.contains(document.activeElement))$('main').focus();}
+}
+mobileNavigation.addEventListener('change',()=>setNavigation(false));
 let token = null, generation = 0, busy = false, currentView = viewFromHash(location.hash), currentFilter = 'all', currentLayout = 'list', searchQuery = '';
 let state = null, selected = null, selectedWorkflow = null, uncertain = false;
 const viewCopy = {
@@ -25,7 +34,7 @@ function notice(message,success=false) { $('notice').textContent=message;$('noti
 function setBusy(value) { busy=value; document.querySelectorAll('button').forEach(node=>{ if(!node.classList.contains('close-dialog'))node.disabled=value; }); }
 function resetSession(message='') {
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;uncertain=false;searchQuery='';
-  $('search-input').value='';document.body.classList.remove('sidebar-open');$('menu-toggle').setAttribute('aria-expanded','false');
+  $('search-input').value='';setNavigation(false);
   for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats'])$(id).replaceChildren();
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
@@ -78,7 +87,7 @@ function navigate(view,{filter='all'}={}) {
   if(busy||!VIEWS.includes(view))return;
   currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
-  document.body.classList.remove('sidebar-open');$('menu-toggle').setAttribute('aria-expanded','false');render();
+  setNavigation(false);render();
 }
 function render() {
   if(!state)return;
@@ -89,6 +98,10 @@ function render() {
   $('pending-total').textContent=totals.pending;
   $('accepted-total').textContent=state.items.filter(item=>item.state==='accepted').length;$('peer-total').textContent=totals.peers;
   const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
+  let acceptedFilter=$('accepted-filter');
+  if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
+  if(acceptedFilter)acceptedFilter.hidden=currentFilter!=='accepted';
+  if(currentFilter==='accepted')$('list-title').textContent=currentView==='tasks'?'Accepted tasks':'Accepted proposals';
   document.querySelectorAll('[data-view]').forEach(node=>{node.classList.toggle('active',node.dataset.view===currentView);node.setAttribute('aria-current',node.dataset.view===currentView?'page':'false');});
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
@@ -145,12 +158,12 @@ function overviewItem(item) {
 }
 function renderOverview(totals) {
   for(const id of ['overview-stats','overview-attention','overview-work','overview-network','overview-events'])$(id).replaceChildren();
-  const stats=[['Needs your review',totals.pending,'Incoming proposals','inbox','pending'],['Accepted tasks',totals.acceptedTasks,'Work agreed by its recipient','tasks','decided'],['Shared artifacts',totals.artifacts,'Exact work, retained','artifacts','all'],['Trusted assistants',totals.peers,'Individually enrolled','peers','all']];
+  const stats=[['Needs your review',totals.pending,'Incoming proposals','inbox','pending'],['Accepted tasks',totals.acceptedTasks,'Work agreed by its recipient','tasks','accepted'],['Artifacts',totals.artifacts,'Drafts and received work','artifacts','all'],['Trusted assistants',totals.peers,'Individually enrolled','peers','all']];
   for(const [label,value,note,view,filter] of stats){const tile=button('','overview-metric',()=>navigate(view,{filter}));tile.append(text('span',label,'metric-label'),text('strong',value,'metric-value'),text('span',note,'metric-note'));$('overview-stats').append(tile);}
-  const attention=projectItems(state,'inbox','pending').slice(0,3);
+  const attention=attentionItems(state).slice(0,3);
   if(attention.length)for(const item of attention)$('overview-attention').append(overviewItem(item));
   else empty('✓','You’re all caught up.','New requests will appear here after you sync the exchange.',undefined,$('overview-attention'));
-  const work=projectItems(state,'tasks').slice(0,5);
+  const work=activeTasks(state).slice(0,5);
   if(work.length)for(const item of work)$('overview-work').append(overviewItem(item));
   else empty('◌','Room for your next idea.','Prepare a task to start a new piece of work.',{label:'New proposal',run:prepareCompose},$('overview-work'));
   const people=[{...state.identity,local:true},...state.peers.slice(0,3)];
@@ -160,7 +173,7 @@ function renderOverview(totals) {
     row.append(main,text('span',peer.local?'Your assistant':isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable','person-status'));$('overview-network').append(row);
   }
   const events=state.history.slice(-4).reverse();
-  for(const event of events){const row=text('div','','overview-event');row.append(text('span','','event-dot'));const main=text('div','','event-main');main.append(text('strong',eventLabel(event)),text('time',datetime(event.created_at??event.time)));row.append(main);$('overview-events').append(row);}
+  for(const event of events){const row=text('div','','overview-event');row.append(text('span','','event-dot'));const main=text('div','','event-main');main.append(text('strong',eventLabel(event)),text('time',eventWhen(event)));row.append(main);$('overview-events').append(row);}
   if(!events.length)$('overview-events').append(text('p','Your saved activity will appear here.','overview-empty-note'));
 }
 function renderPeers() {
@@ -183,14 +196,15 @@ function showPublicIdentity(identity,fingerprint) {
   selected=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
-function eventLabel(item){return plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';}
+function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
+function eventWhen(item){const when=finiteDate(item.created_at??item.time);return when===null?(Number.isSafeInteger(item.sequence)&&item.sequence>0?`Event #${item.sequence}`:'Event recorded'):datetime(when);}
 function renderHistory() {
   const events=state.history.filter(item=>matchesQuery([eventLabel(item),item.item_id,item.id],searchQuery)).slice().reverse();
   if(!events.length){empty('≋',searchQuery?'No matching activity.':'A clear record from the start.',searchQuery?'Try an event name or proposal identifier.':'Saved decisions and exchange events will appear here. An uncertain outcome stays uncertain until saved evidence resolves it.');return;}
   for(const item of events) {
     const row=text('article','','item-row activity-row');const main=text('div','','item-main');main.append(text('h3',eventLabel(item),'item-title'));
     const id=plain(item.item_id)||plain(item.id);if(id)main.append(text('p',id,'peer-fingerprint'));
-    const when=finiteDate(item.created_at??item.time);row.append(text('span','','event-dot'),main,text('time',when===null?`Event ${item.sequence??'recorded'}`:datetime(when),'activity-time'));$('item-list').append(row);
+    row.append(text('span','','event-dot'),main,text('time',eventWhen(item),'activity-time'));$('item-list').append(row);
   }
 }
 async function openReview(item) {
@@ -345,14 +359,27 @@ function clearSearch(){searchQuery='';$('search-input').value='';render();$('sea
 $('search-input').addEventListener('input',event=>{searchQuery=event.target.value.trim().slice(0,200);render();});
 $('search-clear').addEventListener('click',clearSearch);
 document.querySelectorAll('[data-layout]').forEach(node=>node.addEventListener('click',()=>{if(!['list','board'].includes(node.dataset.layout))return;currentLayout=node.dataset.layout;render();}));
-$('menu-toggle').addEventListener('click',()=>{const open=document.body.classList.toggle('sidebar-open');$('menu-toggle').setAttribute('aria-expanded',String(open));});
-$('sidebar-scrim')?.addEventListener('click',()=>{document.body.classList.remove('sidebar-open');$('menu-toggle').setAttribute('aria-expanded','false');});
-window.addEventListener('popstate',()=>{currentView=viewFromHash(location.hash);currentFilter='all';searchQuery='';$('search-input').value='';render();});
-window.addEventListener('hashchange',()=>{currentView=viewFromHash(location.hash);currentFilter='all';render();});
+$('menu-toggle').addEventListener('click',()=>setNavigation(!document.body.classList.contains('sidebar-open'),{restoreFocus:true}));
+$('sidebar-scrim')?.addEventListener('click',()=>setNavigation(false,{restoreFocus:true}));
+function restoreLocation(){
+  currentView=viewFromHash(location.hash);currentFilter='all';searchQuery='';$('search-input').value='';
+  setNavigation(false);render();
+}
+window.addEventListener('popstate',restoreLocation);
+window.addEventListener('hashchange',restoreLocation);
 document.addEventListener('keydown',event=>{
-  if(event.key==='Escape'){document.body.classList.remove('sidebar-open');$('menu-toggle').setAttribute('aria-expanded','false');return;}
-  if(!token||busy||document.querySelector('dialog[open]'))return;
+  if(event.key==='Escape'){setNavigation(false,{restoreFocus:true});return;}
+  if(event.key==='Tab'&&document.body.classList.contains('sidebar-open')){
+    const focusable=[...sidebar.querySelectorAll('a[href],button:not([disabled]),[tabindex="0"]'),$('sidebar-scrim'),$('menu-toggle')].filter(node=>node&&node.getClientRects().length);
+    const first=focusable[0],last=focusable.at(-1);
+    if(!focusable.includes(document.activeElement)||(event.shiftKey&&document.activeElement===first)){event.preventDefault();(event.shiftKey?last:first)?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+    return;
+  }
+  if(!token||busy||document.body.classList.contains('sidebar-open')||document.querySelector('dialog[open]'))return;
   const editing=event.target.closest('input,textarea,select,[contenteditable="true"]');
   if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();$('search-input').focus();$('search-input').select();}
   else if(!editing&&!event.metaKey&&!event.ctrlKey&&!event.altKey&&event.key.toLowerCase()==='n'){event.preventDefault();prepareCompose();}
 });
+
+setNavigation(false);

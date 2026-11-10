@@ -25,6 +25,8 @@ jobs:
           "$RUNNER_TEMP/central-browser/node_modules/.bin/playwright" install --with-deps chromium
       - name: Verify alternative server boundaries
         run: python -B -m unittest discover -s workspace_ui/tests -p 'test_*.py' -v
+      - name: Verify workspace projections
+        run: node --test workspace_ui/tests/projections.test.mjs
       - name: Exercise actual owner API in Chromium
         shell: bash
         run: |

@@ -28,7 +28,15 @@ const nav=async view=>{
   await page.waitForFunction(value=>document.querySelector(`#navigation [data-view="${value}"]`)?.getAttribute('aria-current')==='page',view);
 };
 const noOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
-const screenshot=async name=>{if(screenshots)await page.screenshot({path:path.join(screenshots,name),fullPage:true});};
+const screenshot=async(name,{fullPage=true}={})=>{
+  if(!screenshots)return;
+  await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
+  if(await page.locator('#menu-toggle').isVisible()){
+    assert.equal(await page.locator('body').evaluate(node=>node.classList.contains('sidebar-open')),false);
+    await page.waitForFunction(()=>document.querySelector('.sidebar').getBoundingClientRect().right<=0.5);
+  }
+  await page.screenshot({path:path.join(screenshots,name),fullPage});
+};
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
@@ -43,10 +51,23 @@ try {
   assert.match(await page.locator('#owner-name').textContent(),/blair/i);
   await page.locator('#overview-panel').waitFor({state:'visible'});
   await noOverflow();await screenshot('central-platform-overview.png');
+  await page.setViewportSize({width:390,height:844});await noOverflow();
+  await screenshot('central-platform-mobile.png',{fullPage:false});
+  await screenshot('central-platform-mobile-full.png');
+  await page.setViewportSize({width:1440,height:1000});
 
   // Browse all projections without changing any saved work or authority.
-  for(const view of ['inbox','tasks','artifacts','outbox','peers','activity','overview']){await nav(view);await noOverflow();}
+  for(const view of ['inbox','tasks','artifacts','outbox','peers','activity','overview']){
+    await nav(view);await noOverflow();
+    if(view==='artifacts')await screenshot('central-platform-artifacts.png');
+    if(view==='peers')await screenshot('central-platform-assistants.png');
+  }
   assert.equal(writes.length,0,'navigation must never mutate owner state');
+  await page.locator('.overview-metric').filter({hasText:'Accepted tasks'}).click();
+  assert.equal(await page.locator('#accepted-filter').isVisible(),true);
+  assert.ok(await page.locator('#item-list article').count()>0);
+  assert.equal(await page.locator('#item-list article').count(),await page.locator('#item-list article .badge.accepted').count());
+  assert.equal(await page.locator('#item-list .item-icon.artifact').count(),0);
   await nav('tasks');
   await page.keyboard.press('Control+k');assert.equal(await page.locator('#search-input').evaluate(node=>node===document.activeElement),true);
   await page.locator('#search-input').fill('Map the onboarding');
@@ -146,7 +167,7 @@ try {
   assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false');
-  await nav('overview');await screenshot('central-platform-mobile.png');
+  await nav('overview');await screenshot('central-platform-mobile-after-decisions.png',{fullPage:false});
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
