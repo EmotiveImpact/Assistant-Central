@@ -1,9 +1,11 @@
 # Container-isolation verification record
 
+## Original PR #7 baseline
+
 Implementation commit: `23c62f45940972cfeafae6888b7d8b0f6ac2b6d2`.
-The following commit adds only this record, three harness regression tests, and
-removes the redundant feature-branch push trigger (pull-request and main-push
-checks remain). The container implementation is unchanged.
+The original evidence commit added this record, three harness regression tests,
+and removed the redundant feature-branch push trigger. The baseline below
+predates PR #8's reviewed-work-loop and address-reuse changes.
 
 ## Actual Docker integration
 
@@ -48,6 +50,21 @@ The actual job, not a mock, returned `result: passed` after cleanup:
   harness now stops both servers, waits for normal socket expiry, then restarts.
   No authentication/runtime/provider/server/UI code, capabilities or host sysctls
   were changed to obtain the passing result.
+
+## Composition with PR #8 and PR #9
+
+The harness now integrates PR #9 at `54b8ce69689746516512fd3ba79ed51f805d8408`,
+which includes the merged PR #8 implementation. PR #8 deliberately enables
+`SO_REUSEADDR` to reopen a pinned endpoint after restart; its own tests reject
+sharing an active listener. The harness's port probe now matches that reviewed
+option and verifies both active endpoints cannot be rebound before stopping
+them. It never uses `SO_REUSEPORT` or changes host settings. A bounded 15-second
+availability check replaces the historical 90-second socket-expiry wait.
+
+The guard suite adds a regression that rejects an unexpectedly rebindable live
+listener. The cumulative Docker, pilot, workflow, password-maintenance and full
+CI results are linked from the PR description; older results above establish
+only the explicitly identified earlier baseline.
 
 The editor machine had no Docker CLI and correctly failed closed. No local
 same-UID test is represented as container-isolation evidence. See [README.md](README.md)

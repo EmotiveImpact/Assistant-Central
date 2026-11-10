@@ -203,12 +203,15 @@ class Harness:
         return response["body"]
 
     def restart(self):
+        for config in OWNERS.values():
+            require(not self.probe("controller", "port_available", port=config["port"]),
+                    "A live pilot listener could be rebound")
         for owner in OWNERS:
             self.docker("stop", self.name(owner))
-        # The pilot deliberately disables SO_REUSEADDR. After actual HTTP
-        # traffic, TIME_WAIT can prevent an immediate same-port restart. Wait
-        # for normal socket expiry; do not alter the pilot or host sysctls.
-        deadline = time.monotonic() + 90
+        # PR #8 enables SO_REUSEADDR for pinned-endpoint restarts. Match that
+        # option in the probe, but never SO_REUSEPORT. Check both that a live
+        # listener cannot be stolen and that stopped endpoints become available.
+        deadline = time.monotonic() + 15
         while not all(self.probe("controller", "port_available", port=config["port"]) for config in OWNERS.values()):
             if time.monotonic() >= deadline:
                 raise RuntimeError("Loopback ports remain occupied after stopping both pilots")
@@ -368,6 +371,7 @@ def exchange(harness, passwords, identities):
     return {"task_and_artifact": "accepted through unchanged pilot HTTP routes",
             "cross_owner_password_and_session": "rejected both directions",
             "unreleased_content": "not delivered", "receipt_is_acceptance": False,
+            "live_listener_rebind": "rejected at both endpoints",
             "restart": "identities/history preserved; old sessions rejected", "live_provider_enabled": False}
 
 

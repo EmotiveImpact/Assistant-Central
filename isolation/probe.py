@@ -115,8 +115,12 @@ def main(data):
     if operation == "port_available":
         require(data["port"] in (8765, 8766), "Unexpected test port")
         with socket.socket() as listener:
+            # Match the reviewed pilot listener. SO_REUSEADDR permits restart
+            # after TIME_WAIT, not sharing a live listener. Never SO_REUSEPORT.
+            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
                 listener.bind(("127.0.0.1", data["port"]))
+                listener.listen(1)
             except OSError as exc:
                 if exc.errno == errno.EADDRINUSE:
                     return False

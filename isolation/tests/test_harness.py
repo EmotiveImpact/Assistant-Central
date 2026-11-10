@@ -137,9 +137,9 @@ class HarnessChecks(unittest.TestCase):
         self.assertEqual(deletes, [("rm", "--force", harness.name("owned")),
                                    ("volume", "rm", harness.name("owned-data"))])
 
-    def test_restart_waits_for_normal_port_expiry_before_starting(self):
+    def test_restart_checks_live_listeners_before_reusing_ports(self):
         harness = Harness()
-        with patch.object(harness, "docker") as docker, patch.object(harness, "probe", side_effect=[False, True, True]), \
+        with patch.object(harness, "docker") as docker, patch.object(harness, "probe", side_effect=[False, False, False, True, True]), \
                 patch("time.sleep") as sleep:
             harness.restart()
         self.assertEqual([call.args for call in docker.call_args_list], [
@@ -150,10 +150,17 @@ class HarnessChecks(unittest.TestCase):
     def test_restart_fails_closed_when_port_never_becomes_available(self):
         harness = Harness()
         with patch.object(harness, "docker") as docker, patch.object(harness, "probe", return_value=False), \
-                patch("time.monotonic", side_effect=[0, 91]):
+                patch("time.monotonic", side_effect=[0, 16]):
             with self.assertRaisesRegex(RuntimeError, "ports remain occupied"):
                 harness.restart()
         self.assertEqual([call.args[0] for call in docker.call_args_list], ["stop", "stop"])
+
+    def test_restart_fails_if_probe_can_rebind_a_live_listener(self):
+        harness = Harness()
+        with patch.object(harness, "docker") as docker, patch.object(harness, "probe", return_value=True):
+            with self.assertRaisesRegex(AssertionError, "live pilot listener could be rebound"):
+                harness.restart()
+        docker.assert_not_called()
 
     def test_port_probe_distinguishes_occupied_from_unrelated_errors(self):
         for number in (errno.EADDRINUSE, errno.EACCES, errno.EADDRNOTAVAIL):
@@ -166,6 +173,7 @@ class HarnessChecks(unittest.TestCase):
                 else:
                     with self.assertRaises(OSError):
                         probe.main({"operation": "port_available", "port": 8765})
+                listener.setsockopt.assert_called_once_with(probe.socket.SOL_SOCKET, probe.socket.SO_REUSEADDR, 1)
 
     def test_build_context_is_allowlisted(self):
         with tempfile.TemporaryDirectory() as directory:
