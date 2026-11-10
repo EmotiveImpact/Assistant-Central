@@ -1,0 +1,147 @@
+"""Fast harness checks. These do not claim Docker or cross-UID isolation."""
+import errno
+from pathlib import Path
+import tarfile
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from isolation import probe
+from isolation.run import build_context, Harness, validate_container, validate_dac_mounts, validate_environment
+
+
+def process(uid, suffix):
+    return {"uid": uid, "gid": uid, "groups": [uid], "directory_uid": uid,
+            "directory_mode": 0o700, "namespaces": {"pid": "pid" + suffix, "mnt": "mnt" + suffix, "net": "net1"},
+            "cap_effective": "00000000", "cap_permitted": "00000000", "no_new_privs": "1", "seccomp": "2",
+            "network_interfaces": ["lo"]}
+
+
+def container():
+    return {"Config": {"User": "21001:21001"}, "HostConfig": {
+        "ReadonlyRootfs": True, "Privileged": False, "CapDrop": ["ALL"], "CapAdd": None,
+        "SecurityOpt": ["no-new-privileges:true"], "NetworkMode": "container:anchor",
+        "PortBindings": {}, "PidMode": "", "IpcMode": "private"},
+        "Mounts": [{"Type": "volume", "Name": "atlas-data", "Destination": "/private/atlas", "RW": True}]}
+
+
+class HarnessChecks(unittest.TestCase):
+    def test_valid_environment(self):
+        validate_environment(process(21001, "a"), process(21002, "b"))
+
+    def test_environment_rejects_every_weakened_boundary(self):
+        mutations = [("uid", 0), ("gid", 0), ("groups", [21001, 21002]), ("directory_uid", 21002),
+                     ("directory_mode", 0o755), ("cap_effective", "1"), ("cap_permitted", "1"),
+                     ("no_new_privs", "0"), ("seccomp", "0"), ("network_interfaces", ["lo", "eth0"])]
+        for field, value in mutations:
+            with self.subTest(field=field):
+                info = process(21001, "a")
+                info[field] = value
+                with self.assertRaises(AssertionError):
+                    validate_environment(info, process(21002, "b"))
+
+    def test_shared_private_namespaces_and_wrong_carrier_rejected(self):
+        for name in ("pid", "mnt", "net"):
+            with self.subTest(name=name):
+                first, second = process(21001, "a"), process(21002, "b")
+                second["namespaces"][name] = first["namespaces"][name] if name != "net" else "external"
+                with self.assertRaises(AssertionError):
+                    validate_environment(first, second)
+
+    def test_valid_container(self):
+        validate_container(container(), "atlas", "atlas-data", "anchor")
+
+    def test_unsafe_container_modes_rejected(self):
+        for field, value in [("ReadonlyRootfs", False), ("Privileged", True), ("CapDrop", []),
+                             ("CapAdd", ["SYS_ADMIN"]), ("Devices", ["device"]),
+                             ("DeviceRequests", ["gpu"]), ("SecurityOpt", []), ("NetworkMode", "host"),
+                             ("PortBindings", {"8765/tcp": []}), ("PublishAllPorts", True),
+                             ("PidMode", "host"), ("IpcMode", "host")]:
+            with self.subTest(field=field):
+                value_info = container()
+                value_info["HostConfig"][field] = value
+                with self.assertRaises(AssertionError):
+                    validate_container(value_info, "atlas", "atlas-data", "anchor")
+
+    def test_peer_mount_and_bind_mount_rejected(self):
+        for mount in ({"Type": "volume", "Name": "beacon-data", "Destination": "/private/beacon", "RW": True},
+                      {"Type": "bind", "Source": "/var/run/docker.sock", "Destination": "/var/run/docker.sock"}):
+            info = container()
+            info["Mounts"].append(mount)
+            with self.assertRaises(AssertionError):
+                validate_container(info, "atlas", "atlas-data", "anchor")
+
+    def test_wrong_or_missing_own_volume_rejected(self):
+        for change in ({"Name": "beacon-data"}, {"Destination": "/elsewhere"}, {"RW": False}):
+            info = container()
+            info["Mounts"][0].update(change)
+            with self.assertRaises(AssertionError):
+                validate_container(info, "atlas", "atlas-data", "anchor")
+
+    def test_dac_probe_requires_both_actual_writable_volumes(self):
+        info = container()
+        volumes = {"atlas": "atlas-data", "beacon": "beacon-data"}
+        with self.assertRaises(AssertionError):
+            validate_dac_mounts(info, "atlas", "beacon", volumes)
+        info["Mounts"].append({"Type": "volume", "Name": "beacon-data", "Destination": "/private/beacon", "RW": True})
+        validate_dac_mounts(info, "atlas", "beacon", volumes)
+        for name, value in (("Name", "unrelated-volume"), ("RW", False), ("Type", "bind")):
+            with self.subTest(name=name):
+                old = info["Mounts"][1][name]
+                info["Mounts"][1][name] = value
+                with self.assertRaises(AssertionError):
+                    validate_dac_mounts(info, "atlas", "beacon", volumes)
+                info["Mounts"][1][name] = old
+
+    def test_probe_success_is_not_misreported_as_denial(self):
+        with self.assertRaises(AssertionError):
+            probe.denied(lambda: None)
+
+    def test_only_expected_errors_count_as_denial(self):
+        def error(number):
+            raise OSError(number, "synthetic")
+        for number in (errno.EACCES, errno.EPERM, errno.ENOENT, errno.EROFS):
+            self.assertEqual(probe.denied(lambda: error(number)), errno.errorcode[number])
+        for number in (errno.EIO, errno.EMFILE, errno.ENOSPC, errno.EXDEV):
+            with self.assertRaises(AssertionError):
+                probe.denied(lambda: error(number))
+
+    def test_sensitive_input_and_container_output_not_in_diagnostics(self):
+        fake = type("Result", (), {"returncode": 1, "stdout": "SECRET output", "stderr": "SECRET stderr"})()
+        with patch("subprocess.run", return_value=fake):
+            with self.assertRaises(RuntimeError) as raised:
+                Harness().docker("exec", "fixture", data="SECRET input")
+        self.assertNotIn("SECRET", str(raised.exception))
+
+    def test_missing_docker_fails_instead_of_skipping(self):
+        with patch("shutil.which", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "no isolation test ran"):
+                Harness().prepare()
+
+    def test_build_context_is_allowlisted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "context.tar"
+            build_context(target)
+            with tarfile.open(target) as archive:
+                names = archive.getnames()
+            self.assertIn("pilot/server.py", names)
+            self.assertIn("pilot/requirements.txt", names)
+            self.assertIn("isolation/probe.py", names)
+            self.assertNotIn("isolation/run.py", names)
+            self.assertTrue(all(name == "Dockerfile" or name.startswith(("pilot/", "isolation/")) for name in names))
+            self.assertFalse(any(".git" in name or name.endswith(".sqlite") for name in names))
+
+    def test_snapshot_detects_contents_and_permissions(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "canary"
+            path.write_text("before")
+            before = probe.snapshot(directory)
+            path.write_text("after")
+            self.assertNotEqual(before, probe.snapshot(directory))
+            before = probe.snapshot(directory)
+            path.chmod(0o400)
+            self.assertNotEqual(before, probe.snapshot(directory))
+
+
+if __name__ == "__main__":
+    unittest.main()
