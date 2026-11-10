@@ -79,7 +79,9 @@ One network-only worker consumes a one-shot prepared capability. It cannot read
 or mutate the runtime database, access owner keys or re-authorise a packet. An
 original-expiry/clock-rollback check and five-second monotonic start window prevent indefinitely
 retained preparation from starting a late send. The single transfer slot rejects
-new sends while one is in flight rather than queueing them. A consumed, failed,
+new sends while one is in flight rather than queueing them. Its ownership is
+recorded before worker submission and survives an interrupted submission that
+starts dispatch without returning a Future. A consumed, failed,
 expired or abandoned capability cannot dispatch again. Its attempt stays consumed.
 
 Status, withdrawal and sign-out remain responsive while the network worker is
@@ -121,7 +123,9 @@ All routes retain bearer authentication, exact origin/Host checks, strict JSON a
 no-store responses. Targeted checks: `python -B -m unittest
 pilot.tests.test_owner_transfer`, `node --test pilot/web/tests/transfers.test.mjs`
 and `node pilot/web/tests/browser_transfers.test.mjs` with the existing Playwright
-setup. The browser suite mocks only HTTP, while Python tests exercise the real
-owner server, authentication, SQLite and transfer preparation. Existing HTTPS
-adapter tests retain their real loopback TLS coverage. Hosted browser evidence is
+setup. The supplementary fault-injection browser suite mocks only HTTP. A separate
+`browser_transfers_live.test.mjs` suite uses the actual owner HTTP service and
+disposable loopback TLS fixture for sending, selected duplicate import and
+original cached receipt return. Python tests also exercise the real owner server,
+authentication, SQLite and transfer preparation, plus a TLS receipt roundtrip. Hosted browser evidence is
 recorded on the pull request; do not infer it from source inspection.

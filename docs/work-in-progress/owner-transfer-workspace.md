@@ -14,8 +14,11 @@ immutable attempt inspection, exact reviewed send/retry/import/receipt controls,
 and a bounded network-only worker so owner controls remain responsive.
 Read [the setup and limits](../../pilot/OWNER_TRANSFERS.md).
 
-Local targeted checks and the existing 272-test baseline pass. Final cumulative
-checks, independent review and hosted desktop/mobile Chromium evidence are in
-progress. Local Chromium cannot start because the environment disallows its
+Local 288-test cumulative checks and 30 UI model tests pass. Independent review
+identified an uncertain worker-submission gap; capability-owned dispatch state
+now fixes it, with both independent regressions passing. Final cumulative checks
+and hosted desktop/mobile Chromium evidence are in progress. The hosted actual
+HTTP UI suite passes; the supplementary transfer script needed an explicit wait
+for a newly opened dialog before checking its freshly unchecked confirmation. Local Chromium cannot start because the environment disallows its
 process singleton socket, including after a permitted escalation. No browser
 pass is claimed here. No public deployment, real owner data or live credentials.

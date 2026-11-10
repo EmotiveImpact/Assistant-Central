@@ -102,6 +102,11 @@ jobs:
             UI_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
             node pilot/web/tests/browser.test.mjs
           NODE_PATH="$RUNNER_TEMP/ac-pilot-browser/node_modules" \
+            LIVE_PILOT_URL=http://127.0.0.1:8765 \
+            LIVE_PILOT_PASSWORD='Fictional browser test password' \
+            PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
+            node pilot/web/tests/browser_transfers_live.test.mjs
+          NODE_PATH="$RUNNER_TEMP/ac-pilot-browser/node_modules" \
             PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
             node pilot/web/tests/browser_transfers.test.mjs
       - uses: actions/upload-artifact@v4
