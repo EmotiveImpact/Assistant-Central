@@ -17,3 +17,9 @@ Coordination only. No working integration is claimed by this first commit.
   execution using explicitly labelled deterministic model doubles.
 - Limits: no credentials, paid/live calls, public endpoints, existing personal
   assistant activation, or automatic owner consent. This worker will not merge.
+
+Implementation and proof tiers are now described in README.md and VERIFICATION.md.
+The two selected hosts are OpenAI Agents and Cursor/Grok Agent SDK; the latter
+uses its documented no-model direct tool path. Independent review added the
+malformed-initialisation regression and prompted storage/lifecycle hardening.
+Existing owner UI and persistent conversation integration remain separate.
