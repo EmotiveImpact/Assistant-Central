@@ -82,11 +82,13 @@ scanner is used.
 | Actual HTTP boundary | 8 | Exact Host/Origin; strict JSON and fields; bearer requirements and logout; quarantine versus authenticated admission; mailbox quota/deduplication; static content policy and route protection; endpoint restrictions. |
 | Provider composition | 6 | Pre-claim logout; revocation serialisation through commit; local and source expiry crossing request construction; cancellation before claim; retained uncertain outcomes without redispatch after adapter restart. |
 
-The implementation authors' broader module suites, two-process demo and browser
-checks have separate records. This report does not claim a completed browser
-interaction test: the local Chromium environment cannot create its required Unix
-sockets, and the cloud browser cannot reach this executor's loopback listener.
-The hosted browser workflow must supply that evidence on a supported runner.
+The implementation authors' broader module suites and two-process demo have
+separate records. The local Chromium environment could not create its required
+Unix sockets, and the cloud browser could not reach the executor's loopback
+listener. Hosted Chromium subsequently passed against the actual owner HTTP
+service, including exact accept/reject decisions and desktop/mobile layouts.
+The [verification record](VERIFICATION.md) identifies the tested commit, workflow
+and screenshots. This is synthetic browser evidence, not real-person enrolment.
 
 ## Subsequent engineering gates
 
@@ -110,8 +112,8 @@ The hosted browser workflow must supply that evidence on a supported runner.
   bounded request. The adapter's request/token limits do not establish a spending
   guarantee. The HTTP pilot has no live provider route, and no live result is
   claimed.
-- Complete the hosted browser run and a supervised pilot with independently
-  enrolled participants before any real personal information is introduced.
+- Complete a supervised pilot with independently enrolled participants before
+  any real personal information is introduced.
 
 An unauthenticated local process can still consume the bounded quarantine or
 available connection slots. These limits constrain resource use; they do not

@@ -90,7 +90,9 @@ node --test pilot/web/tests/model.test.mjs
 python -B pilot/web/tests/live_contract.py
 ```
 
-The [independent agent review](SECURITY_REVIEW.md) records concrete findings/fixes;
+The [verification record](VERIFICATION.md) identifies the tested code, commands
+and hosted browser evidence. The [independent agent review](SECURITY_REVIEW.md)
+records concrete findings/fixes;
 it is not third-party security certification. CI runs existing regressions plus a
 real Chromium check against `pilot.ui_fixture`, with desktop/mobile screenshots
 saved as an Actions artifact. That fixture has a public test-only password and

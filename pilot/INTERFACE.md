@@ -103,5 +103,9 @@ node pilot/web/tests/browser.test.mjs
 
 In the initial managed workspace, launching local Chromium failed before a page
 was created: the browser's process-singleton Unix socket returned `EPERM`.
-Therefore no browser pass is claimed from that attempt. Hosted browser CI results
-must be inspected separately; writing a browser test is not evidence it passed.
+Therefore no browser pass is claimed from that attempt. On 10 November 2026 the
+hosted Chromium run subsequently passed against the actual HTTP service. Its
+desktop and mobile screenshots were downloaded, their archive digest checked,
+and both images visually inspected. See the [verification record](VERIFICATION.md)
+for the exact tested commit, workflow and evidence artifact. This automated
+fictional-owner check does not establish real-person or live-provider acceptance.
