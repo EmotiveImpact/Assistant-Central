@@ -6,6 +6,8 @@ security changes, host ports, Docker socket mounts or real credentials.
 import argparse
 import json
 import ipaddress
+import os
+import re
 from pathlib import Path
 import secrets
 import shutil
@@ -40,6 +42,8 @@ def validate_container(info, uid, network, expected_mounts):
     actual = {mount['Destination']: (mount.get('Name'), mount['RW'])
               for mount in info['Mounts'] if mount['Type'] != 'tmpfs'}
     require(all(mount['Type'] in ('volume', 'tmpfs') for mount in info['Mounts']), 'Unexpected bind mount')
+    require(len([mount for mount in info['Mounts'] if mount['Type'] != 'tmpfs']) == len(expected_mounts),
+            'Unexpected private mount count')
     require(actual == expected_mounts, 'Unexpected private volumes or write permissions')
     require(set(info['NetworkSettings']['Networks']) == {network}, 'Extra network attachment')
 
@@ -94,8 +98,19 @@ class Harness:
         except (FileNotFoundError, subprocess.TimeoutExpired):
             raise RuntimeError('Docker unavailable or timed out: ' + args[0]) from None
         if response.returncode:
-            # stdin can contain fictional credentials and disposable TLS keys.
-            raise RuntimeError('Docker operation failed: ' + args[0] + ' (exit ' + str(response.returncode) + ')')
+            # Only a strict, helper-produced exception class may enter diagnostics.
+            # Never echo stdin, stderr, payloads or an arbitrary container response.
+            reason = ''
+            if args[0] == 'exec':
+                try:
+                    failure = json.loads(response.stdout)
+                    if (type(failure) is dict and set(failure) == {'ok', 'unexpected_error_type'}
+                            and failure['ok'] is False and type(failure['unexpected_error_type']) is str
+                            and re.fullmatch(r'[A-Za-z][A-Za-z0-9_]{0,79}', failure['unexpected_error_type'])):
+                        reason = ', helper ' + failure['unexpected_error_type']
+                except (ValueError, TypeError):
+                    pass
+            raise RuntimeError('Docker operation failed: ' + args[0] + ' (exit ' + str(response.returncode) + reason + ')')
         return response.stdout
 
     def prepare(self):
@@ -279,7 +294,9 @@ def exercise(h):
     sent = send(a, b, message, retry=True)
     require(sent['file_digest'] == original['file_digest'], 'Retry resealed packet')
     require(not state(b)['items'] and item(a, task) == 'released', 'Quarantine ACK imported/accepted work')
-    require(all(row['state'] == 'uncertain' for row in h.owner(a, 'attempts', message_id=message)['attempts']), 'ACK changed journal')
+    trust_attempts = h.owner(a, 'attempts', message_id=message)['attempts']
+    require(len(trust_attempts) == 4 and all(row['state'] == 'uncertain' for row in trust_attempts), 'ACK changed journal')
+    require(outbox(a, message)['attempts'] == 4, 'Trust probes lost original attempt accounting')
     incoming(a, b, sent, expected_error='TransportDenied')  # TLS is not enrolment.
     h.owner(b, 'enrol', **h.identities[a])
     h.owner(b, 'import', file_digest=sent['file_digest'], sender=fp[b], expected_error='RuntimeDenied')
@@ -379,8 +396,12 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args(argv)
+    if args.output.exists() or args.output.is_symlink():
+        raise FileExistsError('Choose a new evidence path; previous evidence was retained.')
     result = run()  # Never write a passing artifact on partial/failed acceptance.
-    args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')
+    fd = os.open(args.output, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, 'w') as stream:
+        stream.write(json.dumps(result, indent=2, sort_keys=True) + '\n')
     print(json.dumps(result, sort_keys=True))
 
 

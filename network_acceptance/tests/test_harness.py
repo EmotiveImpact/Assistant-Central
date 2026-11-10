@@ -63,6 +63,10 @@ class GuardTests(unittest.TestCase):
                 if mutation == 'peer': changed['Mounts'].append({'Type': 'volume', 'Destination': '/private/beacon', 'Name': 'peer', 'RW': True})
                 with self.assertRaises(AssertionError): self.check(changed)
 
+    def test_duplicate_mount_destination_is_not_hidden_by_mapping(self):
+        self.container['Mounts'].append(copy.deepcopy(self.container['Mounts'][0]))
+        with self.assertRaises(AssertionError): self.check(self.container)
+
     def test_mailbox_mount_contract_excludes_owner_store(self):
         harness = Harness()
         for owner in OWNERS:
@@ -120,6 +124,15 @@ class GuardTests(unittest.TestCase):
             Harness().docker('exec', 'test', data='SECRET_PASSWORD')
         self.assertNotIn('SECRET', str(caught.exception))
 
+    def test_helper_diagnostics_allow_only_exception_class(self):
+        safe = subprocess.CompletedProcess([], 1, json.dumps({'ok': False, 'unexpected_error_type': 'KeyError'}), 'SECRET')
+        with patch('subprocess.run', return_value=safe), self.assertRaisesRegex(RuntimeError, 'helper KeyError'):
+            Harness().docker('exec', 'fixture', data='SECRET')
+        unsafe = subprocess.CompletedProcess([], 1, json.dumps({'ok': False, 'unexpected_error_type': 'SECRET value'}), 'SECRET')
+        with patch('subprocess.run', return_value=unsafe), self.assertRaises(RuntimeError) as caught:
+            Harness().docker('exec', 'fixture')
+        self.assertNotIn('SECRET', str(caught.exception))
+
     def test_unexpected_error_is_not_successful_refusal(self):
         h = Harness()
         h.passwords['atlas'] = 'Fictional password only'
@@ -134,6 +147,14 @@ class GuardTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, 'No container acceptance ran'):
                 main(['--output', str(path)])
             self.assertFalse(path.exists())
+
+    def test_preexisting_evidence_not_overwritten_or_reused(self):
+        with tempfile.TemporaryDirectory() as temporary, patch('network_acceptance.run.run') as run:
+            path = Path(temporary) / 'evidence.json'
+            path.write_text('previous evidence')
+            with self.assertRaises(FileExistsError): main(['--output', str(path)])
+            run.assert_not_called()
+            self.assertEqual(path.read_text(), 'previous evidence')
 
     def test_disposable_ca_distinct_leaf_keys_exact_sans(self):
         ca, leaves = disposable_pki(['mailbox-atlas', 'mailbox-beacon'])

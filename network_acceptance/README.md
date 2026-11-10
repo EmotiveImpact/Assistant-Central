@@ -20,7 +20,8 @@ python -B -m network_acceptance.run --output /tmp/pilot-network-acceptance.json
 ```
 
 The dedicated `Pilot HTTPS network acceptance` workflow runs both commands and
-uploads a small success-only JSON report. A local guard-test pass is **not** a
+uploads a small success-only JSON report. Choose a fresh output path for each
+run: existing evidence is never overwritten or reused. A local guard-test pass is **not** a
 container acceptance pass. The local TLS smoke intentionally substitutes Docker
 controls; it cannot produce the acceptance report. A missing engine fails closed,
 without a same-UID/loopback fallback or passing artifact. Record the exact tested
