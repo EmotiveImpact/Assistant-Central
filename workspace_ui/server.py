@@ -20,6 +20,7 @@ STATIC_FILES = {
     "/app.mjs": (ROOT / "app.mjs", "text/javascript; charset=utf-8"),
     "/projections.mjs": (ROOT / "projections.mjs", "text/javascript; charset=utf-8"),
     "/model.mjs": (WEB / "model.mjs", "text/javascript; charset=utf-8"),
+    "/InterVariable.woff2": (ROOT / "InterVariable.woff2", "font/woff2"),
 }
 MAX_STATIC_BYTES = 2 * 1024 * 1024
 

@@ -1,5 +1,6 @@
 """Actual HTTP checks for the optional static frontend and inherited owner API."""
 import http.client
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -61,9 +62,27 @@ class WorkspaceHTTPTests(unittest.TestCase):
 
     def test_static_allowlist_refuses_traversal_query_and_non_assets(self):
         for path in ("/server.py", "/demo.py", "/README.md", "/../pilot/auth.py",
-                     "/%2e%2e/pilot/auth.py", "/model.mjs?source=1", "//model.mjs", "/unknown.svg"):
+                     "/%2e%2e/pilot/auth.py", "/model.mjs?source=1", "//model.mjs", "/unknown.svg",
+                     "/fonts/InterVariable.woff2", "/InterVariable.woff2?v=4.1", "/other.woff2"):
             with self.subTest(path=path):
                 self.assertEqual(self.request("GET", path)[0], 400)
+
+    def test_exact_local_variable_font_is_served_without_widening_policy(self):
+        status, headers, body = self.request("GET", "/InterVariable.woff2")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "font/woff2")
+        self.assertEqual(body[:4], b"wOF2")
+        self.assertEqual(body, STATIC_FILES["/InterVariable.woff2"][0].read_bytes())
+        self.assertEqual(len(body), 352_240)
+        self.assertEqual(hashlib.sha256(body).hexdigest(),
+            "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3")
+        self.assertEqual(headers["Cache-Control"], "no-store")
+        policy = headers["Content-Security-Policy"]
+        self.assertIn("default-src 'self'", policy)
+        self.assertNotIn("https:", policy)
+        self.assertNotIn("*", policy)
+        self.assertEqual(self.request("GET", "/InterVariable.woff2",
+            headers={"Origin": "https://attacker.invalid"})[0], 400)
 
     def test_static_files_are_descriptor_pinned_bounded_and_not_symlinks(self):
         target = self.root / "temporary-model.mjs"

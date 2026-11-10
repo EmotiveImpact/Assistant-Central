@@ -4,6 +4,7 @@ import {createRequire} from 'node:module';
 import {mkdir} from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 
 const require=createRequire(import.meta.url);
 const {chromium}=require('playwright');
@@ -15,10 +16,11 @@ if(screenshots)await mkdir(screenshots,{recursive:true});
 const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 const context=await browser.newContext({viewport:{width:1440,height:1000}});
 const page=await context.newPage();
-const errors=[],writes=[];
+const errors=[],writes=[],externalRequests=[];
 page.on('pageerror',error=>errors.push(error.message));
 page.on('request',request=>{
-  const pathname=new URL(request.url()).pathname;
+  const requestURL=new URL(request.url()),pathname=requestURL.pathname;
+  if(['http:','https:'].includes(requestURL.protocol)&&requestURL.origin!==url.origin)externalRequests.push(request.url());
   if(['POST','DELETE'].includes(request.method())&&pathname!=='/api/session')writes.push({path:pathname,body:request.postDataJSON()});
 });
 const article=title=>page.locator('#item-list article').filter({has:page.getByRole('button',{name:'Review '+title,exact:true})});
@@ -41,9 +43,35 @@ const screenshot=async(name,{fullPage=true}={})=>{
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
+const assertAppHeading=async selector=>{
+  const style=await page.locator(selector).evaluate(node=>{
+    const s=getComputedStyle(node);return {size:s.fontSize,weight:s.fontWeight,lineHeight:s.lineHeight,
+      tracking:s.letterSpacing,features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
+  });
+  assert.deepEqual(style,{size:'20px',weight:'590',lineHeight:'26.6px',tracking:'-0.24px',
+    features:'"cv01", "ss03"',opticalSizing:'auto'});
+};
 
 try {
+  const fontResponsePromise=page.waitForResponse(response=>new URL(response.url()).pathname==='/InterVariable.woff2');
   await page.goto(url.origin);
+  const fontResponse=await fontResponsePromise;
+  assert.equal(fontResponse.status(),200,'the actual variable font must load, not a system fallback');
+  assert.equal(fontResponse.headers()['content-type'],'font/woff2');
+  const fontBytes=await fontResponse.body();
+  assert.equal(fontBytes.subarray(0,4).toString(),'wOF2');
+  assert.equal(createHash('sha256').update(fontBytes).digest('hex'),
+    '693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3');
+  await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
+  const fontEvidence=await page.evaluate(()=>({
+    family:getComputedStyle(document.body).fontFamily,
+    ready:document.fonts.check('510 13px "Inter Variable"'),
+    loaded:[...document.fonts].some(face=>face.family.replaceAll('"','').replaceAll("'",'')==='Inter Variable'&&face.status==='loaded'),
+  }));
+  assert.ok(fontEvidence.family.startsWith('"Inter Variable"'),fontEvidence.family);
+  assert.equal(fontEvidence.ready,true);
+  assert.equal(fontEvidence.loaded,true,'a declared family alone does not prove a loaded webfont');
+  await screenshot('central-platform-login.png');
   await page.locator('#password').fill(process.env.WORKSPACE_PASSWORD);
   await page.getByRole('button',{name:'Unlock workspace'}).click();
   await page.locator('#workspace').waitFor({state:'visible'});
@@ -51,6 +79,17 @@ try {
   assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
   assert.match(await page.locator('#owner-name').textContent(),/blair/i);
   await page.locator('#overview-panel').waitFor({state:'visible'});
+  const navStyle=await page.locator('#navigation [data-view="inbox"]').evaluate(node=>{
+    const s=getComputedStyle(node);return {font:s.fontFamily,size:s.fontSize,weight:s.fontWeight,
+      radius:s.borderRadius,height:node.getBoundingClientRect().height,color:s.color,
+      features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
+  });
+  assert.ok(navStyle.font.startsWith('"Inter Variable"'));
+  assert.deepEqual({size:navStyle.size,weight:navStyle.weight,radius:navStyle.radius,height:navStyle.height,color:navStyle.color},
+    {size:'13px',weight:'510',radius:'8px',height:28,color:'rgb(208, 214, 224)'});
+  assert.equal(navStyle.features,'normal');
+  assert.equal(navStyle.opticalSizing,'auto');
+  await assertAppHeading('#page-title');
   await noOverflow();await screenshot('central-platform-overview.png');
   await page.setViewportSize({width:390,height:844});await noOverflow();
   await screenshot('central-platform-mobile.png',{fullPage:false});
@@ -89,6 +128,7 @@ try {
 
   await nav('inbox');
   await openItem('Review the research brief');
+  await assertAppHeading('#review-title');
   assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
   assert.equal(await page.locator('#review-content *').count(),0);
   assert.match(await page.locator('#review-scope').textContent(),/does not start work/);
@@ -180,7 +220,8 @@ try {
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);
   assert.deepEqual(errors,[]);
-  console.log('PASS workspace browser: seven state-backed views, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
+  assert.deepEqual(externalRequests,[],'the font and all workspace assets must stay same-origin');
+  console.log('PASS workspace browser: exact local Inter Variable bytes and loaded face, measured Linear nav and heading typography, no external asset requests, seven state-backed views, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
 } catch(error) {
   if(screenshots)await page.screenshot({path:path.join(screenshots,'central-platform-failure.png'),fullPage:true}).catch(()=>{});
   throw error;
