@@ -14,6 +14,7 @@ from .auth import LocalOwnerAuth
 from .crypto import fingerprint
 from .runtime import PilotRuntime
 from .server import PilotHTTPServer
+from .workflow import FIXTURE_GRANT
 
 PASSWORD = 'Fictional browser test password'
 
@@ -35,10 +36,11 @@ def main():
             sender, receiver = PilotRuntime(root / 'first', first), PilotRuntime(root / 'second', second)
             sender.enrol_peer(first_token, second.public_identity(), fingerprint(second.public_identity()))
             receiver.enrol_peer(second_token, first.public_identity(), fingerprint(first.public_identity()))
-            for index, title in enumerate(('Browser acceptance task', 'Browser rejection task', 'Research the community garden')):
+            for index, title in enumerate(('Browser acceptance task', 'Browser rejection task', 'Research the community garden', 'Browser workflow task')):
                 item = sender.propose(first_token, fingerprint(second.public_identity()), 'task', title,
                     'SYNTHETIC ONLY: ' + title + ' for a fictional community. No real personal information.',
-                    hashlib.sha256(title.encode()).hexdigest(), 'browser-task-' + str(index), time.time() + 3300)
+                    hashlib.sha256(title.encode()).hexdigest(), 'browser-task-' + str(index), time.time() + 3300,
+                    provider_disclosure=FIXTURE_GRANT if index == 3 else None)
                 sender.release(first_token, item['id'], sender.review(first_token, item['id'])['review_digest'])
                 receiver.receive(second_token, sender.prepare_delivery(first_token, 'proposal-' + item['id']))
                 if index == 2:
@@ -47,7 +49,7 @@ def main():
             if sender: sender.close()
             if receiver: receiver.close()
             first.close(); second.close()
-        server = PilotHTTPServer(root / 'second', args.port)
+        server = PilotHTTPServer(root / 'second', args.port, synthetic_workflow=True)
         print(json.dumps({'url': server.origin, 'synthetic_fixture': True}), flush=True)
         try:
             server.serve_forever()

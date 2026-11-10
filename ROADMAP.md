@@ -32,6 +32,14 @@ return, rejection, cancellation and restart. No real owner enrolment or live
 provider acceptance is claimed. The fictional shared-team decisions are not
 treated as authenticated source consent.
 
+The [reviewed work loop](pilot/WORKFLOW.md) now connects accepted input to a
+separately approved synthetic fixture run, retains the original result, and
+atomically stages one exact return-artifact draft after result review. Release
+and requester acceptance remain separate. It tests offline delivery and restart
+on the same pinned loopback address; it performs no actual model work or research.
+The next useful-work milestone still requires separately controlled hosts and a
+reviewed, explicitly approved live provider integration.
+
 ## Next engineering gates
 
 1. Review the new local pilot and verify deployment under separately controlled
