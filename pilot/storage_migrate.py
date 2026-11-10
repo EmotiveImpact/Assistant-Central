@@ -20,11 +20,103 @@ from .storage import RecordStorage, StorageDenied, StoreLease, FIELDS, VERSION, 
 
 MAX_DATABASE = 128 * 1024 * 1024
 PENDING = 'runtime.sqlite.encrypted.pending'
-TABLES = frozenset(('runtime_meta', 'runtime_items', 'runtime_tombstones', 'runtime_controls',
-    'runtime_audit', 'peer_meta', 'peer_enrolment', 'peer_outbox', 'peer_inbox', 'peer_receipts',
-    'pilot_provider_meta', 'pilot_provider_runs', 'pilot_workflow_meta', 'pilot_workflow_artifacts',
-    'https_send_attempts', 'source_grant_meta', 'source_grant_observations', 'source_grant_withdrawals',
-    'source_grant_claims', 'source_grant_cancellations', 'source_grant_revocations', 'sqlite_sequence'))
+# Exact reviewed payload/metadata column layouts. New schemas require review;
+# accepting a familiar table name alone could copy an added plaintext column.
+COLUMNS = {'https_send_attempts': (('sequence', 'INTEGER', 0, None, 1, 0),
+                         ('message_id', 'TEXT', 1, None, 0, 0),
+                         ('packet_digest', 'TEXT', 1, None, 0, 0),
+                         ('file_digest', 'TEXT', 1, None, 0, 0),
+                         ('recipient', 'TEXT', 1, None, 0, 0),
+                         ('destination', 'TEXT', 1, None, 0, 0),
+                         ('kind', 'TEXT', 1, None, 0, 0),
+                         ('state', 'TEXT', 1, None, 0, 0)),
+ 'peer_enrolment': (('fingerprint', 'TEXT', 0, None, 1, 0),
+                    ('owner_id', 'TEXT', 1, None, 0, 0),
+                    ('agent_id', 'TEXT', 1, None, 0, 0),
+                    ('public', 'TEXT', 1, None, 0, 0),
+                    ('state', 'TEXT', 1, None, 0, 0)),
+ 'peer_inbox': (('id', 'TEXT', 0, None, 1, 0),
+                ('digest', 'TEXT', 1, None, 0, 0),
+                ('header', 'TEXT', 1, None, 0, 0),
+                ('peer', 'TEXT', 1, None, 0, 0),
+                ('kind', 'TEXT', 1, None, 0, 0),
+                ('received', 'REAL', 1, None, 0, 0)),
+ 'peer_meta': (('id', 'INTEGER', 0, None, 1, 0),
+               ('version', 'TEXT', 1, None, 0, 0),
+               ('public', 'TEXT', 1, None, 0, 0)),
+ 'peer_outbox': (('id', 'TEXT', 0, None, 1, 0),
+                 ('digest', 'TEXT', 1, None, 0, 0),
+                 ('packet', 'TEXT', 1, None, 0, 0),
+                 ('peer', 'TEXT', 1, None, 0, 0),
+                 ('state', 'TEXT', 1, None, 0, 0),
+                 ('attempts', 'INTEGER', 1, '0', 0, 0),
+                 ('expires', 'REAL', 1, None, 0, 0),
+                 ('receipt_id', 'TEXT', 0, None, 0, 0),
+                 ('receipt_digest', 'TEXT', 0, None, 0, 0)),
+ 'peer_receipts': (('id', 'TEXT', 0, None, 1, 0),
+                   ('packet', 'TEXT', 1, None, 0, 0),
+                   ('digest', 'TEXT', 1, None, 0, 0)),
+ 'pilot_provider_meta': (('singleton', 'INTEGER', 0, None, 1, 0),
+                         ('version', 'TEXT', 1, None, 0, 0),
+                         ('budget', 'TEXT', 1, None, 0, 0)),
+ 'pilot_provider_runs': (('id', 'TEXT', 0, None, 1, 0),
+                         ('item_id', 'TEXT', 1, None, 0, 0),
+                         ('owner', 'TEXT', 1, None, 0, 0),
+                         ('agent', 'TEXT', 1, None, 0, 0),
+                         ('binding', 'TEXT', 1, None, 0, 0),
+                         ('request', 'TEXT', 1, None, 0, 0),
+                         ('review', 'TEXT', 1, None, 0, 0),
+                         ('digest', 'TEXT', 1, None, 0, 0),
+                         ('state', 'TEXT', 1, None, 0, 0),
+                         ('expires', 'REAL', 0, None, 0, 0),
+                         ('claimed_at', 'REAL', 0, None, 0, 0),
+                         ('cancelled', 'INTEGER', 1, '0', 0, 0),
+                         ('response_id', 'TEXT', 0, None, 0, 0),
+                         ('result', 'TEXT', 0, None, 0, 0),
+                         ('result_digest', 'TEXT', 0, None, 0, 0),
+                         ('error_code', 'TEXT', 0, None, 0, 0)),
+ 'pilot_workflow_artifacts': (('run_id', 'TEXT', 0, None, 1, 0),
+                              ('artifact_id', 'TEXT', 1, None, 0, 0),
+                              ('review_digest', 'TEXT', 1, None, 0, 0),
+                              ('review', 'TEXT', 1, None, 0, 0)),
+ 'pilot_workflow_meta': (('singleton', 'INTEGER', 0, None, 1, 0),
+                         ('version', 'TEXT', 1, None, 0, 0),
+                         ('model', 'TEXT', 1, None, 0, 0)),
+ 'runtime_audit': (('sequence', 'INTEGER', 0, None, 1, 0),
+                   ('event', 'TEXT', 1, None, 0, 0),
+                   ('item_id', 'TEXT', 0, None, 0, 0),
+                   ('data', 'TEXT', 1, None, 0, 0)),
+ 'runtime_controls': (('message_id', 'TEXT', 0, None, 1, 0),
+                      ('item_id', 'TEXT', 1, None, 0, 0),
+                      ('kind', 'TEXT', 1, None, 0, 0)),
+ 'runtime_items': (('id', 'TEXT', 0, None, 1, 0),
+                   ('direction', 'TEXT', 1, None, 0, 0),
+                   ('peer_id', 'TEXT', 1, None, 0, 0),
+                   ('body', 'TEXT', 1, None, 0, 0),
+                   ('kind', 'TEXT', 1, None, 0, 0),
+                   ('created_at', 'REAL', 1, None, 0, 0),
+                   ('expires', 'REAL', 1, None, 0, 0),
+                   ('state', 'TEXT', 1, None, 0, 0),
+                   ('cancelled', 'INTEGER', 1, '0', 0, 0),
+                   ('message_id', 'TEXT', 0, None, 0, 0),
+                   ('decision_digest', 'TEXT', 0, None, 0, 0),
+                   ('decision_message_id', 'TEXT', 0, None, 0, 0),
+                   ('cancel_message_id', 'TEXT', 0, None, 0, 0),
+                   ('cancel_acknowledged', 'INTEGER', 1, '0', 0, 0),
+                   ('peer_cancelled', 'INTEGER', 1, '0', 0, 0)),
+ 'runtime_meta': (('id', 'INTEGER', 0, None, 1, 0),
+                  ('version', 'TEXT', 1, None, 0, 0),
+                  ('identity', 'TEXT', 1, None, 0, 0)),
+ 'runtime_tombstones': (('peer_id', 'TEXT', 1, None, 1, 0),
+                        ('item_id', 'TEXT', 1, None, 2, 0),
+                        ('context', 'TEXT', 1, None, 0, 0),
+                        ('route', 'TEXT', 1, None, 0, 0),
+                        ('artifact_digest', 'TEXT', 1, None, 0, 0)),
+ 'sqlite_sequence': (('name', '', 0, None, 0, 0), ('seq', '', 0, None, 0, 0))}
+TABLES = frozenset(COLUMNS)
+REQUIRED_TABLES = frozenset(('runtime_meta', 'runtime_items', 'runtime_tombstones',
+    'runtime_controls', 'runtime_audit', 'peer_meta', 'peer_enrolment', 'peer_outbox',
+    'peer_inbox', 'peer_receipts', 'sqlite_sequence'))
 
 
 class MigrationOutcomeUnknown(RuntimeError):
@@ -73,11 +165,23 @@ def _convert(raw, auth, session):
         schema = db.execute("SELECT type,name FROM sqlite_master WHERE name NOT LIKE 'sqlite_autoindex_%'").fetchall()
         if any(row['type'] != 'table' or row['name'] not in TABLES for row in schema):
             raise StorageDenied('Unknown or already encrypted database schema requires explicit review')
+        tables = {row['name'] for row in schema}
+        if not REQUIRED_TABLES <= tables:
+            raise StorageDenied('Missing required runtime schema')
+        for table in tables:
+            actual = tuple(tuple(row)[1:] for row in db.execute('PRAGMA table_xinfo(' + table + ')'))
+            if actual != COLUMNS[table]:
+                raise StorageDenied('Unknown or missing application storage columns require explicit review')
+        for group in ({'pilot_provider_meta', 'pilot_provider_runs'},
+                      {'pilot_workflow_meta', 'pilot_workflow_artifacts'}):
+            if tables & group and not group <= tables:
+                raise StorageDenied('Incomplete optional application schema')
+        if 'pilot_workflow_meta' in tables and 'pilot_provider_runs' not in tables:
+            raise StorageDenied('Workflow schema requires original provider records')
         from .runtime import VERSION as RUNTIME_VERSION
         metadata = db.execute('SELECT id,version,identity FROM runtime_meta').fetchall()
         if len(metadata) != 1 or tuple(metadata[0]) != (1, RUNTIME_VERSION, canonical(auth.public_identity()).decode()):
             raise StorageDenied('Legacy runtime belongs to a different owner or format')
-        tables = {row['name'] for row in schema}
         before = {table: [dict(row) for row in db.execute('SELECT * FROM ' + table)] for table in tables}
         if sum(len(rows) for rows in before.values()) > 100000:
             raise StorageDenied('Legacy row count exceeds migration bound')

@@ -1,7 +1,6 @@
 # Encrypted application storage work notice
 
-Coordinator: `/root/build_encrypted_storage`, coordinated with
-`/root/advance_central_network`. Base: main `cca92a0f5d69a5893698689613819c83222bdb4a`.
+Coordinator: storage implementation, with independent integration review. Base: main `cca92a0f5d69a5893698689613819c83222bdb4a`.
 
 Goal: encrypt local pilot application payloads at rest without changing existing
 SQLite transaction, delivery, consent or provider-dispatch fences. This is a
@@ -43,3 +42,9 @@ are pending. Inspect open PR ownership before expanding this scope.
   than expecting plaintext from SQLite. Their forgery assertions are unchanged.
 
 Verification remains in progress; final PR evidence records exact tested heads.
+
+A further independent migration review found that table-name allowlisting could
+copy an added private plaintext column. Migration now checks exact reviewed
+column contracts and required table groups, refuses unknown/missing/generated
+columns, and tests optional HTTPS journal preservation. Speculative future
+source-grant tables are refused until their runtime integration is reviewed.

@@ -283,6 +283,37 @@ class StorageTests(unittest.TestCase):
         self.assertEqual((directory / 'runtime.sqlite').read_bytes(), changed[0])
         self.assertTrue((directory / PENDING).exists())
 
+    def test_generated_columns_are_not_silently_copied(self):
+        self.item(); directory = self.legacy()
+        with sqlite3.connect(directory / 'runtime.sqlite') as db:
+            db.execute("ALTER TABLE runtime_items ADD COLUMN generated_secret TEXT GENERATED ALWAYS AS ('FICTIONAL PRIVATE GENERATED TEXT') VIRTUAL")
+        before = (directory / 'runtime.sqlite').read_bytes()
+        with self.assertRaises(StorageDenied): migrate(directory, self.a.auth, self.sa)
+        self.assertEqual(before, (directory / 'runtime.sqlite').read_bytes())
+        self.assertFalse((directory / PENDING).exists())
+
+    def test_missing_known_column_refuses_before_output(self):
+        self.item(); directory = self.legacy()
+        with sqlite3.connect(directory / 'runtime.sqlite') as db:
+            db.execute('ALTER TABLE runtime_items DROP COLUMN cancel_acknowledged')
+        before = (directory / 'runtime.sqlite').read_bytes()
+        with self.assertRaises(StorageDenied): migrate(directory, self.a.auth, self.sa)
+        self.assertEqual(before, (directory / 'runtime.sqlite').read_bytes())
+        self.assertFalse((directory / PENDING).exists())
+
+    def test_optional_https_journal_is_preserved_exactly(self):
+        from pilot.https_exchange import HTTPSExchange
+        self.item()
+        HTTPSExchange(self.a)._schema()
+        self.a.db.execute("INSERT INTO https_send_attempts(message_id,packet_digest,file_digest,recipient,destination,kind,state) VALUES(?,?,?,?,?,?,'uncertain')",
+                          ('synthetic-message', 'a' * 64, 'b' * 64, self.b.fingerprint,
+                           'https://fictional.invalid/v1/packets', 'proposal'))
+        before = [dict(row) for row in self.a.db.execute('SELECT * FROM https_send_attempts')]
+        directory = self.legacy()
+        migrate(directory, self.a.auth, self.sa)
+        self.restart()
+        self.assertEqual([dict(row) for row in self.a.db.execute('SELECT * FROM https_send_attempts')], before)
+
     def test_transaction_rollback_leaves_no_plaintext_or_partial_item(self):
         count = self.a.db.execute('SELECT COUNT(*) FROM runtime_items').fetchone()[0]
         with patch.object(self.a, '_event', side_effect=StorageDenied('synthetic audit failure')):

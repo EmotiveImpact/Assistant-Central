@@ -7,6 +7,7 @@ from pilot.auth import AuthError
 from pilot.provider import ResponsesAdapter
 from pilot.runtime import PilotRuntime
 from pilot.storage import StoreLease, StorageDenied
+from pilot.storage_migrate import migrate, PENDING
 from pilot.tests import test_storage as fixtures
 
 
@@ -44,3 +45,15 @@ class IndependentStorageReview(unittest.TestCase):
         self.assertNotIn(self.secret, late)
         with self.assertRaises(AuthError):
             self.a.storage.open('runtime_items', 'test', 'body', late)
+
+    def test_unknown_column_cannot_survive_migration_as_plaintext(self):
+        self.item()
+        directory = self.legacy()
+        with sqlite3.connect(directory / 'runtime.sqlite') as db:
+            db.execute('ALTER TABLE runtime_items ADD COLUMN extra_private_text TEXT')
+            db.execute('UPDATE runtime_items SET extra_private_text=?', (self.secret,))
+        original = (directory / 'runtime.sqlite').read_bytes()
+        with self.assertRaises(StorageDenied):
+            migrate(directory, self.a.auth, self.sa)
+        self.assertEqual((directory / 'runtime.sqlite').read_bytes(), original)
+        self.assertFalse((directory / PENDING).exists())

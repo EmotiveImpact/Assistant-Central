@@ -69,8 +69,9 @@ and an exclusive runtime migration lease must both be available. Multiple normal
 connections share the runtime lease and retain their existing SQLite serialisation.
 
 Migration reads a bounded, descriptor-pinned original into an in-memory SQLite
-database. It checks integrity, owner/version and recognised tables, refuses views
-and triggers, encrypts known payload columns, performs a memory-only VACUUM, and
+database. It checks integrity, owner/version, required table groups and exact reviewed column layouts (including
+type, nullability, default, primary key and hidden/generated flags), refuses views,
+triggers and unknown columns, encrypts known payload columns, performs a memory-only VACUUM, and
 compares every logical row with its original. The original remains untouched until
 the replacement is fully encrypted and verified. A new exclusive private
 `runtime.sqlite.encrypted.pending` is written and fsynced, its bytes checked, the
@@ -107,7 +108,8 @@ columns, raw file checks, fresh ciphertext, context/owner substitution, corrupti
 lock/unlock, late provider results, identity-preserving password changes, original
 packets, explicit migration with exact logical state preservation, failure before
 publication, uncertain file/directory fsync, retained pending refusal, links,
-sidecars, wrong owner, unknown schema, expired sessions and transaction rollback.
+sidecars, wrong owner, unknown/missing/generated columns, preserved optional HTTPS
+journal metadata, expired sessions and transaction rollback.
 The existing full pilot suite continues to test cancellation, replay, dispatch
 uncertainty, workflow concurrency, restart and owner/peer boundaries.
 
