@@ -1,8 +1,8 @@
-import {plain,finiteDate,stateLabel,statusClass,isPending,isTerminal,isPeerActive,filteredItems,validateState,validateReview,proposalBody,peerBody} from './model.mjs';
+import {plain,finiteDate,stateLabel,statusClass,isPending,isTerminal,isPeerActive,filteredItems,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,canPrepareWorkflow,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult} from './model.mjs';
 
 const $ = id => document.getElementById(id);
 let token = null, generation = 0, busy = false, currentView = 'inbox', currentFilter = 'all';
-let state = null, selected = null, uncertain = false;
+let state = null, selected = null, selectedWorkflow = null, uncertain = false;
 const viewCopy = {
   inbox:['Inbox','INCOMING WORK','The next move is yours.','Review each request before your assistant takes it on.','Your inbox','Exact requests, explicit decisions'],
   outbox:['Outbox','OUTGOING WORK','Share with intention.','Prepare the exact content, then choose whether to release it.','Your outbox','Prepared and released proposals'],
@@ -20,7 +20,7 @@ function identityText(identity) { if(typeof identity==='string')return identity;
 function notice(message,success=false) { $('notice').textContent=message;$('notice').hidden=!message;$('notice').classList.toggle('success',success); }
 function setBusy(value) { busy=value; document.querySelectorAll('button').forEach(node=>{ if(!node.classList.contains('close-dialog'))node.disabled=value; }); }
 function resetSession(message='') {
-  generation++;token=null;state=null;selected=null;uncertain=false;
+  generation++;token=null;state=null;selected=null;selectedWorkflow=null;uncertain=false;
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -80,7 +80,7 @@ function render() {
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   $('summary').hidden=['peers','activity'].includes(currentView);$('filters').hidden=['peers','activity'].includes(currentView);$('add-peer').hidden=currentView!=='peers';
   const provider=state.provider;
-  $('provider-status').textContent=provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
+  $('provider-status').textContent=workflowEnabled(state)?'Local synthetic rehearsal available · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();
   if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else renderItems();
 }
@@ -94,6 +94,8 @@ function renderItems() {
     const row=text('article','','item-row');const main=text('div','','item-main');main.append(text('h3',plain(item.title,'Untitled proposal'),'item-title'));
     const meta=text('div','','item-meta');meta.append(text('span',item.kind==='task'?'TASK REQUEST':'ARTIFACT','item-type'),text('span','·'),text('span',peerName(item.peer_id)));main.append(meta);
     const right=text('div','','row-right');right.append(badge(item.state),button(isTerminal(item)?'Inspect':'Review exact item','button secondary',()=>openReview(item)));
+    const run=state.workflow?.runs.find(run=>run.item_id===item.id);
+    if(run){main.append(text('p',workflowStateLabel(run.state)+(run.artifact_id?' · Artifact draft retained':''),'workflow-note'));right.append(button('Inspect synthetic run','button secondary',()=>openWorkflow(item,run.run_id)));}
     row.append(text('div',item.kind==='task'?'↗':'▤','item-icon '+item.kind),main,right);$('item-list').append(row);
   }
 }
@@ -127,7 +129,7 @@ async function openReview(item) {
   try {
     const review=validateReview(await request(`/api/items/${encodeURIComponent(item.id)}/review`),item);
     if(epoch!==generation)return;
-    selected={item:{...item},review};$('review-title').textContent=plain(item.title,'Exact proposal');$('review-eyebrow').textContent=item.direction==='outgoing'?'OUTGOING RELEASE REVIEW':'RECIPIENT DECISION';$('review-state').replaceChildren(badge(item.state));
+    selected={item:{...item},review};selectedWorkflow=null;$('review-title').textContent=plain(item.title,'Exact proposal');$('review-eyebrow').textContent=item.direction==='outgoing'?'OUTGOING RELEASE REVIEW':'RECIPIENT DECISION';$('review-state').replaceChildren(badge(item.state));
     $('review-details').replaceChildren();detail($('review-details'),'Type',item.kind==='task'?'Task request':'Artifact');detail($('review-details'),'Peer',peerName(item.peer_id));detail($('review-details'),'Recipient',identityText(review.recipient));detail($('review-details'),'Task reference',item.task_id);detail($('review-details'),'Valid until',datetime(item.expires));
     if(item.historical_state&&item.historical_state!==item.state)detail($('review-details'),'Historical state',stateLabel(item.historical_state));
     const permissions=review.source_permissions;
@@ -138,6 +140,7 @@ async function openReview(item) {
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
+    if(canPrepareWorkflow(state,item,review))$('review-actions').append(button('Prepare synthetic run','button secondary',()=>prepareWorkflow(item)));
     if(!review.allowed_actions.length)$('review-actions').append(button('Close','button secondary',()=> $('review-dialog').close()));
     $('review-dialog').showModal();
   } catch(error) { if(epoch===generation)handleFailure(error); }
@@ -148,6 +151,64 @@ async function decideSelected(action) {
   const snapshot=selected;const suffix=['accept','reject'].includes(action)?'decision':action;
   const body={review_digest:snapshot.review.review_digest};if(suffix==='decision')body.decision=action;
   await performWrite(`/api/items/${encodeURIComponent(snapshot.item.id)}/${suffix}`,body,{target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice(action==='release'?'Exact proposal released. Use Sync exchange to deliver queued messages.':'Your decision has been saved.',true);}});
+}
+async function prepareWorkflow(item) {
+  if(!selected||selected.item.id!==item.id||!canPrepareWorkflow(state,item,selected.review))return;
+  await performWrite(`/api/items/${encodeURIComponent(item.id)}/workflow`,{}, {target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice('Synthetic run prepared. Inspect its exact request and approve it separately. Nothing has run.',true);}});
+}
+function workflowDetailHeader(item,run,heading) {
+  selected=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
+  $('review-details').replaceChildren();detail($('review-details'),'Task',plain(item.title,item.task_id));detail($('review-details'),'Return recipient',peerName(item.peer_id));detail($('review-details'),'Provider calls','None. Fixed local fixture only.');
+  $('review-commitments').replaceChildren();detail($('review-commitments'),'Run ID',run.run_id);detail($('review-commitments'),'Task proposal',item.id);detail($('review-commitments'),'Context',item.context);detail($('review-commitments'),'Provider review',run.review_digest);
+  $('review-message').textContent='';$('review-actions').replaceChildren();
+}
+async function openWorkflow(item,runId) {
+  if(busy||uncertain)return;
+  const epoch=generation;setBusy(true);
+  try {
+    const run=validateWorkflowStatus(await request(`/api/workflows/${encodeURIComponent(runId)}`),item);
+    if(epoch!==generation)return;
+    workflowDetailHeader(item,run,'Inspect synthetic run');
+    selectedWorkflow={item:{...item},run,review:null,mode:'status'};
+    $('review-content').textContent='No automatic retry is permitted. Inspect the retained status and original operation.';
+    $('review-scope').textContent='This is a local fixture, not completed research or a live model response. A run never releases an artifact automatically.';
+    if(run.allowed_actions.includes('review')) {
+      const value=validateWorkflowReview(await request(`/api/workflows/${encodeURIComponent(runId)}/review`),run,item,state.identity);
+      if(epoch!==generation)return;
+      selectedWorkflow={item:{...item},run,review:value,mode:'provider'};
+      $('review-title').textContent='Review synthetic request';$('review-content').textContent=JSON.stringify(value.review.request,null,2);
+      detail($('review-details'),'Fixture route',`${value.review.binding.provider} · ${value.review.binding.model}`);detail($('review-details'),'Output limit',`${value.review.binding.max_output_tokens} tokens`);detail($('review-details'),'Input commitment',item.artifact_digest);
+      $('review-scope').textContent='Approve only this exact request for the local synthetic fixture. Approval does not run it. Running is a separate one-shot action and does not publish or release the result.';
+      if(run.allowed_actions.includes('approve'))$('review-actions').append(button('Approve synthetic request','button primary',()=>workflowAction('approve')));
+      if(run.allowed_actions.includes('run'))$('review-actions').append(button('Run synthetic fixture once','button primary',()=>workflowAction('run')));
+    } else if(run.allowed_actions.includes('review_result')) {
+      const peer=state.peers.find(peer=>peer.peer_id===item.peer_id);
+      const value=validateWorkflowResult(await request(`/api/workflows/${encodeURIComponent(runId)}/result`),run,item,peer);
+      if(epoch!==generation)return;
+      selectedWorkflow={item:{...item},run,review:value,mode:'result'};
+      $('review-title').textContent='Review original synthetic result';$('review-content').textContent=value.content;
+      detail($('review-details'),'Artifact title',value.review.title);detail($('review-details'),'Valid until',datetime(value.review.expires));
+      detail($('review-commitments'),'Result digest',value.review.result_digest);detail($('review-commitments'),'Result review',value.review_digest);detail($('review-commitments'),'Source permissions',value.review.source_permissions_digest);
+      $('review-scope').textContent='Stage only this exact original fixture result as an artifact draft for the originating task owner. Staging does not release it. Review and release the resulting outbox item separately.';
+      if(run.allowed_actions.includes('stage'))$('review-actions').append(button('Stage exact artifact','button primary',()=>workflowAction('stage')));
+    }
+    if(run.artifact_id){detail($('review-commitments'),'Retained artifact',run.artifact_id);detail($('review-details'),'Artifact state',stateLabel(run.artifact_state));}
+    if(run.allowed_actions.includes('cancel'))$('review-actions').prepend(button('Cancel synthetic run','button danger',()=>workflowAction('cancel')));
+    $('review-actions').append(button('Close','button secondary',()=>{$('review-dialog').close();selectedWorkflow=null;}));
+    $('review-dialog').showModal();
+  } catch(error) { if(epoch===generation)handleFailure(error); }
+  finally { if(epoch===generation)setBusy(false); }
+}
+async function workflowAction(action) {
+  if(!selectedWorkflow||busy||uncertain||!selectedWorkflow.run.allowed_actions.includes(action)||!workflowEnabled(state))return;
+  const snapshot=selectedWorkflow,body={};
+  if(['approve','run','stage'].includes(action))body.review_digest=snapshot.review.review_digest;
+  if(action==='approve')body.expires=Math.min(Math.floor(Date.now()/1000)+300,Math.floor(snapshot.item.expires));
+  await performWrite(`/api/workflows/${encodeURIComponent(snapshot.run.run_id)}/${action}`,body,{target:'review-message',onSuccess:()=>{
+    selectedWorkflow=null;$('review-dialog').close();
+    if(action==='stage'){currentView='outbox';currentFilter='all';render();}
+    const messages={approve:'Exact synthetic request approved. Inspect the run to perform the separate one-shot fixture action.',run:'Original synthetic result retained. Inspect it before staging an artifact.',stage:'Exact artifact staged as a draft. Review and release it separately from your outbox.',cancel:'Synthetic run cancelled locally. No remote cancellation or recall is claimed.'};notice(messages[action],true);
+  }});
 }
 function openDialog(id) { if(busy||uncertain)return;$(id).showModal(); }
 function newContext(){return Array.from(crypto.getRandomValues(new Uint8Array(32)),byte=>byte.toString(16).padStart(2,'0')).join('');}
@@ -161,6 +222,7 @@ function prepareCompose(){
 }
 function configureKind(){
   const form=$('compose-form'),artifact=form.elements.kind.value==='artifact';$('parent-field').hidden=!artifact;$('proposal-parent').required=artifact;
+  $('workflow-permission-field').hidden=artifact||!workflowEnabled(state);if(artifact||!workflowEnabled(state))form.elements.synthetic_run.checked=false;
   form.elements.context.readOnly=artifact;form.elements.task_id.readOnly=artifact;form.elements.peer_id.disabled=artifact;
   $('compose-message').textContent='';
   if(artifact){
@@ -190,13 +252,13 @@ async function logout(){
   try {await request('/api/session',{method:'DELETE',body:{},sessionToken:original});}catch{$('login-message').textContent='Locked here. Server sign-out could not be confirmed; the session will expire.';}
 }
 $('logout').addEventListener('click',logout);$('mobile-logout').addEventListener('click',logout);
-$('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;setBusy(true);try{await refresh({clearNotice:true});selected=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{if(epoch===generation)setBusy(false);}});
+$('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;setBusy(true);try{await refresh({clearNotice:true});selected=null;selectedWorkflow=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{if(epoch===generation)setBusy(false);}});
 $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>notice('Exchange checked. Review new items and saved delivery outcomes below.',true)}));
 $('new-proposal').addEventListener('click',prepareCompose);$('add-peer').addEventListener('click',()=>openDialog('peer-dialog'));
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentView=node.dataset.view;currentFilter='all';render();}));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
-document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;}));
-document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();else selected=null;}));
+document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;}));
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();else{selected=null;selectedWorkflow=null;}}));
 $('proposal-kind').addEventListener('change',configureKind);$('proposal-parent').addEventListener('change',selectParent);
 $('compose-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertain)return;const form=event.currentTarget;const fields=Object.fromEntries(new FormData(form));fields.peer_id=form.elements.peer_id.value;

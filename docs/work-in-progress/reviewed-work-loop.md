@@ -2,7 +2,7 @@
 
 Started 10 November 2026. Coordination owner: Pepper/Codex primary agent in the Assistant-Central thread.
 
-Status: **work in progress, implementation not yet verified**. This draft is opened before implementation so other agents can see the claimed scope. Based on PR #7 (`66ec206d517d53c7648db0a756774d057176f6fb`), itself stacked on #6. Do not merge without Augustus's explicit approval.
+Status: **implemented and locally verified; hosted checks pending**. This draft was opened before implementation so other agents could see the claimed scope. Based on PR #7 (`66ec206d517d53c7648db0a756774d057176f6fb`), itself stacked on #6. Do not merge without Augustus's explicit approval.
 
 ## Claimed scope
 
@@ -26,11 +26,12 @@ Remote hosting/carrier, real-person enrolment, key recovery/rotation, encryption
 
 ## Acceptance evidence required
 
-- [ ] Exact accepted task to synthetic provider run, with signed source grant and separate recipient approval.
-- [ ] Reviewed original result to one exact return artifact, with no new provider dispatch or automatic release.
-- [ ] Revocation, expiry, cancellation, wrong recipient/context, duplicate submission, concurrent staging and uncertain commit handling.
-- [ ] Restart recovery and denied release after source withdrawal.
-- [ ] Actual two-process HTTP workflow and interface contract/browser checks.
-- [ ] Existing regression suites and independent review.
+- [x] Exact accepted task to synthetic provider run, with signed source grant and separate recipient approval.
+- [x] Reviewed original result to one exact return artifact, with no new provider dispatch or automatic release.
+- [x] Revocation, expiry, cancellation, wrong recipient/context, duplicate submission, concurrent staging and uncertain commit handling.
+- [x] Restart recovery and denied release after source withdrawal.
+- [x] Actual two-process HTTP workflow and both interface contracts.
+- [x] 195 pilot Python tests, including 54 new checks; 24 interface model tests; independent review completed.
+- [ ] Hosted browser and complete existing regression workflow on the published implementation.
 
 The PR description will be kept current with active ownership, blockers, verified results and the final implementation scope.

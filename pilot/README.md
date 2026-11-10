@@ -27,6 +27,21 @@ rejects an alternative and propagates cancellation. It restarts both processes
 and verifies retained history. Credentials and private keys are never printed or
 included in evidence. No model authors the fictional artifact in this demo.
 
+The [reviewed work loop](WORKFLOW.md) connects accepted input to an explicitly
+approved local fixture result, exact result review, an inert artifact draft and
+separate release. Its two-process demo also tests offline delivery and reopening
+the original pinned endpoint:
+
+```sh
+.venv-pilot/bin/python -B -m pilot.workflow_demo
+```
+
+For interactive rehearsal, add `--synthetic-workflow` when starting the receiving
+owner's server. The sender must explicitly declare the exact fixture route on
+the task, then the receiver must separately accept the task and approve the run.
+The interface labels the result synthetic: no model or research was performed.
+This flag enables no live provider, credential access or remote deployment.
+
 ## Run two owner workspaces
 
 Provision each local account through a terminal. Passwords are entered privately
