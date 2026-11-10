@@ -60,8 +60,10 @@ mistaken for a new failed run.
 
 The build sends only allowlisted, versioned pilot source and explicit test helper
 files, not the entire checkout, `.git`, untracked files or owner data. No runtime
-container receives host bind mounts, a Docker socket, provider credentials or
-the other owner's password/token. The helper module is test tooling, not a new
+container receives host bind mounts, a Docker socket or provider credentials.
+The other owner's password/token is supplied only in the deliberate synthetic
+cross-owner authentication rejection probes, never for normal operation.
+The helper module is test tooling, not a new
 owner API or a production deployment recommendation.
 
 ## What the integration check actually verifies

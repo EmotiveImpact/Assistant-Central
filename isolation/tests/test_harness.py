@@ -122,6 +122,7 @@ class HarnessChecks(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "context.tar"
             build_context(target)
+            self.assertEqual(target.read_bytes()[:2], b"\x1f\x8b")
             with tarfile.open(target) as archive:
                 names = archive.getnames()
             self.assertIn("pilot/server.py", names)

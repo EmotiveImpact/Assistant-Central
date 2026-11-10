@@ -78,7 +78,9 @@ def build_context(destination):
     files = [name for name in tracked if (Path(name).suffix in (".py", ".mjs", ".html", ".css")
                                          or name == "pilot/requirements.txt")]
     files += ["isolation/__init__.py", "isolation/probe.py"]
-    with tarfile.open(destination, "w") as archive:
+    # gzip has an unambiguous magic header. Some Docker/BuildKit versions treat
+    # an uncompressed Python PAX archive on stdin as a plain-text Dockerfile.
+    with tarfile.open(destination, "w:gz") as archive:
         archive.add(ROOT / "isolation/Dockerfile", arcname="Dockerfile", recursive=False)
         for name in files:
             path = ROOT / name
@@ -111,7 +113,7 @@ class Harness:
             raise RuntimeError("Docker CLI is required; no isolation test ran. Use an authorized Docker engine or the CI job.")
         self.docker("info", "--format", "{{.ServerVersion}}")
         with tempfile.TemporaryDirectory(prefix=self.prefix) as temporary:
-            archive = Path(temporary) / "context.tar"
+            archive = Path(temporary) / "context.tar.gz"
             build_context(archive)
             with archive.open("rb") as stream:
                 self.build_started = True
