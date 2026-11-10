@@ -91,7 +91,7 @@ is not a new owner-authorised send API and does not bypass product attempt gates
 
 ## What this does not prove
 
-All four containers share a host kernel and one trusted controller. A host/root/
+All four containers share a host kernel and one trusted controller. A host, root or
 Docker administrator, same-owner process compromise, kernel escape, dependency
 compromise, malicious orchestration or snapshot rollback remains outside this
 fixture. Two fictional password accounts are not two real people. A private

@@ -58,7 +58,7 @@ jobs:
         run: python -B -m pilot.workflow_demo
       - name: Check pilot interface model and actual HTTP contract
         run: |
-          node --test pilot/web/tests/model.test.mjs
+          node --test pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
           python -B pilot/web/tests/live_contract.py
           python -B pilot/web/tests/workflow_contract.py
       - name: Check consent and protocol prototype
@@ -101,6 +101,14 @@ jobs:
             PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
             UI_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
             node pilot/web/tests/browser.test.mjs
+          NODE_PATH="$RUNNER_TEMP/ac-pilot-browser/node_modules" \
+            LIVE_PILOT_URL=http://127.0.0.1:8765 \
+            LIVE_PILOT_PASSWORD='Fictional browser test password' \
+            PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
+            node pilot/web/tests/browser_transfers_live.test.mjs
+          NODE_PATH="$RUNNER_TEMP/ac-pilot-browser/node_modules" \
+            PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
+            node pilot/web/tests/browser_transfers.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

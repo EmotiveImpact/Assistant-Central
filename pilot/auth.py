@@ -388,6 +388,24 @@ class LocalOwnerAuth:
             except ValueError:
                 raise AuthError("Peer exchange key rejected") from None
 
+    def _application_storage_exchange(self, ephemeral_public):
+        """Internal record-opening primitive, never an owner/peer route.
+
+        Runtime APIs remain responsible for the exact caller session. Refuse
+        opening after lock, logout, expiry, credential uncertainty or close.
+        Public-key record sealing needs no unlocked private key.
+        """
+        with self._lock:
+            self._open()
+            now = self._now()
+            if self._vault is None or not self._db.execute(
+                    "SELECT 1 FROM sessions WHERE issued<=? AND expires>?", (now, now)).fetchone():
+                raise AuthError("Current owner session required")
+            try:
+                return self._vault[1].exchange(X25519PublicKey.from_public_bytes(ephemeral_public))
+            except (ValueError, TypeError):
+                raise AuthError("Application storage key unavailable") from None
+
     def logout(self, token):
         with self._lock:
             token_hash, _ = self._session(token)

@@ -162,9 +162,12 @@ class FileExchange:
 
     def receipt(self, session, incoming_id, destination):
         with self.authorised(session):
-            # Runtime owns the authenticated transaction and expiry recheck. The
-            # transport returns the original cached signed receipt, never renews it.
+            # Recovery must not use the transport's initial-receipt creation path.
+            # Check and retrieve under the same authenticated runtime transaction.
             with self.runtime._transaction(session):
+                if self.runtime.db.execute('SELECT 1 FROM peer_receipts WHERE id=?',
+                                           (incoming_id,)).fetchone() is None:
+                    raise TransportDenied('Original cached receipt required')
                 packet = self.runtime.exchange.receipt_for(self.runtime.auth, session, incoming_id)
             try:
                 self.runtime.auth.authenticate(session)
