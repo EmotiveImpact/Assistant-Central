@@ -5,9 +5,11 @@ overview, work queue, artifact library, assistant network and activity views use
 the real owner HTTP API. This component does not replace the runtime, identity,
 disclosure, exact-review or delivery boundaries.
 
-The visual direction uses the restraint, typography and spacing of the Linear
-reference, with an original Central identity. It is a working local interface,
-not a claim of production readiness or a hosted service.
+The interface bundles Inter Variable 4.1 and uses measured Linear website and
+workspace component values. Exact source mappings and font provenance are in
+[LINEAR_STYLE_REFERENCE.md](LINEAR_STYLE_REFERENCE.md). Central retains its own
+identity and information layout. This is a working local interface; production
+readiness and remote hosting remain separate requirements.
 
 ## Open the fictional workspace
 

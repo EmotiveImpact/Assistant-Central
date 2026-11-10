@@ -26,3 +26,17 @@ hosted evidence belongs in the PR and workspace_ui/VERIFICATION.md.
 All fixture content remains fictional; live providers stay disabled. No merge
 or deployment without owner approval. Later transfer workspace integration is a
 separate composition check with #16.
+
+## Exact style correction, 10 November
+
+The user requested Linear's exact font and styling. The earlier implementation
+named Inter without loading it. `/root` now owns the bundled official Inter 4.1
+font/licence, measured component tokens, HTML preload and source reference.
+`/root/exact_style_audit` audits reference mappings and cascade conflicts.
+`/root/exact_font_tests` owns the narrow font route and HTTP/browser checks.
+The existing PR was returned to draft before this correction began.
+
+Eight HTTP tests and nine projection tests pass locally. Browser checks pin the
+font bytes and assert successful decoding, the actual family, 510/590 weights,
+optical sizing and exact computed geometry. Final hosted evidence and screenshot
+inspection are recorded in PR #19. No provider or consent boundary was widened.

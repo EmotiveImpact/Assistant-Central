@@ -71,7 +71,12 @@ try {
   assert.ok(fontEvidence.family.startsWith('"Inter Variable"'),fontEvidence.family);
   assert.equal(fontEvidence.ready,true);
   assert.equal(fontEvidence.loaded,true,'a declared family alone does not prove a loaded webfont');
-  await screenshot('central-platform-login.png');
+  await noOverflow();await screenshot('central-platform-login.png');
+  for(const width of [768,701,390]){
+    await page.setViewportSize({width,height:1000});await noOverflow();
+    assert.equal(await page.locator('.login-story').evaluate(node=>node.scrollWidth<=node.clientWidth),true,'entrance headline must fit at '+width);
+  }
+  await page.setViewportSize({width:1440,height:1000});
   await page.locator('#password').fill(process.env.WORKSPACE_PASSWORD);
   await page.getByRole('button',{name:'Unlock workspace'}).click();
   await page.locator('#workspace').waitFor({state:'visible'});
@@ -90,6 +95,11 @@ try {
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
+  assert.equal(await page.locator('.overview-row .badge').first().evaluate(node=>getComputedStyle(node).padding),'0px 11px 0px 7px');
+  await page.setViewportSize({width:800,height:1000});
+  assert.equal(await page.locator('#new-proposal').evaluate(node=>getComputedStyle(node).fontSize),'13px');
+  await noOverflow();
+  await page.setViewportSize({width:1440,height:1000});
   await noOverflow();await screenshot('central-platform-overview.png');
   await page.setViewportSize({width:390,height:844});await noOverflow();
   await screenshot('central-platform-mobile.png',{fullPage:false});
