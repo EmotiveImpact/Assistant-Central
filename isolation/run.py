@@ -135,7 +135,7 @@ class Harness:
     def start(self, role, uid, *, network=None, mounts=(), command=()):
         name = self.name(role)
         self.containers.append(name)
-        args = ["run", "--detach", "--name", name, "--label", "assistant-central.isolation=" + self.prefix,
+        args = ["run", "--detach", "--init", "--name", name, "--label", "assistant-central.isolation=" + self.prefix,
                 "--user", f"{uid}:{uid}", "--read-only", "--cap-drop=ALL",
                 "--security-opt=no-new-privileges:true", "--ipc=private", "--pids-limit=64",
                 "--memory=256m", "--cpus=1", "--network", network or "container:" + self.anchor_id,
@@ -177,11 +177,12 @@ class Harness:
                 # Only exception class and source location, never raw exception
                 # details or log content, enter failure evidence.
                 types = re.findall(r"^([A-Za-z_.]*(?:Error|Exception)):", logs, re.MULTILINE)
+                errnos = re.findall(r"\[Errno (\d+)\]", logs)
                 frames = re.findall(r'File "(/app/(?:pilot|isolation)/[\w/]+\.py)", line (\d+)', logs)
                 reason = ", ".join(path + ":" + line for path, line in frames[-3:])
                 raise RuntimeError("Pilot " + owner + " exited before readiness (exit=" + str(info["State"]["ExitCode"])
                                    + ", OOM=" + str(info["State"].get("OOMKilled", False)) + ") "
-                                   + ",".join(types) + " " + reason)
+                                   + ",".join(types) + " errno=" + ",".join(errnos) + " " + reason)
             lines = self.docker("logs", self.name(owner)).splitlines()
             if lines:
                 ready = json.loads(lines[-1])
@@ -200,6 +201,20 @@ class Harness:
                               method=method, path=path, body=body, token=token)
         require(response["status"] == expected, method + " " + path + " returned " + str(response["status"]))
         return response["body"]
+
+    def restart(self):
+        for owner in OWNERS:
+            self.docker("stop", self.name(owner))
+        # The pilot deliberately disables SO_REUSEADDR. After actual HTTP
+        # traffic, TIME_WAIT can prevent an immediate same-port restart. Wait
+        # for normal socket expiry; do not alter the pilot or host sysctls.
+        deadline = time.monotonic() + 90
+        while not all(self.probe("controller", "port_available", port=config["port"]) for config in OWNERS.values()):
+            if time.monotonic() >= deadline:
+                raise RuntimeError("Loopback ports remain occupied after stopping both pilots")
+            time.sleep(1)
+        for owner in OWNERS:
+            self.docker("start", self.name(owner))
 
     def boundaries(self):
         observed, counts = {}, {}
@@ -337,8 +352,7 @@ def exchange(harness, passwords, identities):
                                                               token=tokens[owner]) for item in (task, artifact)}}
 
     # Restart actual server containers on the same private named volumes.
-    for owner in OWNERS:
-        harness.docker("restart", harness.name(owner))
+    harness.restart()
     for owner in OWNERS:
         harness.wait_ready(owner)
         harness.request(owner, "GET", "/api/state", token=tokens[owner], expected=401)
@@ -366,7 +380,9 @@ def run():
         require(identities["atlas"]["fingerprint"] != identities["beacon"]["fingerprint"], "Shared cryptographic identity")
         for owner in OWNERS:
             harness.wait_ready(owner)
+        print("isolation: both non-root pilot servers are ready", file=sys.stderr)
         boundary = harness.boundaries()
+        print("isolation: both-direction filesystem and actual-volume permission probes passed", file=sys.stderr)
         messages = exchange(harness, passwords, identities)
         return {"schema": "assistant-central-isolation/1", "result": "passed", "synthetic_only": True,
                 "isolation": boundary, "exchange": messages,

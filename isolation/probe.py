@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import secrets
+import socket
 import stat
 import sys
 
@@ -111,6 +112,16 @@ def main(data):
         return environment(data["directory"])
     if operation == "boundary":
         return boundary(data)
+    if operation == "port_available":
+        require(data["port"] in (8765, 8766), "Unexpected test port")
+        with socket.socket() as listener:
+            try:
+                listener.bind(("127.0.0.1", data["port"]))
+            except OSError as exc:
+                if exc.errno == errno.EADDRINUSE:
+                    return False
+                raise
+        return True
     if operation == "request":
         port = data["port"]
         require(type(port) is int and port in (8765, 8766), "Unexpected test port")

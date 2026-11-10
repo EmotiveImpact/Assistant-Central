@@ -95,8 +95,12 @@ owner API or a production deployment recommendation.
    until recipient acceptance, and an independently released return artifact is
    accepted by the original requester. A transport receipt is not owner acceptance.
 6. Restarting both actual server containers preserves each identity and the two
-   accepted items on its own volume while invalidating old owner sessions. Live
-   provider activation remains disabled throughout.
+   accepted items, exact reviewed content and audit history on its own volume
+   while invalidating old owner sessions. The pilot disables address reuse, so
+   the harness stops both servers and waits up to 90 seconds for their loopback
+   sockets to expire before starting them again on their pinned ports. It does
+   not change socket options or host sysctls. Live provider activation remains
+   disabled throughout.
 
 The fast unit tests mutate guard inputs to ensure unsafe settings are rejected,
 check the build allowlist and error redaction, and ensure a successful operation
