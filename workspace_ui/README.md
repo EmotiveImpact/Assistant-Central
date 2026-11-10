@@ -88,11 +88,21 @@ Persistent conversations remain a separate authority in PR #22. This work does
 not create a second thread ledger or present proposals as chat history. Remote
 hosting, live providers and real-owner onboarding remain outside this component.
 
+## Optional host draft review
+
+The **Host drafts** view is disabled unless the launcher receives an explicit
+private `--host-draft-config` file. It connects existing supported-host drafts
+to the authenticated owner for exact inspection and local dismissal only.
+No task is approved, staged, sent or executed. The original host lease is at
+most 15 minutes; an expired or revoked connection is unavailable, not an empty
+queue. See [setup, security boundaries and migration](../agent_bridge/OWNER_REVIEW.md).
+
 ## Verification
 
 ```sh
+npm ci --prefix agent_bridge --ignore-scripts --no-audit --no-fund
 python -B -m unittest discover -s workspace_ui/tests -v
-node --test workspace_ui/tests/projections.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
+node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
 ```
 
 The HTTP tests exercise the actual owner server: exact static content, path and

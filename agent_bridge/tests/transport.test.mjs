@@ -94,10 +94,19 @@ test('a committed draft with an abandoned response recovers by exact request, ne
     // Deliberately never parse/retain the call response. Observe commitment only
     // via the trusted store, then terminate the transport and retry explicitly.
     let stored;
-    for (let i = 0; i < 100; i++) {
+    const deadline = Date.now() + 3000;
+    while (Date.now() < deadline) {
       const { DatabaseSync } = await import('node:sqlite'); const db = new DatabaseSync(f.launch.storePath);
-      const row = db.prepare('SELECT id FROM drafts').get(); db.close();
-      if (row) { stored = row.id; break; } await delay(10);
+      try {
+        // Observation can race the real SQLite commit. A bounded busy wait is
+        // not a mutation retry, nor evidence that a draft has been committed.
+        db.exec('PRAGMA busy_timeout=100');
+        const row = db.prepare('SELECT id FROM drafts').get();
+        if (row) { stored = row.id; break; }
+      } catch (error) {
+        if (error?.errcode !== 5) throw error;
+      } finally { db.close(); }
+      await delay(10);
     }
     assert.ok(stored); process.kill(); await once(process, 'exit'); process = undefined;
     const c = await clientFor(f);

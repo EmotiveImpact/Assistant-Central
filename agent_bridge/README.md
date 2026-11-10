@@ -39,7 +39,8 @@ Exactly two model-facing tools exist:
   another scope.
 
 Both return an opaque draft identifier and the explicit states
-`awaiting_owner_review`, `ownerConsent: not_requested`,
+`awaiting_owner_review` (or `dismissed` after an explicit owner decision),
+`ownerConsent: not_requested`,
 `transportReceipt: none`, `execution: not_started`. No tool grants, accepts,
 sends, retries transport, executes, activates a provider, releases a result,
 enrols a peer or changes permissions. No owner runtime or broad dispatch callback
@@ -83,12 +84,14 @@ authenticate that owner independently before calling it. Revoking agent access
 does not erase the owner's retained review record. The content is still
 untrusted text and must not be rendered as HTML or treated as instructions.
 
-**The existing pilot/workspace owner interface is not wired to this queue.**
-`awaiting_owner_review` describes its inert state, not a notification or promise
-that it appears in that UI. A later reviewed integration must map the exact
-content, source lineage, recipients and purpose into the existing owner approval
-flow, keeping source grants, recipient acceptance, provider approval, release,
-transport receipt and result acceptance distinct.
+The workspace has an **optional, default-disabled authenticated owner queue**
+for exact inspection and local dismissal only. See [owner review](OWNER_REVIEW.md)
+for the private host configuration, real fingerprint binding and offline schema
+upgrade requirements. The queue requires the original active host lease, at most
+15 minutes; it is not a retained owner archive or automatic notification.
+`awaiting_owner_review` remains an inert state, not consent or delivery. A future
+proposal integration would still need independent source grants, recipient
+acceptance, provider approval, release, transport receipt and result acceptance.
 
 ## Storage, replay and revocation
 
