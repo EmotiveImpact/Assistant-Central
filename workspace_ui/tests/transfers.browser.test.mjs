@@ -29,7 +29,16 @@ const row=id=>page.locator('.transfer-row').filter({hasText:id});
 const open=async id=>{await row(id).getByRole('button',{name:'Inspect via Fictional Atlas mailbox',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const close=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const send=async name=>{await page.locator('#transfer-confirm').check();await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
-const screenshot=async name=>{if(evidence)await page.screenshot({path:path.join(evidence,name),fullPage:true});};
+const screenshot=async(name,{fullPage=true}={})=>{
+ if(!evidence)return;
+ await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
+ if(await page.locator('#menu-toggle').isVisible()){
+  assert.equal(await page.locator('body').evaluate(node=>node.classList.contains('sidebar-open')),false);
+  await page.waitForFunction(()=>document.querySelector('.sidebar').inert&&document.querySelector('.sidebar').getBoundingClientRect().right<=0.5);
+  assert.equal(await page.locator('.sidebar').getAttribute('aria-hidden'),'true');
+ }
+ await page.screenshot({path:path.join(evidence,name),fullPage});
+};
 try{
  await page.goto(base.origin);
  const login=page.waitForResponse(response=>response.url().endsWith('/api/session')&&response.request().method()==='POST');
@@ -64,7 +73,7 @@ try{
  await send('Send one explicit retry');await idle();await refresh();
  current=await snapshot();assert.equal(current.transfers.outbox.find(item=>item.message_id===packet).attempts,2);
  // Replay the formerly exact review through the actual owner API. It must fail
- // and cannot silently become another retry after the retainedReview.attempts change.
+ // and cannot silently become another retry after the retained attempts change.
  assert.equal((await api(endpoint+'/send',{review_digest:stale.review_digest,retry:true})).status,400);
  assert.equal((await snapshot()).transfers.outbox.find(item=>item.message_id===packet).attempts,2);
  await open(packet);await page.locator('.commitment-details summary').click();
@@ -123,7 +132,9 @@ try{
  assert.equal(current.transfers.outbox.find(item=>item.message_id===withdrawPacket).owner_acceptance,'not_established');
  await nav('transfers');await screenshot('central-transfers-desktop.png');
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
- await screenshot('central-transfers-mobile.png');await open(packet);await screenshot('central-transfers-review-mobile.png');
+ await page.evaluate(()=>window.scrollTo(0,0));await screenshot('central-transfers-mobile.png',{fullPage:false});await open(packet);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+ await screenshot('central-transfers-review-mobile.png',{fullPage:false});
  await page.keyboard.press('Escape');await page.locator('#review-dialog').waitFor({state:'hidden'});
  await page.locator('#menu-toggle').click();assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),false);await page.keyboard.press('Escape');assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),true);
  await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});

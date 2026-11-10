@@ -209,7 +209,7 @@ try {
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);
   assert.deepEqual(errors,[]);
-  console.log('PASS workspace browser: seven state-backed views, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
+  console.log('PASS workspace browser: eight state-backed views, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
 } catch(error) {
   if(screenshots)await page.screenshot({path:path.join(screenshots,'central-platform-failure.png'),fullPage:true}).catch(()=>{});
   throw error;

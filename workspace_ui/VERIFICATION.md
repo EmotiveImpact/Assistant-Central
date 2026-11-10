@@ -62,12 +62,30 @@ failed actual Chromium startup in
 even though its former seven HTTP and nine projection checks passed. The recursive
 module-graph test now covers that missing boundary.
 
-The historical PR #19 workspace run
-[42792553357](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42792553357)
-passed on its exact head. It does not establish browser acceptance for the composed
-transfer shell. The final composed-tree browser and aggregate runs are pending and
-will be recorded in the PR with exact head/tree identifiers and screenshot evidence.
+The actual combined implementation passed both hosted Chromium suites on head
+`715793b216fb8caf00c146df54ed1d1e55d797c4`, tree
+`c6f5ff3abc93da93579d99bf803afb9564d87f6f`:
+
+- [Combined Central browser run 42799055963](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42799055963)
+  passed nine HTTP tests, 39 model/projection/transfer checks, the original owner
+  workflow browser suite and the new two-owner real HTTP/TLS transfer suite.
+- [Container isolation run 42799065770](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42799065770)
+  passed actual Docker/UID isolation. Its PR merge tree was verified identical to
+  the implementation tree above.
+- [Screenshot archive 13754453383](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42799055963/artifacts/13754453383)
+  was downloaded and its SHA256 verified as
+  `a02849e50948c43f6dc094722b48f682f234060cb0bc1fb8092b2a40c836d875`.
+  Desktop overview, board, artifacts, assistants, result review and transfer
+  screenshots were inspected. The first transfer mobile capture caught the drawer
+  transition, so the capture helper now waits for inert, fully hidden navigation
+  and uses viewport-sized mobile captures. This is a test-evidence correction,
+  not a product-authority change.
+
+The latest exact-head aggregate runs and corrected mobile screenshot archive are
+recorded in [PR #23](https://github.com/EmotiveImpact/Assistant-Central/pull/23).
+The run and tree identifiers above deliberately identify immutable evidence;
+subsequent code changes require their own passing checks rather than inheriting it.
 
 No local Chromium was attempted during this composition. The assigned environment
-has a known process-singleton socket restriction; it was not bypassed. Hosted
-Chromium must execute the actual combined application before this work is accepted.
+has a known process-singleton socket restriction; it was not bypassed. The browser
+evidence comes from actual hosted Chromium against the combined application.
