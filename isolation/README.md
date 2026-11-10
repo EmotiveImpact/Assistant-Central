@@ -8,7 +8,7 @@ synthetic. It never calls a model provider or publishes a listening host port.
 ## Run
 
 Use a checkout containing this harness and the reviewed-work-loop pilot (PR #8 or later),
-Python 3.12 on the host, and an **already authorized Linux Docker engine** with
+Python 3.12 on the host, and an **already authorised Linux Docker engine** with
 seccomp enabled. Docker Desktop's Linux engine or rootless Docker may work, but
 the recorded CI target is the standard GitHub-hosted Ubuntu Docker engine.
 Windows containers are unsupported. Registry access is needed to build the
@@ -27,7 +27,7 @@ nonzero exit if Docker, the daemon, registry, seccomp, an assertion, or cleanup
 is unavailable. There is **no same-UID fallback and no skipped-test success**.
 The harness does not install Docker, invoke sudo, create host users, configure
 daemon access, change host security settings or request privileged containers.
-If you lack access to an authorized Docker engine, use the **Pilot container
+If you lack access to an authorised Docker engine, use the **Pilot container
 isolation** GitHub Actions job instead. Docker daemon access itself is powerful;
 do not grant it to an assistant or untrusted workload just to run this test.
 
@@ -90,7 +90,7 @@ owner API or a production deployment recommendation.
    after all attack probes. No hash or secret file content is printed in evidence.
 5. The unchanged owner HTTP routes reject the other owner's valid password and
    session. Public identities are explicitly fingerprint-pinned in both directions.
-   Synchronization before release does not deliver either a task or its artifact.
+   Synchronisation before release does not deliver either a task or its artifact.
    After reviewed release, the task crosses the HTTP boundary, remains pending
    until recipient acceptance, and an independently released return artifact is
    accepted by the original requester. A transport receipt is not owner acceptance.
@@ -126,13 +126,22 @@ alternate engines and OS versions require their own runs; do not disable their
 protections just to make this fixture pass. The Python base tag is mutable and
 the image is not a signed, digest-pinned production supply-chain artifact.
 
-Private directories and mounts do not encrypt the runtime SQLite store. A host
-administrator, backup reader or attacker with the owner's credentials can still
-access private plaintext. Recovery, retention/deletion, storage encryption,
-backup rollback, identity rotation, real-person enrolment and remote transport
-remain separate work. The shared network allows peer listener probing and
+Private directories and mounts are separate from payload encryption. Current
+[pilot storage](../pilot/STORAGE.md) encrypts runtime bodies, audit details,
+provider payload fields and workflow reviews; routing/state metadata remains
+visible. This harness tests isolation, not the storage cryptography. Public-key
+sealing does not authenticate a database writer. The running host can access
+authorised plaintext, and hostile-host access or restored backups can defeat
+other protections. Old blocks, snapshots and backups may retain pre-migration
+plaintext; explicit stopped-service migration does not securely erase them.
+Recovery, retention/deletion, backup rollback, identity rotation and real-person
+enrolment remain separate work. The optional
+[HTTPS carrier](../pilot/HTTPS_MAILBOX.md) and
+[authenticated adapter](../pilot/HTTPS_EXCHANGE.md) are separate from this shared-loopback
+harness and do not establish independent-device deployment.
+The shared network allows peer listener probing and
 resource-exhaustion attempts; this test neither proves denial-of-service
-resilience nor exhaustively tests HTTP authorization or packet cryptography.
+resilience nor exhaustively tests HTTP authorisation or packet cryptography.
 The existing pilot test suites remain required. No real provider or personal
 data handling, malicious model output, billing, or live spending is tested.
 
@@ -150,3 +159,14 @@ The separate `.github/workflows/pilot-isolation.yml` job runs unit and actual
 container checks and uploads `pilot-isolation-evidence` only on success. Existing
 CI files are untouched. Its run URL and commit SHA establish which revision was
 tested; a green self-test alone is never reported as a container-isolation pass.
+
+## Relationship to later acceptance
+
+This shared-loopback harness is merged on main. The separate
+[distinct-network harness](../network_acceptance/README.md) uses four actual
+containers with separate network namespaces and TLS; it is part of the reviewed,
+published but unmerged product candidate. Neither harness demonstrates independent physical
+hosts, real human owners, existing personal assistants or a deployed service.
+See [delivery evidence](../docs/DELIVERY.md#verification-evidence-and-gaps) for the
+exact tested revisions. Older container/browser successes do not accept later
+local changes; repeat applicable checks on the intended cumulative revision.

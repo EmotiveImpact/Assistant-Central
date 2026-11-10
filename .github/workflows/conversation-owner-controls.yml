@@ -1,0 +1,73 @@
+name: Conversation owner controls
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  owner-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install pinned test dependencies
+        run: |
+          python -m pip install -r pilot/requirements.txt
+          npm ci --prefix agent_bridge --ignore-scripts --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/conversation-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/conversation-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify real HTTP authentication and ledger boundaries
+        run: |
+          python -B -m unittest discover -s workspace_ui/tests -p 'test_*.py' -v
+          python -B -m unittest discover -s conversation/tests -v
+          node --test workspace_ui/tests/conversations.test.mjs workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/operations.test.mjs workspace_ui/tests/projections.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
+      - name: Exercise separate owner browser sessions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m workspace_ui.conversation_fixture --port 8778 > "$RUNNER_TEMP/conversation-fixture.log" 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8778/ > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          NODE_PATH="$RUNNER_TEMP/conversation-browser/node_modules" \
+            CONVERSATION_URL=http://127.0.0.1:8778 \
+            CONVERSATION_PASSWORD='Fictional conversation password' \
+            WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/conversation-evidence" \
+            node workspace_ui/tests/conversations.browser.test.mjs
+      - name: Exercise composed owner panels on desktop and mobile
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m workspace_ui.owner_workspace_fixture --port 8779 > "$RUNNER_TEMP/owner-workspace-fixture.log" 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid" 2>/dev/null || true; wait "$fixture_pid" 2>/dev/null || true' EXIT
+          ready=false
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8779/ > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          NODE_PATH="$RUNNER_TEMP/conversation-browser/node_modules" \
+            OWNER_WORKSPACE_URL=http://127.0.0.1:8779 \
+            OWNER_WORKSPACE_PASSWORD='Fictional conversation password' \
+            WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/conversation-evidence" \
+            node workspace_ui/tests/owner_workspace.browser.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conversation-owner-evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/conversation-evidence
+          if-no-files-found: warn

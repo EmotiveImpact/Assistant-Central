@@ -168,3 +168,11 @@ does not describe released content as an unreleased draft. The work-loop model
 suite has 25 passing tests in total. Current hosted results and screenshots are
 tracked in [PR #8](https://github.com/EmotiveImpact/Assistant-Central/pull/8) and the
 [work-loop verification record](WORKFLOW_VERIFICATION.md).
+
+## Explicit configured HTTPS transfers
+
+The Transfers view adds host-selected connections, all retained outbox states,
+immutable attempt inspection, exact send/retry confirmation, selected quarantine
+import and separate original receipt return. No page visit or refresh sends
+anything. See [owner transfers](OWNER_TRANSFERS.md) for setup, responsive owner
+controls, failure fences, packet/receipt distinctions and the final-gate race.

@@ -1,0 +1,39 @@
+name: Pilot HTTPS network acceptance
+on:
+  pull_request:
+    paths:
+      - 'pilot/**'
+      - 'network_acceptance/**'
+      - '.github/workflows/pilot-network-acceptance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'pilot/**'
+      - 'network_acceptance/**'
+      - '.github/workflows/pilot-network-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  distinct-network-https:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned fixture dependency
+        run: python -m pip install -r pilot/requirements.txt
+      - name: Check independent harness guards and disposable owner flow
+        run: python -B -m unittest discover -s network_acceptance/tests -v
+      - name: Exercise actual distinct-network TLS and restart boundaries
+        run: python -B -m network_acceptance.run --output "$RUNNER_TEMP/pilot-network-acceptance.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot-network-acceptance-evidence
+          path: ${{ runner.temp }}/pilot-network-acceptance.json
+          if-no-files-found: error
+          retention-days: 14

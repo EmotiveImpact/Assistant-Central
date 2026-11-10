@@ -1,0 +1,56 @@
+name: Supported agent bridge
+on:
+  pull_request:
+    paths:
+      - 'agent_bridge/**'
+      - '.github/workflows/agent-bridge.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'agent_bridge/**'
+      - '.github/workflows/agent-bridge.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-sdk-conformance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+          cache: npm
+          cache-dependency-path: agent_bridge/package-lock.json
+      - name: Install exact dependency closure without lifecycle scripts
+        run: npm ci --prefix agent_bridge --ignore-scripts --no-audit --no-fund
+      - name: Type-check the boundary and audit runtime dependencies
+        run: |
+          npm --prefix agent_bridge run check
+          npm audit --prefix agent_bridge --omit=dev --audit-level=moderate
+      - name: Run real SDK transports without any external network
+        shell: bash
+        run: |
+          set -euo pipefail
+          image=node:24.22.1-bookworm-slim
+          docker pull "$image"
+          name="ac-agent-bridge-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          trap 'docker rm -f "$name" >/dev/null 2>&1 || true' EXIT
+          docker create --name "$name" --network none --read-only \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --pids-limit 128 --memory 1g --cpus 2 --user 1000:1000 \
+            --mount "type=bind,source=$GITHUB_WORKSPACE,target=/repo,readonly" \
+            --tmpfs /tmp:rw,nosuid,size=256m --workdir /repo/agent_bridge \
+            "$image" node tests/run.mjs
+          test "$(docker inspect -f '{{ .HostConfig.NetworkMode }}' "$name")" = none
+          docker start --attach "$name" | tee "$RUNNER_TEMP/agent-bridge-checks.txt"
+          test "$(docker inspect -f '{{ .State.ExitCode }}' "$name")" = 0
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: supported-agent-bridge-checks
+          path: ${{ runner.temp }}/agent-bridge-checks.txt
+          if-no-files-found: warn

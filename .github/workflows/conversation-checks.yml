@@ -1,0 +1,25 @@
+name: Conversation ledger checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  conversation-ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned encryption dependency
+        run: python -m pip install -r pilot/requirements.txt
+      - name: Check durable conversations and adversarial history access
+        run: python -B -m unittest discover -s conversation/tests -v
+      - name: Exercise fictional local-host history and restart
+        run: python -B -m conversation.demo
+      - name: Check existing pilot components
+        run: python -B -m unittest discover -s pilot/tests -v

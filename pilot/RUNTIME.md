@@ -11,7 +11,10 @@ The implementation is a restricted synthetic pilot. Independent files and
 processes do not protect against one administrator or a shared operating-system
 account reading both directories. Use separately controlled OS accounts/devices
 and a reviewed deployment before describing this as independent owner custody.
-No live provider or real personal data was used to verify this runtime.
+No live provider or real personal data was used to verify this runtime. A local
+password session establishes the provisioned account, not a verified real person.
+See [delivery status](../docs/DELIVERY.md) for the distinction between main and the
+newer reviewed cumulative candidate.
 
 ## Operations and authority
 
@@ -47,8 +50,14 @@ signed task locally. It can return only to the original requester's identity,
 with the same context/task reference and no longer lifetime. On receipt, that
 requester independently checks its own original released task and cancellation
 state. A third-peer route, fabricated parent or general cross-owner ancestry is
-rejected. Arbitrary inherited-source sharing remains unavailable until all source
-owners' independently verifiable grants have a reviewed contract.
+rejected. The standalone [exact source-grant contract](SOURCE_GRANTS.md) now
+exists, but is not connected to this runtime's release/provider transaction.
+Arbitrary inherited-source sharing remains unavailable until that integration is
+reviewed; verifying or separately consuming a signed grant cannot authorise a
+later effect. The local [conversation disclosure compiler](../conversation/DISCLOSURE_REVIEW.md)
+only prepares and authentically reinspects an inert exact review. It performs no
+signing, consumption or dispatch and is not wired to this runtime. Conversation
+history visibility and unanimous proposal agreement confer no provider authority.
 
 Receiver-side logical-route uniqueness is independently enforced. A malicious
 enrolled sender cannot evade rejection by changing timestamps, content or expiry
@@ -71,14 +80,26 @@ one `BEGIN IMMEDIATE`. An expired/revoked local session is rechecked before comm
 Unknown commit acknowledgements produce a fixed `RuntimeOutcomeUnknown`; inspect
 the retained exact item. The original release cannot be recreated, but delivery
 can explicitly retry the same stored encrypted packet under the transport limit.
-The receiver deduplicates that packet and returns its original receipt. Duplicate
+The receiver deduplicates that packet and returns its original receipt. Missing
+retained receipt state must fail closed, never mint a replacement; the reviewed
+cached-receipt fix is included in the published cumulative candidate, not yet main. Duplicate
 decisions are metadata-only; an opposite terminal decision is rejected.
 
 SQLite durability does not provide rollback-resistant backup recovery, distributed
 clock agreement, compromised-host defence, or a semantic proof that a recipient
-performed the accepted work. All local data other than identity keys is stored
-unencrypted in private files. Session invalidation and locked keys survive process
-restart; the owner must sign in before decrypting or delivering peer packets.
+performed the accepted work. [Application storage](STORAGE.md) encrypts runtime
+item bodies, structured audit details, provider binding/request/review/result
+fields and workflow review mappings. Routing metadata, identities, IDs, digests,
+timestamps, states and counters remain visible; this is not whole-file encryption.
+Public-key sealing allows a late already-dispatched result to be retained while
+locked, but does not authenticate the writer or protect against a hostile host.
+
+Existing plaintext stores are refused until an explicit, bounded
+[stopped-service migration](STORAGE.md#existing-plaintext-stores) succeeds. There
+is no automatic migration or plaintext fallback. Replacing the file cannot erase
+old blocks, snapshots or backups. Session invalidation and locked keys survive
+process restart; the owner must sign in before opening payloads or delivering
+peer packets. See STORAGE.md for recovery and uncertain-write limits.
 
 ## Provider adapter seam
 

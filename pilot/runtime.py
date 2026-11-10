@@ -528,6 +528,11 @@ class PilotRuntime:
                                     (body['message_id'],))
                     self._event('transport_receipt_observed', item_id, message_id=body['message_id'])
                 else: raise RuntimeDenied('Unknown peer packet kind')
+            if result['duplicate'] and header['kind'] != 'receipt':
+                # A replay may recover the original receipt, never mint a replacement.
+                need(self.db.execute('SELECT 1 FROM peer_receipts WHERE id=?',
+                                     (header['message_id'],)).fetchone() is not None,
+                     'Original cached receipt required')
             receipt = None if header['kind']=='receipt' else self.exchange.receipt_for(self.auth,session,header['message_id'])
             row = self.db.execute('SELECT * FROM runtime_items WHERE id=?', (item_id,)).fetchone()
             return {'duplicate':result['duplicate'],'message_id':header['message_id'],

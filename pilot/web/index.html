@@ -36,6 +36,7 @@
         <button class="nav-link active" data-view="inbox" type="button"><span aria-hidden="true">↙</span> Inbox <span id="inbox-count" class="nav-count">0</span></button>
         <button class="nav-link" data-view="outbox" type="button"><span aria-hidden="true">↗</span> Outbox <span id="outbox-count" class="nav-count">0</span></button>
         <button class="nav-link" data-view="peers" type="button"><span aria-hidden="true">⊞</span> Trusted peers</button>
+        <button class="nav-link" data-view="transfers" type="button"><span aria-hidden="true">⇄</span> Transfers</button>
         <button class="nav-link" data-view="activity" type="button"><span aria-hidden="true">≋</span> Activity</button>
       </nav>
       <div class="sidebar-bottom">
@@ -108,7 +109,9 @@
         <p class="form-intro">Get the public identity and fingerprint directly from the other owner. Enrolment does not approve any work or disclosure.</p>
         <label class="full">Public identity<textarea name="public_identity" rows="6" required spellcheck="false" placeholder="Paste the peer's public identity JSON"></textarea></label>
         <label class="full">Verified fingerprint<input name="expected_fingerprint" required maxlength="128" spellcheck="false" autocomplete="off" placeholder="Compare the full fingerprint with the other owner"></label>
-        <label class="full">Local pilot address<input name="endpoint" type="url" required placeholder="http://127.0.0.1:8766" autocomplete="off"></label>
+        <label class="full" id="peer-transport-field" hidden>Connection<select id="peer-connection" name="connection_id"><option value="">Local loopback pilot</option></select></label>
+        <p class="scope-note full" id="peer-connection-note" hidden></p>
+        <label class="full" id="peer-endpoint-field">Local pilot address<input name="endpoint" type="url" required placeholder="http://127.0.0.1:8766" autocomplete="off"></label>
         <label class="check-label full"><input name="verified" type="checkbox" required><span>I have independently checked the full fingerprint with this owner.</span></label>
         <p id="peer-message" class="form-message full" role="status" aria-live="polite"></p>
       </div>
