@@ -12,59 +12,64 @@ def safe_path(name: str) -> bool:
     p = PurePosixPath(name)
     return not p.is_absolute() and '..' not in p.parts and '\\' not in name
 
+def require(condition: bool, message: str) -> None:
+    """Integrity checks must remain active when Python optimisation is enabled."""
+    if not condition:
+        raise ValueError(message)
+
 def verify() -> tuple[int, int, int]:
     index = json.loads((ROOT / 'SOURCES.json').read_text())
     total_files = total_bytes = 0
     for source in index['repositories']:
         directory = source['directory']
-        assert safe_path(directory)
+        require(safe_path(directory), 'Research snapshot validation failed: safe_path(directory)')
         base = ROOT / directory
         manifest = json.loads((base / 'MANIFEST.json').read_text())
-        assert source['repository'] == manifest['repository']
-        assert source['commit'] == manifest['commit']
-        assert len(manifest['commit']) == 40
+        require(source['repository'] == manifest['repository'], "Research snapshot validation failed: source['repository'] == manifest['repository']")
+        require(source['commit'] == manifest['commit'], "Research snapshot validation failed: source['commit'] == manifest['commit']")
+        require(len(manifest['commit']) == 40, "Research snapshot validation failed: len(manifest['commit']) == 40")
         parts = manifest.get('snapshot_parts')
         if parts:
             chunks = []
             for part in parts:
-                assert safe_path(part['path']) and '/' not in part['path']
+                require(safe_path(part['path']) and '/' not in part['path'], "Research snapshot validation failed: safe_path(part['path']) and '/' not in part['path']")
                 chunk = (base / part['path']).read_bytes()
-                assert len(chunk) == part['bytes']
-                assert hashlib.sha256(chunk).hexdigest() == part['sha256']
+                require(len(chunk) == part['bytes'], "Research snapshot validation failed: len(chunk) == part['bytes']")
+                require(hashlib.sha256(chunk).hexdigest() == part['sha256'], "Research snapshot validation failed: hashlib.sha256(chunk).hexdigest() == part['sha256']")
                 chunks.append(chunk)
             archive = b''.join(chunks)
-            assert parts == source['snapshot_parts']
+            require(parts == source['snapshot_parts'], "Research snapshot validation failed: parts == source['snapshot_parts']")
         else:
             archive = (base / 'source.tar.gz').read_bytes()
-        assert len(archive) == manifest['snapshot_bytes'] == source['snapshot_bytes']
-        assert hashlib.sha256(archive).hexdigest() == manifest['snapshot_sha256'] == source['snapshot_sha256']
+        require(len(archive) == manifest['snapshot_bytes'] == source['snapshot_bytes'], "Research snapshot validation failed: len(archive) == manifest['snapshot_bytes'] == source['snapshot_bytes']")
+        require(hashlib.sha256(archive).hexdigest() == manifest['snapshot_sha256'] == source['snapshot_sha256'], "Research snapshot validation failed: hashlib.sha256(archive).hexdigest() == manifest['snapshot_sha256'] == source['snapshot_sha256']")
         expected = {e['path']: e for e in manifest['files']}
-        assert len(expected) == manifest['included_files']
+        require(len(expected) == manifest['included_files'], "Research snapshot validation failed: len(expected) == manifest['included_files']")
         omissions = {e['path']: e for e in manifest['omissions']}
-        assert len(omissions) == manifest['omitted_files']
-        assert not (set(expected) & set(omissions))
-        assert len(expected) + len(omissions) == manifest['tracked_files']
+        require(len(omissions) == manifest['omitted_files'], "Research snapshot validation failed: len(omissions) == manifest['omitted_files']")
+        require(not (set(expected) & set(omissions)), 'Research snapshot validation failed: not (set(expected) & set(omissions))')
+        require(len(expected) + len(omissions) == manifest['tracked_files'], "Research snapshot validation failed: len(expected) + len(omissions) == manifest['tracked_files']")
         seen = set()
         with tarfile.open(fileobj=io.BytesIO(archive), mode='r:gz') as tar:
             for member in tar:
-                assert member.name.startswith('source/') and safe_path(member.name)
-                assert member.isfile() and member.mode == 0o644
+                require(member.name.startswith('source/') and safe_path(member.name), "Research snapshot validation failed: member.name.startswith('source/') and safe_path(member.name)")
+                require(member.isfile() and member.mode == 0o644, 'Research snapshot validation failed: member.isfile() and member.mode == 0o644')
                 name = member.name.removeprefix('source/')
-                assert '.git' not in PurePosixPath(name).parts
-                assert name in expected and name not in seen
+                require('.git' not in PurePosixPath(name).parts, "Research snapshot validation failed: '.git' not in PurePosixPath(name).parts")
+                require(name in expected and name not in seen, 'Research snapshot validation failed: name in expected and name not in seen')
                 seen.add(name)
                 entry = expected[name]
-                assert member.size == entry['bytes']
+                require(member.size == entry['bytes'], "Research snapshot validation failed: member.size == entry['bytes']")
                 data = tar.extractfile(member).read()
-                assert len(data) == entry['bytes'] == member.size
-                assert hashlib.sha256(data).hexdigest() == entry['sha256']
-                assert hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == entry['git_blob']
+                require(len(data) == entry['bytes'] == member.size, "Research snapshot validation failed: len(data) == entry['bytes'] == member.size")
+                require(hashlib.sha256(data).hexdigest() == entry['sha256'], "Research snapshot validation failed: hashlib.sha256(data).hexdigest() == entry['sha256']")
+                require(hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest() == entry['git_blob'], "Research snapshot validation failed: hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\\0' + data).hexdigest() == entry['git_blob']")
                 if name in manifest['licence_paths']:
-                    assert (base / 'licences' / name).read_bytes() == data
+                    require((base / 'licences' / name).read_bytes() == data, "Research snapshot validation failed: (base / 'licences' / name).read_bytes() == data")
                 total_bytes += len(data)
-        assert seen == set(expected)
+        require(seen == set(expected), 'Research snapshot validation failed: seen == set(expected)')
         actual_licences = {p.relative_to(base / 'licences').as_posix() for p in (base / 'licences').rglob('*') if p.is_file()}
-        assert actual_licences == set(manifest['licence_paths'])
+        require(actual_licences == set(manifest['licence_paths']), "Research snapshot validation failed: actual_licences == set(manifest['licence_paths'])")
         total_files += len(seen)
     return len(index['repositories']), total_files, total_bytes
 

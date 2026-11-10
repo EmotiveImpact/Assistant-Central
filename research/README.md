@@ -3,7 +3,9 @@
 Pinned on 10 November 2026. These are **actual source copies**, stored as inert
 compressed archives, not links alone and not installed product dependencies.
 Start with [the comparison and methods report](FINDINGS.md), then the
-[conversation implementation plan](CONVERSATION_PLAN.md).
+[conversation implementation plan](CONVERSATION_PLAN.md). The separate
+[Parley comparison](PARLEY_FINDINGS.md) covers Weldra and ericscalibur/Parley;
+it contains analysis and source links, not additional source archives.
 
 ## What is copied
 
@@ -15,13 +17,16 @@ Each `sources/<owner>--<repository>/` directory contains:
   each part and the reconstructed archive.
 - `MANIFEST.json`: exact upstream commit, Git blob IDs, SHA-256 hashes, sizes,
   every included path, and every omitted path with its reason.
-- `licences/`: upstream licence and notice files, also retained in the archive.
+- `licences/`: selected upstream licence and notice files, also retained in the
+  archive. Additional component licence texts remain at their original paths
+  inside the archives; not every notice is mirrored in this directory.
 
 [SOURCES.json](SOURCES.json) is the machine-readable inventory. These are
 **source snapshots, not complete clones or runnable distributions**. Git history,
-recursive submodules, binary/media assets, build output, vendored dependency
-code, symlinks and conservatively flagged credential-shaped files are omitted.
-The manifests identify omissions individually; some flagged files are likely
+recursive submodules, binary/media assets, build output, selected vendored or
+generated dependency paths, symlinks and conservatively flagged credential-shaped
+files are omitted. This is selective: for example, ggwave's licensed Reed-Solomon
+source remains included. The manifests identify omissions individually; some flagged files are likely
 synthetic fixtures or string constants, but they were not republished blindly.
 Dependency manifests and lockfiles remain available for study. Downloading a
 snapshot does not install those dependencies or include their transitive source.
@@ -47,11 +52,14 @@ Run only our verifier from the repository root:
 
 ```sh
 python -B research/tools/verify_sources.py
+python -B research/tools/test_verify_sources.py
 ```
 
 It checks every archive, path, mode, byte count, SHA-256 and original Git blob
 hash, without extraction or execution. It also checks that copied licence files
-match the upstream bytes. A verified snapshot proves reproducible copied bytes,
+match the upstream bytes. Explicit validation errors stay active under Python
+optimisation; the negative tests exercise both ordinary and `-O` execution.
+A verified snapshot proves reproducible copied bytes,
 not authorship, safety, production maturity or a working integration.
 
 Product workflows on the import base name their source/test directories

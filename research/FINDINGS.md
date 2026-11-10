@@ -19,6 +19,11 @@ verifiable delivery/task state.
 
 ## How to use this evidence
 
+For the two additional, separately requested Parley projects, see
+[PARLEY_FINDINGS.md](PARLEY_FINDINGS.md). That report includes pinned code
+pointers, advertised-versus-inspected behaviour, licence limits and prioritised
+engineering tasks. Neither Parley is included in the source archive inventory.
+
 Every source link below has a matching locally copied, pinned snapshot in
 [SOURCES.json](SOURCES.json). The inventory records the exact revision; follow its
 commit link rather than assuming a mutable `main` branch still behaves the same.
