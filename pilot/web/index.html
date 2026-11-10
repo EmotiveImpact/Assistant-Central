@@ -93,6 +93,7 @@
         <label class="full">Task reference<input name="task_id" maxlength="96" required placeholder="A unique task reference"></label>
         <label class="full">Exact context<input name="context" maxlength="64" pattern="[a-f0-9]{64}" required spellcheck="false" placeholder="64-character task context"></label>
         <label>Valid for<select name="minutes"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option></select></label>
+        <label id="workflow-permission-field" class="check-label full" hidden><input name="synthetic_run" type="checkbox"><span>Permit the local synthetic OpenAI adapter rehearsal: synthetic-research-v1, at most 128 output tokens. No real model or network call. The recipient must approve the exact run separately.</span></label>
         <label class="check-label full"><input name="synthetic" type="checkbox" required><span>This contains fictional data that I am authorised to share.</span></label>
         <p id="compose-message" class="form-message full" role="status" aria-live="polite"></p>
       </div>
