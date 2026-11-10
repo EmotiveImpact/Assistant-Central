@@ -13,7 +13,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const types={'.html':'text/html','.css':'text/css','.mjs':'text/javascript'};
 const server=createServer(async(req,res)=>{
   const name=req.url==='/'?'index.html':req.url.slice(1);
-  if(!['index.html','style.css','app.mjs','model.mjs'].includes(name)){res.writeHead(404);res.end();return;}
+  if(!['index.html','style.css','app.mjs','model.mjs','transfers.mjs'].includes(name)){res.writeHead(404);res.end();return;}
   res.writeHead(200,{'Content-Type':types[path.extname(name)],'Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"});res.end(await readFile(path.join(root,name)));
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));

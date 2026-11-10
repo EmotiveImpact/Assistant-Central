@@ -1,3 +1,4 @@
+import {validateTransfers} from './transfers.mjs';
 // Pure projections and validation. Unknown states/actions never supply authority.
 const HEX = /^[a-f0-9]{64}$/;
 const ACTIONS = new Set(['accept', 'reject', 'release', 'cancel']);
@@ -46,6 +47,7 @@ export function validateState(value) {
     const runs=new Set();
     for(const run of workflow.runs){const item=value.items.find(item=>item.id===run.item_id);if(!item||runs.has(run.run_id))throw new Error('Invalid workflow task');validateWorkflowStatus(run,item);runs.add(run.run_id);}
   }
+  if(value.transfers!==undefined)validateTransfers(value.transfers);
   return value;
 }
 export function fixturePermission(value) { return value?.provider==='openai' && value.model===FIXTURE_GRANT.model && value.max_output_tokens===128 && Object.keys(value).length===3; }
@@ -96,12 +98,17 @@ export function proposalBody(fields,now=Date.now()/1000) {
   }
   return result;
 }
-export function peerBody(fields) {
+export function peerBody(fields,connections=[]) {
   if (fields.verified !== 'on' || !HEX.test(plain(fields.expected_fingerprint))) throw new Error('Check and confirm the full peer fingerprint.');
   let identity;
   try { identity = JSON.parse(fields.public_identity); } catch { throw new Error('Enter a valid public identity object.'); }
   if (!identity || Array.isArray(identity) || typeof identity !== 'object' || Object.keys(identity).some(key => /private|secret|password|token/i.test(key))) throw new Error('Only a public identity can be enrolled.');
   const result={public_identity:identity,expected_fingerprint:fields.expected_fingerprint};
+  if(fields.connection_id){
+    const connection=connections.find(c=>c.id===fields.connection_id);
+    if(!connection||connection.peer_fingerprint!==fields.expected_fingerprint)throw new Error('The independently verified fingerprint must match the selected connection.');
+    return {...result,connection_id:connection.id};
+  }
   if (!fields.endpoint)throw new Error('Enter the other local pilot’s address.');
   if (fields.endpoint) {
     let endpoint;

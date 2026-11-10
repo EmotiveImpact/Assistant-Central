@@ -109,7 +109,7 @@ class ConversationLedger:
             self.db.execute('PRAGMA foreign_keys=ON')
             self.db.execute('PRAGMA synchronous=FULL')
             new_store = self.db.execute(
-                "SELECT 1 FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").fetchone() is None
+                "SELECT 1 FROM sqlite_master WHERE name NOT GLOB 'sqlite_*'").fetchone() is None
             self.storage = _ConversationStorage(self.db, storage_auth, create=True)
             self.db.executescript('''
                 CREATE TABLE IF NOT EXISTS conversation_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version TEXT NOT NULL);
@@ -192,15 +192,23 @@ class ConversationLedger:
             yield guards.enter_context(self.actors[principal].authorised(session))
 
     @contextmanager
-    def _transaction(self, principal, session, *, checks=()):
+    def _transaction(self, principal, session, *, checks=(), final_checks=()):
         # All local operations (including reads) are ordered against membership
         # changes and revocation. No plaintext cache can bypass these guards.
+        # Opted-in callers supply a nonempty final_checks collection on entry;
+        # the default keeps the existing transaction behaviour unchanged.
         with self._lock:
             need(not self._closed and type(principal) is str and principal in self.actors)
             auth = self.actors[principal]
             with self._authorised(principal, session) as identity:
                 need(identity['identity_fingerprint'] == principal)
                 need(self.storage.auth.status()['unlocked'])
+                if final_checks:
+                    # Both genuine auth locks are held. status() keeps the vault
+                    # unlocked while at least one retained session is unexpired.
+                    # Capture that deadline without a trailing auth callback.
+                    storage_deadline = self.storage.auth._db.execute('SELECT MAX(expires) FROM sessions').fetchone()[0]
+                    need(type(storage_deadline) in (int, float) and math.isfinite(storage_deadline))
                 _private_path(self.directory, directory=True)
                 path = self.directory / 'conversation.sqlite'
                 _private_path(path)
@@ -211,16 +219,42 @@ class ConversationLedger:
                 self.db.execute('BEGIN IMMEDIATE')
                 try:
                     yield auth
-                    auth.authenticate(session)  # Expiry/credential changes fail closed.
+                    try:
+                        auth.authenticate(session)  # Expiry/credential changes fail closed.
+                    finally:
+                        if final_checks:
+                            self._now()  # Keep time observed during a refusal.
                     self._now()
                     for check in checks:
                         check()
                     need(self.storage.auth.status()['unlocked'])
-                    auth.authenticate(session)
+                    try:
+                        auth.authenticate(session)
+                    finally:
+                        if final_checks:
+                            self._now()
+                    for check in final_checks:
+                        check()
+                    if final_checks:
+                        # Auth locks still order logout/revocation. A policy check
+                        # may itself observe session expiry; compare the captured
+                        # deadline without another authentication callback gap.
+                        need(self._last_time < identity['expires_at'] and self._last_time < storage_deadline)
                     self.db.execute('COMMIT')
                 except BaseException as error:
-                    if self.db.in_transaction:
-                        self.db.execute('ROLLBACK')
+                    try:
+                        if final_checks:
+                            # Body/policy refusals may observe expiry in an auth
+                            # store before this ledger samples its clock.
+                            self._now()
+                    except BaseException:
+                        # A clock refusal cannot turn an uncertain SQLite result
+                        # into a claim that the operation was rolled back.
+                        if not isinstance(error, sqlite3.Error):
+                            raise
+                    finally:
+                        if self.db.in_transaction:
+                            self.db.execute('ROLLBACK')
                     if isinstance(error, sqlite3.Error):
                         raise ConversationOutcomeUnknown('Inspect the retained exact request after reopening the ledger') from None
                     raise
@@ -409,8 +443,9 @@ class ConversationLedger:
             identifier(source)
         request = {'kind': kind, 'text': text, 'source_ids': list(source_ids)}
         request_digest = digest(request)
-        checks = []
-        with self._transaction(principal, session, checks=checks) as auth:
+        checked_ids = []
+        checks = (lambda: self._assert_visible(principal, binding, checked_ids),)
+        with self._transaction(principal, session, checks=checks, final_checks=checks) as auth:
             self._check_binding(principal, binding)
             conversation_id = binding.conversation_id
             existing = self.db.execute('SELECT id,request_digest FROM conversation_events WHERE conversation_id=? AND author=? AND request_id=?',
@@ -420,7 +455,7 @@ class ConversationLedger:
                 # A retry after removal/rejoin, grant expiry or withdrawal must
                 # not disclose a retained old event or restore its permissions.
                 need(self._visible(existing['id'], principal, binding, {}))
-                checks.append(lambda: self._assert_visible(principal, binding, [existing['id']]))
+                checked_ids.append(existing['id'])
                 return self._public_event(existing['id'])
             need(self.db.execute('SELECT COUNT(*) FROM conversation_events').fetchone()[0] < MAX_EVENTS)
             sources = []
@@ -436,8 +471,47 @@ class ConversationLedger:
             encoded = self.storage.seal('conversation_events', body['id'], 'body', canonical(signed).decode())
             self.db.execute('INSERT INTO conversation_events(id,conversation_id,author,request_id,request_digest,body) VALUES(?,?,?,?,?,?)',
                             (body['id'], conversation_id, principal, request_id, request_digest, encoded))
-            checks.append(lambda: self._assert_visible(principal, binding, [body['id']]))
+            checked_ids.append(body['id'])
             return self._public_event(body['id'])
+
+    def inspect_message_outcome(self, principal, session, binding, *, request_id, expected_request_digest):
+        """Inspect one exact authored request, without appending or replaying it.
+
+        ``committed`` reports only an authorised retained local message.
+        ``inconclusive`` is not proof of rollback or permission to retry. Neither
+        result acknowledges remote delivery or authorises any external effect.
+        """
+        identifier(request_id)
+        need(type(expected_request_digest) is str and re.fullmatch(r'[0-9a-f]{64}', expected_request_digest) is not None)
+        checked_ids = []
+        # Opt in even for an absent request: an inconclusive result still needs
+        # the final binding, actor/coordinator lifetime and durable clock guards.
+        checks = (lambda: self._assert_visible(principal, binding, checked_ids),)
+        with self._transaction(principal, session, checks=checks, final_checks=checks):
+            self._check_binding(principal, binding)
+            row = self.db.execute(
+                'SELECT id FROM conversation_events WHERE conversation_id=? AND author=? AND request_id=?',
+                (binding.conversation_id, principal, request_id)).fetchone()
+            if row is None:
+                return {'status': 'inconclusive'}
+            _, signed = self._event(row['id'])  # Verify signature and indexed routing.
+            body = signed['body']
+            need(body['author'] == principal and body['conversation_id'] == binding.conversation_id
+                 and body['request_id'] == request_id)
+            bounded_text(body['text'])
+            need(body['kind'] in ('message', 'quote', 'summary'))
+            need(type(body['sources']) is list and len(body['sources']) <= MAX_SOURCES
+                 and all(type(source) is dict and set(source) == {'id', 'digest'} for source in body['sources']))
+            source_ids = [identifier(source['id']) for source in body['sources']]
+            need(len(set(source_ids)) == len(source_ids) and (body['kind'] == 'message' or bool(source_ids)))
+            retained_request = {'kind': body['kind'], 'text': body['text'],
+                                'source_ids': source_ids}
+            # An indexed digest alone is insufficient, even with a valid body
+            # signature: recompute the commitment from the exact signed fields.
+            need(digest(retained_request) == body['request_digest'] == expected_request_digest)
+            need(self._visible(row['id'], principal, binding, {}))
+            checked_ids.append(row['id'])
+            return {'status': 'committed', 'event': self._public_event(row['id'])}
 
     def _public_event(self, event_id):
         _, signed = self._event(event_id)
@@ -449,14 +523,24 @@ class ConversationLedger:
                 'provenance_digest': digest(body), 'trust': 'untrusted-message', 'execution_authority': False}
 
     def _assert_visible(self, principal, binding, event_ids):
+        observed_start = self._now()
         self._check_binding(principal, binding)
         cache = {}
         for event_id in event_ids:
             need(self._visible(event_id, principal, binding, cache))
+        observed_end = self._now()
+        # Reuse the existing visibility algorithm, including transitive cached
+        # lineage. Refuse mixed-time output if any active room grant expired
+        # during this complete scan, even an unrelated or overlapping grant.
+        # Return only the usual generic refusal, never hidden IDs or counts.
+        if event_ids:
+            need(self.db.execute(
+                'SELECT 1 FROM conversation_grants WHERE conversation_id=? AND revoked=0 AND expires>? AND expires<=? LIMIT 1',
+                (binding.conversation_id, observed_start, observed_end)).fetchone() is None)
 
     def read(self, principal, session, binding, event_id):
         checks = [lambda: self._assert_visible(principal, binding, [event_id])]
-        with self._transaction(principal, session, checks=checks):
+        with self._transaction(principal, session, checks=checks, final_checks=checks):
             self._check_binding(principal, binding)
             need(self._visible(event_id, principal, binding, {}))
             result = self._public_event(event_id)
@@ -467,13 +551,15 @@ class ConversationLedger:
         need(type(limit) is int and 1 <= limit <= 50)
         if query is not None:
             bounded_text(query, 256)
-        checks = []
-        with self._transaction(principal, session, checks=checks):
+        checked_ids = []
+        checks = (lambda: self._assert_visible(principal, binding, checked_ids),)
+        with self._transaction(principal, session, checks=checks, final_checks=checks):
             self._check_binding(principal, binding)
             start = 0
             if after is not None:
                 need(self._visible(after, principal, binding, {}))
                 start = self._event(after)[0]['sequence']
+                checked_ids.append(after)
             cache, result = {}, []
             for row in self.db.execute('SELECT id FROM conversation_events WHERE conversation_id=? AND sequence>? ORDER BY sequence', (binding.conversation_id, start)).fetchall():
                 if not self._visible(row['id'], principal, binding, cache):
@@ -483,14 +569,14 @@ class ConversationLedger:
                     result.append(item)
                     if len(result) == limit:
                         break
-            checks.append(lambda: self._assert_visible(principal, binding, [item['id'] for item in result]))
+            checked_ids.extend(item['id'] for item in result)
             return result
 
     def context(self, principal, session, binding, event_ids):
         need(type(event_ids) is list and 1 <= len(event_ids) <= 50 and all(type(x) is str for x in event_ids)
              and len(event_ids) == len(set(event_ids)))
         checks = [lambda: self._assert_visible(principal, binding, event_ids)]
-        with self._transaction(principal, session, checks=checks):
+        with self._transaction(principal, session, checks=checks, final_checks=checks):
             self._check_binding(principal, binding)
             cache, messages = {}, []
             for event_id in event_ids:
@@ -505,7 +591,8 @@ class ConversationLedger:
         bounded_text(purpose, 512)
         need(type(event_ids) is list and 1 <= len(event_ids) <= MAX_SOURCES
              and all(type(x) is str for x in event_ids) and len(set(event_ids)) == len(event_ids))
-        with self._transaction(principal, session):
+        final_checks = (lambda: need(self._now() < expires_at),)
+        with self._transaction(principal, session, final_checks=final_checks):
             self._member(conversation_id, principal)
             member = self._member(conversation_id, recipient)
             need(type(expires_at) in (int, float) and math.isfinite(expires_at) and 0 < expires_at - self._now() <= MAX_GRANT_SECONDS)
@@ -530,7 +617,8 @@ class ConversationLedger:
         need(digest(statement) == review['review_digest'] == expected_review_digest)
         identifier(statement['id']); identifier(statement['conversation_id'])
         bounded_text(statement['purpose'], 512)
-        with self._transaction(principal, session) as auth:
+        final_checks = (lambda: need(self._now() < statement['expires_at']),)
+        with self._transaction(principal, session, final_checks=final_checks) as auth:
             need(statement['domain'] == VERSION + '/history-grant' and statement['issuer'] == principal
                  and statement['audience'] == 'local-owner-only')
             self._member(statement['conversation_id'], principal)
@@ -569,3 +657,64 @@ class ConversationLedger:
                 self.db.execute('UPDATE conversation_grants SET revoked=1 WHERE id=?', (grant_id,))
                 self._bump(row['conversation_id'])
                 self._audit(auth, session, 'history_revoked', {'id': grant_id})
+
+    def list_conversations(self, principal, session):
+        """Current membership metadata only, never historical titles or counts."""
+        with self._transaction(principal, session, final_checks=(self._now,)):
+            rows = self.db.execute('''SELECT c.id,c.admin,c.mode FROM conversations c
+                JOIN conversation_members m ON m.conversation_id=c.id
+                WHERE m.principal=? AND m.active=1 ORDER BY c.id LIMIT 256''', (principal,)).fetchall()
+            return [{'id': row['id'], 'admin': row['admin'], 'mode': row['mode']}
+                    for row in rows]
+
+    def list_invitations(self, principal, session):
+        """Only own pending invitations and those issued by this administrator."""
+        with self._transaction(principal, session, final_checks=(self._now,)):
+            rows = self.db.execute('''SELECT i.id,i.conversation_id,i.principal,c.admin
+                FROM conversation_invites i JOIN conversations c ON c.id=i.conversation_id
+                WHERE i.state='pending' AND (i.principal=? OR c.admin=?)
+                ORDER BY i.rowid DESC LIMIT 50''', (principal, principal)).fetchall()
+            return [dict(row) for row in rows]
+
+    def list_history_grants(self, principal, session, conversation_id=None, *, after=None):
+        """Issuer's own exact signed statements, including grants they can revoke.
+
+        No recipient-wide enumeration or other author's historical source list.
+        Removal does not remove the issuer's ability to inspect/revoke their grants.
+        """
+        if conversation_id is not None:
+            identifier(conversation_id)
+        result = []
+        def final_expiry():
+            # Run after the last authentication; the nonempty final check also
+            # enables the captured actor/coordinator deadline fence.
+            now = self._now()
+            for item in result:
+                if item['status'] != 'revoked' and item['statement']['expires_at'] <= now:
+                    item['status'] = 'expired'
+        with self._transaction(principal, session, final_checks=(final_expiry,)):
+            cursor = 2**63 - 1
+            if after is not None:
+                identifier(after)
+                old = self.db.execute('''SELECT rowid FROM conversation_grants WHERE id=? AND issuer=?
+                    AND (? IS NULL OR conversation_id=?)''', (after, principal, conversation_id, conversation_id)).fetchone()
+                need(old is not None)
+                cursor = old['rowid']
+            rows = self.db.execute('''SELECT * FROM conversation_grants
+                WHERE issuer=? AND (? IS NULL OR conversation_id=?) AND rowid<? ORDER BY rowid DESC LIMIT 50''',
+                                   (principal, conversation_id, conversation_id, cursor)).fetchall()
+            for row in rows:
+                statement = json.loads(self.storage.open('conversation_grants', row['id'], 'body', row['statement']))
+                need(statement['domain'] == VERSION + '/history-grant'
+                     and statement['id'] == row['id'] and statement['issuer'] == principal
+                     and statement['conversation_id'] == row['conversation_id']
+                     and statement['recipient'] == row['recipient'] and statement['member_epoch'] == row['epoch']
+                     and statement['expires_at'] == row['expires'] and statement['audience'] == 'local-owner-only')
+                self._verify(principal, statement, row['signature'])
+                member = self.db.execute('''SELECT epoch,active FROM conversation_members
+                    WHERE conversation_id=? AND principal=?''', (row['conversation_id'], row['recipient'])).fetchone()
+                status = ('revoked' if row['revoked'] else 'expired' if row['expires'] <= self._now()
+                          else 'inactive-membership' if member is None or not member['active'] or member['epoch'] != row['epoch']
+                          else 'active')
+                result.append({'statement': statement, 'status': status})
+            return result

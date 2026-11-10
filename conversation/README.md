@@ -18,6 +18,9 @@ It makes no network or provider calls and grants no execution authority.
 - Immutable, signed messages retain original author, recipient epochs, exact
   content, request identity and source-message digests. A stable sender request
   identifier deduplicates identical retries across restart; changed retries fail.
+- Exact outcome inspection resolves a retained authored request without sending
+  again, including messages beyond the first history page. An absent request is
+  explicitly inconclusive, never proof of rollback or permission to retry.
 - An author can review and approve a signed, expiring grant for their own exact
   message IDs and digests, one named current recipient epoch and the
   `local-owner-only` audience. A conversation administrator cannot approve another
@@ -90,8 +93,9 @@ remote delivery or exactly-once external-effect claim in this package.
    principal, current membership epoch and policy generation.
 3. `append` takes that binding, a stable request ID, inert text and optional source
    event IDs. Supported kinds are `message`, `quote` and `summary`. The message ID
-   is generated once and retained. Retry with the same request only after inspecting
-   an uncertain outcome, never as a retry of an external effect.
+   is generated once and retained. After an uncertain outcome, use
+   `inspect_message_outcome` with the original exact request commitment. Do not infer
+   rollback from an absent inspection result or replay an external effect.
 4. `prepare_history_grant` creates an exact review statement. A trusted owner UI
    must show the actual selected content, recipient, purpose, expiry and local-only
    audience before calling `approve_history_grant` with the review digest. A digest
@@ -109,8 +113,58 @@ Identifiers accepted for conversations and client requests use ASCII letters,
 digits, underscores and hyphens, at most 64 characters, matching the SDK bridge's
 conversation identifier boundary. Principal fingerprints are 64-character SHA-256
 identities, not display names or interchangeable bridge owner labels. A future
-adapter must explicitly map and pin that distinction. The current SDK bridge,
-workspace UI, owner transfer UI and peer transport are not wired to this ledger.
+adapter must explicitly map and pin that distinction. The optional local owner
+workspace now wraps this ledger with separate authenticated owner sessions and
+exact message-outcome inspection. This cumulative composition
+does not wire existing personal assistants, the SDK bridge, owner transfer UI or
+peer transport to conversation history, and does not permit provider disclosure.
+
+### Inspect one uncertain message outcome
+
+The trusted host calls
+`inspect_message_outcome(principal, session, binding, request_id=..., expected_request_digest=...)`
+with the original request ID and a strict 64-character lowercase SHA-256 digest.
+The current binding and session must belong to that same authenticated author and
+exact room. There is no request-ID enumeration or lookup for another author.
+
+Before sending, the host computes the commitment using
+`pilot.crypto.digest({'kind': kind, 'text': text, 'source_ids': list(source_ids)})`,
+including the default `kind='message'` and empty source list when applicable.
+The digest covers UTF-8 JSON with sorted keys, compact separators, unescaped
+non-ASCII characters and no Unicode normalisation. Source-ID order is significant.
+Clients in other languages must reproduce `pilot.crypto.canonical` exactly, not
+hash arbitrary JSON serialisation or an event's provenance digest. The host can
+retain this bounded commitment with the original author, room and request ID after
+clearing submitted plaintext; a digest is neither a bearer capability nor a secret
+and can reveal low-entropy content through guessing.
+
+- `{'status': 'committed', 'event': ...}` means the exact signed message is retained
+  locally and currently visible to its author. The normal public event contains
+  no request IDs, historical audiences, internal sequence or hidden-hit count.
+  Both the signed fields and the recomputed request commitment must match.
+- `{'status': 'inconclusive'}` means no matching retained author/room/request row
+  was found in this inspection. It does **not** establish rollback, grant permission
+  to resend, or clear an uncertain-write fence. A generic state refresh or partial
+  history page cannot substitute for exact inspection either.
+- A found but mismatched or inaccessible message produces the ordinary generic
+  refusal, without its ID or body. Current membership epoch, policy binding,
+  original audience or exact history grant, and every transitive source must
+  still allow retrieval. Rejoining does not restore old authored messages.
+
+Inspection does not append, sign, approve, grant access, change membership or call
+a provider. Like other reads, it updates only the existing durable observed-clock
+fence. Actor and coordinating-vault lifetimes and complete source visibility are
+checked again after final authentication; even an inconclusive result requires
+current authentication and a current binding. A clock or storage failure can
+still refuse inspection rather than return an outcome.
+
+A committed result resolves only the existence and exact content of that local
+message. Neither result proves remote receipt, task completion, owner consent to
+other actions or authority to execute or disclose sources. Hosts must retain an
+unresolved fence when inspection is inconclusive or refused. The standalone method
+adds no model tool, recovery journal or automatic retry policy. The optional
+[local owner workspace](../workspace_ui/CONVERSATIONS.md) exposes a separately
+authenticated exact outcome route and a session-bound UI recovery hold.
 
 ## Important limits
 

@@ -1,0 +1,48 @@
+# Authenticated host draft review
+
+Coordination only; no working implementation in this first commit.
+
+The owner-review implementer owns the bridge review API and fixed local helper, a new workspace review facade/module, focused tests and this milestone's documentation. Workspace conversation controls retain ownership of their current server, app and page changes until an explicit handover.
+
+Base: main, with the reviewed supported-host bridge (PR 20) and workspace/conversation controls (PRs 23 and 24) as development dependencies. No automatic merge or provider activation.
+
+Goal: an authenticated owner can inspect exact inert host drafts and explicitly dismiss them. Queueing is not notification, consent, delivery or execution. No model-facing approval, history or new network listener. Host configuration pins the real owner fingerprint and current binding.
+
+Verification: real SDK MCP draft creation, owner HTTP inspection and dismissal, cross-owner/session/digest/expiry/revocation negatives, stable duplicate decisions and restart, encryption and content-free logs, same-origin protection and inert accessible DOM. Hosted acceptance is required because local browser sockets are restricted.
+
+## Implemented candidate
+
+The optional single-owner workspace now lists current host-bound drafts, shows
+exact immutable content and bindings, and records explicit encrypted local
+dismissals. Current owner sessions, original leases, review digests, revocation,
+expiry, clock fences and durable idempotency remain mandatory. The fixed local
+helper distinguishes a known refusal from an uncertain committed outcome.
+
+Local checks: 56 bridge tests and strict TypeScript, 21 workspace HTTP/config
+checks, 45 UI/model checks, import integrity and 320 team/execution/integration
+checks. The full pilot regression and exact-head hosted browser/isolation gates
+are tracked separately; no unrun check is claimed as passing here. A backend
+review found a post-commit helper-error classification issue, now fixed with its
+independent regression retained. UI review also added interrupted-tab restoration
+without clearing the uncertainty latch.
+
+Only already-published product dependencies are composed. Unpublished
+conversation-controls files are excluded. No merge or live activation.
+
+## Final boundary review
+
+A real concurrent owner transaction exposed stale pre-lock clock sampling in the
+inherited bridge dispatch/provision paths. Sampling now occurs under the SQLite
+write lock; final expiry and genuine backwards-time checks remain mandatory.
+The regression uses two actual processes and verifies no duplicate draft, lease
+renewal or false revocation, plus refusal when a new lease expires during the
+lock wait.
+
+A schema check also treated the underscore in `LIKE 'sqlite_%'` as a wildcard.
+The bridge now excludes only SQLite's literal reserved prefix. The integration
+reviewer explicitly coordinated the same one-line correction in
+`pilot/storage.py` and `conversation/ledger.py`, with independent startup
+regressions retained. This is the only scope expansion into those components;
+no other runtime, authentication or conversation semantics are changed. It is
+strict format validation, not a claim of protection from a malicious same-user
+database writer.

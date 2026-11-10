@@ -1,0 +1,70 @@
+name: Central workspace interface
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  workspace-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install pinned verification dependencies
+        run: |
+          python -m pip install cryptography==50.0.0
+          npm ci --prefix agent_bridge --ignore-scripts --no-audit --no-fund
+          npm install --prefix "$RUNNER_TEMP/central-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/central-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify alternative server boundaries
+        run: python -B -m unittest discover -s workspace_ui/tests -p 'test_*.py' -v
+      - name: Verify workspace projections
+        run: node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
+      - name: Exercise actual owner API in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m workspace_ui.demo --port 8775 > "$RUNNER_TEMP/central-workspace.log" 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid" 2>/dev/null || true' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8775/ > /dev/null; then break; fi
+            sleep 1
+          done
+          mkdir -p "$RUNNER_TEMP/central-workspace-evidence"
+          NODE_PATH="$RUNNER_TEMP/central-browser/node_modules" \
+            WORKSPACE_URL=http://127.0.0.1:8775 \
+            WORKSPACE_PASSWORD='Fictional browser test password' \
+            WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/central-workspace-evidence" \
+            node workspace_ui/tests/browser.test.mjs
+      - name: Exercise Central transfers through actual HTTP and disposable TLS
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m workspace_ui.transfer_fixture --port 8776 --gate-directory "$RUNNER_TEMP/central-transfer-gate" > "$RUNNER_TEMP/central-transfers.log" 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid" 2>/dev/null || true' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8776/ > /dev/null; then break; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/central-browser/node_modules" \
+            WORKSPACE_TRANSFER_URL=http://127.0.0.1:8776 \
+            WORKSPACE_TRANSFER_GATE="$RUNNER_TEMP/central-transfer-gate" \
+            WORKSPACE_PASSWORD='Fictional browser test password' \
+            WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/central-workspace-evidence" \
+            node workspace_ui/tests/transfers.browser.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: central-workspace-evidence-${{ github.sha }}
+          path: ${{ runner.temp }}/central-workspace-evidence
+          if-no-files-found: warn

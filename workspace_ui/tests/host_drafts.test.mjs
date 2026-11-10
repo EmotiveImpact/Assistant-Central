@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateDraftQueue,validateDraftReview} from '../host_drafts.mjs';
+const queue=()=>({connections:[{id:'host_one',available:true,items:[{draftId:'draft_one',title:'Untrusted title',state:'awaiting_owner_review'}]}],local_only:true,execution_authority:false});
+const review=()=>({draft:{requestId:'request_one',title:'Host draft',instruction:'<script>untrusted()</script>'},status:{draftId:'draft_one',state:'awaiting_owner_review',ownerConsent:'not_requested',transportReceipt:'none',execution:'not_started'},binding:{ownerId:'a'.repeat(64),hostId:'host_one',sessionId:'session_one',conversationId:'conversation_one',recipientId:'recipient_one',expiresAt:123400},digest:'b'.repeat(64),reviewToken:'opaque.test',reviewExpiresAt:123000,decision:null});
+test('valid owner queue and exact untrusted review retain source text unchanged',()=>{assert.deepEqual(validateDraftQueue(queue()),queue());assert.deepEqual(validateDraftReview(review(),'draft_one','a'.repeat(64)),review());});
+test('queue refuses unknown authority flags, duplicate connection/draft IDs and unbounded content',()=>{
+ for(const mutate of [v=>v.execution_authority=true,v=>v.extra='unrecognised',v=>v.connections.push(v.connections[0]),v=>v.connections[0].items.push(v.connections[0].items[0]),v=>v.connections[0].items[0].title='x'.repeat(161),v=>v.connections[0].available=false,v=>v.connections[0].items[0].state='approved']){const v=queue();mutate(v);assert.throws(()=>validateDraftQueue(v));}
+});
+test('review refuses altered IDs, states, owner labels, dispatch flags and extra authority fields',()=>{
+ for(const mutate of [v=>v.status.draftId='other',v=>v.status.execution='started',v=>v.status.ownerConsent='approved',v=>v.status.transportReceipt='delivered',v=>v.binding.ownerId='model-selected-owner',v=>v.binding.keyHex='secret',v=>v.draft.command='send',v=>v.reviewExpiresAt=v.binding.expiresAt+1,v=>v.digest='bad',v=>v.draft.instruction='x'.repeat(4001)]){const v=review();mutate(v);assert.throws(()=>validateDraftReview(v,'draft_one','a'.repeat(64)));}
+});
+test('saved dismissed state requires its matching immutable decision receipt',()=>{const v=review();v.status.state='dismissed';assert.throws(()=>validateDraftReview(v,'draft_one','a'.repeat(64)));v.decision={decisionId:'stable_decision',digest:v.digest,decision:'dismissed'};assert.equal(validateDraftReview(v,'draft_one','a'.repeat(64)),v);v.decision.digest='c'.repeat(64);assert.throws(()=>validateDraftReview(v,'draft_one','a'.repeat(64)));});
+test('unavailable connections disclose no content or misleading pending counts',()=>{const v=queue();v.connections[0].available=false;assert.throws(()=>validateDraftQueue(v));v.connections[0].items=[];assert.equal(validateDraftQueue(v),v);});
+test('malformed Unicode, control characters, array objects and null reviews are refused',()=>{for(const v of [null,[],{},review()]){if(v?.draft)v.draft.instruction='bad\ud800';assert.throws(()=>validateDraftReview(v,'draft_one','a'.repeat(64)));}const v=review();v.draft.title='bad\0';assert.throws(()=>validateDraftReview(v,'draft_one','a'.repeat(64)));});

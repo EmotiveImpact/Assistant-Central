@@ -26,6 +26,7 @@ from .auth import LocalOwnerAuth, AuthError
 from .crypto import packet_header
 from .runtime import PilotRuntime
 from .workflow import SyntheticWorkLoop
+from .owner_transfer import OwnerTransfer, CONNECTION_ID, load_config
 
 MAX_BODY = 33792
 MAX_PACKET = 32768
@@ -201,7 +202,7 @@ def post_packet(endpoint, packet):
 class OwnerService:
     """Construct and use this object only on its dedicated owner worker thread."""
 
-    def __init__(self, directory, *, synthetic_workflow=False):
+    def __init__(self, directory, *, synthetic_workflow=False, transfer_config=None):
         if type(synthetic_workflow) is not bool:
             raise RequestDenied("Explicit synthetic workflow flag required")
         self.auth = LocalOwnerAuth(directory)
@@ -210,6 +211,7 @@ class OwnerService:
             self.runtime = PilotRuntime(directory, self.auth)
             self.mailbox = Mailbox(directory)
             self.workflow = SyntheticWorkLoop(self.runtime, enabled=synthetic_workflow)
+            self.transfers = OwnerTransfer(self.runtime, transfer_config)
         except BaseException:
             if self.runtime is not None:
                 self.runtime.close()
@@ -217,6 +219,7 @@ class OwnerService:
             raise
 
     def close(self):
+        self.transfers.close()
         if hasattr(self.runtime, "close"):
             self.runtime.close()
         self.auth.close()
@@ -224,6 +227,7 @@ class OwnerService:
     def state(self, token):
         state = self.runtime.state(token)
         state["endpoints"] = self.mailbox.endpoints()
+        state["transfers"] = self.transfers.snapshot(token)
         state["provider"] = {"name": "OpenAI Responses", "enabled": False, "live_enabled": False, "live_verified": False,
                              "status": "Adapter available for explicit synthetic testing; live calls disabled"}
         state["workflow"] = {"enabled": self.workflow.enabled, "synthetic_only": True,
@@ -296,12 +300,31 @@ class OwnerService:
             exact(body, ())
             return self.exchange(token)
         if path == "/api/peers" and method == "POST":
-            exact(body, ("public_identity", "expected_fingerprint", "endpoint"))
+            exact(body, ("public_identity", "expected_fingerprint"), ("endpoint", "connection_id"))
+            if ("endpoint" in body) == ("connection_id" in body):
+                raise RequestDenied("Choose one explicitly configured transport")
+            if "connection_id" in body:
+                self.transfers._enabled()
+                connection = self.transfers.config.connection(body["connection_id"])
+                if connection['peer_fingerprint'] != body['expected_fingerprint']:
+                    raise RequestDenied("Connection differs from independently verified peer")
+                return self.runtime.enrol_peer(token, body["public_identity"], body["expected_fingerprint"])
             endpoint = peer_endpoint(body["endpoint"])
             peer = self.runtime.enrol_peer(token, body["public_identity"], body["expected_fingerprint"])
             peer_id = peer.get("peer_id", body["expected_fingerprint"])
             self.mailbox.set_endpoint(peer_id, endpoint)
             return peer
+        transfer = re.fullmatch(r"/api/transfers/(" + CONNECTION_ID + r")/(outbox|receipt|quarantine)/([A-Za-z0-9_.-]{1,128})(?:/(send|import))?", path)
+        if transfer:
+            connection, kind, identifier, action = transfer.groups()
+            if method == "GET" and action is None:
+                return self.transfers.review(token, connection, kind, identifier)
+            if method == "POST" and action == "send" and kind in ("outbox", "receipt"):
+                exact(body, ("review_digest", "retry"))
+                return self.transfers.send(token, connection, kind, identifier, body["review_digest"], body["retry"])
+            if method == "POST" and action == "import" and kind == "quarantine":
+                exact(body, ("review_digest",))
+                return self.transfers.receive(token, connection, identifier, body["review_digest"])
         if path == "/api/proposals" and method == "POST":
             exact(body, ("peer_id", "kind", "title", "text", "context", "task_id", "expires"),
                   ("parent_id", "provider_disclosure", "source_permissions"))
@@ -348,13 +371,13 @@ class PilotHTTPServer(ThreadingHTTPServer):
     # another live TCP listener still cannot share this exact loopback address.
     allow_reuse_address = True
 
-    def __init__(self, directory, port=0, *, synthetic_workflow=False):
+    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None):
         self.connection_slots = threading.BoundedSemaphore(16)
         self.owner_worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="pilot-owner")
         self.owner = None
         self.directory = Path(directory)
         try:
-            self.owner = self.owner_worker.submit(OwnerService, directory, synthetic_workflow=synthetic_workflow).result()
+            self.owner = self.owner_worker.submit(OwnerService, directory, synthetic_workflow=synthetic_workflow, transfer_config=transfer_config).result()
             super().__init__(("127.0.0.1", port), PilotHandler)
             self.origin = "http://127.0.0.1:" + str(self.server_port)
             self.host_header = "127.0.0.1:" + str(self.server_port)
@@ -498,6 +521,7 @@ def main(argv=None):
     serve.add_argument("--port", type=int, default=8765)
     serve.add_argument("--synthetic-workflow", action="store_true",
                        help="Enable the local fictional result fixture; never contacts a model provider")
+    serve.add_argument("--transfer-config", help="Private host-selected HTTPS connection JSON; no automatic transfer")
     args = parser.parse_args(argv)
     if args.command == "init":
         password = getpass.getpass("Local owner password (at least 12 characters): ")
@@ -511,7 +535,8 @@ def main(argv=None):
         return
     if args.port != 0 and not 1024 <= args.port <= 65535:
         raise SystemExit("Choose a loopback port from 1024 to 65535, or 0 for an ephemeral port")
-    server = PilotHTTPServer(args.directory, args.port, synthetic_workflow=args.synthetic_workflow)
+    server = PilotHTTPServer(args.directory, args.port, synthetic_workflow=args.synthetic_workflow,
+                             transfer_config=load_config(args.transfer_config) if args.transfer_config else None)
     print(json.dumps({"url": server.origin, "synthetic_only": True, "live_provider_enabled": False,
                       "synthetic_workflow_enabled": args.synthetic_workflow}), flush=True)
     try:
