@@ -111,3 +111,48 @@ Cryptographic APIs follow the official documentation for
 [X25519](https://cryptography.io/en/stable/hazmat/primitives/asymmetric/x25519/)
 and [Ed25519](https://cryptography.io/en/stable/hazmat/primitives/asymmetric/ed25519/).
 The repository pins cryptography 50.0.0 for this tested environment.
+
+## Change a known owner password
+
+Stop the local owner service, then run the interactive maintenance command:
+
+```sh
+python -B -m pilot.security change-password --directory /private/path/owner-a
+```
+
+It requires an existing enrolled account and a private terminal. Current, new and
+confirmation passwords are collected with `getpass`, never command arguments,
+logs or configuration files. Echoed-input fallback is refused. A running service's
+exclusive account lock blocks maintenance before any password prompt. Restart the
+service afterward and sign in with the new password.
+
+`change_password(session, current_password, new_password)` also provides the
+local authenticated primitive. It requires both a current owner session and a
+fresh verification of the current password, sharing login's persisted throttling.
+The session is rechecked after expensive derivation and before the credential
+transaction commits. A new random salt and nonce re-encrypt the **same identity
+keys**. Credential replacement and revocation of **every** session commit together;
+no replacement session is returned and the in-memory vault is locked.
+
+This preserves the enrolled fingerprint, peer pins, exact original packets and
+application decisions. The runtime/provider authentication guard serialises
+password rotation with already-authorised transactions. This is local access
+maintenance, not task cancellation, remote recall or a provider stop request.
+
+If a credential commit cannot be confirmed, the instance fails closed until it is
+restarted. Restart invalidates all remaining session hashes regardless of whether
+the credential update committed. Then explicitly inspect by signing in; do not
+repeat the password-change mutation automatically. A failed login may trigger the
+normal cooldown. The CLI prints only fixed outcome flags or bounded errors.
+
+This does **not** rotate identity keys, recover a lost password, invalidate stolen
+old backups, erase prior encrypted vault pages, or repair a compromised host. An
+old encrypted vault copy can still be unlocked by its old password. SQLite journal
+and storage snapshots are not secure-erasure mechanisms. Do not mistake password
+rotation for cryptographic key revocation or backup rollback protection.
+
+The dedicated `pilot.tests.test_password_rotation` suite covers rewrapping and
+fingerprint preservation, all-session revocation, restart, shared throttling,
+cross-owner/stale-session denial, expiry during derivation, concurrent changes,
+runtime-guard ordering, before/after-commit acknowledgement loss, secret absence,
+private CLI prompts and failed maintenance. All test accounts are disposable.

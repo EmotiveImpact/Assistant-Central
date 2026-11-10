@@ -41,6 +41,10 @@ class AuthError(PermissionError):
     """Fixed-message local authentication failure; never include supplied secrets."""
 
 
+class AuthOutcomeUnknown(RuntimeError):
+    """Credential commit outcome is unknown; local key access is locked."""
+
+
 def _canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
 
@@ -119,6 +123,7 @@ class LocalOwnerAuth:
         self._vault = None
         self._public = None
         self._closed = False
+        self._credential_uncertain = False
         self._db = None
         self._lock_fd = None
         self._last_now = None
@@ -165,6 +170,8 @@ class LocalOwnerAuth:
             raise
 
     def _open(self):
+        if self._credential_uncertain:
+            raise AuthOutcomeUnknown("Restart the local pilot before inspecting a password change outcome")
         if self._closed:
             raise AuthError("Owner authentication is closed")
         _private_path(self.directory, directory=True)
@@ -241,6 +248,34 @@ class LocalOwnerAuth:
                 raise AuthError("Enrolled identity changed")
             return public
 
+    def _unlock(self, password_bytes):
+        """Verify the current password with the shared persistent failure budget."""
+        now, account = self._now(), self._account()
+        public = self.public_identity()
+        if now < account["retry_after"]:
+            raise AuthError("Authentication temporarily unavailable")
+        derived = _derive(password_bytes, account["salt"])
+        expected = hmac.digest(derived[:32], VERSION.encode() + _canonical(public), "sha256")
+        if not hmac.compare_digest(expected, account["verifier"]):
+            failures = min(account["failures"] + 1, 10)
+            with self._db:
+                self._db.execute("UPDATE account SET failures=?,retry_after=? WHERE singleton=1",
+                                 (failures, now + min(2 ** (failures - 1), 30)))
+            raise AuthError("Authentication failed")
+        try:
+            private = AESGCM(derived[32:]).decrypt(account["nonce"], account["vault"],
+                                                  VERSION.encode() + _canonical(public))
+            if len(private) != 64:
+                raise ValueError()
+            signing = Ed25519PrivateKey.from_private_bytes(private[:32])
+            exchange = X25519PrivateKey.from_private_bytes(private[32:])
+            if (_b64(signing.public_key().public_bytes_raw()) != public["signing_key"]
+                    or _b64(exchange.public_key().public_bytes_raw()) != public["exchange_key"]):
+                raise ValueError()
+        except (InvalidTag, ValueError):
+            raise AuthError("Identity vault unavailable") from None
+        return signing, exchange
+
     def login(self, password, *, ttl=900):
         """Return a single bearer token. Caller must not log or persist it."""
         if type(ttl) not in (int, float) or not math.isfinite(ttl) or not 1 <= ttl <= MAX_SESSION_SECONDS:
@@ -251,30 +286,8 @@ class LocalOwnerAuth:
             raise AuthError("Authentication failed") from None
         with self._lock:
             self._open()
-            now, account = self._now(), self._account()
-            public = self.public_identity()
-            if now < account["retry_after"]:
-                raise AuthError("Authentication temporarily unavailable")
-            derived = _derive(password_bytes, account["salt"])
-            expected = hmac.digest(derived[:32], VERSION.encode() + _canonical(public), "sha256")
-            if not hmac.compare_digest(expected, account["verifier"]):
-                failures = min(account["failures"] + 1, 10)
-                with self._db:
-                    self._db.execute("UPDATE account SET failures=?,retry_after=? WHERE singleton=1",
-                                     (failures, now + min(2 ** (failures - 1), 30)))
-                raise AuthError("Authentication failed")
-            try:
-                private = AESGCM(derived[32:]).decrypt(account["nonce"], account["vault"],
-                                                      VERSION.encode() + _canonical(public))
-                if len(private) != 64:
-                    raise ValueError()
-                signing = Ed25519PrivateKey.from_private_bytes(private[:32])
-                exchange = X25519PrivateKey.from_private_bytes(private[32:])
-                if (_b64(signing.public_key().public_bytes_raw()) != public["signing_key"]
-                        or _b64(exchange.public_key().public_bytes_raw()) != public["exchange_key"]):
-                    raise ValueError()
-            except (InvalidTag, ValueError):
-                raise AuthError("Identity vault unavailable") from None
+            signing, exchange = self._unlock(password_bytes)
+            now = self._now()
             token = secrets.token_urlsafe(32)
             token_hash = hashlib.sha256((VERSION + "/session\0" + token).encode()).hexdigest()
             with self._db:
@@ -285,6 +298,47 @@ class LocalOwnerAuth:
                 self._db.execute("UPDATE account SET failures=0,retry_after=0 WHERE singleton=1")
             self._vault = (signing, exchange)
             return token
+
+    def change_password(self, token, current_password, new_password):
+        """Rewrap the same identity, atomically revoke every session, then lock.
+
+        This is not lost-password recovery or identity-key rotation. No replacement
+        session is returned. On an uncertain commit the in-memory vault is locked;
+        restart and sign in explicitly; never retry this mutation automatically.
+        """
+        new_bytes = _password(new_password)
+        try:
+            current_bytes = _password(current_password)
+        except AuthError:
+            raise AuthError("Authentication failed") from None
+        with self._lock:
+            self._session(token)
+            signing, exchange = self._unlock(current_bytes)
+            if hmac.compare_digest(current_bytes, new_bytes):
+                raise AuthError("Choose a different new password")
+            public = self.public_identity()
+            salt, nonce = secrets.token_bytes(16), secrets.token_bytes(12)
+            derived = _derive(new_bytes, salt)
+            verifier = hmac.digest(derived[:32], VERSION.encode() + _canonical(public), "sha256")
+            private = signing.private_bytes_raw() + exchange.private_bytes_raw()
+            ciphertext = AESGCM(derived[32:]).encrypt(nonce, private, VERSION.encode() + _canonical(public))
+            # Both KDFs can take time. Expiry and file identity must still hold
+            # immediately before the credential/session transaction commits.
+            self._session(token)
+            try:
+                with self._db:
+                    self._db.execute("UPDATE account SET salt=?,verifier=?,nonce=?,vault=?,failures=0,retry_after=0 WHERE singleton=1",
+                                     (salt, verifier, nonce, ciphertext))
+                    self._session(token)  # Recheck after writes, before revocation/commit.
+                    self._db.execute("DELETE FROM sessions")
+            except BaseException as error:
+                self._credential_uncertain = True
+                if not isinstance(error, Exception):
+                    raise
+                raise AuthOutcomeUnknown("Password change outcome unavailable. Restart the local pilot and sign in explicitly; do not automatically retry.") from None
+            finally:
+                self._vault = None
+            return {"password_changed": True, "all_sessions_revoked": True, "identity_unchanged": True}
 
     def _session(self, token):
         self._open()

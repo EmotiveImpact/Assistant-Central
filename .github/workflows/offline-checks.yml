@@ -54,10 +54,13 @@ jobs:
         run: python -B -m unittest discover -s pilot/tests -v
       - name: Exercise two separate assistant processes
         run: python -B -m pilot.demo
+      - name: Exercise reviewed synthetic task-to-result loop
+        run: python -B -m pilot.workflow_demo
       - name: Check pilot interface model and actual HTTP contract
         run: |
           node --test pilot/web/tests/model.test.mjs
           python -B pilot/web/tests/live_contract.py
+          python -B pilot/web/tests/workflow_contract.py
       - name: Check consent and protocol prototype
         run: python -B prototypes/consent-v29/verify_checkpoint.py --full
       - name: Check targeted synthetic stdio path

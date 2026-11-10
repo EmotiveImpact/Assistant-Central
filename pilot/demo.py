@@ -42,12 +42,15 @@ def request(url, method, path, body=None, token=None):
 
 
 @contextmanager
-def running_process(directory, port=0):
+def running_process(directory, port=0, *, synthetic_workflow=False):
     # No inherited provider keys or unrelated credentials reach the pilot process.
     environment = {'PATH': os.environ.get('PATH', '/usr/bin:/bin'), 'LANG': 'C.UTF-8',
                    'PYTHONDONTWRITEBYTECODE': '1'}
-    process = subprocess.Popen([sys.executable, '-B', '-m', 'pilot.server', 'serve',
-                                '--directory', str(directory), '--port', str(port)],
+    command = [sys.executable, '-B', '-m', 'pilot.server', 'serve',
+               '--directory', str(directory), '--port', str(port)]
+    if synthetic_workflow:
+        command.append('--synthetic-workflow')
+    process = subprocess.Popen(command,
                                cwd=Path(__file__).resolve().parents[1], env=environment,
                                stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
