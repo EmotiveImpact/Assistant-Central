@@ -50,7 +50,57 @@ jobs:
         run: python -B integration/acceptance_demo.py
       - name: Check execution result to unsigned proposal composition
         run: python -B execution/check_composition.py
+      - name: Check isolated authenticated pilot components
+        run: python -B -m unittest discover -s pilot/tests -v
+      - name: Exercise two separate assistant processes
+        run: python -B -m pilot.demo
+      - name: Check pilot interface model and actual HTTP contract
+        run: |
+          node --test pilot/web/tests/model.test.mjs
+          python -B pilot/web/tests/live_contract.py
       - name: Check consent and protocol prototype
         run: python -B prototypes/consent-v29/verify_checkpoint.py --full
       - name: Check targeted synthetic stdio path
         run: python -I -B "$GITHUB_WORKSPACE/prototypes/synthetic-stdio-r5/run_all_checks.py"
+  pilot-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install isolated browser-test dependencies
+        run: |
+          python -m pip install cryptography==50.0.0
+          npm install --prefix "$RUNNER_TEMP/ac-pilot-browser" --no-package-lock --ignore-scripts playwright@1.62.1
+          "$RUNNER_TEMP/ac-pilot-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Exercise real pilot UI in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m pilot.ui_fixture --port 8765 > "$RUNNER_TEMP/ac-pilot-fixture.log" 2>&1 &
+          pilot_fixture_pid=$!
+          trap 'kill "$pilot_fixture_pid" 2>/dev/null || true' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8765/ > /dev/null; then break; fi
+            sleep 1
+          done
+          mkdir -p "$RUNNER_TEMP/pilot-browser-evidence"
+          NODE_PATH="$RUNNER_TEMP/ac-pilot-browser/node_modules" \
+            LIVE_PILOT_URL=http://127.0.0.1:8765 \
+            LIVE_PILOT_PASSWORD='Fictional browser test password' \
+            PILOT_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
+            UI_SCREENSHOT_DIR="$RUNNER_TEMP/pilot-browser-evidence" \
+            node pilot/web/tests/browser.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pilot-browser-evidence
+          path: ${{ runner.temp }}/pilot-browser-evidence
+          if-no-files-found: warn

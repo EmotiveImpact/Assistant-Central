@@ -23,26 +23,34 @@ decision over the exact staged artifact. Current source rights, inherited
 permissions, terminal decisions, expiry and restart uncertainty are checked in
 the shared team transaction. Recipient work still requires its own approval.
 
+The [two-assistant pilot](pilot/README.md) now implements all five follow-on local
+workstreams: password-authenticated owner sessions and encrypted keys, separate
+runtime stores/processes, pinned encrypted peer delivery with durable receipts,
+a disabled-by-default OpenAI Responses adapter, and a browser owner workspace.
+Its actual loopback exchange tests cover task acceptance, origin-only artifact
+return, rejection, cancellation and restart. No real owner enrolment or live
+provider acceptance is claimed. The fictional shared-team decisions are not
+treated as authenticated source consent.
+
 ## Next engineering gates
 
-1. Review the synthetic release/recipient acceptance boundary, then enforce it
-   across two independently controlled stores and processes. The local contract
-   is implemented; shared SQLite transactions are not distributed authority.
-   Preserve exact scope, terminal decisions, expiry and uncertain outcomes.
-2. Bind one authenticated local owner control and one narrowly scoped agent/tool
-   route. A lead must never mint another owner's grants. Keep private local
-   sessions separate from explicitly shared outcomes.
-3. Validate one named host/provider with synthetic input: startup, logging,
-   restart, cancellation, environment handling and rollback. The current r5
-   launcher does not prove native-host acceptance.
-4. Design persistent owner identity, protected key custody, named-peer enrollment,
-   encrypted transport and recovery. Require threat modeling and independent
-   security review before real personal data or production use.
-5. Exercise idempotent outbox/inbox behavior and bounded wake/cancellation semantics.
-   Do not reinterpret timeouts as permission to resend or assign work elsewhere.
-   The local execution ledger proves a single-attempt fence and original-result
-   recovery; transport retries, independently controlled runtimes and provider
-   cancellation still need their own reviewed contracts and acceptance tests.
+1. Review the new local pilot and verify deployment under separately controlled
+   OS accounts/devices. Same-UID process tests do not establish hostile-owner
+   isolation. A reviewed carrier is needed beyond the current loopback listener.
+2. Enrol two real owners explicitly, verify peer fingerprints independently and
+   exercise the actual approval/rejection/cancellation interface. Keep model tools
+   separate from owner controls and private sessions separate from shared results.
+3. Verify one named provider account using synthetic input, exact source/recipient
+   approvals, billing/data policy and privately supplied credentials. The adapter
+   code exists; live provider and native-host acceptance remain unverified.
+4. Complete key rotation/recovery, retention/deletion, backup rollback and incident
+   handling contracts. The pilot encrypts identity keys but stores local application
+   text in private unencrypted files. Obtain external security review before real data.
+5. Validate remote delivery, reconnect and cancellation under real outages. Local
+   tests prove bounded original-packet retries and durable dedup; provider requests
+   remain single-attempt. Remote cancellation takes effect when observed and cannot
+   prove immediate recall or remote shutdown. General inherited-source forwarding
+   still needs independently verifiable upstream owner grants.
 6. Measure realistic workloads and failure modes before making scale, throughput
    or reliability claims. Keep compatibility, observability and operational
    complexity visible alongside performance.
