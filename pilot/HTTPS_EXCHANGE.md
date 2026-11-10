@@ -1,8 +1,9 @@
 # Authenticated owner HTTPS exchange
 
 This synthetic-only adapter connects the authenticated runtime to the optional
-[HTTPS quarantine carrier](HTTPS_MAILBOX.md). It adds no owner-server routes,
-public deployment, provider call, automatic import, background retry or execution.
+[HTTPS quarantine carrier](HTTPS_MAILBOX.md). The CLI adds no public deployment, provider call, automatic import, background
+retry or execution. The optional [owner transfer workspace](OWNER_TRANSFERS.md)
+now exposes separately reviewed operations through host-selected connections.
 Both the owner service and any other process holding its store must be stopped
 before using the CLI. The mailbox is a separate, explicitly enabled process and
 never gets an owner password or session. Use disposable fictional owners only.
@@ -124,8 +125,12 @@ an in-flight send. No post-network mutation can overwrite a later cancellation.
 DNS, multiple resolved-address connection attempts and filesystem I/O inherit
 the carrier's lack of a hard overall deadline. Do not claim instantaneous remote
 withdrawal or prompt network completion. Runtime SQLite objects keep their
-existing single-thread usage constraints; the adapter does not introduce a
-concurrent runtime service.
+existing single-thread usage constraints. The optional owner workspace prepares
+an accounted one-shot capability on that thread and dispatches only network I/O
+on one bounded worker. The CLI still dispatches synchronously. A prepared
+capability has a five-second monotonic start window, original expiry and clock
+rollback check; a late start consumes the attempt without sending. These checks
+do not re-authenticate or guarantee cancellation after the final owner gate.
 
 A successful fixed HTTP ACK is an untrusted peer claim of quarantine. Even a
 malicious mailbox returning that ACK produces `delivery: uncertain`,

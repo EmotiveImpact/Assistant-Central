@@ -1,0 +1,23 @@
+{
+  "name": "@assistant-central/agent-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "scripts": {
+    "test": "node tests/run.mjs",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@grok/agent-sdk": "0.6.0",
+    "@openai/agents": "0.21.0",
+    "@types/node": "24.12.0",
+    "typescript": "5.9.3"
+  }
+}
