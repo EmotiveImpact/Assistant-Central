@@ -1,0 +1,57 @@
+// Actual browser -> owner HTTP service -> independent peer stores.
+// Run only against pilot.ui_fixture with disposable fictional credentials.
+import {createRequire} from 'node:module';
+import {mkdir} from 'node:fs/promises';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url);
+const {chromium}=require('playwright');
+const url=new URL(process.env.LIVE_PILOT_URL||'');
+assert.equal(url.protocol,'http:');assert.equal(url.hostname,'127.0.0.1');
+if(!process.env.LIVE_PILOT_PASSWORD)throw new Error('Disposable fictional fixture password is required');
+const screenshotDir=process.env.PILOT_SCREENSHOT_DIR||process.env.UI_SCREENSHOT_DIR;
+if(screenshotDir)await mkdir(screenshotDir,{recursive:true});
+const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
+const context=await browser.newContext({viewport:{width:1440,height:1000}});
+const page=await context.newPage();const errors=[],decisions=[];page.on('pageerror',error=>errors.push(error.message));
+page.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname.endsWith('/decision'))decisions.push(request.postDataJSON());});
+const article=title=>page.locator('article').filter({has:page.getByRole('heading',{name:title,exact:true})});
+try{
+ await page.goto(url.origin);
+ await page.locator('#password').fill(process.env.LIVE_PILOT_PASSWORD);
+ await page.getByRole('button',{name:'Unlock workspace'}).click();await page.locator('#workspace').waitFor({state:'visible'});
+ assert.equal(await page.locator('#password').inputValue(),'');
+ assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
+ assert.match(await page.locator('#owner-name').textContent(),/blair/i);
+ assert.match(await page.locator('#agent-name').textContent(),/beacon/i);
+ await article('Browser acceptance task').getByRole('button',{name:'Review exact item'}).waitFor();
+ if(screenshotDir)await page.screenshot({path:path.join(screenshotDir,'assistant-central-desktop.png'),fullPage:true});
+ await article('Browser acceptance task').getByRole('button',{name:'Review exact item'}).click();
+ await page.locator('#review-dialog').waitFor({state:'visible'});
+ assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
+ assert.equal(await page.locator('#review-content *').count(),0);
+ assert.match(await page.locator('#review-details').textContent(),/task originator only/);
+ await page.getByRole('button',{name:'Accept exact proposal'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser acceptance task').locator('.badge.accepted').waitFor();
+ await article('Browser rejection task').getByRole('button',{name:'Review exact item'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ await page.getByRole('button',{name:'Reject proposal',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser rejection task').locator('.badge.rejected').waitFor();
+ assert.equal(decisions.length,2);assert.deepEqual(decisions.map(value=>value.decision),['accept','reject']);
+ for(const decision of decisions)assert.match(decision.review_digest,/^[a-f0-9]{64}$/);
+ await page.getByRole('button',{name:'Sync exchange'}).click();await page.locator('#notice').filter({hasText:'Exchange checked'}).waitFor();
+ await page.locator('[data-view=activity]').click();assert.ok(await page.locator('.activity-row').count()>0);
+ await page.locator('[data-view=peers]').click();await page.getByRole('button',{name:'View public identity'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ const publicIdentity=JSON.parse(await page.locator('#review-content').textContent());
+ assert.deepEqual(Object.keys(publicIdentity).sort(),['agent_id','exchange_key','owner_id','signing_key']);
+ await page.getByRole('button',{name:'Close review'}).click();
+ await page.locator('[data-view=inbox]').click();
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+ assert.equal(await page.locator('#mobile-logout').isVisible(),true);
+ if(screenshotDir)await page.screenshot({path:path.join(screenshotDir,'assistant-central-mobile.png'),fullPage:true});
+ await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
+ assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
+ await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});assert.equal(await page.locator('#workspace').isVisible(),false);
+ assert.deepEqual(errors,[]);
+ console.log('PASS live browser: actual authenticated owner login, exact accept/reject, explicit exchange, activity, public identity, inert content, desktop/mobile layout and session cleanup.');
+}finally{await browser.close();}

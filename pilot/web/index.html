@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="referrer" content="no-referrer">
+  <title>Assistant Central · Owner workspace</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to workspace</a>
+  <section id="login-screen" class="login-screen" aria-labelledby="login-heading">
+    <div class="login-brand"><span class="brand-mark" aria-hidden="true">a<span>c</span></span><span>Assistant Central</span></div>
+    <div class="login-card">
+      <div class="eyebrow"><span class="status-dot"></span> PRIVATE OWNER WORKSPACE</div>
+      <h1 id="login-heading">Your assistant.<br><span>Your authority.</span></h1>
+      <p>Review the work you share. Choose the work you accept.</p>
+      <form id="login-form">
+        <label for="password">Owner password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required minlength="1" maxlength="1024" placeholder="Enter your password">
+        <button class="button primary wide" type="submit">Unlock workspace <span aria-hidden="true">↗</span></button>
+      </form>
+      <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+      <div class="pilot-note"><span class="small-icon" aria-hidden="true">◇</span><div><strong>Synthetic pilot</strong><span>Use fictional tasks and content. Live provider calls are disabled.</span></div></div>
+    </div>
+    <p class="login-footer">ONE OWNER. ONE ASSISTANT. EXPLICIT PERMISSION.</p>
+  </section>
+
+  <div id="workspace" class="workspace" hidden>
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="#inbox" aria-label="Assistant Central inbox"><span class="brand-mark" aria-hidden="true">a<span>c</span></span><span>Assistant<br><b>Central</b></span></a>
+      <div class="workspace-label">OWNER WORKSPACE</div>
+      <nav id="navigation">
+        <button class="nav-link active" data-view="inbox" type="button"><span aria-hidden="true">↙</span> Inbox <span id="inbox-count" class="nav-count">0</span></button>
+        <button class="nav-link" data-view="outbox" type="button"><span aria-hidden="true">↗</span> Outbox <span id="outbox-count" class="nav-count">0</span></button>
+        <button class="nav-link" data-view="peers" type="button"><span aria-hidden="true">⊞</span> Trusted peers</button>
+        <button class="nav-link" data-view="activity" type="button"><span aria-hidden="true">≋</span> Activity</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="pilot-tag"><span class="status-dot"></span> Synthetic pilot</div>
+        <div class="owner-card"><div id="owner-avatar" class="avatar">·</div><div><strong id="owner-name">Owner</strong><span id="agent-name">Assistant</span></div></div>
+        <button id="logout" class="text-button" type="button">Lock &amp; sign out <span aria-hidden="true">↗</span></button>
+      </div>
+    </aside>
+
+    <main id="main" class="main" tabindex="-1">
+      <header class="topbar"><div><span class="breadcrumb">Workspace</span><span aria-hidden="true">/</span><strong id="view-name">Inbox</strong></div><div class="topbar-actions"><span id="connection-status" class="connection-status">Checking state</span><button id="sync" class="button secondary compact-button" type="button">Sync exchange</button><button id="refresh" class="icon-button" type="button" aria-label="Refresh saved state">↻</button><button id="mobile-logout" class="icon-button" type="button" aria-label="Lock and sign out">⏻</button></div></header>
+      <div class="content">
+        <section class="page-heading">
+          <div><div class="eyebrow" id="page-eyebrow">INCOMING WORK</div><h1 id="page-title">The next move is yours.</h1><p id="page-description">Review each request before your assistant takes it on.</p></div>
+          <button id="new-proposal" class="button primary" type="button"><span aria-hidden="true">＋</span> New proposal</button>
+        </section>
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+        <section id="summary" class="summary" aria-label="Workspace summary">
+          <div class="summary-item"><span>Awaiting your decision</span><strong id="pending-total">0</strong><div class="summary-line accent"></div></div>
+          <div class="summary-item"><span>Accepted</span><strong id="accepted-total">0</strong><div class="summary-line"></div></div>
+          <div class="summary-item"><span>Trusted peers</span><strong id="peer-total">0</strong><div class="summary-line"></div></div>
+        </section>
+        <section class="work-panel" aria-labelledby="list-title">
+          <div class="panel-toolbar"><div><h2 id="list-title">Your inbox</h2><span id="list-description">Exact requests, explicit decisions</span></div><div id="filters" class="segmented" aria-label="Filter proposals"><button data-filter="all" class="selected" type="button">All</button><button data-filter="pending" type="button">To review</button><button data-filter="decided" type="button">Decided</button></div><button id="add-peer" class="button secondary" type="button" hidden>Enrol a peer</button></div>
+          <div id="item-list" class="item-list"></div>
+        </section>
+        <footer class="workspace-footer"><span><span class="status-dot"></span> Owner decisions remain separate</span><span id="provider-status">Provider not connected</span></footer>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="review-dialog" class="review-dialog">
+    <header class="dialog-header"><div><div id="review-eyebrow" class="eyebrow">EXACT PROPOSAL REVIEW</div><h2 id="review-title">Review proposal</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close review">×</button></header>
+    <div class="dialog-body">
+      <div id="review-state" class="review-state"></div>
+      <dl id="review-details" class="review-details"></dl>
+      <div class="content-label">Exact content</div><pre id="review-content" class="artifact-content"></pre>
+      <details class="commitment-details"><summary>Verify exact commitments</summary><dl id="review-commitments" class="review-details"></dl></details>
+      <p id="review-scope" class="scope-note">Acceptance records this exact proposal. It does not start work or authorise onward sharing.</p>
+      <p id="review-message" class="form-message" role="status" aria-live="polite"></p>
+    </div>
+    <footer id="review-actions" class="dialog-footer"></footer>
+  </dialog>
+
+  <dialog id="compose-dialog">
+    <form id="compose-form">
+      <header class="dialog-header"><div><div class="eyebrow">OUTGOING WORK</div><h2>Prepare a proposal</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close proposal form">×</button></header>
+      <div class="dialog-body form-grid">
+        <p class="form-intro">Create the exact proposal first. You will review it separately before release.</p>
+        <label>Trusted recipient<select id="proposal-peer" name="peer_id" required></select></label>
+        <label>Proposal type<select id="proposal-kind" name="kind"><option value="task">Task request</option><option value="artifact">Artifact</option></select></label>
+        <label id="parent-field" class="full" hidden>Accepted task<select id="proposal-parent" name="parent_id"></select></label>
+        <label class="full">Title<input name="title" maxlength="120" required placeholder="A short, recognisable name"></label>
+        <label class="full">Exact content<textarea name="text" rows="6" maxlength="4096" required placeholder="Describe the fictional task or paste the exact artifact."></textarea></label>
+        <label class="full">Task reference<input name="task_id" maxlength="96" required placeholder="A unique task reference"></label>
+        <label class="full">Exact context<input name="context" maxlength="64" pattern="[a-f0-9]{64}" required spellcheck="false" placeholder="64-character task context"></label>
+        <label>Valid for<select name="minutes"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option></select></label>
+        <label class="check-label full"><input name="synthetic" type="checkbox" required><span>This contains fictional data that I am authorised to share.</span></label>
+        <p id="compose-message" class="form-message full" role="status" aria-live="polite"></p>
+      </div>
+      <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Cancel</button><button class="button primary" type="submit">Create for review</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="peer-dialog">
+    <form id="peer-form">
+      <header class="dialog-header"><div><div class="eyebrow">EXPLICIT TRUST</div><h2>Enrol a trusted peer</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close peer form">×</button></header>
+      <div class="dialog-body form-grid">
+        <p class="form-intro">Get the public identity and fingerprint directly from the other owner. Enrolment does not approve any work or disclosure.</p>
+        <label class="full">Public identity<textarea name="public_identity" rows="6" required spellcheck="false" placeholder="Paste the peer's public identity JSON"></textarea></label>
+        <label class="full">Verified fingerprint<input name="expected_fingerprint" required maxlength="128" spellcheck="false" autocomplete="off" placeholder="Compare the full fingerprint with the other owner"></label>
+        <label class="full">Local pilot address<input name="endpoint" type="url" required placeholder="http://127.0.0.1:8766" autocomplete="off"></label>
+        <label class="check-label full"><input name="verified" type="checkbox" required><span>I have independently checked the full fingerprint with this owner.</span></label>
+        <p id="peer-message" class="form-message full" role="status" aria-live="polite"></p>
+      </div>
+      <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Cancel</button><button class="button primary" type="submit">Enrol this exact peer</button></footer>
+    </form>
+  </dialog>
+</body>
+</html>

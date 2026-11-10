@@ -11,9 +11,10 @@ approve another owner's actions or disclosure. See [the vision](VISION.md).
 
 ## Current state
 
-This repository contains **offline fictional prototypes**, not a connected
-production network. No real model runs the examples, no provider account is
-connected, and no peer message, publication, purchase or deployment occurs.
+This repository contains **synthetic local prototypes and a two-assistant pilot**.
+No real model runs the examples and no provider account is connected. The pilot
+exchanges encrypted peer messages over loopback between separate processes;
+there is no production network, public publication, purchase or deployment.
 
 | Component | Status | Evidence |
 | --- | --- | --- |
@@ -22,6 +23,7 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
 | [Recipient acceptance](integration/RECIPIENT_ACCEPTANCE.md) | Explicit synthetic release, per-source-owner controls and exact recipient accept/reject; restart and duplicate handling | 45 new checks; 103 total integration checks |
+| [Two-assistant pilot](pilot/README.md) | Authenticated local owners, separate stores, encrypted delivery, exact decisions, provider adapter and browser workspace | Component/adversarial tests, actual two-process exchange and separate UI acceptance |
 | [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
 | [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from direct and upstream data owners; atomic one-shot local release | Provider and ancestry checks, including independent privacy, concurrency and withdrawal tests |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
@@ -61,6 +63,7 @@ peer-lifecycle experiments and does not claim native-host acceptance.
 - `team/`: new team rebuild, tests, examples and provenance.
 - `integration/`: exact team artifact mapping, synthetic in-memory wire demo and tests.
 - `execution/`: synthetic dispatch ledger, crash/revocation checks and restart demo.
+- `pilot/`: separate local assistants, authenticated owner controls, encrypted exchange, provider adapter and UI.
 - `prototypes/consent-v29/`: recovered consent/protocol checkpoint with sanitized evidence paths.
 - `prototypes/synthetic-stdio-r5/`: recovered synthetic stdio checkpoint with sanitized evidence paths.
 - `docs/`: original architecture, security, pilot and integration-readiness material.
