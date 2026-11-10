@@ -15,6 +15,8 @@ import time
 import urllib.error
 import urllib.request
 
+from .storage import RecordStorage
+
 ENDPOINT = "https://api.openai.com/v1/responses"
 VERSION = "assistant-central-responses-pilot/1"
 MAX_RESPONSE_BYTES = 65536
@@ -123,7 +125,7 @@ class ResponsesAdapter:
     whose provider authority has not been independently verified.
     """
     def __init__(self, connection, authorise, authenticate, *, authorised=None, budget=ProviderBudget(),
-                 transport=None, allow_live=False, clock=time.time):
+                 transport=None, allow_live=False, clock=time.time, legacy_storage_fixture=False):
         if type(connection) is not sqlite3.Connection or not callable(authorise) or not callable(authenticate):
             raise ProviderDenied("Expected a runtime connection and authority callbacks")
         if type(budget) is not ProviderBudget or type(allow_live) is not bool:
@@ -132,6 +134,10 @@ class ResponsesAdapter:
         self._authorised = authorised or getattr(getattr(authenticate, "__self__", None), "authorised", None)
         if not callable(self._authorised):
             raise ProviderDenied("A revocation-serialised owner session guard is required")
+        if type(legacy_storage_fixture) is not bool:
+            raise ProviderDenied("Expected explicit legacy storage fixture choice")
+        self.storage = RecordStorage(connection, getattr(authenticate, "__self__", None),
+                                     legacy_fixture=legacy_storage_fixture)
         self.budget, self.transport, self.allow_live, self.clock = budget, transport, allow_live, clock
         with self._transaction():
             self.db.execute("""CREATE TABLE IF NOT EXISTS pilot_provider_meta(
@@ -200,6 +206,7 @@ class ResponsesAdapter:
         row = dict(zip((column[0] for column in cursor.description), value))
         if (row["owner"], row["agent"]) != identity:
             raise ProviderDenied("Provider run belongs to another local identity")
+        row = self.storage.row("pilot_provider_runs", row)
         review = json.loads(row["review"])
         if (_digest(review) != row["digest"] or _canonical(review) != row["review"]
                 or review.get("domain") != VERSION + "/review" or review.get("endpoint") != ENDPOINT
@@ -264,7 +271,8 @@ class ResponsesAdapter:
             self.db.execute("""INSERT INTO pilot_provider_runs
                 (id,item_id,owner,agent,binding,request,review,digest,state)
                 VALUES(?,?,?,?,?,?,?,?,'prepared')""",
-                (run_id, binding["item_id"], *identity, _canonical(binding), _canonical(request), _canonical(review), _digest(review)))
+                (run_id, binding["item_id"], *identity, *(self.storage.seal("pilot_provider_runs", run_id, key, _canonical(value))
+                  for key, value in (("binding", binding), ("request", request), ("review", review))), _digest(review)))
             return self._status(self._get(run_id, identity))
 
     def review(self, token, run_id):
@@ -341,8 +349,12 @@ class ResponsesAdapter:
             response_id, result = self._parse_response(response, request["max_output_tokens"])
             with self._transaction():
                 self.db.execute("""UPDATE pilot_provider_runs SET state='completed',response_id=?,result=?,result_digest=?
-                    WHERE id=? AND state='uncertain'""", (response_id, result, _digest({"text": result}), run_id))
-                outcome = self._status(self._get(run_id, identity))
+                    WHERE id=? AND state='uncertain'""", (response_id, self.storage.seal("pilot_provider_runs", run_id, "result", result), _digest({"text": result}), run_id))
+                # No plaintext must be opened after a response arrives: the owner
+                # may have locked or expired while the single request was in flight.
+                cursor = self.db.execute("SELECT * FROM pilot_provider_runs WHERE id=?", (run_id,))
+                value = cursor.fetchone()
+                outcome = self._status(dict(zip((column[0] for column in cursor.description), value)))
             return outcome
         except ProviderDenied:
             self._failure(run_id, "invalid_response")

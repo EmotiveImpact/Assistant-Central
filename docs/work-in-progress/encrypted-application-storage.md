@@ -20,3 +20,26 @@ No actual owner credentials, provider accounts or personal data are accessed.
 
 This first commit contains coordination only. Implementation and verification
 are pending. Inspect open PR ownership before expanding this scope.
+
+## Implementation decisions
+
+- Retain ordinary SQLite transactions. Field encryption was chosen over replacing
+  the database engine or snapshotting the whole database at each transaction.
+- Encrypt content, provider request/result/review, workflow review and audit data.
+  Metadata/indexes remain visible, explicitly outside this confidentiality claim.
+- Use ephemeral public-key sealing to the immutable owner exchange key. This
+  preserves late results after logout without retaining an unlocked decryption
+  key. It is not writer authentication or an anti-rollback consent ledger.
+- Existing plaintext needs explicit stopped-service migration. Build only in
+  memory, verify exact logical rows, VACUUM in memory, then fsync private encrypted
+  output and atomically replace. Never promise old filesystem blocks were erased.
+- Shared normal-runtime leases preserve concurrent SQLite connections; migration
+  requires an exclusive lease. An early exclusive-runtime version broke existing
+  concurrency regressions and was corrected before publication.
+- Independent review caught a constructor lease leak on malformed SQLite and an
+  implicit standalone-provider plaintext fallback. Both were fixed and regression
+  tests added. Fixtures now explicitly opt in and concrete owner auth cannot.
+- Two pre-existing adversarial fixture reads now use the runtime helper rather
+  than expecting plaintext from SQLite. Their forgery assertions are unchanged.
+
+Verification remains in progress; final PR evidence records exact tested heads.

@@ -70,7 +70,7 @@ class ProviderTests(unittest.TestCase):
         return {"task_text": self.text, "context": binding['context'], "recipient": "assistant", "synthetic_only": True}
 
     def make_adapter(self, **kwargs):
-        return ResponsesAdapter(self.db, self.authorise, self.auth.authenticate,
+        return ResponsesAdapter(self.db, self.authorise, self.auth.authenticate, legacy_storage_fixture=True,
                                 transport=self.transport, clock=lambda: self.now, **kwargs)
 
     def prepare(self):
@@ -81,7 +81,7 @@ class ProviderTests(unittest.TestCase):
         return self.adapter.approve('owner-session', 'run-one', result['review_digest'], expires=1100)
 
     def test_defaults_never_contact_a_provider(self):
-        self.adapter = ResponsesAdapter(self.db, self.authorise, self.auth.authenticate, clock=lambda: self.now)
+        self.adapter = ResponsesAdapter(self.db, self.authorise, self.auth.authenticate, legacy_storage_fixture=True, clock=lambda: self.now)
         self.approved()
         with self.assertRaises(ProviderDenied): self.adapter.dispatch('owner-session', 'run-one')
         self.assertEqual(self.adapter.status('owner-session', 'run-one')['state'], 'approved')
@@ -280,7 +280,7 @@ class ProviderTests(unittest.TestCase):
                 def authority(token, binding):
                     return {'task_text': self.text, 'context': binding['context'], 'recipient': 'assistant', 'synthetic_only': True}
                 fixture = FixtureTransport(lambda encoded: sample)
-                adapter = ResponsesAdapter(db, authority, self.auth.authenticate, transport=fixture, clock=lambda: self.now)
+                adapter = ResponsesAdapter(db, authority, self.auth.authenticate, legacy_storage_fixture=True, transport=fixture, clock=lambda: self.now)
                 prepared = adapter.prepare('owner-session', 'run', self.binding)
                 adapter.approve('owner-session', 'run', prepared['review_digest'], expires=1100)
                 with self.assertRaises(ProviderOutcomeUnknown): adapter.dispatch('owner-session', 'run')
@@ -345,7 +345,7 @@ class ProviderTests(unittest.TestCase):
                 self.auth.authenticate(token)
                 return {'task_text': self.text, 'context': binding['context'], 'recipient':'assistant', 'synthetic_only':True}
             try:
-                adapter = ResponsesAdapter(db, authority, self.auth.authenticate, transport=fixture, clock=lambda:self.now)
+                adapter = ResponsesAdapter(db, authority, self.auth.authenticate, legacy_storage_fixture=True, transport=fixture, clock=lambda:self.now)
                 barrier.wait(5)
                 try: results.append(adapter.dispatch('owner-session', 'run-one')['state'])
                 except ProviderDenied: results.append('denied')
