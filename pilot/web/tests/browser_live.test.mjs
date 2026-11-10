@@ -13,8 +13,8 @@ const screenshotDir=process.env.PILOT_SCREENSHOT_DIR||process.env.UI_SCREENSHOT_
 if(screenshotDir)await mkdir(screenshotDir,{recursive:true});
 const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 const context=await browser.newContext({viewport:{width:1440,height:1000}});
-const page=await context.newPage();const errors=[],decisions=[];page.on('pageerror',error=>errors.push(error.message));
-page.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname.endsWith('/decision'))decisions.push(request.postDataJSON());});
+const page=await context.newPage();const errors=[],decisions=[],workflowWrites=[];page.on('pageerror',error=>errors.push(error.message));
+page.on('request',request=>{const pathname=new URL(request.url()).pathname;if(request.method()==='POST'&&pathname.endsWith('/decision'))decisions.push(request.postDataJSON());if(request.method()==='POST'&&(pathname.includes('/workflows/')||pathname.endsWith('/workflow')))workflowWrites.push({path:pathname,body:request.postDataJSON()});});
 const article=title=>page.locator('article').filter({has:page.getByRole('heading',{name:title,exact:true})});
 try{
  await page.goto(url.origin);
@@ -38,6 +38,42 @@ try{
  await article('Browser rejection task').locator('.badge.rejected').waitFor();
  assert.equal(decisions.length,2);assert.deepEqual(decisions.map(value=>value.decision),['accept','reject']);
  for(const decision of decisions)assert.match(decision.review_digest,/^[a-f0-9]{64}$/);
+ // Each transition below is an independent owner click against the real HTTP service.
+ await article('Browser workflow task').getByRole('button',{name:'Review exact item'}).click();
+ await page.locator('#review-dialog').waitFor({state:'visible'});
+ await page.getByRole('button',{name:'Accept exact proposal'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser workflow task').getByRole('button',{name:'Inspect',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ await page.getByRole('button',{name:'Prepare synthetic run'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser workflow task').getByRole('button',{name:'Inspect synthetic run'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ assert.match(await page.locator('#review-content').textContent(),/synthetic-research-v1/);
+ assert.equal(await page.getByRole('button',{name:'Run synthetic fixture once'}).count(),0);
+ await page.getByRole('button',{name:'Approve synthetic request'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser workflow task').getByRole('button',{name:'Inspect synthetic run'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ await page.getByRole('button',{name:'Run synthetic fixture once'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await article('Browser workflow task').getByRole('button',{name:'Inspect synthetic run'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ assert.match(await page.locator('#review-title').textContent(),/original synthetic result/i);
+ assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
+ assert.equal(await page.locator('#review-content *').count(),0);
+ assert.match(await page.locator('#review-scope').textContent(),/does not release/);
+ if(screenshotDir)await page.screenshot({path:path.join(screenshotDir,'assistant-central-workflow-result.png'),fullPage:true});
+ await page.getByRole('button',{name:'Stage exact artifact'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ const outgoingArtifact=page.locator('article').filter({has:page.getByText('ARTIFACT',{exact:true})});
+ await outgoingArtifact.locator('.badge.draft').waitFor();
+ assert.deepEqual(workflowWrites.map(value=>value.path.split('/').at(-1)),['workflow','approve','run','stage']);
+ for(const write of workflowWrites.slice(1))assert.match(write.body.review_digest,/^[a-f0-9]{64}$/);
+ assert.equal(workflowWrites[1].body.review_digest,workflowWrites[2].body.review_digest);
+ assert.notEqual(workflowWrites[2].body.review_digest,workflowWrites[3].body.review_digest);
+ await outgoingArtifact.getByRole('button',{name:'Review exact item'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+ await page.getByRole('button',{name:'Approve & release'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
+ await outgoingArtifact.locator('.badge.released').waitFor();
+ await page.locator('[data-view=inbox]').click();
+ assert.match(await article('Browser workflow task').locator('.workflow-note').textContent(),/Artifact released/);
+ assert.doesNotMatch(await article('Browser workflow task').locator('.workflow-note').textContent(),/draft|awaiting release/i);
+ await page.getByRole('button',{name:'New proposal'}).click();await page.locator('#compose-dialog').waitFor({state:'visible'});
+ assert.equal(await page.locator('#workflow-permission-field').isVisible(),true);
+ await page.locator('[name=synthetic_run]').check();await page.locator('#proposal-kind').selectOption('artifact');
+ assert.equal(await page.locator('#workflow-permission-field').isVisible(),false);assert.equal(await page.locator('[name=synthetic_run]').isChecked(),false);
+ await page.getByRole('button',{name:'Close proposal form'}).click();
  await page.getByRole('button',{name:'Sync exchange'}).click();await page.locator('#notice').filter({hasText:'Exchange checked'}).waitFor();
  await page.locator('[data-view=activity]').click();assert.ok(await page.locator('.activity-row').count()>0);
  await page.locator('[data-view=peers]').click();await page.getByRole('button',{name:'View public identity'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
@@ -53,5 +89,5 @@ try{
  assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
  await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});assert.equal(await page.locator('#workspace').isVisible(),false);
  assert.deepEqual(errors,[]);
- console.log('PASS live browser: actual authenticated owner login, exact accept/reject, explicit exchange, activity, public identity, inert content, desktop/mobile layout and session cleanup.');
+ console.log('PASS live browser: actual authenticated owner login, exact accept/reject, separately approved one-shot synthetic workflow, exact result staged as draft then separately released, explicit exchange, history, inert content, desktop/mobile layout and session cleanup.');
 }finally{await browser.close();}

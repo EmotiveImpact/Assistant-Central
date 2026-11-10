@@ -12,3 +12,5 @@ input,textarea,select{width:100%;border:1px solid #34404d;border-radius:8px;colo
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}.button:hover{transform:none}}
 .compact-button{min-height:34px;padding:8px 11px;font-size:10px}#mobile-logout{display:none}@media(max-width:700px){#mobile-logout{display:inline-block}.connection-status{display:none}.topbar-actions{gap:4px!important}.compact-button{font-size:9px;padding:7px 9px}.topbar .icon-button{width:30px;font-size:20px}.topbar{font-size:10px}}
 .badge.draft,.badge.prepared,.badge.received,.badge.awaiting_review{color:#e8d6a2;background:#e8d6a208;border-color:#5b5034}@media(max-width:700px){input,textarea,select{font-size:16px}.row-right .button{min-height:38px}}
+
+.workflow-note{font-size:10px;line-height:1.6;color:var(--muted);margin:8px 0 0}.row-right{flex-wrap:wrap;max-width:340px}.badge.approved,.badge.completed{color:var(--accent);border-color:#33523b}@media(max-width:700px){.row-right{justify-content:flex-start;gap:8px}.row-right .button{flex:1;white-space:normal}.row-right .badge{flex:none}.workflow-note{font-size:9px}}

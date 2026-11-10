@@ -24,6 +24,7 @@ there is no production network, public publication, purchase or deployment.
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
 | [Recipient acceptance](integration/RECIPIENT_ACCEPTANCE.md) | Explicit synthetic release, per-source-owner controls and exact recipient accept/reject; restart and duplicate handling | 45 new checks; 103 total integration checks |
 | [Two-assistant pilot](pilot/README.md) | Authenticated local owners, separate stores, encrypted delivery, exact decisions, provider adapter and browser workspace | Component/adversarial tests, actual two-process exchange and separate UI acceptance |
+| [Reviewed work loop](pilot/WORKFLOW.md) | Opt-in synthetic request approval, original-result review and atomic return draft, followed by separate release/acceptance | Two-process HTTP, restart/offline delivery and independent authority regressions |
 | [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
 | [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from direct and upstream data owners; atomic one-shot local release | Provider and ancestry checks, including independent privacy, concurrency and withdrawal tests |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
@@ -59,6 +60,10 @@ pinned Python dependencies. The stdio suite intentionally excludes inherited
 peer-lifecycle experiments and does not claim native-host acceptance.
 
 ## Repository layout
+
+Agents starting new implementation work must open a draft PR before substantial
+code changes, with scope, file ownership and verification plans. See [agent
+coordination](AGENTS.md).
 
 - `team/`: new team rebuild, tests, examples and provenance.
 - `integration/`: exact team artifact mapping, synthetic in-memory wire demo and tests.
