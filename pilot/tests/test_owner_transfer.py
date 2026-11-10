@@ -163,6 +163,31 @@ class OwnerTransferTests(unittest.TestCase):
         self.assertEqual(self.review()['outbox']['attempts'], 1)
         self.assertEqual(list(self.a[2].directory.glob('.https-send-*')), [])
 
+    def test_submit_can_start_then_raise_without_losing_in_flight_slot(self):
+        entered, release = threading.Event(), threading.Event()
+        self.addCleanup(release.set)
+        thread = None
+        def network(*args, **kwargs):
+            entered.set(); release.wait(5); return {'transport_acknowledged': True}
+        def uncertain_submit(operation):
+            nonlocal thread
+            thread = threading.Thread(target=operation)
+            thread.start()
+            self.assertTrue(entered.wait(2))
+            raise RuntimeError('Interrupted after dispatch started')
+        with patch('pilot.https_exchange.send_file', side_effect=network), patch.object(self.first.worker, 'submit', side_effect=uncertain_submit):
+            with self.assertRaises(RuntimeError): self.send()
+            self.assertIsNone(self.first.future)
+            self.assertTrue(self.first.active())
+            self.assertEqual(self.first.snapshot(self.a[1])['dispatch']['state'], 'in_flight')
+            with self.assertRaises(RuntimeDenied): self.send(self.review(), retry=True)
+            self.a[2].cancel(self.a[1], self.item_id, self.a[2].review(self.a[1], self.item_id)['review_digest'])
+            release.set(); thread.join(timeout=2)
+        self.assertFalse(self.first.active())
+        row = self.a[2].exchange.outbox_status(self.message_id)
+        self.assertEqual((row['attempts'], row['state']), (1, 'cancelled'))
+        self.assertEqual(list(self.a[2].directory.glob('.https-send-*')), [])
+
     def test_selected_import_is_separate_from_receipt_and_owner_acceptance(self):
         packet = self.a[2].prepare_delivery(self.a[1], self.message_id)
         raw = canonical(packet); selected = hashlib.sha256(raw).hexdigest()

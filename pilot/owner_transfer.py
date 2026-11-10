@@ -76,6 +76,7 @@ class OwnerTransfer:
         self.exchange = HTTPSExchange(runtime)
         self.worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix='explicit-https')
         self.future = None
+        self.prepared = None
         self.dispatched = None
 
     def close(self):
@@ -86,21 +87,15 @@ class OwnerTransfer:
         need(self.config is not None, 'HTTPS transfers are not configured by the host')
 
     def active(self):
-        return self.future is not None and not self.future.done()
+        return self.prepared is not None and self.prepared.observation()['state'] in ('prepared', 'running')
 
     def _observation(self):
-        if self.future is None:
+        if self.prepared is None:
             return None
-        observation = {**self.dispatched, 'state': 'in_flight' if self.active() else 'outcome_unknown',
-                       'transport_acknowledged': False, 'delivery': 'uncertain', 'authorises_execution': False}
-        if not self.active():
-            try:
-                result = self.future.result()
-            except BaseException:
-                pass  # Never return exception or peer response contents.
-            else:
-                observation.update(state='finished', transport_acknowledged=result['transport_acknowledged'])
-        return observation
+        observation = self.prepared.observation()
+        return {**self.dispatched, **observation,
+                'state': 'in_flight' if observation['state'] in ('prepared', 'running') else observation['state'],
+                'delivery': 'uncertain', 'authorises_execution': False}
 
     def _quarantine(self):
         if not self.config or not self.config.quarantine:
@@ -202,12 +197,16 @@ class OwnerTransfer:
         connection = self.config.connection(connection_id)
         prepared = self.exchange._prepare_send(session, identifier, connection['destination'], connection['peer_fingerprint'],
                      retry=retry, ca_file=connection.get('ca_file'), receipt=kind == 'receipt')
+        # Claim the slot before submitting: submit can start work and then raise.
+        # The capability's own state, not receipt of a Future, owns this slot.
+        self.prepared = prepared
+        self.dispatched = {'message_id': review['message_id'], 'connection_id': connection_id}
+        self.future = None
         try:
             self.future = self.worker.submit(prepared.dispatch)
         except BaseException:
             prepared.close()
             raise
-        self.dispatched = {'message_id': review['message_id'], 'connection_id': connection_id}
         return {'message_id': review['message_id'], 'delivery': 'uncertain', 'dispatch_started': True,
                 'owner_acceptance': 'not_established', 'authorises_execution': False}
 

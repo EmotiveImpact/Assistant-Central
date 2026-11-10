@@ -203,29 +203,46 @@ class _PreparedHTTPSAttempt:
         self._source, self._target, self._recipient, self._ca_file = source, target, recipient, ca_file
         self._metadata, self._staging = metadata, staging
         self._lock, self._used = threading.Lock(), False
+        self._state, self._acknowledged = 'prepared', False
         self._expires, self._prepared_at, self._clock = expires, prepared_at, clock
         self._start_deadline = time.monotonic() + 5
+
+    def observation(self):
+        with self._lock:
+            return {'state': self._state, 'transport_acknowledged': self._acknowledged}
 
     def dispatch(self):
         with self._lock:
             need(not self._used, 'Prepared transfer already consumed')
             self._used = True
+            self._state = 'running'
+        result = None
         try:
             now = self._clock()
             need(type(now) in (int, float) and math.isfinite(now) and 0 < self._prepared_at <= now < self._expires
                  and time.monotonic() < self._start_deadline, 'Prepared transfer start window expired')
-            result = send_file(self._source, self._target, self._recipient, ca_file=self._ca_file)
-            return {**self._metadata, 'transport_acknowledged': result['transport_acknowledged'] is True}
+            sent = send_file(self._source, self._target, self._recipient, ca_file=self._ca_file)
+            result = {**self._metadata, 'transport_acknowledged': sent['transport_acknowledged'] is True}
         except BaseException:
             raise HTTPSOutcomeUnknown('Attempt retained as uncertain; inspect state and quarantine before any explicit retry.') from None
         finally:
-            self._staging.close()
+            try:
+                self._staging.close()
+            except BaseException:
+                result = None
+                raise HTTPSOutcomeUnknown('Attempt retained as uncertain; staging cleanup outcome unavailable.') from None
+            finally:
+                with self._lock:
+                    self._state = 'finished' if result is not None else 'outcome_unknown'
+                    self._acknowledged = bool(result and result['transport_acknowledged'])
+        return result
 
     def close(self):
         with self._lock:
             if self._used:
                 return
             self._used = True
+            self._state = 'outcome_unknown'
         self._staging.close()
 
 
