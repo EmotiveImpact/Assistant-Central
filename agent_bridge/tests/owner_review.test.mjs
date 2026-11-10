@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { fixture, draft } from './helpers.mjs';
-import { DraftStore } from '../src/store.ts';
+import { DraftStore, Audit } from '../src/store.ts';
 const principal = 'a'.repeat(64);
 const owner = {principal, sessionDigest:'b'.repeat(64), sessionExpiresAt:Date.now()+600_000};
 const setup = () => fixture('review',{ownerId:principal});
@@ -99,5 +99,12 @@ test('ciphertext swaps or a corrupted dismissal cannot give successful reviewed 
  db.exec("UPDATE owner_dismissals SET sealed='invalid'");db.close();
  denied(()=>f.store.listForOwner(f.binding,owner));denied(()=>review(f,id));denied(()=>dismiss(f,r));
  denied(()=>f.store.dispatch(f.binding,'task_draft_status',{draftId:id}));
+ }finally{f.cleanup();}
+});
+
+test('published audit metadata includes the saved owner dismissal action',()=>{
+ const f=setup();try{const id=create(f);dismiss(f,review(f,id));const db=new DatabaseSync(f.launch.storePath);
+ try{const rows=db.prepare('SELECT action,outcome FROM audit').all();assert.ok(rows.some(row=>row.action==='owner_dismiss'));for(const row of rows){assert.ok(Audit.actions.includes(row.action));assert.ok(Audit.outcomes.includes(row.outcome));}}
+ finally{db.close();}
  }finally{f.cleanup();}
 });

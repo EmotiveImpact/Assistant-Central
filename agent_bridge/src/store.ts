@@ -25,7 +25,7 @@ const MAX_OPERATIONS = 256;
 const MAX_DRAFTS = 32;
 const MAX_SCOPES = 64;
 const MAX_LIFETIME_MS = 15 * 60 * 1000;
-export const Audit = Object.freeze({ version: 1, actions: ['create', 'status', 'reject'], outcomes: ['ok', 'invalid_input', 'unavailable', 'conflict', 'limit_reached', 'internal_error'] });
+export const Audit = Object.freeze({ version: 1, actions: ['create', 'status', 'reject', 'owner_dismiss'], outcomes: ['ok', 'invalid_input', 'unavailable', 'conflict', 'limit_reached', 'internal_error'] });
 
 
 /** Trusted-host API. Never expose this object, database path or key to an agent. */
@@ -60,7 +60,7 @@ export class DraftStore {
       // Only the exact known v1 schema with the current key can migrate. Unknown
       // versions, partial migrations, extra tables and missing markers fail shut.
       this.#transaction(() => {
-        const schema = this.#db.prepare("SELECT sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' ORDER BY sql").all().map(row => row.sql);
+        const schema = this.#db.prepare("SELECT sql FROM sqlite_master WHERE name NOT GLOB 'sqlite_*' ORDER BY sql").all().map(row => row.sql);
         const metadata = this.#db.prepare('SELECT * FROM bridge_meta').all();
         if (metadata.length !== 1 || metadata[0].key_check !== this.#mac('store-key-check-v1')) throw new BoundaryError('unavailable');
         if (options.allowOfflineV1Upgrade === true && metadata[0].version === 1 && JSON.stringify(schema) === JSON.stringify([...V1_SCHEMA].sort())) {
@@ -85,19 +85,33 @@ export class DraftStore {
   /** Provision only after the embedding host has authenticated the real owner.
    * This is a fictional binding in the acceptance demo, not human consent. */
   provision(binding: Binding) {
-    const b = Binding.parse(binding); const scope = this.#scope(b); const now = this.#now();
-    if (b.expiresAt <= now || b.expiresAt > now + MAX_LIFETIME_MS) throw new BoundaryError('unavailable');
-    this.#transaction(() => {
-      const old = this.#db.prepare('SELECT binding, revoked FROM scopes WHERE scope=?').get(scope);
+    const b = Binding.parse(binding); const scope = this.#scope(b);
+    const error = this.#transaction((): ErrorCode | undefined => {
+      // A pre-lock timestamp can become stale while another owner/host commits.
+      const now = this.#now();
+      const old = this.#db.prepare('SELECT binding,revoked,last_seen,expires FROM scopes WHERE scope=?').get(scope);
       const commitment = this.#mac(JSON.stringify(b));
-      if (old) {
-        if (old.binding !== commitment || old.revoked) throw new BoundaryError('unavailable');
-        return;
+      if (old && (old.binding !== commitment || old.revoked)) return 'unavailable';
+      if (old && (now < Number(old.last_seen) || now >= Number(old.expires))) {
+        this.#db.prepare('UPDATE scopes SET revoked=1 WHERE scope=?').run(scope);
+        return 'unavailable';
       }
-      const count = this.#db.prepare('SELECT count(*) AS n FROM scopes').get()!;
-      if (Number(count.n) >= MAX_SCOPES) throw new BoundaryError('limit_reached');
-      this.#db.prepare('INSERT INTO scopes(scope,binding,expires,last_seen) VALUES(?,?,?,?)').run(scope, commitment, b.expiresAt, now);
+      if (b.expiresAt <= now || b.expiresAt > now + MAX_LIFETIME_MS) return 'unavailable';
+      if (!old) {
+        const count = this.#db.prepare('SELECT count(*) AS n FROM scopes').get()!;
+        if (Number(count.n) >= MAX_SCOPES) return 'limit_reached';
+        this.#db.prepare('INSERT INTO scopes(scope,binding,expires,last_seen) VALUES(?,?,?,?)').run(scope, commitment, b.expiresAt, now);
+      }
+      const finished = this.#now();
+      if (finished < now || finished >= b.expiresAt) {
+        if (old) this.#db.prepare('UPDATE scopes SET revoked=1 WHERE scope=?').run(scope);
+        else this.#db.prepare('DELETE FROM scopes WHERE scope=?').run(scope);
+        return 'unavailable';
+      }
+      // Never renew the immutable lease or reset model counters on duplicates.
+      this.#db.prepare('UPDATE scopes SET last_seen=? WHERE scope=?').run(finished, scope);
     });
+    if (error) throw new BoundaryError(error);
   }
   revoke(binding: Binding) {
     const result = this.#db.prepare('UPDATE scopes SET revoked=1 WHERE scope=? AND binding=?').run(this.#scope(binding), this.#mac(JSON.stringify(Binding.parse(binding))));
@@ -213,9 +227,12 @@ export class DraftStore {
   }
   /** The only model-facing operation, with one fixed trusted binding. */
   dispatch(binding: Binding, name: string, input: unknown): Status {
-    const scope = this.#scope(binding); const now = this.#now();
+    const scope = this.#scope(binding);
     // Audit rejection commits too. No user strings, content, keys or session IDs in audit.
     const outcome = this.#transaction((): { value?: Status, error?: ErrorCode } => {
+      // Sample only after the write lock; an earlier timestamp can falsely look
+      // like rollback after a legitimate concurrent owner transaction.
+      const now = this.#now();
       const row = this.#db.prepare('SELECT * FROM scopes WHERE scope=?').get(scope);
       if (!row || row.revoked || row.binding !== this.#mac(JSON.stringify(Binding.parse(binding)))) return { error: 'unavailable' };
       if (now < Number(row.last_seen) || now >= Number(row.expires)) {

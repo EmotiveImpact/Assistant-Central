@@ -28,3 +28,21 @@ without clearing the uncertainty latch.
 
 Only already-published product dependencies are composed. Unpublished
 conversation-controls files are excluded. No merge or live activation.
+
+## Final boundary review
+
+A real concurrent owner transaction exposed stale pre-lock clock sampling in the
+inherited bridge dispatch/provision paths. Sampling now occurs under the SQLite
+write lock; final expiry and genuine backwards-time checks remain mandatory.
+The regression uses two actual processes and verifies no duplicate draft, lease
+renewal or false revocation, plus refusal when a new lease expires during the
+lock wait.
+
+A schema check also treated the underscore in `LIKE 'sqlite_%'` as a wildcard.
+The bridge now excludes only SQLite's literal reserved prefix. The integration
+reviewer explicitly coordinated the same one-line correction in
+`pilot/storage.py` and `conversation/ledger.py`, with independent startup
+regressions retained. This is the only scope expansion into those components;
+no other runtime, authentication or conversation semantics are changed. It is
+strict format validation, not a claim of protection from a malicious same-user
+database writer.
