@@ -3,7 +3,7 @@
 The trusted host supplies authenticators and sessions. Message bodies are inert.
 No network, model invocation, embeddings, attachment fetch or execution is here.
 """
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
 import hashlib
 import json
@@ -111,6 +111,7 @@ class ConversationLedger:
             self.storage = _ConversationStorage(self.db, storage_auth, create=True)
             self.db.executescript('''
                 CREATE TABLE IF NOT EXISTS conversation_meta(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS conversation_clock(singleton INTEGER PRIMARY KEY CHECK(singleton=1),observed REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS conversation_principals(id TEXT PRIMARY KEY,public TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS conversations(id TEXT PRIMARY KEY,admin TEXT NOT NULL,generation INTEGER NOT NULL,mode TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS conversation_members(conversation_id TEXT NOT NULL,principal TEXT NOT NULL,epoch TEXT NOT NULL,active INTEGER NOT NULL,PRIMARY KEY(conversation_id,principal));
@@ -126,6 +127,14 @@ class ConversationLedger:
                     need(old['version'] == VERSION)
                 else:
                     self.db.execute('INSERT INTO conversation_meta VALUES(1,?)', (VERSION,))
+                observed = self.db.execute('SELECT observed FROM conversation_clock WHERE singleton=1').fetchone()
+                if observed is None:
+                    need(old is None)  # Never silently reset an existing ledger's clock fence.
+                    self.db.execute('INSERT INTO conversation_clock VALUES(1,0)')
+                    self._last_time = 0
+                else:
+                    need(type(observed['observed']) in (int, float) and math.isfinite(observed['observed']) and observed['observed'] >= 0)
+                    self._last_time = observed['observed']
                 for principal, auth in self.actors.items():
                     public = canonical(auth.public_identity()).decode()
                     old = self.db.execute('SELECT public FROM conversation_principals WHERE id=?', (principal,)).fetchone()
@@ -152,6 +161,33 @@ class ConversationLedger:
         self._last_time = value
         return value
 
+    def _persist_observed_time(self):
+        # This fence deliberately commits outside the message/grant transaction.
+        # A refused/rolled-back read must not forget that expiry was observed.
+        try:
+            need(not self.db.in_transaction)
+            self.db.execute('BEGIN IMMEDIATE')
+            row = self.db.execute('SELECT observed FROM conversation_clock WHERE singleton=1').fetchone()
+            need(row is not None and type(row['observed']) in (int, float)
+                 and math.isfinite(row['observed']) and 0 <= row['observed'] <= self._last_time)
+            self.db.execute('UPDATE conversation_clock SET observed=? WHERE singleton=1', (self._last_time,))
+            self.db.execute('COMMIT')
+        except BaseException as error:
+            if self.db.in_transaction:
+                self.db.execute('ROLLBACK')
+            if isinstance(error, sqlite3.Error):
+                raise ConversationOutcomeUnknown('Conversation clock fence unavailable; reopen and inspect retained state') from None
+            raise
+
+    @contextmanager
+    def _authorised(self, principal, session):
+        # Two trusted stores may reuse the same authenticators with different
+        # storage owners. Acquire distinct auth locks in a stable global order.
+        with ExitStack() as guards:
+            for owner in sorted({self.storage_owner, principal}):
+                guards.enter_context(self.actors[owner]._lock)
+            yield guards.enter_context(self.actors[principal].authorised(session))
+
     @contextmanager
     def _transaction(self, principal, session, *, checks=()):
         # All local operations (including reads) are ordered against membership
@@ -159,7 +195,7 @@ class ConversationLedger:
         with self._lock:
             need(not self._closed and type(principal) is str and principal in self.actors)
             auth = self.actors[principal]
-            with self.storage.auth._lock, auth.authorised(session) as identity:
+            with self._authorised(principal, session) as identity:
                 need(identity['identity_fingerprint'] == principal)
                 need(self.storage.auth.status()['unlocked'])
                 _private_path(self.directory, directory=True)
@@ -168,6 +204,7 @@ class ConversationLedger:
                 need((path.stat().st_dev, path.stat().st_ino) == self._file_identity)
                 self.storage._check()
                 self._now()
+                self._persist_observed_time()
                 self.db.execute('BEGIN IMMEDIATE')
                 try:
                     yield auth
@@ -183,6 +220,8 @@ class ConversationLedger:
                     if isinstance(error, sqlite3.Error):
                         raise ConversationOutcomeUnknown('Inspect the retained exact request after reopening the ledger') from None
                     raise
+                finally:
+                    self._persist_observed_time()
 
     def _conversation(self, conversation_id):
         identifier(conversation_id)

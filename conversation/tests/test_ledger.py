@@ -490,5 +490,72 @@ class LedgerCase(unittest.TestCase):
             self.post('carol', kind='quote', source_ids=[source['id']])
 
 
+    def test_expiry_observed_inside_refused_output_survives_restart(self):
+        initial = self.now
+        event = self.post('alice')
+        self.join('carol')
+        self.grant('alice', 'carol', [event])
+        original = self.ledger._public_event
+        def delayed(event_id):
+            result = original(event_id)
+            self.now += 301
+            return result
+        self.ledger._public_event = delayed
+        with self.assertRaises(ConversationDenied):
+            self.read('carol', event)
+        self.ledger.close()
+        for name, auth in self.auths.items():
+            auth.close()
+        self.now = initial + 1
+        for name in self.auths:
+            self.auths[name] = LocalOwnerAuth(self.root / name, clock=lambda: self.now)
+            self.sessions[name] = self.auths[name].login('Fictional test password')
+        self.ledger = self.open_ledger()
+        with self.assertRaises(ConversationDenied):
+            self.read('carol', event)
+        self.now = initial + 302
+        with self.assertRaises(ConversationDenied):
+            self.read('carol', event)
+
+    def test_missing_durable_clock_cannot_reset_existing_store(self):
+        self.post('alice')
+        self.ledger.db.execute('DELETE FROM conversation_clock')
+        self.ledger.close()
+        with self.assertRaises(ConversationDenied):
+            self.open_ledger()
+
+
+    def test_reciprocal_storage_owners_use_same_auth_lock_order(self):
+        other = ConversationLedger(self.root / 'other_ledger', self.auths['bob'],
+                                   {self.keys[n]: a for n, a in self.auths.items()}, clock=lambda: self.now)
+        other.create(*self.actor('bob'), 'other_thread')
+        invite = other.invite(*self.actor('bob'), 'other_thread', self.keys['alice'])
+        other.accept_invitation(*self.actor('alice'), invite['id'])
+        trace = []
+        class RecordingLock:
+            def __init__(self, key, lock):
+                self.key, self.lock = key, lock
+            def __enter__(self):
+                self.lock.__enter__()
+                trace.append(self.key)
+                return self
+            def __exit__(self, *args):
+                return self.lock.__exit__(*args)
+        original = {name: auth._lock for name, auth in self.auths.items()}
+        try:
+            for name, auth in self.auths.items():
+                auth._lock = RecordingLock(self.keys[name], original[name])
+            self.bind('bob')
+            expected = sorted((self.keys['alice'], self.keys['bob']))
+            self.assertEqual(trace[:2], expected)
+            trace.clear()
+            other.bind_context(*self.actor('alice'), 'other_thread')
+            self.assertEqual(trace[:2], expected)
+        finally:
+            for name, auth in self.auths.items():
+                auth._lock = original[name]
+            other.close()
+
+
 if __name__ == '__main__':
     unittest.main()

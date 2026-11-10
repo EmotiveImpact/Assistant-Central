@@ -22,7 +22,9 @@ It is not independently hosted multi-owner messaging or end-to-end encryption
 against that host. Exact author-owned history grants are local-only and bind fresh
 recipient epochs. The SDK bridge and UI are intentionally not connected yet.
 
-Local evidence on 10 November 2026: 44 conversation adversarial tests pass; the
+Local evidence on 10 November 2026: 48 conversation adversarial tests pass; the
 fictional encrypted history/restart/revocation demo passes; public import verifies
-673 files and 17 team manifest entries. Existing pilot regressions and independent
-review are in progress. GitHub CI must be checked against the published exact head.
+673 files and 17 team manifest entries. All 347 existing pilot component regressions pass. Independent review found an
+expiry/restart clock-rewind gap; a durable observed-time fence now prevents it,
+including when expiry is first observed during a refused output. The review
+regression is retained. Final independent review is in progress. GitHub CI must be checked against the published exact head.

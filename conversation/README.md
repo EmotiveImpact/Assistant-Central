@@ -63,7 +63,9 @@ including empty searches and membership metadata. Actors do not receive other
 actors' session tokens, passwords or private keys. Storage-owner lock and actor
 logout are ordered against operations; session expiry and output authority are
 rechecked before commit. Restart locks every auth vault and invalidates old bearer
-sessions. Persisted history and observed revocations survive.
+sessions. Persisted history and observed revocations survive. A durable observed-time
+high-water survives refused operations and restart; a rewound clock fails closed
+until it catches up, rather than reviving an expired grant.
 
 This does not isolate mutually hostile owners from the trusted Python process or
 host. All authenticators are supplied by trusted provisioning, not by model input.
