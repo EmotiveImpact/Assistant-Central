@@ -32,7 +32,10 @@ function symbolIcon(symbol,className) {
   const icon=document.createElementNS('http://www.w3.org/2000/svg','svg'),use=document.createElementNS('http://www.w3.org/2000/svg','use');
   icon.setAttribute('class','icon');use.setAttribute('href','#'+symbol);icon.append(use);wrapper.append(icon);return wrapper;
 }
-function workIcon(kind,className) { return symbolIcon(kind==='artifact'?'i-artifacts':'i-tasks',className); }
+function workIcon(kind,className,state) {
+  const symbol=kind==='artifact'?'i-artifacts':state==='accepted'?'i-tasks':['rejected','revoked','cancelled','expired'].includes(state)?'i-task-closed':'i-task-open';
+  return symbolIcon(symbol,className);
+}
 function nameAvatar(name,className='peer-avatar') {
   const label=plain(name,'?'),avatar=text('span',label.slice(0,1).toUpperCase(),className);
   let hash=0;for(const character of label.toLowerCase())hash=(hash*31+character.codePointAt(0))>>>0;
@@ -142,7 +145,7 @@ function itemRow(item) {
   const right=text('div','','row-right');right.append(badge(item.state),peerAvatar(item.peer_id),button(isTerminal(item)?'Inspect':'Review exact item','button secondary row-action',()=>openReview(item)));
   const run=state.workflow?.runs.find(run=>run.item_id===item.id);
   if(run){main.append(text('p',workflowSummary(run),'workflow-note'));right.append(button('Inspect synthetic run','button secondary workflow-action',()=>openWorkflow(item,run.run_id)));}
-  const symbol=workIcon(item.kind,'item-icon '+item.kind+' '+statusClass(item.state));
+  const symbol=workIcon(item.kind,'item-icon '+item.kind+' '+statusClass(item.state),item.state);
   row.append(symbol,main,right);return row;
 }
 function renderItems() {
@@ -163,7 +166,7 @@ function renderItems() {
 }
 function overviewItem(item) {
   const row=button('','overview-row',()=>openReview(item));row.dataset.itemId=item.id;
-  row.append(workIcon(item.kind,'overview-item-icon '+item.kind+' '+statusClass(item.state)));
+  row.append(workIcon(item.kind,'overview-item-icon '+item.kind+' '+statusClass(item.state),item.state));
   const main=text('span','','overview-row-main');main.append(text('strong',plain(item.title,'Untitled proposal')),text('span',peerName(item.peer_id)+' · '+plain(item.task_id).slice(0,28),'overview-row-meta'));
   row.append(main,badge(item.state),text('span','↗','overview-arrow'));return row;
 }

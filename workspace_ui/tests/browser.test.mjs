@@ -112,6 +112,7 @@ try {
   await page.setViewportSize({width:1440,height:1000});
   await noOverflow();await screenshot('central-platform-overview.png');
   await page.setViewportSize({width:390,height:844});await noOverflow();
+  assert.deepEqual(await page.locator('.overview-metric').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).paddingLeft)),['14px','14px','14px','14px']);
   await screenshot('central-platform-mobile.png',{fullPage:false});
   await screenshot('central-platform-mobile-full.png');
   await page.setViewportSize({width:1440,height:1000});
