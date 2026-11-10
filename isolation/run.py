@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shutil
 import subprocess
@@ -106,7 +107,7 @@ class Harness:
             # stdin may contain synthetic credentials. Never print it or output
             # from an arbitrary container command on an error path.
             raise RuntimeError("Docker operation failed: " + args[0] + " (exit " + str(result.returncode) + ")")
-        return result.stdout
+        return result.stdout + result.stderr if args[0] == "logs" else result.stdout
 
     def prepare(self):
         if shutil.which("docker") is None:
@@ -147,8 +148,11 @@ class Harness:
         return json.loads(self.docker("inspect", self.name(role)))[0]
 
     def probe(self, role, operation, **values):
-        return json.loads(self.docker("exec", "-i", self.name(role), "python", "-B", "-m", "isolation.probe",
-                                      data=json.dumps({"operation": operation, **values})))
+        try:
+            return json.loads(self.docker("exec", "-i", self.name(role), "python", "-B", "-m", "isolation.probe",
+                                          data=json.dumps({"operation": operation, **values})))
+        except RuntimeError as exc:
+            raise RuntimeError("Container helper " + role + "/" + operation + " failed: " + str(exc)) from None
 
     def provision(self, owner, password):
         volume = self.name(owner + "-data")
@@ -168,7 +172,16 @@ class Harness:
     def wait_ready(self, owner):
         for _ in range(100):
             info = self.inspect(owner)
-            require(info["State"]["Running"], "Pilot container exited before readiness")
+            if not info["State"]["Running"]:
+                logs = self.docker("logs", "--tail", "40", self.name(owner))
+                # Only exception class and source location, never raw exception
+                # details or log content, enter failure evidence.
+                types = re.findall(r"^([A-Za-z_.]*(?:Error|Exception)):", logs, re.MULTILINE)
+                frames = re.findall(r'File "(/app/(?:pilot|isolation)/[\w/]+\.py)", line (\d+)', logs)
+                reason = ", ".join(path + ":" + line for path, line in frames[-3:])
+                raise RuntimeError("Pilot " + owner + " exited before readiness (exit=" + str(info["State"]["ExitCode"])
+                                   + ", OOM=" + str(info["State"].get("OOMKilled", False)) + ") "
+                                   + ",".join(types) + " " + reason)
             lines = self.docker("logs", self.name(owner)).splitlines()
             if lines:
                 ready = json.loads(lines[-1])
@@ -213,7 +226,13 @@ class Harness:
                             if key not in ("modify_code", "replace_peer")),
                         "DAC test did not encounter a real permission boundary")
             finally:
-                self.docker("rm", "--force", self.name(role))
+                original = sys.exc_info()[1]
+                try:
+                    self.docker("rm", "--force", self.name(role))
+                except RuntimeError as cleanup_error:
+                    if original is not None:
+                        raise RuntimeError(str(original) + "; " + str(cleanup_error)) from None
+                    raise
                 self.containers.remove(self.name(role))
             after = self.probe(victim, "snapshot", directory="/private/" + victim)
             require(before == after, "Victim private bytes, modes or ownership changed")
@@ -307,11 +326,15 @@ def exchange(harness, passwords, identities):
     sync()
     action("atlas", artifact, "decision", "accept")
     sync()
+    persisted = {}
     for owner in OWNERS:
         current = state(owner)
         require({item["id"] for item in current["items"]} == {task, artifact}, "Unexpected exchanged objects")
         require(all(item["state"] == "accepted" for item in current["items"]), "Exchange did not settle")
         require(current["provider"]["enabled"] is False, "Provider unexpectedly enabled")
+        persisted[owner] = {"items": current["items"], "history": current["history"],
+                            "reviews": {item: harness.request(owner, "GET", "/api/items/" + item + "/review",
+                                                              token=tokens[owner]) for item in (task, artifact)}}
 
     # Restart actual server containers on the same private named volumes.
     for owner in OWNERS:
@@ -322,8 +345,12 @@ def exchange(harness, passwords, identities):
         fresh = harness.request(owner, "POST", "/api/session", {"password": passwords[owner]})
         require(fresh["identity"] == identities[owner]["identity"], "Identity changed on restart")
         tokens[owner] = fresh["token"]
-        require(all(item["state"] == "accepted" for item in state(owner)["items"])
-                and len(state(owner)["items"]) == 2, "History not preserved on restart")
+        current = state(owner)
+        require(current["items"] == persisted[owner]["items"] and current["history"] == persisted[owner]["history"],
+                "Exact item identities, digests, decisions or history changed on restart")
+        for item in (task, artifact):
+            review = harness.request(owner, "GET", "/api/items/" + item + "/review", token=tokens[owner])
+            require(review == persisted[owner]["reviews"][item], "Exact reviewed content changed on restart")
     return {"task_and_artifact": "accepted through unchanged pilot HTTP routes",
             "cross_owner_password_and_session": "rejected both directions",
             "unreleased_content": "not delivered", "receipt_is_acceptance": False,

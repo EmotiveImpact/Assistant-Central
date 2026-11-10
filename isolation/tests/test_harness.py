@@ -118,6 +118,25 @@ class HarnessChecks(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "no isolation test ran"):
                 Harness().prepare()
 
+    def test_cleanup_ignores_objects_never_created(self):
+        harness = Harness()
+        harness.containers = [harness.name("attempted")]
+        harness.volumes = [harness.name("attempted-data")]
+        with patch.object(harness, "docker", return_value="") as docker:
+            harness.cleanup()
+        self.assertEqual([call.args[0] for call in docker.call_args_list], ["ps", "volume"])
+
+    def test_cleanup_never_deletes_untracked_resources(self):
+        harness = Harness()
+        harness.containers = [harness.name("owned")]
+        harness.volumes = [harness.name("owned-data")]
+        with patch.object(harness, "docker", side_effect=[harness.name("owned") + "\nnot-ours\n",
+                                                         harness.name("owned-data") + "\nother-volume\n", "", ""]) as docker:
+            harness.cleanup()
+        deletes = [call.args for call in docker.call_args_list[2:]]
+        self.assertEqual(deletes, [("rm", "--force", harness.name("owned")),
+                                   ("volume", "rm", harness.name("owned-data"))])
+
     def test_build_context_is_allowlisted(self):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "context.tar"
