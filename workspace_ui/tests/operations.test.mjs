@@ -24,7 +24,7 @@ class Element extends EventTarget {
   querySelector(selector){return find(this,e=>selector[0]==='.'?e.className?.split(' ').includes(selector.slice(1)):e.tagName===selector);}
 }
 function find(root,predicate){return predicate(root)?root:root.children.map(c=>find(c,predicate)).find(Boolean);}
-function harness({room=false,otherParticipant=false}={}){
+function harness({room=false,otherParticipant=false,historyAuthor='bob',historyReview=null}={}){
   const original=globalThis.document,document=new EventTarget(),dialog=new Element('dialog'),root=new Element('div');
   document.hidden=false;document.body=new Element('body');document.body.append(root,dialog);
   document.createElement=tag=>new Element(tag);document.getElementById=()=>dialog;globalThis.document=document;
@@ -36,8 +36,9 @@ function harness({room=false,otherParticipant=false}={}){
   const request=async(path,options={})=>{
     requests.push({path,actor,options});
     if(path.endsWith('/history')&&historyFailure){historyFailure=false;throw Object.assign(new Error('History unavailable'),{unknown:requestIsMutation(path,options.method,options.readOnly)});}
-    if(path==='/api/conversations/thread/history')return {messages:[{id:'message_'+revision,conversation_id:'thread',author:principals.bob,provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message '+revision,sources:[]}]};
+    if(path==='/api/conversations/thread/history')return {messages:[{id:'message_'+revision,conversation_id:'thread',author:principals[historyAuthor],provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message '+revision,sources:[]}]};
     if(path==='/api/conversations/thread')return {id:'thread',mode:'direct',admin:principals[actor],binding:{conversation_id:'thread',principal:principals[actor],member_epoch:'epoch_'+actor,policy_generation:policyGeneration},participants:[{principal:principals[actor],epoch:'epoch_'+actor},...(otherParticipant?[{principal:principals.bob,epoch:'epoch_bob'}]:[])]};
+    if(path.endsWith('/grant-review')&&historyReview)return historyReview;
     if(path.endsWith('/message-outcome')){
       if(outcomeError){const error=outcomeError;outcomeError=null;throw error;}
       if(outcomeWait){const held=outcomeWait;outcomeWait=null;return held.promise;}
@@ -336,5 +337,21 @@ test('conversation selects have fixed accessible labels without option text',asy
     const selectedMessage=find(h.root,e=>e.tagName==='input'&&e.type==='checkbox');
     assert.equal(selectedMessage.getAttribute('aria-label'),'Select message message_0','Preserve the exact existing message selection name');
     assert.equal(h.writes.length,0,'Rendering labels cannot trigger a mutation');
+  }finally{h.close();}
+});
+
+
+test('exact history review renders its bound digest without mutating authority',async()=>{
+  const review={statement:{domain:'assistant-central-conversation/1/history-grant',id:'history_grant',conversation_id:'thread',issuer:principals.alice,recipient:principals.bob,member_epoch:'epoch_bob',policy_generation:1,events:[{id:'message_0',digest:'d'.repeat(64)}],purpose:'Exact local history review',expires_at:2000000000,audience:'local-owner-only'},review_digest:'e'.repeat(64),execution_authority:false,recipient:{principal:principals.bob},messages:[{id:'message_0',conversation_id:'thread',author:principals.alice,provenance_digest:'d'.repeat(64),trust:'untrusted-message',execution_authority:false,kind:'message',text:'Incoming message 0',sources:[]}]};
+  const h=harness({room:true,otherParticipant:true,historyAuthor:'alice',historyReview:review});
+  try{
+    h.mount('conversations');await flush();h.click('Conversation · thread');await flush();await flush();
+    const check=find(h.root,e=>e.tagName==='input'&&e.type==='checkbox');check.checked=true;check.dispatchEvent(new Event('change'));
+    find(h.root,e=>e.tagName==='select'&&e.getAttribute('aria-label')==='Exact recipient').value=principals.bob;
+    h.click('Review exact history share');await flush();await flush();
+    assert.deepEqual(h.failures,[]);const dialog=h.document.getElementById('conversation-dialog');
+    assert.equal(dialog.open,true);assert.match(dialog.textContent,/Incoming message 0/);assert.match(dialog.textContent,new RegExp(review.review_digest));
+    assert.match(dialog.textContent,/bob · bob_assistant/);assert.equal(h.writes.length,0,'Preparing the dialog must not approve a grant');
+    assert.equal(h.requests.filter(r=>r.path.endsWith('/grant-review')).length,1);
   }finally{h.close();}
 });
