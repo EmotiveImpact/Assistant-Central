@@ -8,6 +8,9 @@ from pathlib import Path
 import re
 import ssl
 import tempfile
+import threading
+import time
+import math
 from urllib.parse import urlsplit
 import warnings
 
@@ -114,15 +117,21 @@ class HTTPSExchange:
             sequence = runtime.db.execute('SELECT last_insert_rowid()').fetchone()[0]
         return packet, sequence
 
-    def _send(self, session, identifier, target, recipient, *, retry, ca_file, receipt):
+    def _prepare_send(self, session, identifier, target, recipient, *, retry, ca_file, receipt):
+        """Owner-thread preparation; returns a one-shot network-only capability.
+
+        No database or key access is delegated. The final owner/expiry gates are
+        here; cancellation after this boundary cannot recall an in-flight send.
+        The caller must dispatch once or close the capability to remove staging.
+        """
         runtime = self.runtime
-        with ExitStack() as staging:
+        staging = ExitStack()
+        try:
             with self.files.authorised(session), runtime._lock:
                 token(identifier)
                 hash_id(recipient)
                 need(type(retry) is bool, 'Explicit retry flag must be boolean')
                 destination(target)
-                # Fail a missing/invalid CA before any attempt. No TLS verification bypass.
                 ssl.create_default_context(cafile=ca_file)
                 try:
                     packet, sequence = self._prepare(session, identifier, recipient, target, retry, receipt)
@@ -131,29 +140,35 @@ class HTTPSExchange:
                 except BaseException:
                     raise HTTPSOutcomeUnknown('Preparation outcome unavailable; inspect retained state before any explicit retry.') from None
                 try:
-                    # Canonical bytes equal the original retained queue/cache bytes.
                     directory = staging.enter_context(tempfile.TemporaryDirectory(
                         prefix='.https-send-', dir=runtime.directory))
                     source = Path(directory) / 'packet.json'
                     write_packet(source, packet)
                     self._proposal_gate(packet)
-                    need(packet['header']['expires'] > runtime._now(), 'Original packet has expired')
+                    prepared_at = runtime._now()
+                    need(packet['header']['expires'] > prepared_at, 'Original packet has expired')
                     runtime.exchange.peer_public(recipient)
                     runtime.auth.authenticate(session)
                 except BaseException:
                     raise HTTPSOutcomeUnknown('Attempt retained as uncertain; inspect state before any explicit retry.') from None
-            # No SQLite transaction or auth/runtime lock is held across DNS/TLS/I/O.
-            # Cancellation after this final gate cannot recall the in-flight bytes.
-            try:
-                result = send_file(source, target, recipient, ca_file=ca_file)
-            except BaseException:
-                raise HTTPSOutcomeUnknown('Attempt retained as uncertain; inspect state and quarantine before any explicit retry.') from None
-            # No post-network mutation, reauthentication or peer-supplied authority.
-            return {'message_id': packet['header']['message_id'], 'attempt_sequence': sequence,
-                    'transport_acknowledged': result['transport_acknowledged'] is True,
-                    'delivery': 'uncertain', 'owner_acceptance': 'not_established',
-                    'authorises_execution': False, 'packet_digest': digest(packet),
-                    'file_digest': hashlib.sha256(canonical(packet)).hexdigest(), 'recipient': recipient}
+                metadata = {'message_id': packet['header']['message_id'], 'attempt_sequence': sequence,
+                            'delivery': 'uncertain', 'owner_acceptance': 'not_established',
+                            'authorises_execution': False, 'packet_digest': digest(packet),
+                            'file_digest': hashlib.sha256(canonical(packet)).hexdigest(), 'recipient': recipient}
+            # Transfer cleanup ownership only after the auth context's final
+            # check exits successfully. Failed exit must not leak staging.
+            prepared = _PreparedHTTPSAttempt(source, target, recipient, ca_file, metadata, staging,
+                         expires=packet['header']['expires'], prepared_at=prepared_at, clock=runtime.clock)
+            staging = None
+            return prepared
+        finally:
+            if staging is not None:
+                staging.close()
+
+    def _send(self, session, identifier, target, recipient, *, retry, ca_file, receipt):
+        prepared = self._prepare_send(session, identifier, target, recipient,
+                                      retry=retry, ca_file=ca_file, receipt=receipt)
+        return prepared.dispatch()
 
     def send(self, session, message_id, target, recipient, *, retry=False, ca_file=None):
         return self._send(session, message_id, target, recipient, retry=retry, ca_file=ca_file, receipt=False)
@@ -181,6 +196,60 @@ class HTTPSExchange:
             return {'message_id': result['message_id'], 'file_digest': file_digest,
                     'duplicate': result['duplicate'], 'receipt_available': result['receipt'] is not None,
                     'owner_acceptance': result['owner_acceptance'], 'authorises_execution': False}
+
+
+class _PreparedHTTPSAttempt:
+    """Internal one-shot capability, never constructible from an HTTP request.
+
+    Carries only an already-accounted immutable ciphertext file and fixed route.
+    Consumes the capability before any network call, even when that call fails.
+    Closing an unused capability abandons delivery, not its durable attempt.
+    """
+    def __init__(self, source, target, recipient, ca_file, metadata, staging, *, expires, prepared_at, clock):
+        self._source, self._target, self._recipient, self._ca_file = source, target, recipient, ca_file
+        self._metadata, self._staging = metadata, staging
+        self._lock, self._used = threading.Lock(), False
+        self._state, self._acknowledged = 'prepared', False
+        self._expires, self._prepared_at, self._clock = expires, prepared_at, clock
+        self._start_deadline = time.monotonic() + 5
+
+    def observation(self):
+        with self._lock:
+            return {'state': self._state, 'transport_acknowledged': self._acknowledged}
+
+    def dispatch(self):
+        with self._lock:
+            need(not self._used, 'Prepared transfer already consumed')
+            self._used = True
+            self._state = 'running'
+        result = None
+        try:
+            now = self._clock()
+            need(type(now) in (int, float) and math.isfinite(now) and 0 < self._prepared_at <= now < self._expires
+                 and time.monotonic() < self._start_deadline, 'Prepared transfer start window expired')
+            sent = send_file(self._source, self._target, self._recipient, ca_file=self._ca_file)
+            result = {**self._metadata, 'transport_acknowledged': sent['transport_acknowledged'] is True}
+        except BaseException:
+            raise HTTPSOutcomeUnknown('Attempt retained as uncertain; inspect state and quarantine before any explicit retry.') from None
+        finally:
+            try:
+                self._staging.close()
+            except BaseException:
+                result = None
+                raise HTTPSOutcomeUnknown('Attempt retained as uncertain; staging cleanup outcome unavailable.') from None
+            finally:
+                with self._lock:
+                    self._state = 'finished' if result is not None else 'outcome_unknown'
+                    self._acknowledged = bool(result and result['transport_acknowledged'])
+        return result
+
+    def close(self):
+        with self._lock:
+            if self._used:
+                return
+            self._used = True
+            self._state = 'outcome_unknown'
+        self._staging.close()
 
 
 def main(argv=None):

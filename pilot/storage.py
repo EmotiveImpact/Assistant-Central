@@ -50,7 +50,7 @@ class RecordStorage:
                     "SELECT 1 FROM sqlite_master WHERE name='runtime_meta'").fetchone():
                 self.legacy = True
                 return
-            if not create or db.execute("SELECT 1 FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").fetchone():
+            if not create or db.execute("SELECT 1 FROM sqlite_master WHERE name NOT GLOB 'sqlite_*'").fetchone():
                 raise StorageDenied('Plaintext or missing storage format: explicit offline migration required')
             db.execute('CREATE TABLE application_storage(singleton INTEGER PRIMARY KEY CHECK(singleton=1),version TEXT NOT NULL,owner TEXT NOT NULL)')
             db.execute('INSERT INTO application_storage VALUES(1,?,?)', (VERSION, fingerprint(auth.public_identity())))
