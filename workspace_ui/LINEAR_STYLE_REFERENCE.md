@@ -66,3 +66,17 @@ The browser test checks exact navigation and heading computed values, successful
 font decoding, same-origin requests, real owner API workflows, and mobile
 horizontal overflow. It captures the entrance, overview, board, review and mobile
 screens. All approvals remain synthetic and the UI does not enable providers.
+
+## Approved interface refinement
+
+After approving the font and visual direction, Augustus requested further
+interface polish. The next revision retains the font asset, font features,
+palette, desktop navigation and page/review heading measurements. It introduces
+a focused decision panel, separate network/activity panels, consistent SVG icons,
+stable assistant avatar tones and a card view for public peer identities.
+
+Deliberate layout refinements include 14px/21px board titles, compact mobile
+metric cards, 36px mobile navigation rows and larger mobile actions. Meaningful
+small metadata uses the existing secondary grey `#8a8f98`; the darker grey is
+reserved for decoration. These are Central layout choices following approval,
+not additional claims about exact Linear component geometry.

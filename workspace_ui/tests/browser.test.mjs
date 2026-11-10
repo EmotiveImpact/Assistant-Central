@@ -29,7 +29,13 @@ const nav=async view=>{
   await page.locator(`#navigation [data-view="${view}"]`).click();
   await page.waitForFunction(value=>document.querySelector(`#navigation [data-view="${value}"]`)?.getAttribute('aria-current')==='page',view);
 };
-const noOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+const noOverflow=async()=>{
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+  const clipped=await page.locator('#main .section-heading, #main .panel-controls, #main .item-title, #main .peer-fingerprint, #main .badge, #main .row-action').evaluateAll(nodes=>nodes.filter(node=>{
+    if(!node.getClientRects().length)return false;const r=node.getBoundingClientRect();return r.left<-.5||r.right>innerWidth+.5;
+  }).map(node=>node.className));
+  assert.deepEqual(clipped,[],'visible work content must not be clipped by the main panel');
+};
 const screenshot=async(name,{fullPage=true}={})=>{
   if(!screenshots)return;
   await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
@@ -95,6 +101,10 @@ try {
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
+  const attentionIds=await page.locator('#overview-attention [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
+  const workIds=await page.locator('#overview-work [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
+  assert.equal(workIds.some(id=>attentionIds.includes(id)),false,'overview sections must not repeat the same work');
+  assert.equal(await page.locator('#attention-count').textContent(),'3');
   assert.equal(await page.locator('.overview-row .badge').first().evaluate(node=>getComputedStyle(node).padding),'0px 11px 0px 7px');
   await page.setViewportSize({width:800,height:1000});
   assert.equal(await page.locator('#new-proposal').evaluate(node=>getComputedStyle(node).fontSize),'13px');

@@ -40,3 +40,14 @@ Eight HTTP tests and nine projection tests pass locally. Browser checks pin the
 font bytes and assert successful decoding, the actual family, 510/590 weights,
 optical sizing and exact computed geometry. Final hosted evidence and screenshot
 inspection are recorded in PR #19. No provider or consent boundary was widened.
+
+## Interface refinement after visual approval
+
+Coordinator `/root` owns HTML/CSS and screenshot integration.
+`/root/polish_rendering` owns read-only client presentation changes;
+`/root/polish_review` independently reviews visuals and accessibility.
+Previous head `2488aef` passed both full regression and workspace browser CI.
+The approved Inter font and tokens remain in place. This pass focuses attention
+and network panels, reduces repeated overview work, improves mobile density and
+metadata contrast, and removes the non-functional workspace-switch chevron.
+No authentication, provider, transport or decision endpoint was changed.
