@@ -6,7 +6,7 @@ on:
       - 'isolation/**'
       - '.github/workflows/pilot-isolation.yml'
   push:
-    branches: [main, 'feat/pilot-isolation-harness']
+    branches: [main]
     paths:
       - 'pilot/**'
       - 'isolation/**'

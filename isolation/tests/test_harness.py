@@ -4,7 +4,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from isolation import probe
 from isolation.run import build_context, Harness, validate_container, validate_dac_mounts, validate_environment
@@ -136,6 +136,36 @@ class HarnessChecks(unittest.TestCase):
         deletes = [call.args for call in docker.call_args_list[2:]]
         self.assertEqual(deletes, [("rm", "--force", harness.name("owned")),
                                    ("volume", "rm", harness.name("owned-data"))])
+
+    def test_restart_waits_for_normal_port_expiry_before_starting(self):
+        harness = Harness()
+        with patch.object(harness, "docker") as docker, patch.object(harness, "probe", side_effect=[False, True, True]), \
+                patch("time.sleep") as sleep:
+            harness.restart()
+        self.assertEqual([call.args for call in docker.call_args_list], [
+            ("stop", harness.name("atlas")), ("stop", harness.name("beacon")),
+            ("start", harness.name("atlas")), ("start", harness.name("beacon"))])
+        sleep.assert_called_once_with(1)
+
+    def test_restart_fails_closed_when_port_never_becomes_available(self):
+        harness = Harness()
+        with patch.object(harness, "docker") as docker, patch.object(harness, "probe", return_value=False), \
+                patch("time.monotonic", side_effect=[0, 91]):
+            with self.assertRaisesRegex(RuntimeError, "ports remain occupied"):
+                harness.restart()
+        self.assertEqual([call.args[0] for call in docker.call_args_list], ["stop", "stop"])
+
+    def test_port_probe_distinguishes_occupied_from_unrelated_errors(self):
+        for number in (errno.EADDRINUSE, errno.EACCES, errno.EADDRNOTAVAIL):
+            listener = MagicMock()
+            listener.__enter__.return_value = listener
+            listener.bind.side_effect = OSError(number, "synthetic")
+            with self.subTest(number=number), patch("socket.socket", return_value=listener):
+                if number == errno.EADDRINUSE:
+                    self.assertFalse(probe.main({"operation": "port_available", "port": 8765}))
+                else:
+                    with self.assertRaises(OSError):
+                        probe.main({"operation": "port_available", "port": 8765})
 
     def test_build_context_is_allowlisted(self):
         with tempfile.TemporaryDirectory() as directory:
