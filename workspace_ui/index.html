@@ -11,7 +11,7 @@
  <aside class="sidebar" aria-label="Workspace navigation">
   <a class="brand wordmark" href="#overview" aria-label="Central overview"><span class="central-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Central</span><span class="workspace-plan">Pilot</span></a>
   <div class="workspace-switch"><span class="workspace-monogram">C</span><div><strong>My workspace</strong><span>Personal workspace</span></div><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></div>
-  <nav id="navigation" aria-label="Main navigation"><button class="nav-link" data-view="overview" type="button"><svg class="icon" aria-hidden="true"><use href="#i-overview"/></svg><span>Overview</span></button><button class="nav-link" data-view="inbox" type="button"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg><span>Inbox</span><span id="inbox-count" class="nav-count">0</span></button><div class="nav-section">Workspace</div><button class="nav-link" data-view="tasks" type="button"><svg class="icon" aria-hidden="true"><use href="#i-tasks"/></svg><span>All work</span></button><button class="nav-link" data-view="artifacts" type="button"><svg class="icon" aria-hidden="true"><use href="#i-artifacts"/></svg><span>Artifacts</span></button><button class="nav-link" data-view="outbox" type="button"><svg class="icon" aria-hidden="true"><use href="#i-outbox"/></svg><span>Outbox</span><span id="outbox-count" class="nav-count">0</span></button><div class="nav-section">Network</div><button class="nav-link" data-view="peers" type="button"><svg class="icon" aria-hidden="true"><use href="#i-peers"/></svg><span>Assistants</span></button><button class="nav-link" data-view="activity" type="button"><svg class="icon" aria-hidden="true"><use href="#i-activity"/></svg><span>Activity</span></button></nav>
+  <nav id="navigation" aria-label="Main navigation"><button class="nav-link" data-view="overview" type="button"><svg class="icon" aria-hidden="true"><use href="#i-overview"/></svg><span>Overview</span></button><button class="nav-link" data-view="inbox" type="button"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg><span>Inbox</span><span id="inbox-count" class="nav-count">0</span></button><div class="nav-section">Workspace</div><button class="nav-link" data-view="tasks" type="button"><svg class="icon" aria-hidden="true"><use href="#i-tasks"/></svg><span>All work</span></button><button class="nav-link" data-view="artifacts" type="button"><svg class="icon" aria-hidden="true"><use href="#i-artifacts"/></svg><span>Artifacts</span></button><button class="nav-link" data-view="outbox" type="button"><svg class="icon" aria-hidden="true"><use href="#i-outbox"/></svg><span>Outbox</span><span id="outbox-count" class="nav-count">0</span></button><div class="nav-section">Network</div><button class="nav-link" data-view="peers" type="button"><svg class="icon" aria-hidden="true"><use href="#i-peers"/></svg><span>Assistants</span></button><button class="nav-link" data-view="transfers" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span>Transfers</span></button><button class="nav-link" data-view="activity" type="button"><svg class="icon" aria-hidden="true"><use href="#i-activity"/></svg><span>Activity</span></button></nav>
   <div class="sidebar-bottom"><div class="workspace-note"><span class="status-dot"></span><strong>Synthetic workspace</strong><p>A place to explore, with fictional work.</p></div><div class="owner-card"><div id="owner-avatar" class="avatar">·</div><div><strong id="owner-name">Owner</strong><span id="agent-name">Assistant</span></div><button id="logout" class="icon-button" type="button" aria-label="Lock and sign out"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></button></div></div>
  </aside><button class="sidebar-backdrop" id="sidebar-scrim" aria-label="Close navigation" type="button"></button>
  <main id="main" class="main" tabindex="-1">
@@ -25,17 +25,17 @@
       <section class="overview-section attention-section"><header class="section-heading"><div><span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg></span><h2>Needs your attention</h2></div><a href="#inbox" class="section-link">Open inbox <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header><p class="section-description">A few decisions to keep things moving.</p><div id="overview-attention" class="overview-rows"></div></section>
       <section class="overview-section"><header class="section-heading"><div><span class="section-icon"><svg class="icon" aria-hidden="true"><use href="#i-tasks"/></svg></span><h2>Work in motion</h2></div><a href="#tasks" class="section-link">All work <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header><div id="overview-work" class="overview-rows"></div></section>
     </div><div class="overview-secondary">
-      <section class="network-section"><header class="section-heading"><div><h2>Your network</h2></div><a href="#peers" class="section-link" aria-label="View assistant network"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header><p class="section-description">Independent assistants. Shared purpose.</p><div id="overview-network"></div><a href="#peers" class="network-link">Manage connections <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
+      <section class="network-section"><header class="section-heading"><div><h2>Your network</h2></div><a href="#peers" class="section-link" aria-label="View assistant network"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header><p class="section-description">Independent assistants. Shared purpose.</p><div id="overview-network"></div><a href="#transfers" class="network-link">Manage connections <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></section>
       <section class="events-section"><header class="section-heading"><div><h2>Recent activity</h2></div><a href="#activity" class="section-link" aria-label="View all activity"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header><div id="overview-events"></div></section>
       <div class="permission-note"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><div><strong>You stay in control.</strong><p>Every request, result and release has its own decision.</p></div></div>
     </div></div>
    </section>
    <section id="work-panel" class="work-panel" aria-labelledby="list-title" hidden><div class="panel-toolbar"><div class="panel-title"><h2 id="list-title">Your inbox</h2><span id="list-description">Requests waiting for a decision</span></div><div class="panel-controls"><div id="filters" class="segmented" aria-label="Filter proposals"><button data-filter="all" class="selected" type="button">All</button><button data-filter="pending" type="button">To review</button><button data-filter="decided" type="button">Decided</button></div><div id="view-toggle" class="segmented layout-toggle" aria-label="Work layout"><button type="button" data-layout="list" class="selected" aria-label="List view"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button><button type="button" data-layout="board" aria-label="Board view"><svg class="icon" aria-hidden="true"><use href="#i-board"/></svg></button></div><button id="add-peer" class="button secondary" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Enrol a peer</button></div></div><div id="item-list" class="item-list"></div></section>
-   <footer class="workspace-footer"><span class="footer-state"><span class="status-dot"></span><span id="connection-status">Checking state</span></span><span id="provider-status">Live provider calls disabled</span><button id="sync" type="button" class="text-button">Sync exchange <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button></footer>
+   <footer class="workspace-footer"><span class="footer-state"><span class="status-dot"></span><span id="connection-status">Checking state</span></span><span id="provider-status">Live provider calls disabled</span><button id="sync" type="button" class="text-button" title="Local loopback exchange only. Use Transfers for configured HTTPS delivery.">Sync exchange <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button></footer>
   </div>
  </main>
 </div>
-  <dialog id="review-dialog" class="review-dialog">
+  <dialog id="review-dialog" class="review-dialog" aria-labelledby="review-title">
     <header class="dialog-header"><div><div id="review-eyebrow" class="eyebrow">EXACT PROPOSAL REVIEW</div><h2 id="review-title">Review proposal</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close review">×</button></header>
     <div class="dialog-body">
       <div id="review-state" class="review-state"></div>
@@ -48,9 +48,9 @@
     <footer id="review-actions" class="dialog-footer"></footer>
   </dialog>
 
-  <dialog id="compose-dialog">
+  <dialog id="compose-dialog" aria-labelledby="compose-title">
     <form id="compose-form">
-      <header class="dialog-header"><div><div class="eyebrow">OUTGOING WORK</div><h2>Prepare a proposal</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close proposal form">×</button></header>
+      <header class="dialog-header"><div><div class="eyebrow">OUTGOING WORK</div><h2 id="compose-title">Prepare a proposal</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close proposal form">×</button></header>
       <div class="dialog-body form-grid">
         <p class="form-intro">Create the exact proposal first. You will review it separately before release.</p>
         <label>Trusted recipient<select id="proposal-peer" name="peer_id" required></select></label>
@@ -69,14 +69,16 @@
     </form>
   </dialog>
 
-  <dialog id="peer-dialog">
+  <dialog id="peer-dialog" aria-labelledby="peer-title">
     <form id="peer-form">
-      <header class="dialog-header"><div><div class="eyebrow">EXPLICIT TRUST</div><h2>Enrol a trusted peer</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close peer form">×</button></header>
+      <header class="dialog-header"><div><div class="eyebrow">EXPLICIT TRUST</div><h2 id="peer-title">Enrol a trusted peer</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close peer form">×</button></header>
       <div class="dialog-body form-grid">
         <p class="form-intro">Get the public identity and fingerprint directly from the other owner. Enrolment does not approve any work or disclosure.</p>
         <label class="full">Public identity<textarea name="public_identity" rows="6" required spellcheck="false" placeholder="Paste the peer's public identity JSON"></textarea></label>
         <label class="full">Verified fingerprint<input name="expected_fingerprint" required maxlength="128" spellcheck="false" autocomplete="off" placeholder="Compare the full fingerprint with the other owner"></label>
-        <label class="full">Local pilot address<input name="endpoint" type="url" required placeholder="http://127.0.0.1:8766" autocomplete="off"></label>
+        <label class="full" id="peer-transport-field" hidden>Connection<select id="peer-connection" name="connection_id"><option value="">Local loopback pilot</option></select></label>
+        <p class="scope-note full" id="peer-connection-note" hidden></p>
+        <label class="full" id="peer-endpoint-field">Local pilot address<input name="endpoint" type="url" required placeholder="http://127.0.0.1:8766" autocomplete="off"></label>
         <label class="check-label full"><input name="verified" type="checkbox" required><span>I have independently checked the full fingerprint with this owner.</span></label>
         <p id="peer-message" class="form-message full" role="status" aria-live="polite"></p>
       </div>

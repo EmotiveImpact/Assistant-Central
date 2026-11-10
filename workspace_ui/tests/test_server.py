@@ -1,6 +1,8 @@
 """Actual HTTP checks for the optional static frontend and inherited owner API."""
 import http.client
 import json
+import re
+from urllib.parse import urljoin
 from pathlib import Path
 import tempfile
 import threading
@@ -58,6 +60,46 @@ class WorkspaceHTTPTests(unittest.TestCase):
         self.assertEqual(headers["Referrer-Policy"], "no-referrer")
         self.assertIn("script-src 'self'", headers["Content-Security-Policy"])
         self.assertIn("frame-ancestors 'none'", headers["Content-Security-Policy"])
+
+    def test_recursive_browser_module_graph_is_available_over_http(self):
+        # Follow imports from the HTML entrypoint over the actual HTTP server.
+        # This catches transitive dependencies added to shared pilot modules.
+        status, _, html = self.request("GET", "/")
+        self.assertEqual(status, 200)
+        pending = re.findall(r'<script[^>]+src="([^"]+\.mjs)"', html.decode())
+        self.assertTrue(pending)
+        visited = set()
+        while pending:
+            route = pending.pop()
+            if route in visited:
+                continue
+            visited.add(route)
+            status, headers, body = self.request("GET", route)
+            self.assertEqual(status, 200, route)
+            self.assertIn("javascript", headers["Content-Type"])
+            for dependency in re.findall(r"(?:from\s*|import\s*\(?\s*)['\"](\.[^'\"]+)['\"]", body.decode()):
+                pending.append(urljoin(route, dependency))
+        self.assertIn("/model.mjs", visited)
+        self.assertIn("/transfers.mjs", visited)
+        self.assertEqual(self.request("GET", "/transfers.mjs")[2], (WEB / "transfers.mjs").read_bytes())
+
+    def test_transfer_config_is_disabled_by_default_and_only_trusted_cli_loaded(self):
+        token = self.login()
+        state = json.loads(self.request("GET", "/api/state", token=token)[2])
+        self.assertFalse(state["transfers"]["enabled"])
+        self.assertEqual(state["transfers"]["connections"], [])
+        with patch("workspace_ui.server.WorkspaceHTTPServer") as factory, patch("workspace_ui.server.load_config") as load:
+            factory.return_value.origin = "http://127.0.0.1:8877"
+            main(["serve", "--directory", str(self.owner), "--port", "0"])
+            load.assert_not_called()
+            self.assertIsNone(factory.call_args.kwargs["transfer_config"])
+            main(["serve", "--directory", str(self.owner), "--port", "0", "--transfer-config", "/private/host.json"])
+            load.assert_called_once_with("/private/host.json")
+            self.assertIs(factory.call_args.kwargs["transfer_config"], load.return_value)
+        with patch("workspace_ui.server.WorkspaceHTTPServer") as factory, patch("workspace_ui.server.load_config", side_effect=ValueError("invalid configuration")):
+            with self.assertRaises(ValueError):
+                main(["serve", "--directory", str(self.owner), "--port", "0", "--transfer-config", "/private/invalid.json"])
+            factory.assert_not_called()
 
     def test_static_allowlist_refuses_traversal_query_and_non_assets(self):
         for path in ("/server.py", "/demo.py", "/README.md", "/../pilot/auth.py",

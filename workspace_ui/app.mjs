@@ -1,3 +1,4 @@
+import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
@@ -12,7 +13,7 @@ function setNavigation(open,{restoreFocus=false}={}){
 }
 mobileNavigation.addEventListener('change',()=>setNavigation(false));
 let token = null, generation = 0, busy = false, currentView = viewFromHash(location.hash), currentFilter = 'all', currentLayout = 'list', searchQuery = '';
-let state = null, selected = null, selectedWorkflow = null, uncertain = false;
+let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null, uncertain = false;
 const viewCopy = {
   overview:['Overview','WORKSPACE OVERVIEW','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
   inbox:['Inbox','INCOMING WORK','Inbox','Review the requests and artifacts shared with your assistant.','All incoming','Every proposal has its own decision'],
@@ -20,6 +21,7 @@ const viewCopy = {
   artifacts:['Artifacts','SHARED ARTIFACTS','Artifacts','Find the exact artifacts prepared and shared across your network.','All artifacts','Drafts, received artifacts and saved decisions'],
   outbox:['Outbox','OUTGOING WORK','Outbox','Prepare the exact content. Review it before you release it.','All outgoing','Prepared and released proposals'],
   peers:['Assistants','YOUR NETWORK','Your assistants','A network of people and the assistants they choose to trust.','Assistant network','Enrolment is separate from approval'],
+  transfers:['Transfers','EXPLICIT DELIVERY','Every handoff, deliberate.','Review an exact packet before each send or import.','Connections & transfers','No automatic delivery or retries'],
   activity:['Activity','WORKSPACE ACTIVITY','Activity','The saved history of work moving through your workspace.','Recent activity','Recorded events from this assistant']
 };
 class RequestFailure extends Error { constructor(message,{unknown=false,unauthorised=false}={}) { super(message); this.unknown=unknown;this.unauthorised=unauthorised; } }
@@ -33,12 +35,16 @@ function identityText(identity) { if(typeof identity==='string')return identity;
 function notice(message,success=false) { $('notice').textContent=message;$('notice').hidden=!message;$('notice').classList.toggle('success',success); }
 function setBusy(value) { busy=value; document.querySelectorAll('button').forEach(node=>{ if(!node.classList.contains('close-dialog'))node.disabled=value; }); }
 function resetSession(message='') {
-  generation++;token=null;state=null;selected=null;selectedWorkflow=null;uncertain=false;searchQuery='';
+  generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertain=false;searchQuery='';
   $('search-input').value='';setNavigation(false);
   for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats'])$(id).replaceChildren();
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
+  for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
+  for(const id of ['proposal-peer','proposal-parent','peer-connection'])$(id).replaceChildren();
+  for(const id of ['inbox-count','outbox-count','pending-total','accepted-total','peer-total'])$(id).textContent='0';
+  $('review-dialog').querySelector('.commitment-details').open=false;notice('');
   $('compose-form').reset();$('peer-form').reset();$('login-message').textContent=message;
   setBusy(false);
 }
@@ -105,15 +111,16 @@ function render() {
   document.querySelectorAll('[data-view]').forEach(node=>{node.classList.toggle('active',node.dataset.view===currentView);node.setAttribute('aria-current',node.dataset.view===currentView?'page':'false');});
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
-  const overview=currentView==='overview'&&!searchQuery, structural=['peers','activity'].includes(currentView);
+  const overview=currentView==='overview'&&!searchQuery, structural=['peers','activity','transfers'].includes(currentView);
   $('overview-panel').hidden=!overview;$('work-panel').hidden=overview;
   $('summary').hidden=true;$('filters').hidden=structural||overview;$('view-toggle').hidden=structural||overview;$('add-peer').hidden=currentView!=='peers';
   $('search-clear').hidden=!searchQuery;
-  $('search-input').setAttribute('placeholder',currentView==='peers'?'Search assistants…':currentView==='activity'?'Search activity…':'Search work…');
+  $('search-input').disabled=currentView==='transfers';
+  $('search-input').setAttribute('placeholder',currentView==='transfers'?'Exact transfer selection below':currentView==='peers'?'Search assistants…':currentView==='activity'?'Search activity…':'Search work…');
   const provider=state.provider;
   $('provider-status').textContent=workflowEnabled(state)?'Synthetic workspace · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();$('item-list').classList.toggle('board',currentLayout==='board'&&!structural);
-  if(overview)renderOverview(totals);else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else renderItems();
+  if(overview)renderOverview(totals);else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else renderItems();
   const date=$('overview-date');if(date)date.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 }
 function empty(symbol,title,description,action,target=$('item-list')) {
@@ -183,7 +190,7 @@ function renderPeers() {
   own.append(text('div',plain(state.identity.agent_id,'?').slice(0,1).toUpperCase(),'peer-avatar local'),main,right);
   if(matchesQuery([state.identity.agent_id,state.identity.owner_id,'your assistant'],searchQuery))$('item-list').append(own);
   const peers=state.peers.filter(peer=>matchesQuery([peer.agent_id,peer.owner_id,peer.peer_id,peer.fingerprint,peer.state],searchQuery));
-  if(!state.peers.length&&!searchQuery){empty('⊞','Good work is connected.','Exchange public identities with another owner and verify their full fingerprint.',{label:'Enrol a peer',run:()=>openDialog('peer-dialog')});return;}
+  if(!state.peers.length&&!searchQuery){empty('⊞','Good work is connected.','Exchange public identities with another owner and verify their full fingerprint.',{label:'Enrol a peer',run:openPeerDialog});return;}
   for(const peer of peers) {
     const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',plain(peer.owner_id,'Owner'),'item-meta'),text('p',peer.fingerprint,'peer-fingerprint'));
     const right=text('div','','row-right');right.append(text('span',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable',isPeerActive(peer)?'badge accepted':'badge revoked'));
@@ -193,7 +200,7 @@ function renderPeers() {
 }
 
 function showPublicIdentity(identity,fingerprint) {
-  selected=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
+  selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
 function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
@@ -213,7 +220,7 @@ async function openReview(item) {
   try {
     const review=validateReview(await request(`/api/items/${encodeURIComponent(item.id)}/review`),item);
     if(epoch!==generation)return;
-    selected={item:{...item},review};selectedWorkflow=null;$('review-title').textContent=plain(item.title,'Exact proposal');$('review-eyebrow').textContent=item.direction==='outgoing'?'OUTGOING RELEASE REVIEW':'RECIPIENT DECISION';$('review-state').replaceChildren(badge(item.state));
+    selected={item:{...item},review};selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent=plain(item.title,'Exact proposal');$('review-eyebrow').textContent=item.direction==='outgoing'?'OUTGOING RELEASE REVIEW':'RECIPIENT DECISION';$('review-state').replaceChildren(badge(item.state));
     $('review-details').replaceChildren();detail($('review-details'),'Type',item.kind==='task'?'Task request':'Artifact');detail($('review-details'),'Peer',peerName(item.peer_id));detail($('review-details'),'Recipient',identityText(review.recipient));detail($('review-details'),'Task reference',item.task_id);detail($('review-details'),'Valid until',datetime(item.expires));
     if(item.historical_state&&item.historical_state!==item.state)detail($('review-details'),'Historical state',stateLabel(item.historical_state));
     const permissions=review.source_permissions;
@@ -234,14 +241,14 @@ async function decideSelected(action) {
   if(!selected||busy||uncertain||!selected.review.allowed_actions.includes(action))return;
   const snapshot=selected;const suffix=['accept','reject'].includes(action)?'decision':action;
   const body={review_digest:snapshot.review.review_digest};if(suffix==='decision')body.decision=action;
-  await performWrite(`/api/items/${encodeURIComponent(snapshot.item.id)}/${suffix}`,body,{target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice(action==='release'?'Exact proposal released. Use Sync exchange to deliver queued messages.':'Your decision has been saved.',true);}});
+  await performWrite(`/api/items/${encodeURIComponent(snapshot.item.id)}/${suffix}`,body,{target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice(action==='release'?'Exact proposal released. Choose a configured transfer for HTTPS delivery, or Sync exchange for local loopback only.':action==='cancel'?'Proposal withdrawn locally. In-flight bytes cannot be recalled; recipient handling remains separate.':'Your decision has been saved.',true);}});
 }
 async function prepareWorkflow(item) {
   if(!selected||selected.item.id!==item.id||!canPrepareWorkflow(state,item,selected.review))return;
   await performWrite(`/api/items/${encodeURIComponent(item.id)}/workflow`,{}, {target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice('Synthetic run prepared. Inspect its exact request and approve it separately. Nothing has run.',true);}});
 }
 function workflowDetailHeader(item,run,heading) {
-  selected=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
+  selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
   $('review-details').replaceChildren();detail($('review-details'),'Task',plain(item.title,item.task_id));detail($('review-details'),'Return recipient',peerName(item.peer_id));detail($('review-details'),'Provider calls','None. Fixed local fixture only.');
   $('review-commitments').replaceChildren();detail($('review-commitments'),'Run ID',run.run_id);detail($('review-commitments'),'Task proposal',item.id);detail($('review-commitments'),'Context',item.context);detail($('review-commitments'),'Provider review',run.review_digest);
   $('review-message').textContent='';$('review-actions').replaceChildren();
@@ -336,13 +343,14 @@ async function logout(){
   try {await request('/api/session',{method:'DELETE',body:{},sessionToken:original});}catch{$('login-message').textContent='Locked here. Server sign-out could not be confirmed; the session will expire.';}
 }
 $('logout').addEventListener('click',logout);$('mobile-logout').addEventListener('click',logout);
-$('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;setBusy(true);try{await refresh({clearNotice:true});selected=null;selectedWorkflow=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{if(epoch===generation)setBusy(false);}});
+$('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;setBusy(true);try{await refresh({clearNotice:true});selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{if(epoch===generation)setBusy(false);}});
+document.querySelector('.skip-link').addEventListener('click',event=>{event.preventDefault();setNavigation(false);(token?$('main'):$('password')).focus();});
 $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>notice('Exchange checked. Review new items and saved delivery outcomes below.',true)}));
-$('new-proposal').addEventListener('click',prepareCompose);$('add-peer').addEventListener('click',()=>openDialog('peer-dialog'));
+$('new-proposal').addEventListener('click',prepareCompose);$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
-document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;}));
-document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();else{selected=null;selectedWorkflow=null;}}));
+document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;selectedTransfer=null;}));
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();else{selected=null;selectedWorkflow=null;selectedTransfer=null;}}));
 $('proposal-kind').addEventListener('change',configureKind);$('proposal-parent').addEventListener('change',selectParent);
 $('compose-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertain)return;const form=event.currentTarget;const fields=Object.fromEntries(new FormData(form));fields.peer_id=form.elements.peer_id.value;
@@ -351,7 +359,7 @@ $('compose-form').addEventListener('submit',async event=>{
 });
 $('peer-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertain)return;
-  try {const body=peerBody(Object.fromEntries(new FormData(event.currentTarget)));await performWrite('/api/peers',body,{target:'peer-message',onSuccess:()=>{$('peer-dialog').close();$('peer-form').reset();notice('Exact peer enrolled. Each proposal still needs separate approval.',true);}});}catch(error){$('peer-message').textContent=error.message;}
+  try {const body=peerBody(Object.fromEntries(new FormData(event.currentTarget)),state.transfers?.connections||[]);await performWrite('/api/peers',body,{target:'peer-message',onSuccess:()=>{$('peer-dialog').close();$('peer-form').reset();notice('Exact peer enrolled. Each proposal still needs separate approval.',true);}});}catch(error){$('peer-message').textContent=error.message;}
 });
 document.addEventListener('visibilitychange',()=>{if(document.hidden){$('password').value='';}});
 
@@ -383,3 +391,74 @@ document.addEventListener('keydown',event=>{
 });
 
 setNavigation(false);
+
+function openPeerDialog(){
+  if(busy||uncertain)return;
+  $('peer-form').reset();$('peer-message').textContent='';
+  $('peer-connection').replaceChildren();const local=text('option','Local loopback pilot');local.value='';$('peer-connection').append(local);
+  for(const c of state.transfers?.connections||[]){const option=text('option',c.label);option.value=c.id;$('peer-connection').append(option);}
+  $('peer-transport-field').hidden=!(state.transfers?.connections.length);configurePeerConnection();openDialog('peer-dialog');
+}
+function configurePeerConnection(){
+  const c=state?.transfers?.connections.find(c=>c.id===$('peer-connection').value);
+  $('peer-endpoint-field').hidden=Boolean(c);$('peer-form').elements.endpoint.required=!c;
+  $('peer-connection-note').hidden=!c;$('peer-connection-note').textContent=c?`Host-configured destination: ${c.destination}. Expected fingerprint: ${c.peer_fingerprint}. Independently compare it with the owner; this is not proof of their identity.`:'';
+}
+$('peer-connection').addEventListener('change',configurePeerConnection);
+function renderTransfers(){
+  const transfers=state.transfers;
+  if(!transfers){empty('⇄','Transfer controls unavailable.','This host does not expose the transfer workspace.');return;}
+  const intro=text('div','','transfer-intro');intro.append(text('p','Sending, importing a signed receipt, accepting a proposal and approving execution are separate decisions. Nothing here starts work.','scope-note'));
+  if(!transfers.enabled)intro.append(text('p','HTTPS delivery is not configured. A host administrator must supply private connection configuration and restart the service. No network call is made by opening this page.'));
+  const d=transfers.dispatch;
+  if(d)intro.append(text('p',d.state==='in_flight'?'One transfer is in flight. You can inspect, withdraw or sign out; already handed-off bytes cannot be recalled. Refresh saved state to inspect its outcome.':d.transport_acknowledged?'The mailbox returned an untrusted quarantine acknowledgement. Delivery remains uncertain until a signed receipt is imported.':'The last network outcome is unknown. Inspect the immutable attempts before choosing a retry.','scope-note'));
+  $('item-list').append(intro);
+  if(transfers.connections.length)$('item-list').append(text('h3','Configured connections','transfer-heading'));
+  for(const c of transfers.connections){const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',c.label,'item-title'),text('p',c.destination,'peer-fingerprint'),text('p',c.peer_fingerprint,'peer-fingerprint'),text('p',state.peers.some(p=>p.peer_id===c.peer_fingerprint&&isPeerActive(p))?'Peer is enrolled. This destination is host configuration, not proof of owner identity.':'Peer is not enrolled. Independently verify and enrol it under Assistants.','workflow-note'));row.append(text('div','⊞','item-icon'),main);$('item-list').append(row);}
+  $('item-list').append(text('h3','Retained outbox','transfer-heading'));
+  if(!transfers.outbox.length)$('item-list').append(text('p','No released packets. Creating a draft does not queue it for delivery.','transfer-intro'));
+  for(const item of transfers.outbox)renderTransferRow('outbox',item.message_id,item.peer,`${item.state==='received'?'Signed receipt observed':item.state==='cancelled'?'Locally stopped':item.state==='uncertain'?'Delivery uncertain':'Queued'} · ${item.attempts} of 5 transport attempts`,item.message_id);
+  $('item-list').append(text('h3','Original cached receipts','transfer-heading'));
+  if(!transfers.receipts.length)$('item-list').append(text('p','No cached receipts. Importing does not automatically send a receipt.','transfer-intro'));
+  for(const item of transfers.receipts)renderTransferRow('receipt',item.incoming_id,item.peer,'Transport receipt only. Not recipient acceptance.',item.message_id);
+  $('item-list').append(text('h3','Quarantine: choose one exact file','transfer-heading'));
+  if(!transfers.quarantine.length)$('item-list').append(text('p','No digest-named entries available. Quarantine is untrusted and is never automatically imported.','transfer-intro'));
+  else {
+    const form=text('form','','transfer-import');const peerLabel=text('label','Expected sender connection');const peerSelect=text('select','');peerSelect.required=true;const blank=text('option','Choose the independently verified sender');blank.value='';peerSelect.append(blank);for(const c of transfers.connections){const option=text('option',c.label);option.value=c.id;peerSelect.append(option);}peerLabel.append(peerSelect);
+    const fileLabel=text('label','Exact quarantine file digest');const fileSelect=text('select','');fileSelect.required=true;for(const id of transfers.quarantine){const option=text('option',id);option.value=id;fileSelect.append(option);}fileLabel.append(fileSelect);
+    const inspect=button('Inspect selected import','button secondary',()=>{if(!form.reportValidity())return;const connection=transfers.connections.find(c=>c.id===peerSelect.value);openTransfer({connection,kind:'quarantine',identifier:fileSelect.value});});form.append(peerLabel,fileLabel,inspect);form.addEventListener('submit',e=>e.preventDefault());$('item-list').append(form);
+  }
+}
+function renderTransferRow(kind,identifier,peer,summary,messageId){
+  const row=text('article','','item-row transfer-row');const main=text('div','','item-main');main.append(text('h3',kind==='receipt'?'Return original receipt':peerName(peer),'item-title'),text('p',summary,'workflow-note'),text('p',messageId,'peer-fingerprint'));
+  const actions=text('div','','row-right');for(const c of state.transfers.connections.filter(c=>c.peer_fingerprint===peer))actions.append(button(`Inspect via ${c.label}`,'button secondary',()=>openTransfer({connection:c,kind,identifier})));
+  if(!actions.children.length)actions.append(text('span','No configured connection','workflow-note'));row.append(text('div',kind==='receipt'?'↩':'↗','item-icon'),main,actions);$('item-list').append(row);
+}
+async function openTransfer(selection){
+  if(busy||uncertain)return;const epoch=generation;setBusy(true);
+  try{
+    const review=validateTransferReview(await request(transferPath(selection)),selection);if(epoch!==generation)return;
+    selected=null;selectedWorkflow=null;selectedTransfer={...selection,review};
+    $('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
+    $('review-details').replaceChildren();detail($('review-details'),'Connection',review.connection.label);detail($('review-details'),'Destination',review.connection.destination);detail($('review-details'),selection.kind==='quarantine'?'Expected sender':'Exact recipient',review.connection.peer_fingerprint);detail($('review-details'),'Packet type',review.packet_kind);detail($('review-details'),'Original expiry',datetime(review.expires));
+    if(review.outbox){detail($('review-details'),'Current outbox',review.outbox.state);detail($('review-details'),'Total attempts',String(review.outbox.attempts));}
+    $('review-content').textContent=selection.kind==='quarantine'?'This file is untrusted. Import verifies its original signature and current peer/source gates. It does not accept a proposal, start work or send a receipt.':'Only the original retained encrypted packet can be sent. A fixed mailbox acknowledgement proves neither signed receipt nor owner acceptance.';
+    $('review-commitments').replaceChildren();detail($('review-commitments'),'Message ID',review.message_id);detail($('review-commitments'),'Packet digest',review.packet_digest);detail($('review-commitments'),'Review digest',review.review_digest);if(selection.kind==='quarantine')detail($('review-commitments'),'Selected file digest',selection.identifier);
+    for(const a of review.attempts){detail($('review-commitments'),`Attempt ${a.sequence}`,`Uncertain · ${a.destination}`);detail($('review-commitments'),'Original file digest',a.file_digest);}
+    if(!review.attempts.length)detail($('review-commitments'),'HTTPS attempts','None recorded');
+    $('review-scope').textContent='Attempts are immutable history. Cancellation or sign-out after the final send gate cannot recall in-flight bytes. A retry consumes another bounded attempt without renewing permission. Refresh explicitly to inspect saved state.';
+    $('review-message').textContent='';$('review-actions').replaceChildren();
+    const action=review.allowed_actions[0];
+    if(action&&(action==='import'||state.transfers.dispatch?.state!=='in_flight')){
+      const label=text('label','','check-label transfer-confirm');const check=text('input','');check.type='checkbox';check.id='transfer-confirm';label.append(check,text('span',action==='import'?'Import only this selected file from this expected sender.':'Send only this original packet to this exact destination. This does not approve work.'));$('review-actions').append(label);
+      $('review-actions').append(button(action==='import'?'Import selected packet':action==='retry'?'Send one explicit retry':'Send original packet once','button primary',()=>transferAction(action)));
+    }else $('review-message').textContent=state.transfers.dispatch?.state==='in_flight'?'Another transfer is in flight. No additional send will be queued.':'This packet is stopped, expired, already received or unavailable. Its history remains inspectable.';
+    $('review-actions').append(button('Close','button secondary',()=>{$('review-dialog').close();selectedTransfer=null;}));$('review-dialog').showModal();
+  }catch(error){if(epoch===generation)handleFailure(error);}finally{if(epoch===generation)setBusy(false);}
+}
+async function transferAction(action){
+  if(!selectedTransfer||busy||uncertain||!selectedTransfer.review.allowed_actions.includes(action))return;
+  if(!$('transfer-confirm')?.checked){$('review-message').textContent='Confirm the exact selected transfer before proceeding.';return;}
+  const snapshot=selectedTransfer,body={review_digest:snapshot.review.review_digest};if(action!=='import')body.retry=action==='retry';
+  await performWrite(transferPath(snapshot)+(action==='import'?'/import':'/send'),body,{target:'review-message',onSuccess:()=>{selectedTransfer=null;$('review-dialog').close();notice(action==='import'?'Selected packet imported. Review any proposal separately; a cached receipt is not sent automatically.':'One transfer attempt started. Delivery remains uncertain. Refresh saved state to inspect it; no automatic retry will occur.',true);}});
+}

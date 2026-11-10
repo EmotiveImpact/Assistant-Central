@@ -1,7 +1,7 @@
 // Read-only projections. Display groups and search never create authority.
 import {plain, isPending, isTerminal, isPeerActive, stateLabel, statusClass} from './model.mjs';
 
-export const VIEWS = Object.freeze(['overview','inbox','tasks','artifacts','outbox','peers','activity']);
+export const VIEWS = Object.freeze(['overview','inbox','tasks','artifacts','outbox','peers','transfers','activity']);
 export function viewFromHash(hash) {
   const value = plain(hash).replace(/^#/, '');
   return VIEWS.includes(value) ? value : 'overview';

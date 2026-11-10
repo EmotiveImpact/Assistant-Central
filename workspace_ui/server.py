@@ -10,6 +10,7 @@ from pathlib import Path
 import stat
 
 from pilot.server import PilotHTTPServer, PilotHandler, RequestDenied, WEB
+from pilot.owner_transfer import load_config
 
 
 ROOT = Path(__file__).resolve().parent
@@ -20,6 +21,7 @@ STATIC_FILES = {
     "/app.mjs": (ROOT / "app.mjs", "text/javascript; charset=utf-8"),
     "/projections.mjs": (ROOT / "projections.mjs", "text/javascript; charset=utf-8"),
     "/model.mjs": (WEB / "model.mjs", "text/javascript; charset=utf-8"),
+    "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
 }
 MAX_STATIC_BYTES = 2 * 1024 * 1024
 
@@ -50,8 +52,8 @@ class WorkspaceHandler(PilotHandler):
 
 
 class WorkspaceHTTPServer(PilotHTTPServer):
-    def __init__(self, directory, port=0, *, synthetic_workflow=False):
-        super().__init__(directory, port, synthetic_workflow=synthetic_workflow)
+    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None):
+        super().__init__(directory, port, synthetic_workflow=synthetic_workflow, transfer_config=transfer_config)
         # Construction does not accept requests; use the specialised handler
         # before the caller starts serve_forever. No module globals are patched.
         self.RequestHandlerClass = WorkspaceHandler
@@ -65,6 +67,7 @@ def main(argv=None):
     serve.add_argument("--port", type=int, default=8877)
     serve.add_argument("--synthetic-workflow", action="store_true",
                        help="Enable only the fixed fictional result fixture, with no model calls")
+    serve.add_argument("--transfer-config", help="Private host-selected HTTPS connection JSON; no automatic transfer")
     args = parser.parse_args(argv)
     if args.port != 0 and not 1024 <= args.port <= 65535:
         parser.error("Choose a loopback port from 1024 to 65535, or 0 for an ephemeral port")
@@ -73,7 +76,8 @@ def main(argv=None):
     directory = Path(args.directory)
     if not directory.is_dir() or not (directory / "auth.sqlite").is_file():
         parser.error("An existing pilot owner directory is required")
-    server = WorkspaceHTTPServer(directory, args.port, synthetic_workflow=args.synthetic_workflow)
+    server = WorkspaceHTTPServer(directory, args.port, synthetic_workflow=args.synthetic_workflow,
+                                 transfer_config=load_config(args.transfer_config) if args.transfer_config else None)
     print(json.dumps({"url": server.origin, "synthetic_only": True,
                       "live_provider_enabled": False,
                       "synthetic_workflow_enabled": args.synthetic_workflow}), flush=True)

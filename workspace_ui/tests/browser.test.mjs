@@ -38,12 +38,30 @@ const screenshot=async(name,{fullPage=true}={})=>{
   }
   await page.screenshot({path:path.join(screenshots,name),fullPage});
 };
+const checkContrast=async()=>{
+  const failures=await page.evaluate(()=>{
+    const rgba=value=>{const parts=value.match(/[\d.]+/g)?.map(Number)||[];return [parts[0]||0,parts[1]||0,parts[2]||0,parts.length>3?parts[3]:1];};
+    const mix=(fg,bg)=>fg.slice(0,3).map((v,i)=>v*fg[3]+bg[i]*(1-fg[3]));
+    const background=node=>{if(!node)return [255,255,255];const value=rgba(getComputedStyle(node).backgroundColor);return mix(value,background(node.parentElement));};
+    const luminance=rgb=>rgb.map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
+    const failures=[];
+    for(const node of document.querySelectorAll('.nav-section,.section-link,.network-link,.peer-fingerprint,.metric-note,.item-meta,.task-ref,.board-empty,.group-count,.review-details dt,.commitment-details summary,input[placeholder],textarea[placeholder]')){
+      if(!node.getClientRects().length)continue;
+      const placeholder=node.matches('input,textarea'),style=getComputedStyle(node,placeholder?'::placeholder':null);
+      const bg=background(node),fg=mix(rgba(style.color),bg),a=luminance(fg),b=luminance(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+      if(ratio<4.5)failures.push({element:node.id||node.className,placeholder,ratio,foreground:style.color,background:bg});
+    }
+    return failures;
+  });
+  assert.deepEqual(failures,[],'ordinary quiet and placeholder text must meet 4.5:1 on actual surfaces');
+};
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 
 try {
   await page.goto(url.origin);
+  await checkContrast();
   await page.locator('#password').fill(process.env.WORKSPACE_PASSWORD);
   await page.getByRole('button',{name:'Unlock workspace'}).click();
   await page.locator('#workspace').waitFor({state:'visible'});
@@ -58,8 +76,12 @@ try {
   await page.setViewportSize({width:1440,height:1000});
 
   // Browse all projections without changing any saved work or authority.
-  for(const view of ['inbox','tasks','artifacts','outbox','peers','activity','overview']){
-    await nav(view);await noOverflow();
+  for(const view of ['inbox','tasks','artifacts','outbox','peers','transfers','activity','overview']){
+    await nav(view);await noOverflow();await checkContrast();
+    const route=await page.evaluate(()=>location.hash);
+    await page.locator('.skip-link').focus();await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(()=>location.hash),route,'skip link must not change the route');
+    assert.equal(await page.locator('#main').evaluate(node=>document.activeElement===node),true);
     if(view==='artifacts')await screenshot('central-platform-artifacts.png');
     if(view==='peers')await screenshot('central-platform-assistants.png');
   }
@@ -80,15 +102,18 @@ try {
   assert.ok(await page.locator('#item-list article').count()>=5);
   await page.locator('[data-layout="board"]').click();
   assert.ok(await page.locator('.board-column').count()>=2);
+  await checkContrast();
   await noOverflow();await screenshot('central-platform-work-board.png');
   await page.locator('[data-layout="list"]').click();
   await page.locator('#main').focus();await page.keyboard.press('n');
   await page.locator('#compose-dialog').waitFor({state:'visible'});
+  assert.equal(await page.getByRole('dialog',{name:'Prepare a proposal',exact:true}).count(),1);await checkContrast();
   await page.keyboard.press('Escape');await page.locator('#compose-dialog').waitFor({state:'hidden'});
   assert.equal(writes.length,0,'search, layout and opening a form must not submit work');
 
   await nav('inbox');
   await openItem('Review the research brief');
+  assert.equal(await page.getByRole('dialog',{name:'Review the research brief',exact:true}).count(),1);await checkContrast();
   assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
   assert.equal(await page.locator('#review-content *').count(),0);
   assert.match(await page.locator('#review-scope').textContent(),/does not start work/);
@@ -156,7 +181,10 @@ try {
   await page.locator('#notice').filter({hasText:'Saved state inspected'}).waitFor();
   await article('Draft the launch announcement').locator('.badge.released').waitFor();
 
-  await nav('peers');await page.getByRole('button',{name:'View public identity'}).click();
+  await nav('peers');await page.locator('#add-peer').click();
+  assert.equal(await page.getByRole('dialog',{name:'Enrol a trusted peer',exact:true}).count(),1);await checkContrast();
+  await page.keyboard.press('Escape');await page.locator('#peer-dialog').waitFor({state:'hidden'});
+  await page.getByRole('button',{name:'View public identity'}).click();
   const publicIdentity=JSON.parse(await page.locator('#review-content').textContent());
   assert.deepEqual(Object.keys(publicIdentity).sort(),['agent_id','exchange_key','owner_id','signing_key']);await closeReview();
   for(const width of [768,390]){
@@ -177,6 +205,7 @@ try {
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
   assert.equal(await page.locator('#overview-stats').textContent(),'');
+  for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','review-details','review-commitments','owner-name','agent-name','owner-avatar','notice','connection-status'])assert.equal(await page.locator('#'+id).textContent(),'','clear hidden owner data: '+id);
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);
   assert.deepEqual(errors,[]);

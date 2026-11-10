@@ -25,3 +25,21 @@ socket restriction; no workaround or local browser pass is claimed.
 
 The initial commit contains dependency composition and coordination only, not
 working transfer integration. No live provider, real data or public deployment.
+
+## Implementation decisions
+
+- Retain one Central shell and the shared model/transfer validators. The transfer
+  view has no new session, backend authority, automatic retry or import path.
+- Add only the exact descriptor-pinned shared transfer module. Keep private host
+  configuration optional and use the existing loader without changing its checks.
+- Keep transport ACK, signed receipt, owner acceptance and execution separate.
+  Show immutable attempt history and warn that local withdrawal cannot recall bytes.
+- Improve quiet/placeholder contrast while retaining original Central assets and
+  layout. Name all dialogs, preserve skip-link routing and clear hidden owner data.
+- Use real disposable HTTP/TLS owners and explicit browser actions. Test-only
+  response faults and a post-TLS completion gate reproduce uncertainty and
+  in-flight withdrawal; they are never available in the production launcher.
+
+Current local regression results and hosted evidence are tracked in
+[workspace verification](../../workspace_ui/VERIFICATION.md). This remains a draft
+until exact combined-tree browser, aggregate CI and independent review are complete.

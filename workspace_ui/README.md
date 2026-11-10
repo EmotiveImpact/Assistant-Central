@@ -1,7 +1,7 @@
 # Central workspace
 
 An optional platform interface for the existing Assistant Central pilot. The
-overview, work queue, artifact library, assistant network and activity views use
+overview, work queue, artifact library, assistant network, transfers and activity views use
 the real owner HTTP API. This component does not replace the runtime, identity,
 disclosure, exact-review or delivery boundaries.
 
@@ -43,6 +43,12 @@ python -B -m workspace_ui.server serve --directory /path/to/fictional-owner --po
 This requires a previously provisioned pilot owner and binds only to
 `127.0.0.1`. Stop its other pilot server before opening the same owner directory.
 Add `--synthetic-workflow` only to enable the existing fixed local rehearsal.
+HTTPS transfer controls remain disabled unless the host explicitly supplies
+`--transfer-config /private/transfer-config.json`. The launcher uses the existing
+reviewed `pilot.owner_transfer.load_config`, with its private-file, exact schema,
+TLS trust and bounded connection checks. It reads this trusted configuration once
+at startup. It does not create a configuration, infer a peer, enable a provider
+or send anything. See [host configuration](../pilot/OWNER_TRANSFERS.md#trusted-host-configuration).
 Provisioning and password maintenance remain in the reviewed pilot CLI. This
 launcher has no password argument and creates no missing account.
 
@@ -50,7 +56,8 @@ launcher has no password argument and creates no missing account.
 
 `WorkspaceHTTPServer` retains the existing pilot server and changes only its
 static GET handler before serving. An exact allowlist serves the new HTML, CSS
-and client modules; `/model.mjs` comes directly from `pilot/web/model.mjs`.
+and client modules. `/model.mjs` and `/transfers.mjs` come directly from their
+reviewed `pilot/web/` files. No other pilot asset is served.
 Static files are bounded and opened with `O_NOFOLLOW`. Source files, arbitrary
 paths, query strings and directory traversal are refused.
 
@@ -61,16 +68,31 @@ filtering and searching do not accept work, disclose content, run a provider or
 release a proposal. Each of those operations still requires its existing exact
 review step. An uncertain result requires inspection before another mutation.
 
-This branch does not incorporate the separately owned transfer workspace in
-PR #16. Its network settings and HTTPS attempt UI need a later composition and
-regression pass. Remote hosting, live providers and real-owner onboarding remain
-outside this component.
+The refined shell composes the reviewed owner transfer controls from PR #16,
+using one owner session, mutation gate and uncertainty latch. Its shared validators
+bind the exact connection, full recipient fingerprint, original digest, expiry and
+attempt history. Enrol a peer under **Assistants** using either its existing local
+endpoint or one host-approved connection; independently verify the full fingerprint.
+Configuration alone is never peer enrolment or permission to send.
+
+Under **Transfers**, choose and inspect one retained outbox packet, original cached
+receipt or quarantine file. Each send, retry and import requires its own unchecked
+confirmation. Imports never automatically send a receipt. A mailbox acknowledgement,
+a signed receipt, recipient acceptance and execution approval remain distinct.
+An in-flight transfer cannot be recalled by closing a dialog, withdrawing work or
+signing out. Inspect saved state after an uncertain response, then review again
+before any permitted retry. No automatic retry or additional queue is introduced.
+**Sync exchange** is for existing local loopback exchange only.
+
+Persistent conversations remain a separate authority in PR #22. This work does
+not create a second thread ledger or present proposals as chat history. Remote
+hosting, live providers and real-owner onboarding remain outside this component.
 
 ## Verification
 
 ```sh
 python -B -m unittest discover -s workspace_ui/tests -v
-node --test pilot/web/tests/model.test.mjs
+node --test workspace_ui/tests/projections.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
 ```
 
 The HTTP tests exercise the actual owner server: exact static content, path and
