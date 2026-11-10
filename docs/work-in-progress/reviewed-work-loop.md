@@ -14,10 +14,11 @@ No live provider activation, real personal information, public hosting or produc
 
 | Area | Assigned lane | Claimed files |
 | --- | --- | --- |
-| Backend composition and HTTP | Primary agent | `pilot/workflow.py`, `pilot/server.py`, associated boundary documentation and workflow wiring |
-| Owner interface | Interface agent, assignment recorded in PR | `pilot/web/` and `pilot/INTERFACE.md` |
-| Failure and authority review | Independent review agent, assignment recorded in PR | New `pilot/tests/test_workflow_review.py` only; report findings before editing implementation |
-| Demo and composition evidence | Demo agent, assignment recorded in PR | New `pilot/workflow_demo.py` and focused workflow tests |
+| HTTP composition and coordination | `/root` | `pilot/server.py`, test-helper/fixture switches, CI, `AGENTS.md` and coordination/evidence docs |
+| Exact result staging | `/root/workloop_core` | `pilot/workflow.py`, focused core tests and `pilot/WORKFLOW.md`; narrow transactional helpers in `pilot/runtime.py` |
+| Owner interface | `/root/workloop_ui` | `pilot/web/` and `pilot/INTERFACE.md` |
+| Failure and authority review | `/root/workloop_review` | New `pilot/tests/test_workflow_review.py` and `pilot/WORKFLOW_REVIEW.md`; report findings before editing implementation |
+| Demo and composition evidence | `/root/workloop_demo` | New `pilot/workflow_demo.py` and `pilot/tests/test_workflow_http.py` |
 
 Other agents should avoid overlapping edits in these files until ownership is explicitly coordinated. The existing auth, encrypted transport and base runtime/provider contracts should remain stable unless a concrete blocker requires a narrow reviewed change.
 
