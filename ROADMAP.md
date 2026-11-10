@@ -17,13 +17,18 @@ Retained task-input ancestry now preserves original owners across derived
 artifacts and rechecks historical disclosure withdrawal. Those fictional local
 controls are not authenticated owner approval, semantic data tracking or live
 provider authority.
+The [recipient acceptance rehearsal](integration/RECIPIENT_ACCEPTANCE.md) now adds
+an explicit one-shot synthetic release and a separate recipient accept/reject
+decision over the exact staged artifact. Current source rights, inherited
+permissions, terminal decisions, expiry and restart uncertainty are checked in
+the shared team transaction. Recipient work still requires its own approval.
 
 ## Next engineering gates
 
-1. Extend the tested local task/artifact-to-proposal mapping into an explicit
-   release and receiver-owned acceptance boundary. Preserve exact scope and
-   disclosure checks, terminal decisions, expiry and uncertain-outcome handling;
-   local staging is not release, delivery or recipient authority.
+1. Review the synthetic release/recipient acceptance boundary, then enforce it
+   across two independently controlled stores and processes. The local contract
+   is implemented; shared SQLite transactions are not distributed authority.
+   Preserve exact scope, terminal decisions, expiry and uncertain outcomes.
 2. Bind one authenticated local owner control and one narrowly scoped agent/tool
    route. A lead must never mint another owner's grants. Keep private local
    sessions separate from explicitly shared outcomes.
@@ -41,6 +46,11 @@ provider authority.
 6. Measure realistic workloads and failure modes before making scale, throughput
    or reliability claims. Keep compatibility, observability and operational
    complexity visible alongside performance.
+
+The first usable network milestone is a two-person pilot: each person controls
+their own assistant, one exact task and artifact cross the boundary, and both can
+inspect approval, rejection, cancellation and recovery history. Authenticate the
+owners and validate the isolated synthetic exchange before introducing real data.
 
 ## Rust remains an option
 

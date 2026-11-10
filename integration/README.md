@@ -1,5 +1,11 @@
 # Offline team-to-protocol binding
 
+The original staging adapter below now has a separate
+[synthetic recipient acceptance extension](RECIPIENT_ACCEPTANCE.md). It adds
+explicit per-source-owner release and exact recipient accept/reject controls in
+the trusted local team database. The original adapter and wire tools retain their
+staging-only contract; independent authentication and transport remain unimplemented.
+
 This is a trusted, local composition of the rebuilt team coordinator and the
 recovered r5 proposal/wire building blocks. It stages **one unsigned local
 proposal** for one exact accepted artifact and downstream task. It does not
@@ -100,6 +106,6 @@ service. Hash verification requires a trusted, nonconcurrently modified checkout
 it establishes consistency, not authenticity or runtime isolation.
 
 Next work must supply authenticated owner controls and protected key custody,
-receiver-owned acceptance policy, an explicit release boundary and safe persistent
+independently enforced receiver acceptance and release controls, and safe persistent
 transport/reconciliation before any real cross-owner sharing. A nominated lead
 must never gain authority to approve another owner's actions or disclosure.

@@ -72,3 +72,49 @@ protocol role mapping and the remaining authentication and transport boundaries.
 The demo must end with one unsigned pending proposal, an empty inbox and the
 recipient task still planned. No owner command, release, message or recipient
 processing is exercised. Existing prototype source and import hashes are unchanged.
+
+## Synthetic recipient acceptance, 10 November 2026
+
+The separate acceptance extension passes 45 new checks, bringing integration to
+103. These cover exact recipient/artifact/context commitments, direct and
+inherited source authority, scoped previews, expiry, revocation, conflicting and
+duplicate decisions, concurrent delivery and release, restart, rejected proposals,
+rollback and lost commit acknowledgements. Both transaction orderings of source
+revocation versus recipient acceptance are exercised with competing connections.
+These tests were written with the implementation; they are not an independent
+security audit or proof of distributed ownership.
+
+Fresh regression results for this implementation:
+
+| Check | Result |
+| --- | --- |
+| Integration | 103 tests passed, including all 58 existing tests |
+| Team | 84 tests passed |
+| Execution and provider disclosure | 133 tests passed |
+| Frozen v29 | 948 Python tests and all 15 DOM-model suites passed |
+| Frozen r5 | All 39 targeted checks passed |
+| Import preservation | 673 imported files and 17 team manifest entries verified |
+| Demos | Team, execution, provider, lineage, wire, recipient acceptance and execution composition passed |
+| Patch whitespace | `git diff --check` passed |
+
+The full verifier used Python 3.12 in a dedicated virtual environment with
+`prototypes/consent-v29/requirements-mcp-offline.txt` installed. No frozen prototype
+or team source was modified. CI includes the new acceptance demo and discovers
+the new tests through the existing integration runner. Inspect CI at the exact PR
+head; these are local results.
+
+Run the existing commands above plus:
+
+```sh
+python -B execution/run_checks.py
+python -B integration/acceptance_demo.py
+python -B execution/check_composition.py
+```
+
+The [recorded acceptance demo](../integration/evidence/recipient-acceptance-demo.json)
+shows an accepted artifact after restart, a rejection surviving duplicate
+delivery, a blocked second release and accepted history after source withdrawal.
+The [composition output](../integration/evidence/execution-acceptance-composition.json)
+connects the execution ledger to the new boundary. Both outputs contain only
+fictional labels, hashes and metadata. No network, authenticated owner, browser,
+native host or live provider acceptance is claimed.

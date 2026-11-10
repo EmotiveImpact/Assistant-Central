@@ -46,6 +46,8 @@ jobs:
         run: python -B integration/run_checks.py
       - name: Exercise fictional team-to-proposal wire demo
         run: python -B integration/demo.py
+      - name: Exercise synthetic recipient acceptance and restart
+        run: python -B integration/acceptance_demo.py
       - name: Check execution result to unsigned proposal composition
         run: python -B execution/check_composition.py
       - name: Check consent and protocol prototype
