@@ -192,7 +192,7 @@ class ConversationLedger:
             yield guards.enter_context(self.actors[principal].authorised(session))
 
     @contextmanager
-    def _transaction(self, principal, session, *, checks=()):
+    def _transaction(self, principal, session, *, checks=(), final_checks=()):
         # All local operations (including reads) are ordered against membership
         # changes and revocation. No plaintext cache can bypass these guards.
         with self._lock:
@@ -201,6 +201,12 @@ class ConversationLedger:
             with self._authorised(principal, session) as identity:
                 need(identity['identity_fingerprint'] == principal)
                 need(self.storage.auth.status()['unlocked'])
+                if final_checks:
+                    # Both genuine auth locks are held. status() keeps the vault
+                    # unlocked while at least one retained session is unexpired.
+                    # Capture that deadline without a trailing auth callback.
+                    storage_deadline = self.storage.auth._db.execute('SELECT MAX(expires) FROM sessions').fetchone()[0]
+                    need(type(storage_deadline) in (int, float) and math.isfinite(storage_deadline))
                 _private_path(self.directory, directory=True)
                 path = self.directory / 'conversation.sqlite'
                 _private_path(path)
@@ -211,12 +217,27 @@ class ConversationLedger:
                 self.db.execute('BEGIN IMMEDIATE')
                 try:
                     yield auth
-                    auth.authenticate(session)  # Expiry/credential changes fail closed.
+                    try:
+                        auth.authenticate(session)  # Expiry/credential changes fail closed.
+                    finally:
+                        if final_checks:
+                            self._now()  # Keep time observed during a refusal.
                     self._now()
                     for check in checks:
                         check()
                     need(self.storage.auth.status()['unlocked'])
-                    auth.authenticate(session)
+                    try:
+                        auth.authenticate(session)
+                    finally:
+                        if final_checks:
+                            self._now()
+                    for check in final_checks:
+                        check()
+                    if final_checks:
+                        # Auth locks still order logout/revocation. A policy check
+                        # may itself observe session expiry; compare the captured
+                        # deadline without another authentication callback gap.
+                        need(self._last_time < identity['expires_at'] and self._last_time < storage_deadline)
                     self.db.execute('COMMIT')
                 except BaseException as error:
                     if self.db.in_transaction:
