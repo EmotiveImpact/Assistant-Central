@@ -155,9 +155,15 @@ class HTTPSExchange:
                             'delivery': 'uncertain', 'owner_acceptance': 'not_established',
                             'authorises_execution': False, 'packet_digest': digest(packet),
                             'file_digest': hashlib.sha256(canonical(packet)).hexdigest(), 'recipient': recipient}
-                return _PreparedHTTPSAttempt(source, target, recipient, ca_file, metadata, staging.pop_all(), expires=packet['header']['expires'], prepared_at=prepared_at, clock=runtime.clock)
+            # Transfer cleanup ownership only after the auth context's final
+            # check exits successfully. Failed exit must not leak staging.
+            prepared = _PreparedHTTPSAttempt(source, target, recipient, ca_file, metadata, staging,
+                         expires=packet['header']['expires'], prepared_at=prepared_at, clock=runtime.clock)
+            staging = None
+            return prepared
         finally:
-            staging.close()
+            if staging is not None:
+                staging.close()
 
     def _send(self, session, identifier, target, recipient, *, retry, ca_file, receipt):
         prepared = self._prepare_send(session, identifier, target, recipient,

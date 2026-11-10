@@ -70,18 +70,20 @@ def main():
         mailbox = MailboxServer(quarantine, certificate, key, enabled=True)
         mailbox_thread = threading.Thread(target=mailbox.serve_forever, kwargs={'poll_interval': 0.01})
         mailbox_thread.start()
-        transfer_config = TransferConfig({'version': VERSION, 'connections': [{'id': 'fixture-peer',
-            'label': 'Fictional Atlas mailbox', 'peer_fingerprint': sender_pin,
-            'destination': f'https://localhost:{mailbox.server_address[1]}{ROUTE}', 'ca_file': str(ca)}],
-            'quarantine_directory': str(receiver_spool)})
-        server = PilotHTTPServer(root / 'second', args.port, synthetic_workflow=True, transfer_config=transfer_config)
-        print(json.dumps({'url': server.origin, 'synthetic_fixture': True}), flush=True)
+        server = None
         try:
+            transfer_config = TransferConfig({'version': VERSION, 'connections': [{'id': 'fixture-peer',
+                'label': 'Fictional Atlas mailbox', 'peer_fingerprint': sender_pin,
+                'destination': f'https://localhost:{mailbox.server_address[1]}{ROUTE}', 'ca_file': str(ca)}],
+                'quarantine_directory': str(receiver_spool)})
+            server = PilotHTTPServer(root / 'second', args.port, synthetic_workflow=True, transfer_config=transfer_config)
+            print(json.dumps({'url': server.origin, 'synthetic_fixture': True}), flush=True)
             server.serve_forever()
         except KeyboardInterrupt:
             pass
         finally:
-            server.server_close()
+            if server is not None:
+                server.server_close()
             mailbox.shutdown(); mailbox_thread.join(); mailbox.server_close(); quarantine.close()
 
 

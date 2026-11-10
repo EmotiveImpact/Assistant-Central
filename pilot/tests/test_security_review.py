@@ -207,7 +207,7 @@ class IndependentRuntimeReview(unittest.TestCase):
         return item['id'], packet
 
     def rewrap(self, original, **changes):
-        body = json.loads(self.ar.db.execute('SELECT body FROM runtime_items WHERE id=?', (original,)).fetchone()[0])
+        body = self.ar._row(original)[1]
         body.update(changes)
         return seal(self.a, self.at, self.b.public_identity(), message_id='alias-' + digest(body),
                     context=body['context'], artifact_id=body['artifact_digest'], proposal_id=digest(body),
@@ -227,7 +227,7 @@ class IndependentRuntimeReview(unittest.TestCase):
 
     def test_forged_upstream_permission_labels_are_rejected_even_when_signed(self):
         item, _ = self.sent()
-        body = json.loads(self.ar.db.execute('SELECT body FROM runtime_items WHERE id=?', (item,)).fetchone()[0])
+        body = self.ar._row(item)[1]
         for change in ({'owner_fingerprint': 'f' * 64}, {'upstream': ['unverified-third-owner']},
                        {'return_policy': 'any-recipient'}):
             rights = dict(body['source_permissions']); rights.update(change)
@@ -266,7 +266,7 @@ class IndependentRuntimeReview(unittest.TestCase):
         c.bootstrap('third-owner', 'third-assistant', 'fictional-third-password')
         ct = c.login('fictional-third-password')
         self.ar.enrol_peer(self.at, c.public_identity(), fingerprint(c.public_identity()))
-        body = json.loads(self.ar.db.execute('SELECT body FROM runtime_items WHERE id=?', (item,)).fetchone()[0])
+        body = self.ar._row(item)[1]
         payload = {'domain': 'assistant-central-pilot-runtime/1/decision', 'item_id': item,
                    'review_digest': '0' * 64, 'decision': 'accept', 'recipient': self.br.fingerprint}
         forged = seal(c, ct, self.a.public_identity(), message_id='fake-third-decision',

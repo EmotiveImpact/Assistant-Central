@@ -1,5 +1,6 @@
 """Owner transfers, exact review replay fences and responsive in-flight controls."""
 import copy
+from contextlib import contextmanager
 import hashlib
 import http.client
 import json
@@ -156,6 +157,19 @@ class OwnerTransferTests(unittest.TestCase):
             with self.assertRaises(HTTPSOutcomeUnknown): p.dispatch()
             sender.assert_not_called()
         self.assertEqual(self.a[2].exchange.outbox_status(self.message_id)['attempts'], 1)
+
+    def test_failed_final_auth_context_exit_retains_attempt_without_staging_leak(self):
+        original = self.first.exchange.files.authorised
+        @contextmanager
+        def expired_at_exit(session):
+            with original(session):
+                yield
+                raise PermissionError('Session ended at context exit')
+        with patch.object(self.first.exchange.files, 'authorised', expired_at_exit):
+            with self.assertRaises(PermissionError): self.send()
+        self.assertEqual(self.a[2].exchange.outbox_status(self.message_id)['attempts'], 1)
+        self.assertEqual(list(self.a[2].directory.glob('.https-send-*')), [])
+        self.assertIsNone(self.first.prepared)
 
     def test_worker_submission_failure_keeps_attempt_and_cleans_staging(self):
         with patch.object(self.first.worker, 'submit', side_effect=RuntimeError('worker unavailable')):
