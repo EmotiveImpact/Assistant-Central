@@ -88,6 +88,14 @@ class GuardTests(unittest.TestCase):
                 'namespaces': {key: kind + owner + key for key in ('net', 'pid', 'mnt')}}
                 for owner, uid in OWNERS.items() for kind in ('owner', 'mailbox')}
 
+    def test_environment_requires_exact_four_roles(self):
+        safe = self.environments()
+        subset = {key: value for key, value in safe.items() if key != 'mailbox-atlas'}
+        extra = {**safe, 'unexpected-atlas': safe['owner-atlas']}
+        for observed in ({}, subset, extra):
+            with self.subTest(roles=sorted(observed)), self.assertRaises(AssertionError):
+                validate_environment(observed)
+
     def test_distinct_actual_namespaces_required(self):
         safe = self.environments()
         validate_environment(safe)

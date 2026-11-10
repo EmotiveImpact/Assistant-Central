@@ -49,6 +49,8 @@ def validate_container(info, uid, network, expected_mounts):
 
 
 def validate_environment(observed):
+    expected = {kind + '-' + owner for owner in OWNERS for kind in ('owner', 'mailbox')}
+    require(set(observed) == expected, 'Expected all four owner/mailbox process observations')
     for role, info in observed.items():
         owner = role.split('-', 1)[1]
         uid = OWNERS[owner]
