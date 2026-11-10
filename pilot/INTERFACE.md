@@ -101,7 +101,7 @@ The server routes are in `pilot/server.py`:
 
 ## Verification
 
-Run `node --test pilot/web/tests/model.test.mjs`. The 24 tests cover crossed
+Run `node --test pilot/web/tests/model.test.mjs`. The 25 tests cover crossed
 commitments, sender/recipient separation, unknown actions, immutable terminal
 decisions, withheld content, parent expiry, input bounds and no unsafe markup or
 token-persistence sinks. Revoked and unknown peer state cannot appear as active
@@ -160,4 +160,11 @@ separate artifact release. It also checks that an artifact cannot retain the tas
 composer's fixture permission. A result-review screenshot is added to the two
 existing viewport screenshots. The new local Chromium attempt again failed before
 page creation with process-singleton Unix-socket `EPERM`; the new flow requires
-its own hosted CI evidence and is not covered by the earlier browser pass.
+its own hosted CI evidence and is not covered by the earlier browser pass. The
+new sequence subsequently passed on implementation `95c3ef0`. Visual inspection
+then found and corrected a stale post-release artifact subtitle; the interface
+now reflects the actual artifact state and a browser assertion checks that it
+does not describe released content as an unreleased draft. The work-loop model
+suite has 25 passing tests in total. Current hosted results and screenshots are
+tracked in [PR #8](https://github.com/EmotiveImpact/Assistant-Central/pull/8) and the
+[work-loop verification record](WORKFLOW_VERIFICATION.md).

@@ -5,7 +5,7 @@ Local verification on 10 November 2026:
 | Check | Result |
 | --- | --- |
 | `python -B -m unittest discover -s pilot/tests -v` | 195 passed: original 141 plus 17 work-loop core, 11 actual HTTP and 26 independent review tests |
-| `node --test pilot/web/tests/model.test.mjs` | 24 passed: original 16 plus 8 workflow cases |
+| `node --test pilot/web/tests/model.test.mjs` | 25 passed: original 16 plus 9 workflow cases, including truthful post-release state labels |
 | `python -B pilot/web/tests/live_contract.py` | Existing actual HTTP-to-interface contract passed |
 | `python -B pilot/web/tests/workflow_contract.py` | New actual HTTP workflow contract passed |
 | `python -B -m pilot.workflow_demo` | Two separate processes/stores completed the synthetic result and return-artifact loop |
@@ -27,9 +27,18 @@ The hosted browser extension exercises the real owner HTTP service through the
 complete sequence of separate approval, run, result review, staging and release
 clicks. Its new result-review screenshot supplements desktop and mobile captures.
 Local Chromium was attempted but failed before opening a page because Unix
-sockets are blocked (`EPERM`). Hosted browser and full legacy regression results
-must be checked on [PR #8](https://github.com/EmotiveImpact/Assistant-Central/pull/8);
-the earlier PR #7 browser pass does not validate the new interaction sequence.
+sockets are blocked (`EPERM`). The hosted browser passed the new sequence on
+implementation `95c3ef01dfadcb1c3884c987faba91101b3a7e14` in
+[run 42781429103](https://github.com/EmotiveImpact/Assistant-Central/actions/runs/42781429103).
+All three screenshots were inspected after verifying the downloaded archive's
+SHA-256, `29abfe3d9349d54b57d0cc780308881831622f6f4cf756de7e571f6da08365e2`.
+
+Visual review found that the task subtitle still called a released artifact a
+draft. The UI now displays the actual artifact state, with a model regression
+and a browser assertion after release. That correction requires its own hosted
+run. Browser/full-regression results for the current commit and screenshot artifacts
+are linked in [PR #8](https://github.com/EmotiveImpact/Assistant-Central/pull/8).
+The earlier PR #7 browser pass does not validate this interaction sequence.
 
 No model or research was run, no provider was contacted and no real people were
 enrolled. The fixed labelled output is a local fixture. Separate same-UID processes

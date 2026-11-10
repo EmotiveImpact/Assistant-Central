@@ -1,4 +1,4 @@
-import {plain,finiteDate,stateLabel,statusClass,isPending,isTerminal,isPeerActive,filteredItems,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,canPrepareWorkflow,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult} from './model.mjs';
+import {plain,finiteDate,stateLabel,statusClass,isPending,isTerminal,isPeerActive,filteredItems,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,workflowSummary,canPrepareWorkflow,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult} from './model.mjs';
 
 const $ = id => document.getElementById(id);
 let token = null, generation = 0, busy = false, currentView = 'inbox', currentFilter = 'all';
@@ -95,7 +95,7 @@ function renderItems() {
     const meta=text('div','','item-meta');meta.append(text('span',item.kind==='task'?'TASK REQUEST':'ARTIFACT','item-type'),text('span','·'),text('span',peerName(item.peer_id)));main.append(meta);
     const right=text('div','','row-right');right.append(badge(item.state),button(isTerminal(item)?'Inspect':'Review exact item','button secondary',()=>openReview(item)));
     const run=state.workflow?.runs.find(run=>run.item_id===item.id);
-    if(run){main.append(text('p',workflowStateLabel(run.state)+(run.artifact_id?' · Artifact draft retained':''),'workflow-note'));right.append(button('Inspect synthetic run','button secondary',()=>openWorkflow(item,run.run_id)));}
+    if(run){main.append(text('p',workflowSummary(run),'workflow-note'));right.append(button('Inspect synthetic run','button secondary',()=>openWorkflow(item,run.run_id)));}
     row.append(text('div',item.kind==='task'?'↗':'▤','item-icon '+item.kind),main,right);$('item-list').append(row);
   }
 }

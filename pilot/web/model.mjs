@@ -8,6 +8,12 @@ const WORKFLOW_STATES = new Set(['prepared','approved','cancelled','uncertain','
 export const FIXTURE_GRANT = Object.freeze({provider:'openai',model:'synthetic-research-v1',max_output_tokens:128});
 export function workflowEnabled(state) { return state?.workflow?.enabled===true && state.workflow.synthetic_only===true && state.workflow.live_enabled===false; }
 export function workflowStateLabel(state) { return ({prepared:'Run awaiting approval',approved:'Run approved',cancelled:'Run cancelled',uncertain:'Run outcome uncertain',completed:'Original result retained',expired:'Run approval expired'})[state]||'Run status unavailable'; }
+export function workflowSummary(run) {
+  const status=workflowStateLabel(run.state);
+  if(!run.artifact_id)return status;
+  const artifact=({draft:'Draft awaiting release',released:'Artifact released',accepted:'Artifact accepted',rejected:'Artifact rejected',cancelled:'Artifact cancelled',expired:'Artifact expired'})[run.artifact_state]||'Artifact status unavailable';
+  return `${status} · ${artifact}`;
+}
 export const labels = Object.freeze({pending:'To review', proposed:'To review', draft:'Awaiting release', prepared:'Awaiting release', received:'To review', awaiting_review:'To review', accepted:'Accepted', rejected:'Rejected', cancelled:'Cancelled', canceled:'Cancelled', withdrawn:'Withdrawn', revoked:'Revoked', expired:'Expired', uncertain:'Outcome uncertain', released:'Released', queued:'Queued', delivered:'Delivered'});
 export function plain(value, fallback='') { return typeof value === 'string' ? value : fallback; }
 export function finiteDate(value) { return typeof value === 'number' && Number.isFinite(value) ? value : null; }

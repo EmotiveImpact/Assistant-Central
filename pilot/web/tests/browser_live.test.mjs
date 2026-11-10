@@ -66,6 +66,9 @@ try{
  await outgoingArtifact.getByRole('button',{name:'Review exact item'}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
  await page.getByRole('button',{name:'Approve & release'}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});
  await outgoingArtifact.locator('.badge.released').waitFor();
+ await page.locator('[data-view=inbox]').click();
+ assert.match(await article('Browser workflow task').locator('.workflow-note').textContent(),/Artifact released/);
+ assert.doesNotMatch(await article('Browser workflow task').locator('.workflow-note').textContent(),/draft|awaiting release/i);
  await page.getByRole('button',{name:'New proposal'}).click();await page.locator('#compose-dialog').waitFor({state:'visible'});
  assert.equal(await page.locator('#workflow-permission-field').isVisible(),true);
  await page.locator('[name=synthetic_run]').check();await page.locator('#proposal-kind').selectOption('artifact');
