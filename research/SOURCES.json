@@ -1,0 +1,323 @@
+{
+  "retrieved_utc_date": "2026-11-10",
+  "repositories": [
+    {
+      "repository": "https://github.com/AgenticsWorks/AgentPeerChat",
+      "commit": "9edfadf1ba5ba4ed4268f453fefde9f9e49f11d6",
+      "snapshot_sha256": "fba92ea8dfb2929aea74f8426cd63c5f14c9dd1feed6266cf820da75fa8b2110",
+      "snapshot_bytes": 1134478,
+      "source_bytes": 3942171,
+      "tracked_files": 393,
+      "included_files": 337,
+      "omitted_files": 56,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/AgenticsWorks--AgentPeerChat"
+    },
+    {
+      "repository": "https://github.com/BrightbeamAI/chap",
+      "commit": "f7dfe946227789106c3aa31ead65e23e562aeb00",
+      "snapshot_sha256": "8f8e98e2611e3e1387aebec014e580630223428c506a252334aa0e0040308a09",
+      "snapshot_bytes": 2648848,
+      "source_bytes": 11246076,
+      "tracked_files": 842,
+      "included_files": 816,
+      "omitted_files": 26,
+      "licence_paths": [
+        "LICENSE",
+        "LICENSE-SPEC.md",
+        "packages/chap-ag2/LICENSE",
+        "packages/chap-analytics/LICENSE",
+        "packages/chap-analytics/chap_analytics/_vendor/LICENSE.vega",
+        "packages/chap-analytics/chap_analytics/_vendor/LICENSE.vega-embed",
+        "packages/chap-analytics/chap_analytics/_vendor/LICENSE.vega-lite",
+        "packages/chap-code-gate/LICENSE",
+        "packages/chap-google-adk/LICENSE",
+        "packages/chap-langgraph/LICENSE",
+        "packages/chap-llama-index/LICENSE",
+        "packages/chap-pydantic-ai/LICENSE",
+        "packages/chap-server/LICENSE",
+        "packages/coordinator-a2a/LICENSE",
+        "packages/coordinator-mcp/LICENSE",
+        "packages/coordinator-py/LICENSE",
+        "packages/coordinator/LICENSE",
+        "packages/create-chap-app/LICENSE"
+      ],
+      "directory": "sources/BrightbeamAI--chap"
+    },
+    {
+      "repository": "https://github.com/PennyroyalTea/gibberlink",
+      "commit": "693ef3e36ee61da7e2323519711c0dfab327c284",
+      "snapshot_sha256": "a4628add820986fbd059ce21242399dce93fe14869898b4bbd5c30e4e2652dc5",
+      "snapshot_bytes": 137574,
+      "source_bytes": 447187,
+      "tracked_files": 39,
+      "included_files": 35,
+      "omitted_files": 4,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/PennyroyalTea--gibberlink"
+    },
+    {
+      "repository": "https://github.com/a2aproject/A2A",
+      "commit": "9fff3e08ab33bb7674e7d98fc7c08ae8592bb4bd",
+      "snapshot_sha256": "f37d8f278fba33c5ef48836c24ab4a64a2c22865f412633fdf11280e3b2fc7cb",
+      "snapshot_bytes": 311299,
+      "source_bytes": 1041709,
+      "tracked_files": 144,
+      "included_files": 131,
+      "omitted_files": 13,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/a2aproject--A2A"
+    },
+    {
+      "repository": "https://github.com/block/buzz-app",
+      "commit": "4fb386b0be5966f5ad9e930a33d1c75b432625fb",
+      "snapshot_sha256": "17153eff6ef930b63af65603f2093cf2e86f94ba6ac539ef04ea21a4b915b004",
+      "snapshot_bytes": 10619734,
+      "source_bytes": 45950382,
+      "tracked_files": 4039,
+      "included_files": 3830,
+      "omitted_files": 209,
+      "licence_paths": [
+        "LICENSE",
+        "NOTICE.md",
+        "public/recipient-removal/LICENSE.txt"
+      ],
+      "directory": "sources/block--buzz-app"
+    },
+    {
+      "repository": "https://github.com/block/buzz",
+      "commit": "44b3c4823f0cf1f7715f85dbf5566cb64e848162",
+      "snapshot_sha256": "2a5050654d6c1668ab641737559ad4e8ddf0b2b84968ecb5b889455c4ecaedb0",
+      "snapshot_bytes": 16663593,
+      "source_bytes": 72946065,
+      "tracked_files": 6788,
+      "included_files": 6339,
+      "omitted_files": 449,
+      "licence_paths": [
+        "LICENSE",
+        "crates/buzz-push-gateway/src/app_attest/LICENSE",
+        "desktop/public/pow/LICENSE.txt",
+        "desktop/src-tauri/resources/pocket-voices/NOTICE.md",
+        "mobile/ios/BuzzPushKit/Sources/CSecp256k1/vendor/COPYING",
+        "mobile/packages/buzz_secp256k1/third_party/secp256k1/COPYING"
+      ],
+      "directory": "sources/block--buzz",
+      "snapshot_parts": [
+        {
+          "path": "source.tar.gz.part-001",
+          "bytes": 8388608,
+          "sha256": "5c564b0899ed21fa7a4a58d1a2a38e9deda0304400b384b1752ae67113ce03b0"
+        },
+        {
+          "path": "source.tar.gz.part-002",
+          "bytes": 8274985,
+          "sha256": "884f8781479c17f4f7becd79c0d24c17565270338586f482caa9afd0167f1ffa"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ggerganov/ggwave",
+      "commit": "060aec73dd7123ccac200442f75bdc7369795ffe",
+      "snapshot_sha256": "9bde9e357c5e463234b310038087f533ea5852e3172250fd582d534d71ce92ab",
+      "snapshot_bytes": 283667,
+      "source_bytes": 1160323,
+      "tracked_files": 195,
+      "included_files": 142,
+      "omitted_files": 53,
+      "licence_paths": [
+        "LICENSE",
+        "bindings/python/debian/copyright",
+        "examples/pfd/COPYING",
+        "src/reed-solomon/LICENSE"
+      ],
+      "directory": "sources/ggerganov--ggwave"
+    },
+    {
+      "repository": "https://github.com/kevinArgueta96/open-agent-bridge",
+      "commit": "c117ae93a8d3a86633fb2fd6d8f3365d44463ac8",
+      "snapshot_sha256": "0ea1b725a713cf454976077cd1aeb4abc7ffb3f03d4518bd4874b370ce6a0c4e",
+      "snapshot_bytes": 365535,
+      "source_bytes": 1336008,
+      "tracked_files": 219,
+      "included_files": 219,
+      "omitted_files": 0,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/kevinArgueta96--open-agent-bridge"
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "commit": "e5e37b5d70dbfd93c7006bd90a658c6179a95946",
+      "snapshot_sha256": "e9e40d8f6ef2d3c4df8bd180c0d63eda3f9ec16eb618b035a264e63a9b8af916",
+      "snapshot_bytes": 3870617,
+      "source_bytes": 13981092,
+      "tracked_files": 706,
+      "included_files": 705,
+      "omitted_files": 1,
+      "licence_paths": [
+        "LICENSE",
+        "libs/checkpoint-postgres/LICENSE",
+        "libs/checkpoint-sqlite/LICENSE",
+        "libs/checkpoint/LICENSE",
+        "libs/cli/LICENSE",
+        "libs/cli/js-examples/LICENSE",
+        "libs/langgraph/LICENSE",
+        "libs/prebuilt/LICENSE",
+        "libs/sdk-py/LICENSE"
+      ],
+      "directory": "sources/langchain-ai--langgraph"
+    },
+    {
+      "repository": "https://github.com/matrix-org/matrix-spec",
+      "commit": "a0bbfcd56fe9a220bf7ebb225d9289e6232413a4",
+      "snapshot_sha256": "afa872ad861d3ada340370a24c0de10854576fb3a5a5dfdd5b068df9941c9be1",
+      "snapshot_bytes": 728605,
+      "source_bytes": 3189907,
+      "tracked_files": 765,
+      "included_files": 753,
+      "omitted_files": 12,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/matrix-org--matrix-spec"
+    },
+    {
+      "repository": "https://github.com/microsoft/agent-framework",
+      "commit": "ee538ca21950b15123e506a994bab3e07f3c2926",
+      "snapshot_sha256": "40eb6cc2f84d3f41e313b341e06a1f75b77cbc4c62dfe242463343f186d5b56b",
+      "snapshot_bytes": 11102057,
+      "source_bytes": 58271064,
+      "tracked_files": 5639,
+      "included_files": 5598,
+      "omitted_files": 41,
+      "licence_paths": [
+        "LICENSE",
+        "python/LICENSE",
+        "python/packages/a2a/LICENSE",
+        "python/packages/ag-ui/LICENSE",
+        "python/packages/anthropic/LICENSE",
+        "python/packages/azure-ai-search/LICENSE",
+        "python/packages/azure-contentunderstanding/LICENSE",
+        "python/packages/azure-cosmos-memory/LICENSE",
+        "python/packages/azure-cosmos/LICENSE",
+        "python/packages/azure-documentdb/LICENSE",
+        "python/packages/bedrock/LICENSE",
+        "python/packages/chatkit/LICENSE",
+        "python/packages/claude/LICENSE",
+        "python/packages/copilotstudio/LICENSE",
+        "python/packages/core/LICENSE",
+        "python/packages/declarative/LICENSE",
+        "python/packages/devui/LICENSE",
+        "python/packages/duckdb/LICENSE",
+        "python/packages/foundry/LICENSE",
+        "python/packages/foundry_hosting/LICENSE",
+        "python/packages/foundry_local/LICENSE",
+        "python/packages/gemini/LICENSE",
+        "python/packages/github_copilot/LICENSE",
+        "python/packages/hosting-a2a/LICENSE",
+        "python/packages/hosting-mcp/LICENSE",
+        "python/packages/hosting-responses/LICENSE",
+        "python/packages/hosting-telegram/LICENSE",
+        "python/packages/hosting/LICENSE",
+        "python/packages/hyperlight/LICENSE",
+        "python/packages/lab/LICENSE",
+        "python/packages/mem0/LICENSE",
+        "python/packages/mistral/LICENSE",
+        "python/packages/mongodb/LICENSE",
+        "python/packages/monty/LICENSE",
+        "python/packages/nvidia/LICENSE",
+        "python/packages/ollama/LICENSE",
+        "python/packages/openai/LICENSE",
+        "python/packages/oracle/LICENSE",
+        "python/packages/orchestrations/LICENSE",
+        "python/packages/postgres/LICENSE",
+        "python/packages/purview/LICENSE",
+        "python/packages/qdrant/LICENSE",
+        "python/packages/redis/LICENSE",
+        "python/packages/sql-server/LICENSE",
+        "python/packages/tools/LICENSE",
+        "python/packages/typesafe/LICENSE"
+      ],
+      "directory": "sources/microsoft--agent-framework"
+    },
+    {
+      "repository": "https://github.com/munboon/open-agent-bridge",
+      "commit": "b360775cd5e4885e4af538581bb378590edde240",
+      "snapshot_sha256": "42461fd62d8664c35ae3fe45310800e651c7dbbb58f6d360a031995740575140",
+      "snapshot_bytes": 496427,
+      "source_bytes": 1707361,
+      "tracked_files": 230,
+      "included_files": 222,
+      "omitted_files": 8,
+      "licence_paths": [
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "directory": "sources/munboon--open-agent-bridge"
+    },
+    {
+      "repository": "https://github.com/openagents-org/openagents",
+      "commit": "fe61c9d8b7eb4f0c8753de75203f6f8628878617",
+      "snapshot_sha256": "64baf77be0bc4c5f757629f3ae88a58f26877ee1ea1fd2e87fafbc1239f2ef34",
+      "snapshot_bytes": 7884175,
+      "source_bytes": 31084548,
+      "tracked_files": 3673,
+      "included_files": 3494,
+      "omitted_files": 179,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/openagents-org--openagents"
+    },
+    {
+      "repository": "https://github.com/openfga/openfga",
+      "commit": "b00c87dbd5ac1ba9672119c21be8b1a0fc5ab7b5",
+      "snapshot_sha256": "8bd0e38c659b9b3c9f4bf4f59e1908f3e58751375809a484b00647e0a4a7c85a",
+      "snapshot_bytes": 1135513,
+      "source_bytes": 7161624,
+      "tracked_files": 591,
+      "included_files": 589,
+      "omitted_files": 2,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/openfga--openfga"
+    },
+    {
+      "repository": "https://github.com/xhluca/agent-talk",
+      "commit": "8a7fc4f140ef233f163c4f5816ff739dea096cdc",
+      "snapshot_sha256": "e855605e63f3f03ed0867c4b28caf6cbd331955b075e2e659b8f0550d5c68e6a",
+      "snapshot_bytes": 119775,
+      "source_bytes": 390273,
+      "tracked_files": 64,
+      "included_files": 59,
+      "omitted_files": 5,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/xhluca--agent-talk"
+    },
+    {
+      "repository": "https://github.com/xhluca/retalk",
+      "commit": "a3b99c18d5b219d3ed115494cc4cd33d2e64ee52",
+      "snapshot_sha256": "bc21a8b978f2144ba01f4ee6087a3d7c0b2686e01adb7cf9d3a32312d691d229",
+      "snapshot_bytes": 187717,
+      "source_bytes": 680655,
+      "tracked_files": 65,
+      "included_files": 53,
+      "omitted_files": 12,
+      "licence_paths": [
+        "LICENSE"
+      ],
+      "directory": "sources/xhluca--retalk"
+    }
+  ]
+}

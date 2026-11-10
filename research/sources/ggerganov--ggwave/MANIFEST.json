@@ -1,0 +1,1589 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/ggerganov/ggwave",
+  "commit": "060aec73dd7123ccac200442f75bdc7369795ffe",
+  "retrieved_utc_date": "2026-11-10",
+  "snapshot": "source.tar.gz",
+  "snapshot_sha256": "9bde9e357c5e463234b310038087f533ea5852e3172250fd582d534d71ce92ab",
+  "snapshot_bytes": 283667,
+  "source_bytes": 1160323,
+  "tracked_files": 195,
+  "included_files": 142,
+  "omitted_files": 53,
+  "licence_paths": [
+    "LICENSE",
+    "bindings/python/debian/copyright",
+    "examples/pfd/COPYING",
+    "src/reed-solomon/LICENSE"
+  ],
+  "files": [
+    {
+      "path": ".clang-format",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "645ff920361f55b4215360b1782c4919e4c107fc",
+      "bytes": 356,
+      "sha256": "1aefcb8629f8aba32270e3405c23c873da310a352b00968c59c12bbd070fa33f"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b650418df71e2fc32c9d43925f1fadfc4c48cf7d",
+      "bytes": 8374,
+      "sha256": "02d6b651da52d7a971b60102824e4df8567ce95750fc8d9dc096a064f931a2e6"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "30bcdfddefcd2b403ed278f67292712b900fc586",
+      "bytes": 110,
+      "sha256": "0895ac8dc343c0649cba4da47db919725f34c87c319d6e11eff6677cecf3e62d"
+    },
+    {
+      "path": ".gitmodules",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9b96980bfb330a246a68f4ee616cf74acb8eaa0c",
+      "bytes": 344,
+      "sha256": "0298f35d459e77936a04f5ec79c9f08a47727b54faa8dd17ebf5cd5fedc54fd5"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "118ea0035c0bbe07c76569fbb9733d29d8f53dfe",
+      "bytes": 2143,
+      "sha256": "df71458f0b5b47eaa8b4af252c7257af545f262e600a26ed22afc403df4d9c09"
+    },
+    {
+      "path": "CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "98b59fc52585e4bbfa554fc91f46ab32dbbcb15a",
+      "bytes": 6168,
+      "sha256": "db651bf4f547349a24047351756f1c1bf26b664be1cfe3df4fafffaaa9ff944e"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "db7a934edc443ee05cdea6786e5f1f800c1a6fe5",
+      "bytes": 1072,
+      "sha256": "463a87b0f9e9c23ccf82e4cae3ea50fc4653ed63fca5e3e148f6513cf03d38ae"
+    },
+    {
+      "path": "README-tmpl.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f9ea6be183aa00a7e89e47252babd4797679f4ec",
+      "bytes": 12305,
+      "sha256": "72927703f5b0a25de960a65baa74514e68bc2fe9b79c82b64e809eb51ed384e9"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "47d78aff5bb72ed550fa7c87fdc69955e9da70b3",
+      "bytes": 12293,
+      "sha256": "5b0080ec391501f58986f890074ed784cfdb9481dd73a2f9cd0da3a8bf353efc"
+    },
+    {
+      "path": "bindings/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1b1b70f2cb407432bbd6dbf9966c9c58f83bc2f9",
+      "bytes": 3052,
+      "sha256": "9edda03662249303951defbf0cdcefa9efe56728f9d196fd2958312ff83cdc9e"
+    },
+    {
+      "path": "bindings/javascript/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "17b4c53a2aa14dc3d144ace819227f8d9637c685",
+      "bytes": 12,
+      "sha256": "b1d085f7fdea67370cc989022cb1c1f9e547aa1d37d45f022648cd9321ac1714"
+    },
+    {
+      "path": "bindings/javascript/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "63832c47e2f589d3b0acbe783b62a5b911e5373a",
+      "bytes": 680,
+      "sha256": "a81a55c555ec5629b4ad65319e4e13de405283ba98f77cda173858d970908820"
+    },
+    {
+      "path": "bindings/javascript/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4a884d9db868e4fa6ef0ce128225827eaa7faaed",
+      "bytes": 962,
+      "sha256": "ebdf1a7d6ffd80c2df2acffb6137ad29a9890bad910bbd66895dad04efe33609"
+    },
+    {
+      "path": "bindings/javascript/emscripten.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fa30f66b0fd33afa47fca028c1a60e42869409f4",
+      "bytes": 7194,
+      "sha256": "8ecade6ef13a02f18b63bce157d0e178f06a77441d3769d9e79ec8e749ef5033"
+    },
+    {
+      "path": "bindings/javascript/ggwave.js",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b9ca22672b85ebe916ec7baa344bde983421751c",
+      "bytes": 148131,
+      "sha256": "d5fdb0a11b390d357d67163311c064ffd8cd90476911dcca3c689a98ea11ab6b"
+    },
+    {
+      "path": "bindings/javascript/package-tmpl.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "356a34e695fcd88594804eed5c4e8a6832b78339",
+      "bytes": 585,
+      "sha256": "6d53228692c339bdce77db7ff59db710c6c6d5ba7a98b4622dfe16838d86e233"
+    },
+    {
+      "path": "bindings/javascript/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "161b722d175dab886b82f219870993d459bdab84",
+      "bytes": 573,
+      "sha256": "3b6c324271f357de22915a11dc706a1189b13869d9244f471131332330f2583c"
+    },
+    {
+      "path": "bindings/python/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9044a0170c5583d3e850d656aa649158103121c8",
+      "bytes": 109,
+      "sha256": "415c00d4d63bc136b035098730369dc56bc3919760ade5ed7b2ebcd98e95fbc0"
+    },
+    {
+      "path": "bindings/python/MANIFEST.in",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "159fefefa2cd892187688e1fcc289fae53e4234e",
+      "bytes": 95,
+      "sha256": "c32968ee361ec0fcecdc8623a2270007668dbfc0bd812cacdf57acc82dfbb817"
+    },
+    {
+      "path": "bindings/python/Makefile",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f6d825e064b8607c59a0217ddb5bda154e90b767",
+      "bytes": 2426,
+      "sha256": "9c28d15ab67bf802aefccbfb400f142705271d8813c20ec9184ce8c975283431"
+    },
+    {
+      "path": "bindings/python/README-tmpl.rst",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "31284ee72250417e1444ad56d5255969ab4a70bf",
+      "bytes": 3731,
+      "sha256": "54641e44f0afb31a52a2c089df253b6121823ef43a0fbe0c66b49cb12c117e6b"
+    },
+    {
+      "path": "bindings/python/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fee70fe0792a482ecc2c7d73b9fe5c2465d52d83",
+      "bytes": 1900,
+      "sha256": "58952634efb256cae6be9b470d4a3ac9ebd1da10b8fff33dbd415ff3ddcacbc4"
+    },
+    {
+      "path": "bindings/python/cggwave.pxd",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9209406f7a6cf54f0e0e210694caaf62b3045288",
+      "bytes": 2517,
+      "sha256": "d29634223ce5677bc09783f64a2563ff7c66eb3ad1093a2f469598fcbf247437"
+    },
+    {
+      "path": "bindings/python/debian/changelog",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "da41037221fb09e2a1da2827515a0cafb9f3c31f",
+      "bytes": 276,
+      "sha256": "b030f1a53d88a01d9dd7e05102ce27b8f60e5ea7ff3c77f91c828df6f1a81842"
+    },
+    {
+      "path": "bindings/python/debian/control",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3cd3454013e040c270ed366ed94b585d01ee77de",
+      "bytes": 1023,
+      "sha256": "c1183d9dfc6716b2bb6393b49985fb85e1040e3b275040126ab840934922db14"
+    },
+    {
+      "path": "bindings/python/debian/copyright",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d8fb91c4cc363e32276e8614155fa70f56fd3476",
+      "bytes": 362,
+      "sha256": "bb8a3d66c1381ff2132774aef08aa902eb9a0742f35f5911ff497b1520af7e99"
+    },
+    {
+      "path": "bindings/python/debian/python3-ggwave.docs",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a1320b1b4ab22e9be9bbc9d5777c0e31aa4011d5",
+      "bytes": 11,
+      "sha256": "c99ae314441ebdbe3a6d64f138f84d98969a7f90ac94348a651b386bf5a4e076"
+    },
+    {
+      "path": "bindings/python/debian/rules",
+      "mode": "100755",
+      "type": "blob",
+      "git_blob": "d202a554c33547c0fcb5a28c93f2a51bac4d4ce4",
+      "bytes": 95,
+      "sha256": "662a402e57d97af091cab91942e84506d7a14e7caaaa5a33b53cf2a989c903a8"
+    },
+    {
+      "path": "bindings/python/debian/source/format",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "163aaf8d82b6c54f23c45f32895dbdfdcc27b047",
+      "bytes": 12,
+      "sha256": "1be7080d72e6b566df3e236ce2c55efdfbbb8fa1c972d825e5b672ff8773be1a"
+    },
+    {
+      "path": "bindings/python/debian/source/options",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fb8b37b8c14d43157066234c32af78c0df9fd063",
+      "bytes": 50,
+      "sha256": "dc043cb783ffd1c433cae290a9b6451e5e9c48f4a80c30e200e1b85163bf8d61"
+    },
+    {
+      "path": "bindings/python/ggwave.pyx",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "07fc2e89d8c267fed303203ead90a20a82093fb3",
+      "bytes": 2155,
+      "sha256": "5d1e57f4c5cf3c6df1e73a064c4ce5cd205ed5be63ea362a7a3a66bd6e122d15"
+    },
+    {
+      "path": "bindings/python/setup-tmpl.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "49e497a05e438a74e40473191c1c2780196e298c",
+      "bytes": 1840,
+      "sha256": "f2f37bbdb2a254fc288e28e6422a265ec185474172238b27bf691042a84ad8cb"
+    },
+    {
+      "path": "bindings/python/setup.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9e587f17c9b82e3c61686d0acb82c0ad3aa1a281",
+      "bytes": 1822,
+      "sha256": "cf11b54e03f9dc9f5fece9fbf693dcaaa7818802a85e1f28f6e3b6c1a44d5bea"
+    },
+    {
+      "path": "bindings/python/test.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a30635a7b586f02162378ff206086d3815611585",
+      "bytes": 281,
+      "sha256": "4bfcd4acdd8bdf3f72f680a59948c1b0998c7e3671e0fb498882c515819d33fc"
+    },
+    {
+      "path": "cmake/BuildTypes.cmake",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a9c7b6c91ec681d6f74db0619fa93798628d2dd7",
+      "bytes": 2037,
+      "sha256": "8a3d5551877098da1e51baf81f8c06b31d8a3df5604098f7de2732d524ddfe09"
+    },
+    {
+      "path": "cmake/GitVars.cmake",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1a4c24ebf6adeb1126e626f56de601621179353d",
+      "bytes": 717,
+      "sha256": "411507be4e991f2afc0007905a95bbf848176a282189d0e27d7df1d48974290d"
+    },
+    {
+      "path": "cmake/sdl2/FindSDL2.cmake",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7250e21de01ace6fe666674080f7f25473aa173b",
+      "bytes": 7476,
+      "sha256": "39c33021cc5c6fd9cf636eeffb7b20e2fc670cc2d19c9d99fd14c76e7a850816"
+    },
+    {
+      "path": "examples/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6c6e3b96e51761223c214be60dc76e822caa9f7e",
+      "bytes": 2797,
+      "sha256": "c5000c1f93480954de3a484f6858bd8f1ff8273d22d8e9b75c43494b019274a5"
+    },
+    {
+      "path": "examples/arduino-rx-web/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0b39aeadb3baefda7d113079903ba3061c7f6433",
+      "bytes": 631,
+      "sha256": "73b5aa0b928a2723c7b23107eaccf06b178fede2e71e32d61cbd71f85bb191cb"
+    },
+    {
+      "path": "examples/arduino-rx-web/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4d98b5abf013745b0ae71686cac12520f1464677",
+      "bytes": 363,
+      "sha256": "8ad4147ebf77169a30fccfe40b969ab8ece22d1440a0d53514e539a51b8e11be"
+    },
+    {
+      "path": "examples/arduino-rx-web/arduino-rx-web.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "aeb06371cb33f6cbba9a24c8ff0cc8519a42c442",
+      "bytes": 13362,
+      "sha256": "ddc7dfe338ef782173b1913ac7473d1a2154689df2529625982ed0214d234dde"
+    },
+    {
+      "path": "examples/arduino-rx-web/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f86499c045e3a7b007fa487a828b340d26e87534",
+      "bytes": 9061,
+      "sha256": "21b56d8932b0c695297b95a75fcdee08042f0858efd7d4d674890f177ae75820"
+    },
+    {
+      "path": "examples/arduino-rx/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4211c4ffb4a3c1f6f05b87cf129224a5c630347f",
+      "bytes": 63,
+      "sha256": "8c3069a3e9952946c5af9c5fd38607ba826c15b4913519827df1898c97fea843"
+    },
+    {
+      "path": "examples/arduino-rx/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "afe04bd397a180655100385276e5c4a73f6f094f",
+      "bytes": 870,
+      "sha256": "309bdbaabe1b5d5468b2b982b49204824394b6f2d94b9f0c485048934f416d67"
+    },
+    {
+      "path": "examples/arduino-rx/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2300cbf66292a6513eb137dd21f00cfc30c71c64",
+      "bytes": 1093,
+      "sha256": "87fe2092bfd470923c62c84ca181d3d4bac658a8610c9ab9d90b9811dea77a97"
+    },
+    {
+      "path": "examples/arduino-rx/arduino-rx.ino",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "506edd2b11317458323c269babb5a2bc8cfcc636",
+      "bytes": 13745,
+      "sha256": "19a00cafdd8d45f3325c423359c4b332ec2c901a9e415968972134a02c99f19e"
+    },
+    {
+      "path": "examples/arduino-tx-obsolete/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4211c4ffb4a3c1f6f05b87cf129224a5c630347f",
+      "bytes": 63,
+      "sha256": "8c3069a3e9952946c5af9c5fd38607ba826c15b4913519827df1898c97fea843"
+    },
+    {
+      "path": "examples/arduino-tx-obsolete/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "examples/arduino-tx-obsolete/arduino-tx.ino",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2e107b00c34fa2c83f630b345bc53695a3593648",
+      "bytes": 2752,
+      "sha256": "f76f6713755337f92ed74687a21e103a755799fb8bb90ee5ef996f837d7c0aa3"
+    },
+    {
+      "path": "examples/arduino-tx-obsolete/ggwave.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "01284647ea36362f0ea3259cc340752ce4f243bf",
+      "bytes": 32256,
+      "sha256": "c175c98cb281c91f3726323dcb06ae3314bf6e887507045e5111c831d41f1267"
+    },
+    {
+      "path": "examples/arduino-tx/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4211c4ffb4a3c1f6f05b87cf129224a5c630347f",
+      "bytes": 63,
+      "sha256": "8c3069a3e9952946c5af9c5fd38607ba826c15b4913519827df1898c97fea843"
+    },
+    {
+      "path": "examples/arduino-tx/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "cacf8a7f66660226d346614f2ec34dd44232fd81",
+      "bytes": 870,
+      "sha256": "304d34249fb2b6cd9ea3cc02c9c9e65d5316b04082c9174fbfe8db9ccfa7b9e0"
+    },
+    {
+      "path": "examples/arduino-tx/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ea58b8c47d01e08b980bb953887cb9d5543c8e61",
+      "bytes": 539,
+      "sha256": "3c23c60e69a7220a0d6a5b0dd941daddb586d9211466035d051da3df3cfe69ba"
+    },
+    {
+      "path": "examples/arduino-tx/arduino-tx.ino",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "533563ecd20728ad2d1872f0f77b86bac090e4bf",
+      "bytes": 5845,
+      "sha256": "a303dab6781b0f16f4e911f2774a4f0ec9498f1140c1dadbc1e0a98c9cb0ecc9"
+    },
+    {
+      "path": "examples/buttons/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "64500c4df48ae265d15b6d701967a01464136f31",
+      "bytes": 277,
+      "sha256": "34636cb4ca233d7b2f3ffe6cad8cbc4a1f98d1563a845e2a8c8b3f1c133103ea"
+    },
+    {
+      "path": "examples/buttons/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f371115d4ebb5975f61a9035e840bead05cd877f",
+      "bytes": 152,
+      "sha256": "82baf2dd798ff0f890acf7a088dad1d92e71c210cede3ba06573053514138bf2"
+    },
+    {
+      "path": "examples/buttons/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bb571bdc30c06f95071a334e1a0b57a60405f912",
+      "bytes": 9266,
+      "sha256": "f368e5fed3cfba4f1cbef48708112730130e93e03c56fa08c7de2d16a94f0171"
+    },
+    {
+      "path": "examples/dr_wav.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fd3e95b34a0fadcffcc94e01a353339975f18fb7",
+      "bytes": 241358,
+      "sha256": "6d4fcaa8dd7b2897963bb1993cf80eb5d77562388402744f5dd4f398215f154a"
+    },
+    {
+      "path": "examples/esp32-rx/.gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4211c4ffb4a3c1f6f05b87cf129224a5c630347f",
+      "bytes": 63,
+      "sha256": "8c3069a3e9952946c5af9c5fd38607ba826c15b4913519827df1898c97fea843"
+    },
+    {
+      "path": "examples/esp32-rx/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ce42909a662ed3a2cc9faa0d9a2fc005cbbeb8cf",
+      "bytes": 868,
+      "sha256": "3b22d6adbef646f9bc3b92efe7dc6e2727f061960d056ae23dbcad11ba5293bc"
+    },
+    {
+      "path": "examples/esp32-rx/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c2a5acd70acb5bb0f1a6d231e0d249a71a00c13b",
+      "bytes": 1562,
+      "sha256": "e09de54eac7e55ed13228835d13750ad80417fe8a3916133e7417f0430b3605e"
+    },
+    {
+      "path": "examples/esp32-rx/esp32-rx.ino",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "75e3d4bc98073222bdb0d241e4247faac3c78a6f",
+      "bytes": 13968,
+      "sha256": "ade232e4329748e76aa67aa5ad3ae4c763784843d888a1f1a392dffbf1298740"
+    },
+    {
+      "path": "examples/ggwave-cli/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c56ff4748bab969bd2590c2011087f05c343d2f8",
+      "bytes": 251,
+      "sha256": "e91e99a9e69cb0d841582baf756939fa198549b388c9f9bca87b06217e612c45"
+    },
+    {
+      "path": "examples/ggwave-cli/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "eb10d272f100414679721f2bd9318d5006bb8121",
+      "bytes": 129,
+      "sha256": "91f7645c42ade1b86dcc0f837c0a4ca6da520268b76da2f17f1a819e2cd5c6c6"
+    },
+    {
+      "path": "examples/ggwave-cli/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "072c56f99e349c790b90cb7d03af3853a21b46ec",
+      "bytes": 3537,
+      "sha256": "22d978b8d477c2f85a8079617c0047e059e5d19e281f74da1a7cb9f9ba12e031"
+    },
+    {
+      "path": "examples/ggwave-common-sdl2.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4f09accbbb685efea46703ab0706c25de905c3a2",
+      "bytes": 10782,
+      "sha256": "402ed217e3c1e78498b8535cd32846bcff00c3e1231f071f5e1c214bdb098f22"
+    },
+    {
+      "path": "examples/ggwave-common-sdl2.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0d3291762877e5ae1615f2bfce14f3a0093b2641",
+      "bytes": 423,
+      "sha256": "83e43e20a1cc79c85f1ce81eebcc3644720d80d7b7a13fa2b2f4931fc7aedada"
+    },
+    {
+      "path": "examples/ggwave-common.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "719fa824838ec25ffa4634bb7548871a831d6dfa",
+      "bytes": 1720,
+      "sha256": "9e3b080540ac69e6b58928df611e9ba9b9b87f84a77f4d7010311814b6a71aa4"
+    },
+    {
+      "path": "examples/ggwave-common.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dcc769be784ed2a9b39e3f46152f0b9027b78140",
+      "bytes": 472,
+      "sha256": "2fbc7994a06952276ec3e7347ab4c4b0e5068f2a461c8ce5b651327f2cdbd2b3"
+    },
+    {
+      "path": "examples/ggwave-from-file/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "347b0aac891997a3f1c6cbf5a4000893dbd814ef",
+      "bytes": 282,
+      "sha256": "0ac391dcacc840cdd22f60ea7bf13371bed78cb2e357c558d1e4de32c02a2954"
+    },
+    {
+      "path": "examples/ggwave-from-file/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fed434029d35720cb18f5b282cdc216ba5e1cb5c",
+      "bytes": 925,
+      "sha256": "9e9a5bdd82cfbfbfdc00509c52b8265235d5467865070334e2ecab210847e9e3"
+    },
+    {
+      "path": "examples/ggwave-from-file/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f85db8051cc9ca35ba68b5fe5d5dcbb5149fcfe9",
+      "bytes": 4239,
+      "sha256": "e8d1c9ce3e61e6f29f2095ec96ee85b0f8164afa0798db9692de07b43e0dff57"
+    },
+    {
+      "path": "examples/ggwave-js/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "fedb0a8c1592fb41734483f94d47b43a0997d8a5",
+      "bytes": 280,
+      "sha256": "a39fa8dcb900bafd9f7f0e27c125463f198e07f399de31dc7c92eea441c1e7c5"
+    },
+    {
+      "path": "examples/ggwave-js/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ba9a694273b3d5001536660f4d73e60528fbf9f9",
+      "bytes": 56,
+      "sha256": "6476f0e1fc2ede535c3cb30dd3bbb42efe149dc984f6139e9e40de7d1a97e661"
+    },
+    {
+      "path": "examples/ggwave-js/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f2e37ee33860c111b8ce04088e44ea7a93739c21",
+      "bytes": 7552,
+      "sha256": "5f48dcc941185b56b969644126d6beb96875ca3785818fcbc99b62b76b0801aa"
+    },
+    {
+      "path": "examples/ggwave-py/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "66492880ba93a3d0e8b7701ea7acc6d7fa9cfdff",
+      "bytes": 268,
+      "sha256": "d27b96ad8fff182c347bfb7931e959c014abbb25c9ba4e8043a7d974526c68ec"
+    },
+    {
+      "path": "examples/ggwave-py/receive.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b99a1b386639794e47a813c0b521e71e6b155c64",
+      "bytes": 614,
+      "sha256": "e288bdb0bdc609c80946f889268c21f0746e6a7646fd8aee9586e90c10b66a55"
+    },
+    {
+      "path": "examples/ggwave-py/send.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f5d872661d486c4a9853c9b8a66bd46370046da0",
+      "bytes": 417,
+      "sha256": "e61a81c29046f95b8bb0716938af8d0bcc75ec80ad7fae79690fd8110522b39f"
+    },
+    {
+      "path": "examples/ggwave-rx/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dc4998ab41da3f436b4ba7130a73f54315f57a81",
+      "bytes": 241,
+      "sha256": "a800c15fea2195dcc8c45c73a0f7aaf2739bb16233bbf895fba7aab516fbc0d0"
+    },
+    {
+      "path": "examples/ggwave-rx/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f3242e9e2538a8d57ed29fb9cb91daaaebceb950",
+      "bytes": 730,
+      "sha256": "03abfaefcd28875188c401a9fd23faa8151b04bd449ebf71976b57e588f05d66"
+    },
+    {
+      "path": "examples/ggwave-to-file/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e62f832e8d0d2b20e35fd496e0b84075a70d9195",
+      "bytes": 228,
+      "sha256": "6a1bc74b19a587f552d26ebf5dc426b55a1ccfd3fc2067e803d1be2f82b72cad"
+    },
+    {
+      "path": "examples/ggwave-to-file/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0277df1583cb9cafa091d4f01b2c17cca0529a7d",
+      "bytes": 3382,
+      "sha256": "1a8fd298b472a760fa1204270680c5b0f90a647bd9c3230cf16d3dd5835f229b"
+    },
+    {
+      "path": "examples/ggwave-to-file/ggwave-to-file-local.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b755db90ebf9a7675a63131d0d5c551d079f3284",
+      "bytes": 770,
+      "sha256": "59b28800dd67e15282833af97631418b24ed318479114d60153fea5758d335bc"
+    },
+    {
+      "path": "examples/ggwave-to-file/ggwave-to-file.php",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "505f9189d18f033afd8556bc7c34390ef706ce6d",
+      "bytes": 1541,
+      "sha256": "505e064a4ba8d4d47882147f513bc80d814a97e4e71327bdf9ceee82c70b4533"
+    },
+    {
+      "path": "examples/ggwave-to-file/ggwave-to-file.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "91993744575a1cde23e89a0b68a23da8f2148d5c",
+      "bytes": 1120,
+      "sha256": "a4307754592d9983056b26c5ed7e8cc4a51c076baf4e8fea63fe33b77fea1492"
+    },
+    {
+      "path": "examples/ggwave-to-file/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "dab45852de8198fe9e75bda5294caf77dd044c2a",
+      "bytes": 4587,
+      "sha256": "4480a944d7367689399342d0fd06cb8b15ea8bf19db1c4fd49ee3bb1da56998d"
+    },
+    {
+      "path": "examples/ggwave-wasm/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "d89ffe73d000c1fce2e2274bb05c8ece0c3193ce",
+      "bytes": 883,
+      "sha256": "6f7f10222ab0fcf00431da1c05f37e2b2e0f74ace6972e2f6e2ba2e17ceaa8cf"
+    },
+    {
+      "path": "examples/ggwave-wasm/build_timestamp-tmpl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "63cb81689a9bb72bdd9a5082ebd1336365ca7bcb",
+      "bytes": 63,
+      "sha256": "f83b1f6cdf51a7bd034a8398570d1c21dc8b88fa2f3391185963a8370c26100b"
+    },
+    {
+      "path": "examples/ggwave-wasm/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "977d6121420628d592fbcecdf56b8728a34711ff",
+      "bytes": 15494,
+      "sha256": "684686793781b9320ca8083baebf7258ed674f448d368b4b426e82d0087c6d16"
+    },
+    {
+      "path": "examples/ggwave-wasm/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "40852f5df86e9c675282aeab9569c47867431359",
+      "bytes": 410,
+      "sha256": "d2ba22e40fad443b914102eec12d62c74ce999e8ba6c5f1bbddf5df30b070aa0"
+    },
+    {
+      "path": "examples/ggwave-wasm/main.js",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ee39e5565739ce1da34b922f5a4663893704d9f1",
+      "bytes": 2037,
+      "sha256": "2b92db4b34eb4244811638cb87624786d986bf0d3157f28c09c651cda47eb483"
+    },
+    {
+      "path": "examples/ggwave-wasm/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7d02fde9764f5b6c6b6427ce44c581d2d13cbede",
+      "bytes": 6920,
+      "sha256": "3f0a847deeb2ae56392ecd2de8343729bafbb7a13ca117cc699c4d7af58a202d"
+    },
+    {
+      "path": "examples/icons_font_awesome.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ca5c112c3d246dce45db7f80c5e02f3e15c6747b",
+      "bytes": 40378,
+      "sha256": "4ba1367c06dcccd92ad965d3fc8a19a584c692a43e30ec5a1909feff8b430866"
+    },
+    {
+      "path": "examples/pfd/COPYING",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8b014d64ae1d2cb2fa8570ac329640d011d66079",
+      "bytes": 466,
+      "sha256": "d20ad7990610153b563c52681da860b8302afcf0778f75237f8815c07d05141f"
+    },
+    {
+      "path": "examples/pfd/pfd.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1071fd2782502223874a567d4910caf162e1a2b6",
+      "bytes": 51777,
+      "sha256": "3048ec0f0bca475b37bd3cec8ef4eab6a2857fcd2b815ec75eaaaa40875dc781"
+    },
+    {
+      "path": "examples/r2t2/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9f1e0b1d38c4be2e91bd46dd57ae322f7932fa05",
+      "bytes": 1524,
+      "sha256": "32ff7153d65875393edd412f5e3913a258c99317380d1a30c16f80734f0f1342"
+    },
+    {
+      "path": "examples/r2t2/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "35e2f2a4b465b0c823993872f840e2543440727c",
+      "bytes": 2898,
+      "sha256": "58a6d37b553a6565312b348d12cf6be36b8ee9c6fa779e16b84e59db3558d9ce"
+    },
+    {
+      "path": "examples/r2t2/build_timestamp-tmpl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "63cb81689a9bb72bdd9a5082ebd1336365ca7bcb",
+      "bytes": 63,
+      "sha256": "f83b1f6cdf51a7bd034a8398570d1c21dc8b88fa2f3391185963a8370c26100b"
+    },
+    {
+      "path": "examples/r2t2/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7a2064d0b134313354a975e4a82301e73a0c18f8",
+      "bytes": 8391,
+      "sha256": "ec8aba2efc806964edc8dd268c79185607d0378158729c3a5818b961720460aa"
+    },
+    {
+      "path": "examples/r2t2/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3c10a3787aaa30c05e535b00c2996c67ca76ccea",
+      "bytes": 4607,
+      "sha256": "548cdb76ab01bb8510326fca984127ba98a627812bc9bb35da77a8f72d6da856"
+    },
+    {
+      "path": "examples/r2t2/main.js",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ee39e5565739ce1da34b922f5a4663893704d9f1",
+      "bytes": 2037,
+      "sha256": "2b92db4b34eb4244811638cb87624786d986bf0d3157f28c09c651cda47eb483"
+    },
+    {
+      "path": "examples/r2t2/r2t2-rx.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8730258a702275af8d71b860fb9697843bc6ad77",
+      "bytes": 13030,
+      "sha256": "9bc919f299b8b9e538bc0297351785d3e0057fda4d297af326365bc26c850f85"
+    },
+    {
+      "path": "examples/r2t2/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6b269f7c76d10300eee3ca574f75c39f36a154fc",
+      "bytes": 6919,
+      "sha256": "8dfd0f27e74abef832130db03d0aa121f18fbbbfb9631c081a8bb63b3ba1d1ac"
+    },
+    {
+      "path": "examples/rp2040-rx/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "60b58005970318d902e4a1cb52d0ad7906ede79e",
+      "bytes": 14,
+      "sha256": "706fda7c119c2e8400b7ac878426adb8298b81f490bfe74f572727ce32503500"
+    },
+    {
+      "path": "examples/rp2040-rx/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "37aeccc3c822be50015b8add51ff7ff0e934d605",
+      "bytes": 802,
+      "sha256": "171e98e50100fcb3d806724ed354b8f4e801d194c877e58a8c607d29fa29eb4b"
+    },
+    {
+      "path": "examples/rp2040-rx/mic-analog.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9c5c331026892ebf718be5b5aa0a536c0e599432",
+      "bytes": 5948,
+      "sha256": "23af06122165fdbdce7a8e9b1c225b2f743dbf8e269f382a2d7b655e87d482f6"
+    },
+    {
+      "path": "examples/rp2040-rx/mic-analog.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "93f3461b4a8f34d58fffa56ae0c784b89be9810f",
+      "bytes": 768,
+      "sha256": "11679f4c48fd3b93b5395882b72f4ea0130bba7b9b24583dd1556bb5067dc7bb"
+    },
+    {
+      "path": "examples/rp2040-rx/rp2040-rx.ino",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7c2b42170aaf5db642c3fc5e51dfa86230f513c8",
+      "bytes": 8200,
+      "sha256": "7a8d7d56695cc3e62b19178351d61b3fb5a6458d421faa165dbd0367fcc1f02f"
+    },
+    {
+      "path": "examples/spectrogram/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "952e187649d0e62b848cd70073d509e4da0de1f8",
+      "bytes": 1309,
+      "sha256": "8b606aefcde423b142ac5c478a34d9ea01ccef017d12bc31c3ea6c40c1c78b89"
+    },
+    {
+      "path": "examples/spectrogram/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ebec5c7d2bcfc51069c7eecd7dfadd77655ac07f",
+      "bytes": 209,
+      "sha256": "8a84d99cd9214ded3a74bf72706887fd184d012a4fa2f59f4cee7d2784988a42"
+    },
+    {
+      "path": "examples/spectrogram/build_timestamp-tmpl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "63cb81689a9bb72bdd9a5082ebd1336365ca7bcb",
+      "bytes": 63,
+      "sha256": "f83b1f6cdf51a7bd034a8398570d1c21dc8b88fa2f3391185963a8370c26100b"
+    },
+    {
+      "path": "examples/spectrogram/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f3bc390155afeae8110d02b294e0c4bb96a1b163",
+      "bytes": 10806,
+      "sha256": "5eb8de2fb9669912283b3733322ec56a20afe672f7d350aa21c13d90435b2de2"
+    },
+    {
+      "path": "examples/spectrogram/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7b55073bc8829631d95d345c30350bd66105dc04",
+      "bytes": 22227,
+      "sha256": "1d04bee8e09cc945002a2ed352ff6cb8c7f94742914558fe9b0631dbf6c46221"
+    },
+    {
+      "path": "examples/spectrogram/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8708ff59ec5097922da2b08b7beec48f747e6092",
+      "bytes": 7932,
+      "sha256": "9a2b33212bf735c62c97bf9e9e86e99ae2d68957f628423147b0602894330b65"
+    },
+    {
+      "path": "examples/waver/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "226de486099fb7875b4395a3aaef9c41dc36af01",
+      "bytes": 1796,
+      "sha256": "f08303066727cee2e0b777346d33427a11330a0e5eccd3c0c6cc42908a95ea0f"
+    },
+    {
+      "path": "examples/waver/README.md",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4a32e800db3b4aacf3ddb49a47ab8b8551ff7260",
+      "bytes": 3630,
+      "sha256": "8b268ac03228880923ae82ca2d8fc01312ede8849d7085d0b4c8858af913dd9d"
+    },
+    {
+      "path": "examples/waver/build_timestamp-tmpl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "63cb81689a9bb72bdd9a5082ebd1336365ca7bcb",
+      "bytes": 63,
+      "sha256": "f83b1f6cdf51a7bd034a8398570d1c21dc8b88fa2f3391185963a8370c26100b"
+    },
+    {
+      "path": "examples/waver/common.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ac728c9120894c6b76b5fc572e6b2c47d0bfe4a5",
+      "bytes": 87465,
+      "sha256": "8ee38e470ace2f4258727b40522d0db540ab1614238a3d8404fbe80291adc314"
+    },
+    {
+      "path": "examples/waver/common.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f87d5386d751f404c44158c2189aa14d4281cf95",
+      "bytes": 1270,
+      "sha256": "b5cd0defd5c66cf41c2513cc69bd7b5ba104f5e98db6c5de47c2e0e1d712dc39"
+    },
+    {
+      "path": "examples/waver/index-tmpl.html",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5c76c417a4c5fa2143a1a361638469ab7148571c",
+      "bytes": 10782,
+      "sha256": "babd3e422a28064e62f8d5eeea3ae1ec2f055ef23ccb8b6f61ebbe24723b3644"
+    },
+    {
+      "path": "examples/waver/interface-emscripten.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5d367aa301736bed0e8621507caefb62cdd63284",
+      "bytes": 679,
+      "sha256": "de0c5355a818467ee8e148daf5073340f7008971969a6d3a3da28e2a4a448550"
+    },
+    {
+      "path": "examples/waver/interface-unix.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2036661ea224d702b8820c9384ef8f106530d1ae",
+      "bytes": 1189,
+      "sha256": "a55e1321dd2c7f8562fe8f50e6b5e894b2c5945726adfe10d6bb9279c25f5388"
+    },
+    {
+      "path": "examples/waver/interface.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e8b3cbc1a02896636259a9f545e3710bf638aacf",
+      "bytes": 2033,
+      "sha256": "dff209265aae51141ebe1339400fc6e1b8a7e7fcf84a39e96d21b0ac4c58d867"
+    },
+    {
+      "path": "examples/waver/interface.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5e6d520ff11ef1d6d76f5b1b67e287ae3c1581c4",
+      "bytes": 900,
+      "sha256": "53b67c1c01ae08c2d7d61f750a833ec57c11a4ceb7a38ccb9768aaacb16751ac"
+    },
+    {
+      "path": "examples/waver/main.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7139f47c62949d8ddae540e101d2a04e6cd4252a",
+      "bytes": 11780,
+      "sha256": "04a28461d28a4487713731daf5d8776744d220112d8de569cfd9254ef561cc8e"
+    },
+    {
+      "path": "examples/waver/style.css",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a7c17b1bff995d268690c205ebe25459cb3eeab3",
+      "bytes": 7979,
+      "sha256": "3a5557d2136972f6417b88701e7a47e951fa421d62df34899fd7e669c78ed2e3"
+    },
+    {
+      "path": "include/ggwave/ggwave.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "203c29338ff67dd3c642b01b8407b3226a2aff75",
+      "bytes": 35733,
+      "sha256": "ed03a28e7299a2d686bf28d747b177a1ead059e0563e11807ee6e96fa9e3dda0"
+    },
+    {
+      "path": "media/favicons-waver/browserconfig.xml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "c5541482230075d4b4800ebbb7ac42fad29e5133",
+      "bytes": 281,
+      "sha256": "13bc647273455808acd0f6605124ab3a78bbae67b532f8b993dc0f8ce2a03d0d"
+    },
+    {
+      "path": "media/favicons-waver/manifest.json",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "013d4a6a53334fae827a32824eaf51a889396514",
+      "bytes": 720,
+      "sha256": "27eca3e8297eb7ff340deb3849b210185a459b3845456aa4d0036f6d966b3518"
+    },
+    {
+      "path": "snap/snapcraft.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9dcf351b5fcc345c3c3c003197706edd894dda9e",
+      "bytes": 3134,
+      "sha256": "0f9815ba589f910b9b734076ad97b8d6651f8820573ac4b3ae578f52bd27f2e2"
+    },
+    {
+      "path": "src/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0e9031d6f1df0e71c81dadeaf023b1184f1e8051",
+      "bytes": 585,
+      "sha256": "66c2b58fe368f57203e1ebef00858de09a3d527a675f78d872cb5ded01c1909a"
+    },
+    {
+      "path": "src/fft.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6599d7d8c79bda3c9e49d3617a62d5f8da118fcf",
+      "bytes": 20871,
+      "sha256": "1ec89c52f15a9bb25badbb6dde4612d5aedb445d946a7f571c4363523903de55"
+    },
+    {
+      "path": "src/ggwave.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "eb918c4172703ac08adcfdfca1d425778d1c2b4d",
+      "bytes": 71470,
+      "sha256": "97404255fe603511e7123efa1bf41b25fd7bdc80e837ac4742a3170fab287a0f"
+    },
+    {
+      "path": "src/reed-solomon/LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "aaffd33cde56f45560a2058eb81636477701c423",
+      "bytes": 1101,
+      "sha256": "5bf6ddd498c8be8f49960f331c883449ce7bbd8a40bb9c969fc6e0c441cc731b"
+    },
+    {
+      "path": "src/reed-solomon/gf.hpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "68a3b4f6758304ed9c6d026df426107eb7f244f5",
+      "bytes": 10141,
+      "sha256": "4b0f806c4bda5dfee0a01343b664e83d2064a198c1c7cc69b3ae36d8dfba3055"
+    },
+    {
+      "path": "src/reed-solomon/poly.hpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9e1b65fdf5fe189f1b9925d0d4639b8a9af492b0",
+      "bytes": 2371,
+      "sha256": "9c8fa3b3099144009002a8543a11d756e26d633ac005f1e07ce0e5eff900f020"
+    },
+    {
+      "path": "src/reed-solomon/rs.hpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8753f5e6b82ae3dfcd8294651850bd7be1f190c0",
+      "bytes": 18005,
+      "sha256": "b1e42030ed26981c2074152a839d2fa3006af97925f687052e8497e02497c2b7"
+    },
+    {
+      "path": "tests/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "16319963f369f4913f501b8a48e8e98d86ce68e5",
+      "bytes": 1078,
+      "sha256": "69bcf300110b5219389b623fb92902a0649c62dab28a20cd42648ffc0bab3e19"
+    },
+    {
+      "path": "tests/test-ggwave.c",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "8810e0aba863bf619a01b1681bfc4a45c43a099a",
+      "bytes": 2253,
+      "sha256": "bf55f10a9f4cdaf48845ec3d572ea8c45dd7f444ed3fb1a00db5c190fbad53f7"
+    },
+    {
+      "path": "tests/test-ggwave.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ead5b6b5e8cfb1dcf912871a7373c24c96f1ddd3",
+      "bytes": 15427,
+      "sha256": "c8647b246ba3af629a31709c9ec9d46829d986dbaf6f0e6511fc3a3ce1c5a2f4"
+    },
+    {
+      "path": "tests/test-ggwave.js",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1f439ba9d0f6106c9478fcc5cca5c54b484b01fd",
+      "bytes": 738,
+      "sha256": "51032f12e3be5a670c3261f86f896342299a2d7b6c58594da59fcb56d2d7c11a"
+    },
+    {
+      "path": "tests/test-ggwave.py",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b5a8bdfe59003bd127514d5b59077b87b9d70e57",
+      "bytes": 952,
+      "sha256": "585ef34094ebaa0f777e1d4dcf2fefc476b52bbaf9de637b9d99389f591f8e57"
+    }
+  ],
+  "omissions": [
+    {
+      "path": "bindings/ios",
+      "mode": "160000",
+      "type": "commit",
+      "git_blob": "03b109f78551b4cd0db1145812a7d962d7eceba0",
+      "bytes": null,
+      "reason": "gitlink; submodule contents not fetched"
+    },
+    {
+      "path": "examples/arduino-rx/fritzing-sketch.fzz",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "58389b5b9055d0632b3ab6e6e660bfb4d4e022f8",
+      "bytes": 106461,
+      "reason": "binary file detected by NUL bytes"
+    },
+    {
+      "path": "examples/arduino-rx/fritzing-sketch_bb.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "67eb5e2c9d53575d4b8641d2a13681a4c183af00",
+      "bytes": 367667,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/arduino-tx/fritzing-sketch.fzz",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "271977b9a470ed48c86e2be49124c896946bbc4a",
+      "bytes": 116440,
+      "reason": "binary file detected by NUL bytes"
+    },
+    {
+      "path": "examples/arduino-tx/fritzing-sketch_bb.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b1966bcbac1d69d1dd70b5be37945d42b04021e9",
+      "bytes": 409920,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/assets/fonts/DroidSans.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "767c63ad000e3eea20f3cb7a43ba9f4154ed7a5d",
+      "bytes": 190044,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/assets/fonts/fontawesome-webfont.ttf",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "35acda2fa1196aad98c2adf4378a7611dd713aa3",
+      "bytes": 165548,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/esp32-rx/fritzing-sketch.fzz",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "81ee74415aec3c73ec90ce4093f63045f69570a0",
+      "bytes": 184850,
+      "reason": "binary file detected by NUL bytes"
+    },
+    {
+      "path": "examples/esp32-rx/fritzing-sketch_bb.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6606dce3481043250fe5ac539b304673b944c5aa",
+      "bytes": 677383,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/ggwave-wasm/plucky.mp3",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "367a0e90b38a5969c5fcd6f1421fa432fc3f09a0",
+      "bytes": 28003,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/r2t2/plucky.mp3",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "367a0e90b38a5969c5fcd6f1421fa432fc3f09a0",
+      "bytes": 28003,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/rp2040-rx/fritzing-sketch.fzz",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7da072194aa7cfc00a76e38646d968f4dc96fdfd",
+      "bytes": 608756,
+      "reason": "binary file detected by NUL bytes"
+    },
+    {
+      "path": "examples/rp2040-rx/fritzing-sketch_bb.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2931282a9390ea4d2bbb1ce540c98d92149eda01",
+      "bytes": 248215,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "examples/third-party/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "daee6c9e8439053726ab62e789bf86ccc876aa5d",
+      "bytes": 78,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/ggsock",
+      "mode": "160000",
+      "type": "commit",
+      "git_blob": "2b278837bb58306038f6382914c9b0986b501b09",
+      "bytes": null,
+      "reason": "gitlink; submodule contents not fetched"
+    },
+    {
+      "path": "examples/third-party/imgui/CMakeLists.txt",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "5dced7d5f7e067e4627ec44ae884033541c79765",
+      "bytes": 3307,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui",
+      "mode": "160000",
+      "type": "commit",
+      "git_blob": "9801c8c1c5f8757e8eed43592beb0a5e215c4291",
+      "bytes": null,
+      "reason": "gitlink; submodule contents not fetched"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9c3a196e637fc2fb1487d9eaa0fa76ba408eecc3",
+      "bytes": 4299,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "9abe3cd9be11ff9fad2354d8d7f3ab628ff3c121",
+      "bytes": 841,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl_opengl3.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3eca476471a60532b708360afdefd9ad7209071f",
+      "bytes": 33390,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl_opengl3.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "4f28defb96207cc350e8dcdd95668cf9864fb18e",
+      "bytes": 3629,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl_sdl.cpp",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e5ed575ba2535367f12cc27242eb1a43dbc72f20",
+      "bytes": 19424,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/third-party/imgui/imgui-extra/imgui_impl_sdl.h",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2deb112e7f1dacc9e319bb4a9434d1aedc5e2f26",
+      "bytes": 1832,
+      "reason": "generated build/cache or vendored dependency directory"
+    },
+    {
+      "path": "examples/waver/background-0.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "df85c076721894a3484b8feedce7560b3a818aad",
+      "bytes": 365831,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-144x144.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ecaed0f345fa3ff10f32da8af75b07a577e4c178",
+      "bytes": 4643,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-192x192.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "7dfc181fe85d0028288f1a27de3af400d2b5e76a",
+      "bytes": 4849,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-36x36.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b6b7aceddaa9464fdb4226513acd302e80a66578",
+      "bytes": 1323,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-48x48.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ebb54e2d035fc35de9514c839a8298e7c9f73be7",
+      "bytes": 1566,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-72x72.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bb985b35dc86e607b1ea77e1b71df6ab2b2d0c2f",
+      "bytes": 1928,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/android-icon-96x96.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bda54e7dcd74fc51c954ee474c08f4b5113d6bf4",
+      "bytes": 2338,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-114x114.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "69ed29d060d861d4648d266fc11f44fb062f4faa",
+      "bytes": 2546,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-120x120.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "128a1a96c90437a443695328c331a874feaebc7d",
+      "bytes": 3861,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-144x144.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ecaed0f345fa3ff10f32da8af75b07a577e4c178",
+      "bytes": 4643,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-152x152.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "1b24cea4090046e4a9daa14936df77e809421992",
+      "bytes": 4900,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-180x180.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "b1e2ca38b95a47e4f779c90ec9719c30bed9d103",
+      "bytes": 5892,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-57x57.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "6698f255ad0f7f43d5ce44f4f7dcde4629188b27",
+      "bytes": 1657,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-60x60.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "0f654a035f4f1b9e50e4323f89a73f0949364866",
+      "bytes": 1726,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-72x72.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bb985b35dc86e607b1ea77e1b71df6ab2b2d0c2f",
+      "bytes": 1928,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-76x76.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e854420493832af66a37d135c3ddb15f4fcd27cb",
+      "bytes": 1962,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon-precomposed.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "830e08b8d77fd4dd2c1cd59a0829194b292b9e50",
+      "bytes": 5425,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/apple-icon.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "830e08b8d77fd4dd2c1cd59a0829194b292b9e50",
+      "bytes": 5425,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/favicon-16x16.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3afca457cc4da7dfea86efe0e0b48d7127f241dc",
+      "bytes": 937,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/favicon-32x32.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "2f4c8bcd0fc47639954fd3d8e958c1fd78c13efc",
+      "bytes": 1222,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/favicon-96x96.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "bda54e7dcd74fc51c954ee474c08f4b5113d6bf4",
+      "bytes": 2338,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/favicon.ico",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "42331684a7a9a73c032183a4f9edf4a79b9641ee",
+      "bytes": 1150,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/ms-icon-144x144.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "ecaed0f345fa3ff10f32da8af75b07a577e4c178",
+      "bytes": 4643,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/ms-icon-150x150.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "f7141d76145d1f2b1eeb8f20bc81c54dc7306c4a",
+      "bytes": 4839,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/ms-icon-310x310.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a2bbe635bf39e44082651a249d77274daebcba69",
+      "bytes": 12620,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/favicons-waver/ms-icon-70x70.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "e020e01abb42bd8026de994c8b49b0e1130e6d6d",
+      "bytes": 1886,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/ggwave0.gif",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "196303d0baa46e756c63ea1990f5f0c21ab30fe5",
+      "bytes": 3843782,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/waver-0-fast.gif",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "a150a045084148925496ad07009f2e6bc21e3db5",
+      "bytes": 2889782,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/waver-preview0.png",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "06d041f5f9403d29b4361c1a94ebf2d10da0d99b",
+      "bytes": 1773003,
+      "reason": "binary/media/generated asset or terminal recording"
+    },
+    {
+      "path": "media/waver-preview1.gif",
+      "mode": "100644",
+      "type": "blob",
+      "git_blob": "3dcade29587cfebdd3940f844f18926666563018",
+      "bytes": 7764618,
+      "reason": "binary/media/generated asset or terminal recording"
+    }
+  ],
+  "notes": [
+    "Revision-pinned source snapshot, not a complete repository clone or a runnable distribution.",
+    "Upstream files are byte-identical; archive paths have a source/ prefix and modes normalised to 0644.",
+    "No .git history, recursive submodules, dependency installation or upstream code execution.",
+    "All omission reasons and original Git blob IDs are recorded. Credential scan is heuristic, not a security audit."
+  ]
+}

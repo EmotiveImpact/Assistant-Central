@@ -29,7 +29,13 @@ export function validateHistoryReview(value,room,principal,recipient,ids){
 }
 function node(tag,text='',className=''){const e=document.createElement(tag);e.textContent=String(text);e.className=className;return e;}
 function btn(label,action,kind='secondary'){const b=node('button',label,'button '+kind);b.type='button';b.addEventListener('click',action);return b;}
-function field(label,input){const e=node('label',label);e.append(input);return e;}
+function field(label,input){
+  const e=node('label',label);
+  // A wrapping select label also contains its option text. Keep its accessible
+  // name equal to the visible field label, independent of recipients/options.
+  if(input.tagName.toLowerCase()==='select')input.setAttribute('aria-label',label);
+  e.append(input);return e;
+}
 function select(options){const s=node('select');for(const [value,label] of options){const o=node('option',label);o.value=value;s.append(o);}return s;}
 
 // Passive refresh may keep only an unsent draft for this exact audience.

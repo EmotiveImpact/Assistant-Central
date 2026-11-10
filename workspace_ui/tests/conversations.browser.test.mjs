@@ -14,7 +14,7 @@ async function nav(p){if(await p.locator('#menu-toggle').isVisible())await p.loc
 async function open(p){await p.getByRole('button',{name:/^(Conversation|Group) · thread_1$/}).click();await p.getByLabel('Message to the members shown above').waitFor();}
 async function refresh(p){await p.bringToFront();await p.locator('#refresh').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();await open(p);}
 async function selectOld(p){const article=p.locator('.conversation-history article').filter({hasText:'Only Alice and Bob saw this earlier plan.'});await article.getByRole('checkbox').check();}
-async function review(p){await selectOld(p);await p.getByLabel('Exact recipient',{exact:true}).selectOption({label:'carol · carol_assistant'});await p.getByLabel('Purpose',{exact:true}).fill('Give Carol this exact earlier plan');await p.getByRole('button',{name:'Review exact history share',exact:true}).click();await p.locator('#conversation-dialog').waitFor({state:'visible'});}
+async function review(p){await selectOld(p);const recipient=p.getByLabel('Exact recipient',{exact:true});await recipient.waitFor();assert.equal(await p.getByRole('combobox',{name:'Exact recipient',exact:true}).count(),1);await recipient.selectOption({label:'carol · carol_assistant'});await p.getByLabel('Purpose',{exact:true}).fill('Give Carol this exact earlier plan');await p.getByRole('button',{name:'Review exact history share',exact:true}).click();await p.locator('#conversation-dialog').waitFor({state:'visible'});}
 async function approve(p){await p.locator('#history-confirm').check();await p.getByRole('button',{name:'Approve exact history share',exact:true}).click();}
 try{
   for(const name of ['alice','bob','carol']){
