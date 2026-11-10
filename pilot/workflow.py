@@ -81,7 +81,7 @@ class SyntheticWorkLoop:
             raise WorkflowDenied('No retained synthetic workflow exists')
         try:
             row = self.adapter._get(run_id, self.adapter._identity(session))
-        except ProviderDenied:
+        except (ProviderDenied, PermissionError):
             raise WorkflowDenied('Unknown or unavailable local workflow') from None
         binding = json.loads(row['binding'])
         if (run_id != 'work-' + binding['item_id']
@@ -93,6 +93,7 @@ class SyntheticWorkLoop:
     def _mapping(self, run_id):
         row = self.runtime.db.execute('SELECT * FROM pilot_workflow_artifacts WHERE run_id=?', (run_id,)).fetchone()
         if row:
+            row = self.runtime.storage.row('pilot_workflow_artifacts', row)
             review = json.loads(row['review'])
             if (digest(review) != row['review_digest'] or review.get('run_id') != run_id
                     or review.get('artifact_id') != row['artifact_id']
@@ -106,7 +107,7 @@ class SyntheticWorkLoop:
     def _current_request(self, session, row):
         try:
             request = self.adapter._request(session, json.loads(row['binding']), self.adapter._identity(session))
-        except ProviderDenied:
+        except (ProviderDenied, PermissionError):
             raise WorkflowDenied('Current exact task and source authority required') from None
         if canonical(request).decode() != row['request']:
             raise WorkflowDenied('Original provider request changed')
@@ -261,7 +262,7 @@ class SyntheticWorkLoop:
             if staged['state'] != 'draft' or staged['id'] != review['artifact_id']:
                 raise WorkflowDenied('Original result must stage one exact unreleased draft')
             self.runtime.db.execute('INSERT INTO pilot_workflow_artifacts VALUES(?,?,?,?)',
-                (run_id, staged['id'], review_digest, canonical(review).decode()))
+                (run_id, staged['id'], review_digest, self.runtime.storage.seal('pilot_workflow_artifacts', run_id, 'review', canonical(review).decode())))
             self.runtime._event('workflow_result_staged', row['item_id'], run_id=run_id,
                                 result_digest=row['result_digest'], artifact_id=staged['id'],
                                 review_digest=review_digest)

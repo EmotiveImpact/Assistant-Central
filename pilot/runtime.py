@@ -15,6 +15,7 @@ import stat
 import threading
 import time
 
+from .storage import RecordStorage, StoreLease
 from .crypto import canonical, digest, fingerprint, packet_header, seal, token, TransportDenied
 from .transport import PeerExchange
 
@@ -78,12 +79,18 @@ class PilotRuntime:
         info = path.lstat()
         need(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode) & 0o077 == 0
              and info.st_uid == os.getuid(), 'Runtime store must be private and locally owned')
-        self.db = sqlite3.connect(path, timeout=5, isolation_level=None)
-        self.db.row_factory = sqlite3.Row
-        self.db.execute('PRAGMA foreign_keys=ON')
-        self.db.execute('PRAGMA synchronous=FULL')
-        self._lock = threading.RLock()
+        self._storage_lease = StoreLease(self.directory)
         try:
+            self.db = sqlite3.connect(path, timeout=5, isolation_level=None)
+        except BaseException:
+            self._storage_lease.close()
+            raise
+        try:
+            self.db.row_factory = sqlite3.Row
+            self.db.execute('PRAGMA foreign_keys=ON')
+            self.db.execute('PRAGMA synchronous=FULL')
+            self._lock = threading.RLock()
+            self.storage = RecordStorage(self.db, self.auth, create=True)
             self.exchange = PeerExchange(self.db, self.identity, clock=clock)
             self.db.executescript('''
                 CREATE TABLE IF NOT EXISTS runtime_meta(id INTEGER PRIMARY KEY CHECK(id=1),version TEXT NOT NULL,identity TEXT NOT NULL);
@@ -112,11 +119,17 @@ class PilotRuntime:
                 self.db.execute('INSERT INTO runtime_meta VALUES(1,?,?)', (VERSION, canonical(self.identity).decode()))
             self.db.execute('COMMIT')
         except BaseException:
-            self.db.close()
+            try:
+                self.db.close()
+            finally:
+                self._storage_lease.close()
             raise
 
     def close(self):
+        # Failed close (for example on the wrong thread) leaves a live SQLite
+        # connection. Keep its shared lease so migration remains excluded.
         self.db.close()
+        self._storage_lease.close()
 
     def _now(self):
         now = self.clock()
@@ -147,13 +160,16 @@ class PilotRuntime:
     def _event(self, event, item_id=None, **data):
         need(self.db.execute('SELECT COUNT(*) FROM runtime_audit').fetchone()[0] < MAX_HISTORY,
              'Runtime audit capacity reached; no history eviction')
-        self.db.execute('INSERT INTO runtime_audit(event,item_id,data) VALUES(?,?,?)',
-                        (event, item_id, canonical(data).decode()))
+        cursor = self.db.execute('INSERT INTO runtime_audit(event,item_id,data) VALUES(?,?,?)',
+                                 (event, item_id, ''))
+        self.db.execute('UPDATE runtime_audit SET data=? WHERE sequence=?',
+            (self.storage.seal('runtime_audit', cursor.lastrowid, 'data', canonical(data).decode()), cursor.lastrowid))
 
     def _row(self, item_id):
         hash_id(item_id)
         row = self.db.execute('SELECT * FROM runtime_items WHERE id=?', (item_id,)).fetchone()
         need(row is not None, 'Unknown local item')
+        row = self.storage.row('runtime_items', row)
         body = json.loads(row['body'])
         need(digest(body) == row['id'], 'Retained item integrity mismatch')
         return row, body
@@ -270,14 +286,14 @@ class PilotRuntime:
         if old:
             return self._status(old)
         # Do not mint aliases for the same logical task/return in this context.
-        for candidate in self.db.execute("SELECT body FROM runtime_items WHERE direction='outgoing'"):
-            prior = json.loads(candidate['body'])
+        for candidate in self.db.execute("SELECT id,body FROM runtime_items WHERE direction='outgoing'"):
+            prior = json.loads(self.storage.row('runtime_items', candidate)['body'])
             need((prior['kind'],prior['context'],prior['task_id'],prior['parent_id'],fingerprint(prior['recipient'])) !=
                  (kind,context,task_id,parent_id,peer_id), 'Original task/artifact route is immutable; aliases cannot renew it')
         need(self.db.execute('SELECT COUNT(*) FROM runtime_items').fetchone()[0] < MAX_ITEMS,
              'Runtime item capacity reached')
         self.db.execute("INSERT INTO runtime_items(id,direction,peer_id,body,kind,created_at,expires,state) VALUES(?,'outgoing',?,?,?,?,?,'draft')",
-                        (item_id, peer_id, canonical(body).decode(), kind, now, expires))
+                        (item_id, peer_id, self.storage.seal('runtime_items', item_id, 'body', canonical(body).decode()), kind, now, expires))
         self._event('proposal_created', item_id, peer=peer_id, kind=kind)
         return self._status(self._row(item_id)[0])
 
@@ -408,11 +424,11 @@ class PilotRuntime:
         existing = self.db.execute('SELECT * FROM runtime_items WHERE id=?', (item_id,)).fetchone()
         if existing:
             need(existing['direction'] == 'incoming' and existing['peer_id'] == header['sender']
-                 and existing['body'] == canonical(body).decode(), 'Received proposal conflicts with retained item')
+                 and self.storage.row('runtime_items', existing)['body'] == canonical(body).decode(), 'Received proposal conflicts with retained item')
             return item_id
         route = {key:body[key] for key in ('kind','task_id','parent_id')}
-        for candidate in self.db.execute("SELECT body FROM runtime_items WHERE direction='incoming' AND peer_id=?", (header['sender'],)):
-            prior = json.loads(candidate['body'])
+        for candidate in self.db.execute("SELECT id,body FROM runtime_items WHERE direction='incoming' AND peer_id=?", (header['sender'],)):
+            prior = json.loads(self.storage.row('runtime_items', candidate)['body'])
             need((prior['context'],prior['kind'],prior['task_id'],prior['parent_id']) !=
                  (body['context'],body['kind'],body['task_id'],body['parent_id']),
                  'Received logical route already has its immutable original proposal')
@@ -423,7 +439,7 @@ class PilotRuntime:
             need(cancelled['item_id'] == item_id and cancelled['artifact_digest']==body['artifact_digest'],
                  'Cancellation cannot be bypassed by a new proposal alias')
         self.db.execute("INSERT INTO runtime_items(id,direction,peer_id,body,kind,created_at,expires,state,cancelled,message_id,peer_cancelled) VALUES(?,'incoming',?,?,?,?,?,'pending',?,?,?)",
-                        (item_id,header['sender'],canonical(body).decode(),body['kind'],body['created_at'],body['expires'],
+                        (item_id,header['sender'],self.storage.seal('runtime_items', item_id, 'body', canonical(body).decode()),body['kind'],body['created_at'],body['expires'],
                          int(bool(cancelled)),header['message_id'],int(bool(cancelled))))
         self._event('proposal_received', item_id, peer=header['sender'], cancelled=bool(cancelled))
         return item_id
@@ -519,6 +535,7 @@ class PilotRuntime:
                     'owner_acceptance': row['state'] if row and row['state'] in ('accepted','rejected') else 'not_established'}
 
     def _status(self, row):
+        row = self.storage.row('runtime_items', row)
         body = json.loads(row['body'])
         active = not row['cancelled'] and row['expires'] > self._now()
         return {'id':row['id'],'direction':row['direction'],'kind':row['kind'],
@@ -544,7 +561,7 @@ class PilotRuntime:
             return {'identity':{**self.identity,'fingerprint':self.fingerprint},'peers':peers,
                     'items':[self._status(row) for row in self.db.execute('SELECT * FROM runtime_items ORDER BY created_at,id')],
                     'history':[{'sequence':row['sequence'],'event':row['event'],'item_id':row['item_id'],
-                                'data':json.loads(row['data'])} for row in self.db.execute('SELECT * FROM runtime_audit ORDER BY sequence')],
+                                'data':json.loads(self.storage.row('runtime_audit', row)['data'])} for row in self.db.execute('SELECT * FROM runtime_audit ORDER BY sequence')],
                     'outbox':self.exchange.pending(),'session_ready':True,'synthetic_only':True}
 
     def authorise_provider(self, session, binding):
