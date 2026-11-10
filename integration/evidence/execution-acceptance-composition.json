@@ -1,0 +1,24 @@
+{
+  "simulation": true,
+  "external_calls": 0,
+  "execution_state": "published",
+  "proposal_state": "pending",
+  "recipient_acceptance": {
+    "offer_id": "a1c6c9055b07ecf107b368c418b36ff95ae0eec107f64db453ebf59825c45ffe",
+    "release_state": "released",
+    "recipient_state": "accepted",
+    "outcome": "accepted",
+    "delivery_digest": "60da2e0dbfe4b64f6d0311368792375609648e09a1b6d6ae7fbed4b14c869866",
+    "decision_digest": "35b9b4f8bdb40e7ec00aa9bd6e59ea645cc101e1b576a22e5697db2e2a0c4bf6",
+    "recipient_review_digest": "689c2ff669473dc4acb05e69260335e9566949e8c86a2942492d14dbf8d5e488",
+    "expires": 1100.0,
+    "retry_release_allowed": false,
+    "current_source_authority": "unavailable",
+    "synthetic_only": true,
+    "authenticated_consent": false,
+    "authorises_work": false,
+    "authorises_onward_disclosure": false
+  },
+  "downstream_state": "stopped",
+  "revoked_route_restage_blocked": true
+}

@@ -22,6 +22,60 @@ def _copy(value):
     return json.loads(canonical(value))
 
 
+def current_mapping(workflow, source_artifact_id, recipient_task_id, expected_context):
+    """Validate an exact mapping under the caller's team transaction."""
+    if not workflow.db.in_transaction:
+        raise Denied("Mapping validation requires the team transaction")
+    w = workflow
+    w._check(expected_context)
+    if w.plan.context != expected_context:
+        raise Denied('Immutable team context mismatch')
+    w._live()
+    artifact = w._artifact(source_artifact_id)
+    source = w._task(artifact['task_id'])
+    source_state = w._row(source.id)
+    target = w._task(recipient_task_id)
+    if (source_state['state'] != 'completed' or source_state['artifact_id'] != source_artifact_id
+            or artifact['state'] != 'accepted' or artifact['producer'] != source.assignee):
+        raise Denied('An exact completed and accepted source artifact is required')
+    if source.assignee == target.assignee:
+        raise Denied('This two-agent mapping requires distinct agent references')
+    body = json.loads(artifact['body'])
+    if digest(body) != artifact['digest'] or body['context'] != expected_context:
+        raise Denied('Artifact integrity or context mismatch')
+    request = w._request(source_state['request_id'])
+    if body['start_review_digest'] != request['digest']:
+        raise Denied('Artifact does not commit the source start review')
+    text = body['content']
+    if type(text) is not str or not text or len(text) > MAX_UTF8:
+        raise Denied('Only bounded nonempty text artifacts can be mapped')
+    try:
+        if len(text.encode('utf-8')) > MAX_UTF8:
+            raise Denied('Artifact exceeds the protocol UTF-8 bound; no truncation is allowed')
+    except UnicodeError:
+        raise Denied('Artifact must contain Unicode scalar text') from None
+    # Reuse the exact team-side recipient/purpose rules, then require the
+    # current explicit grant. Same-owner agents receive no implicit sharing.
+    owner = w.agents[source.assignee].owner
+    review = w._disclosure_review(owner, source_artifact_id, target.assignee, target.id)
+    grant = w.db.execute('SELECT * FROM disclosures WHERE artifact_id=? AND recipient=? AND purpose=?',
+                         (source_artifact_id, target.assignee, 'task:' + target.id)).fetchone()
+    if not grant or grant['state'] != 'granted' or grant['review_digest'] != digest(review):
+        raise Denied('Exact current downstream disclosure approval is required')
+    mapping = {
+        'domain': DOMAIN, 'team_context': expected_context,
+        'source_task': source.to_dict(), 'recipient_task': target.to_dict(),
+        'source_agent': w.agents[source.assignee].to_dict(),
+        'recipient_agent': w.agents[target.assignee].to_dict(),
+        'artifact_id': source_artifact_id, 'artifact_digest': artifact['digest'],
+        'start_review_digest': request['digest'], 'disclosure_review_digest': grant['review_digest'],
+        'protocol_roles': {'alice': source.assignee, 'bob': target.assignee},
+        'protocol_capability': PROTOCOL_CAPABILITY,
+        'public_descriptors': 'r5 public RFC fixtures, not real identities',
+    }
+    return mapping, text
+
+
 class BoundArtifactProposal:
     """Trusted host-only constructor; never expose this selector to a tool caller.
 
@@ -80,54 +134,8 @@ class BoundArtifactProposal:
         return self._content_digest
 
     def _current_mapping(self):
-        w = self._workflow
-        w._check(self._context)
-        if w.plan.context != self._context:
-            raise Denied('Immutable team context mismatch')
-        w._live()
-        artifact = w._artifact(self._artifact_id)
-        source = w._task(artifact['task_id'])
-        source_state = w._row(source.id)
-        target = w._task(self._recipient_task_id)
-        if (source_state['state'] != 'completed' or source_state['artifact_id'] != self._artifact_id
-                or artifact['state'] != 'accepted' or artifact['producer'] != source.assignee):
-            raise Denied('An exact completed and accepted source artifact is required')
-        if source.assignee == target.assignee:
-            raise Denied('This two-agent mapping requires distinct agent references')
-        body = json.loads(artifact['body'])
-        if digest(body) != artifact['digest'] or body['context'] != self._context:
-            raise Denied('Artifact integrity or context mismatch')
-        request = w._request(source_state['request_id'])
-        if body['start_review_digest'] != request['digest']:
-            raise Denied('Artifact does not commit the source start review')
-        text = body['content']
-        if type(text) is not str or not text or len(text) > MAX_UTF8:
-            raise Denied('Only bounded nonempty text artifacts can be mapped')
-        try:
-            if len(text.encode('utf-8')) > MAX_UTF8:
-                raise Denied('Artifact exceeds the protocol UTF-8 bound; no truncation is allowed')
-        except UnicodeError:
-            raise Denied('Artifact must contain Unicode scalar text') from None
-        # Reuse the exact team-side recipient/purpose rules, then require the
-        # current explicit grant. Same-owner agents receive no implicit sharing.
-        owner = w.agents[source.assignee].owner
-        review = w._disclosure_review(owner, self._artifact_id, target.assignee, target.id)
-        grant = w.db.execute('SELECT * FROM disclosures WHERE artifact_id=? AND recipient=? AND purpose=?',
-                             (self._artifact_id, target.assignee, 'task:' + target.id)).fetchone()
-        if not grant or grant['state'] != 'granted' or grant['review_digest'] != digest(review):
-            raise Denied('Exact current downstream disclosure approval is required')
-        mapping = {
-            'domain': DOMAIN, 'team_context': self._context,
-            'source_task': source.to_dict(), 'recipient_task': target.to_dict(),
-            'source_agent': w.agents[source.assignee].to_dict(),
-            'recipient_agent': w.agents[target.assignee].to_dict(),
-            'artifact_id': self._artifact_id, 'artifact_digest': artifact['digest'],
-            'start_review_digest': request['digest'], 'disclosure_review_digest': grant['review_digest'],
-            'protocol_roles': {'alice': source.assignee, 'bob': target.assignee},
-            'protocol_capability': PROTOCOL_CAPABILITY,
-            'public_descriptors': 'r5 public RFC fixtures, not real identities',
-        }
-        return mapping, text
+        return current_mapping(self._workflow, self._artifact_id,
+                               self._recipient_task_id, self._context)
 
     def _open(self):
         if self._closed:

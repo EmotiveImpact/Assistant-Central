@@ -21,6 +21,7 @@ connected, and no peer message, publication, purchase or deployment occurs.
 | [Consent and protocol foundation](prototypes/consent-v29/README.md) | Recovered v29 prototype; executable source preserved | 948 Python tests and 273 DOM-model checks |
 | [Synthetic stdio path](prototypes/synthetic-stdio-r5/README.md) | Recovered r5 launcher; executable source preserved | 39 targeted local stdio checks |
 | [Team-to-protocol binding](integration/README.md) | Exact accepted artifact to unsigned local proposal; in-memory recovered wire path | 58 mapping and adversarial checks |
+| [Recipient acceptance](integration/RECIPIENT_ACCEPTANCE.md) | Explicit synthetic release, per-source-owner controls and exact recipient accept/reject; restart and duplicate handling | 45 new checks; 103 total integration checks |
 | [Execution ledger](execution/README.md) | One synthetic dispatch claim per started task; durable uncertainty and original-result recovery | 47 execution checks, including independent concurrency/cancellation review |
 | [Provider disclosure gate](execution/PROVIDER_DISCLOSURE.md) | Exact synthetic destination and separate approvals from direct and upstream data owners; atomic one-shot local release | Provider and ancestry checks, including independent privacy, concurrency and withdrawal tests |
 | [Integration readiness](docs/integration-readiness/README.md) | Native-host, identity, confidentiality and pilot gates | Design and static readiness evidence, not native acceptance |
@@ -32,6 +33,8 @@ The execution ledger preserves uncertain attempts across restart without retryin
 them; it does not invoke providers or grant authority to external tools. The new
 provider disclosure rehearsal adds separate owner-specific data reviews and an
 atomic local payload release, without making any live provider call.
+The recipient acceptance extension separately rehearses accepting or rejecting
+one exact artifact, without starting work or authenticating any human owner.
 GitHub Actions runs the same offline checks on pushes and pull requests. Check
 the exact commit's Actions result rather than assuming a local pass means CI passed.
 
