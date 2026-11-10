@@ -33,7 +33,8 @@ const screenshot=async(name,{fullPage=true}={})=>{
   await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
   if(await page.locator('#menu-toggle').isVisible()){
     assert.equal(await page.locator('body').evaluate(node=>node.classList.contains('sidebar-open')),false);
-    await page.waitForFunction(()=>document.querySelector('.sidebar').getBoundingClientRect().right<=0.5);
+    await page.waitForFunction(()=>document.querySelector('.sidebar').inert&&document.querySelector('.sidebar').getBoundingClientRect().right<=0.5);
+    assert.equal(await page.locator('.sidebar').getAttribute('aria-hidden'),'true');
   }
   await page.screenshot({path:path.join(screenshots,name),fullPage});
 };
@@ -165,8 +166,12 @@ try {
   }
   await page.locator('#menu-toggle').click();
   assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'true');
+  assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),false);
+  assert.equal(await page.locator('#navigation [data-view="overview"]').evaluate(node=>node===document.activeElement),true);
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#menu-toggle').getAttribute('aria-expanded'),'false');
+  assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),true);
+  assert.equal(await page.locator('#menu-toggle').evaluate(node=>node===document.activeElement),true);
   await nav('overview');await screenshot('central-platform-mobile-after-decisions.png',{fullPage:false});
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
