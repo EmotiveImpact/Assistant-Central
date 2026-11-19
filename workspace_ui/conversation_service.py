@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import time
 
+from .mission_service import MissionService, ROUTE as MISSION_ROUTE
 from conversation import ConversationLedger, ContextBinding
 from conversation.ledger import need, identifier
 from pilot.auth import AuthError, _private_path
@@ -61,6 +62,7 @@ class ConversationService:
         self.services = {}
         self.ledger = None
         self.reviews = {}
+        self.missions = MissionService(self)
         self.extra_services = []
         try:
             primary_id = fingerprint(primary.auth.public_identity())
@@ -146,6 +148,9 @@ class ConversationService:
         return result
 
     def conversation_call(self, principal, token, method, path, body):
+        mission = MISSION_ROUTE.fullmatch(path)
+        if mission and method == 'POST':
+            return self.missions.call(principal, token, *mission.groups(), body)
         ledger = self.ledger
         # A bounded in-memory exact review cache is a UI capability, never an
         # owner approval. It is lost on restart and bound to this exact session.
