@@ -23,6 +23,28 @@ try{
     await p.goto(url.href);await p.locator('#account').fill(name);await p.locator('#password').fill(password);await p.getByRole('button',{name:/Unlock workspace/}).click();await p.locator('#workspace').waitFor({state:'visible'});assert.equal(await p.locator('#owner-name').textContent(),name);await nav(p);
   }
   const {alice,bob,carol}=pages;
+  const button=(page,label)=>page.getByRole('button',{name:label,exact:true});
+  await alice.bringToFront();await open(alice);
+  await button(alice,'Mission agreements').click();
+  await button(alice,'Create mission agreement').click();
+  await alice.getByLabel('Goal',{exact:true}).fill('Check the fictional brief');
+  await alice.getByLabel('Deliverable',{exact:true}).fill('A reviewed note');
+  await alice.getByLabel('Expected value',{exact:true}).fill('Fictional research plan');
+  await button(alice,'Save revision').click();
+  const agreementButton='Approve exact revision';
+  await button(alice,'Review agreement').click();
+  await button(alice,agreementButton).click();
+  await alice.getByText(/1 of 2 owners agreed/).waitFor();
+  await screenshot(alice,'central-mission-agreement.png');
+  await button(alice,'Close').click();
+  await bob.bringToFront();await open(bob);
+  await button(bob,'Mission agreements').click();
+  await button(bob,'Check the fictional brief · revision 1').click();
+  await button(bob,'Review agreement').click();await button(bob,agreementButton).click();
+  await bob.getByText(/2 of 2 owners agreed/).waitFor();
+  await button(bob,'Withdraw my agreement').click();
+  await bob.getByText(/1 of 2 owners agreed/).waitFor();
+  await button(bob,'Close').click();
   const api=async(name,path,body)=>{const r=await pages[name].request.fetch(new URL(path,url).href,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+tokens[name]},...(body===undefined?{}:{data:body})});assert.equal(r.status(),200);return r.json();};
   const bound=async name=>{const r=await api(name,'/api/conversations/thread_1');return {member_epoch:r.binding.member_epoch,policy_generation:r.binding.policy_generation};};
   const catalogue=await api('alice','/api/conversations');const principal=name=>catalogue.actors.find(a=>a.owner_id===name).principal;

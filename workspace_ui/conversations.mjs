@@ -1,3 +1,4 @@
+import {openMissions} from './missions.mjs';
 import {operationGate} from './operations.mjs';
 export {operationGate} from './operations.mjs';
 // Trusted local-host owner controls. Text stays inert; no model receives history.
@@ -153,6 +154,20 @@ export function createConversations({request,busy,uncertain=()=>false,setBusy,ga
     layout.append(rooms);const panel=node('section','','conversation-room');layout.append(panel);root.append(layout);
     if(!room){composer=null;panel.append(node('h2','A conversation starts with permission.'),node('p','Choose a conversation. No previews are generated from inaccessible history.'));schedule();return;}
     panel.append(node('h2',room.mode==='group'?'Group conversation':'Direct conversation'),node('p',room.id,'peer-fingerprint'));
+    panel.append(btn('Mission agreements', () => {
+      const bound=binding(), base=route('/missions/'), principal=catalogue.principal;
+      openMissions({dialog,room,principal,name,node,btn,field,select,close:clearDialog,
+        call:async(action,body,show,write)=>{
+          const stamp=epoch;
+          let value;
+          await run(async(current,tracked)=>{
+            if(write)tracked.dispatched=true;
+            const response=await request(base+action,{method:'POST',readOnly:!write,body:{binding:bound,...body}});
+            if(current())value=response;
+          },{write,operation:{path:base+action,session:session()}});
+          if(value && stamp===epoch && active() && dialog.open)show(value);
+        }});
+    }));
     const participants=node('ul','','conversation-participants');
     for(const p of room.participants){const row=node('li',name(p.principal));if(p.principal!==room.admin&&(room.admin===catalogue.principal||p.principal===catalogue.principal))row.append(btn(p.principal===catalogue.principal?'Leave conversation':'Remove member',()=>mutate(route('/remove'),{binding:binding(),recipient:p.principal}),'danger'));participants.append(row);}panel.append(participants);
     if(room.admin===catalogue.principal){const choices=catalogue.actors.filter(a=>!room.participants.some(p=>p.principal===a.principal));if(choices.length){const form=node('form','','conversation-inline'),recipient=select(choices.map(a=>[a.principal,name(a.principal)]));form.append(field('Invite an existing local owner',recipient),btn('Invite future messages only',()=>mutate(route('/invite'),{binding:binding(),recipient:recipient.value})));form.addEventListener('submit',e=>e.preventDefault());panel.append(form);}}

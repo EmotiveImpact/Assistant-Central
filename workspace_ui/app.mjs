@@ -285,6 +285,10 @@ async function openWorkflow(item,runId) {
       $('review-title').textContent='Review synthetic request';$('review-content').textContent=JSON.stringify(value.review.request,null,2);
       detail($('review-details'),'Fixture route',`${value.review.binding.provider} · ${value.review.binding.model}`);detail($('review-details'),'Output limit',`${value.review.binding.max_output_tokens} tokens`);detail($('review-details'),'Input commitment',item.artifact_digest);
       $('review-scope').textContent='Approve only this exact request for the local synthetic fixture. Approval does not run it. Running is a separate one-shot action and does not publish or release the result.';
+      if(value.review.mission_quote) {
+        const q=value.review.mission_quote;
+        detail($('review-details'),'Simulated reservation',q.reserve_microusd+' of '+q.cap_microusd+' millionths of a US dollar');
+      }
       if(run.allowed_actions.includes('approve'))$('review-actions').append(button('Approve synthetic request','button primary',()=>workflowAction('approve')));
       if(run.allowed_actions.includes('run'))$('review-actions').append(button('Run synthetic fixture once','button primary',()=>workflowAction('run')));
     } else if(run.allowed_actions.includes('review_result')) {
@@ -293,6 +297,7 @@ async function openWorkflow(item,runId) {
       if(epoch!==generation)return;
       selectedWorkflow={item:{...item},run,review:value,mode:'result'};
       $('review-title').textContent='Review original synthetic result';$('review-content').textContent=value.content;
+      if(run.mission_usage) detail($('review-details'),'Simulated usage',run.mission_usage.actual_microusd+' millionths of a US dollar');
       detail($('review-details'),'Artifact title',value.review.title);detail($('review-details'),'Valid until',datetime(value.review.expires));
       detail($('review-commitments'),'Result digest',value.review.result_digest);detail($('review-commitments'),'Result review',value.review_digest);detail($('review-commitments'),'Source permissions',value.review.source_permissions_digest);
       $('review-scope').textContent='Stage only this exact original fixture result as an artifact draft for the originating task owner. Staging does not release it. Review and release the resulting outbox item separately.';
