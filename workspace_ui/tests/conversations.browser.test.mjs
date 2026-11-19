@@ -27,9 +27,10 @@ try{
   await alice.bringToFront();await open(alice);
   await button(alice,'Mission agreements').click();
   await button(alice,'Create mission agreement').click();
-  await alice.getByLabel('Goal',{exact:true}).fill('Check the fictional brief');
-  await alice.getByLabel('Deliverable',{exact:true}).fill('A reviewed note');
-  await alice.getByLabel('Expected value',{exact:true}).fill('Fictional research plan');
+  const editor=alice.locator('#conversation-dialog[open]');
+  await editor.getByLabel('Goal',{exact:true}).fill('Check the fictional brief');
+  await editor.getByLabel('Deliverable',{exact:true}).fill('A reviewed note');
+  await editor.getByLabel('Expected value',{exact:true}).fill('Fictional research plan');
   await button(alice,'Save revision').click();
   const agreementButton='Approve exact revision';
   await button(alice,'Review agreement').click();
