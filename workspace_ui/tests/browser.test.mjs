@@ -197,7 +197,10 @@ try {
   await page.locator('input[name="synthetic"]').check();
   await page.getByRole('button',{name:'Create for review',exact:true}).click();
   await article('Fictional studio brief').getByRole('button',{name:'Review Fictional studio brief',exact:true}).click();
-  assert.match(await page.locator('#review-content').textContent(),/Fictional studio brief/);
+  await page.getByRole('dialog',{name:'Fictional studio brief',exact:true}).waitFor();
+  const offerText = await page.locator('#review-content').textContent();
+  assert.match(offerText,/Fictional studio brief/);
+  assert.match(offerText,/Prepare one fictional studio note/);
   assert.equal(writes.at(-1).path,'/api/mission-offers');
   assert.equal(writes.at(-1).body.permit_fixture,false);
   await closeReview();
