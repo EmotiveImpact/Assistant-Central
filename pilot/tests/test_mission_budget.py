@@ -8,7 +8,9 @@ import tempfile
 import threading
 import unittest
 
-from pilot.mission import mission_context, task_text
+from pilot.mission import direct_offer, direct_task_text, evidence, fixture_request, mission_context, task_text
+from pilot.crypto import digest
+import hashlib
 from pilot.provider import ProviderBudget, ProviderDenied, ProviderOutcomeUnknown, ResponsesAdapter
 from pilot.tests.test_provider import FixtureAuth, FixtureTransport, response
 
@@ -30,7 +32,7 @@ class MissionBudgetTests(unittest.TestCase):
 
     def adapter(self, db, **options):
         def authorise(token, binding):
-            return {'task_text': self.text, 'context': binding['context'], 'recipient': 'assistant', 'synthetic_only': True}
+            return {'task_text': self.text, 'context': binding['context'], 'recipient': 'assistant', 'synthetic_only': True, 'projection':'mission-brief-only/1'}
         return ResponsesAdapter(db, authorise, self.auth.authenticate, legacy_storage_fixture=True,
                                 transport=self.transport, clock=lambda: 1000, budget=ProviderBudget(max_requests=3),
                                 **options)
@@ -46,6 +48,24 @@ class MissionBudgetTests(unittest.TestCase):
         self.assertEqual(review['request']['input'], 'Original fictional brief')
         self.assertEqual(review['mission_quote']['reserve_microusd'], 276)
         adapter.approve('owner-session', run, result['review_digest'], expires=1100)
+
+    def test_utf8_measurement_and_exact_digest_are_independent_of_owner_judgement(self):
+        content = 'é'
+        expected = hashlib.sha256(content.encode()).hexdigest()
+        agreed = {'executor': 'a' * 64, 'goal': 'Review', 'deliverable': 'Text',
+                  'cap_microusd': 276, 'criteria': [{'kind': 'sha256', 'value': expected},
+                                                     {'kind': 'max_utf8_bytes', 'value': 1}]}
+        offer = direct_offer('b' * 64, 'one', 1500, agreed)
+        commitment = digest(offer)
+        context = mission_context(commitment, 276)
+        artifact = {'text': content, 'context': context, 'parent_id': 'c' * 64}
+        report = evidence(agreed, artifact['parent_id'], 1, commitment, digest(artifact), artifact)
+        self.assertEqual(report['findings'][0]['status'], 'passed')
+        self.assertEqual(report['findings'][1]['observed'], 2)
+        self.assertFalse(report['all_checks_passed'])
+        changed = {**offer, 'terms': {**agreed, 'cap_microusd': 277}}
+        with self.assertRaises(ValueError):
+            fixture_request({'input': direct_task_text('Brief', changed)}, context)
 
     def test_two_connections_cannot_reserve_the_same_remaining_budget(self):
         with closing(self.connect()) as db:

@@ -187,6 +187,20 @@ try {
   await page.getByRole('button',{name:'View public identity'}).click();
   const publicIdentity=JSON.parse(await page.locator('#review-content').textContent());
   assert.deepEqual(Object.keys(publicIdentity).sort(),['agent_id','exchange_key','owner_id','signing_key']);await closeReview();
+  await nav('outbox');
+  await page.locator('#new-proposal').click();
+  await page.locator('#proposal-kind').selectOption('mission');
+  await page.getByLabel('Title',{exact:true}).fill('Fictional studio brief');
+  await page.getByLabel('Deliverable',{exact:true}).fill('One note');
+  await page.getByLabel('Expected value',{exact:true}).fill('studio');
+  await page.getByLabel('Exact content',{exact:true}).fill('Prepare one fictional studio note.');
+  await page.locator('input[name="synthetic"]').check();
+  await page.getByRole('button',{name:'Create for review',exact:true}).click();
+  await article('Fictional studio brief').getByRole('button',{name:'Review Fictional studio brief',exact:true}).click();
+  assert.match(await page.locator('#review-content').textContent(),/Fictional studio brief/);
+  assert.equal(writes.at(-1).path,'/api/mission-offers');
+  assert.equal(writes.at(-1).body.permit_fixture,false);
+  await closeReview();
   for(const width of [768,390]){
     await page.setViewportSize({width,height:844});
     for(const view of ['overview','tasks','artifacts','peers','activity']){await nav(view);await noOverflow();}

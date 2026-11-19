@@ -87,7 +87,7 @@ class MissionService:
             return runtime.propose(session, agreed['executor'], 'task', 'Mission task',
                                    task_text(body['brief'], agreed['cap_microusd'], commitment),
                                    mission_context(commitment, agreed['cap_microusd']), body['task_id'],
-                                   statement['expires_at'], provider_disclosure={**FIXTURE_GRANT, 'projection': PROJECTION})
+                                   min(statement['expires_at'], runtime._now() + 3600), provider_disclosure={**FIXTURE_GRANT, 'projection': PROJECTION})
         with runtime._transaction(session) as checks:
             artifact_id = body['artifact_id']
             row, artifact = runtime._row(artifact_id)

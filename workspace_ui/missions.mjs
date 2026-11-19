@@ -59,7 +59,9 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
       const s = signature(view.proposal), t = parse(s);
       const controls = [];
       if (view.proposal_current) {
-        if (!view.current_approval_owners.includes(principal)) controls.push(btn('Review agreement', () => {
+        const withdrawn=view.revocations.some(r=>r.statement.owner===principal);
+        if(withdrawn)controls.push(node('p','You withdrew agreement to this revision. A new revision requires fresh approval.'));
+        else if (!view.current_approval_owners.includes(principal)) controls.push(btn('Review agreement', () => {
           route('review',{proposal_id:pid}, review => {
             const exact = signature(review.proposal);
             section('Approve this revision',node('pre',JSON.stringify(parse(exact),null,2),'artifact-content'),

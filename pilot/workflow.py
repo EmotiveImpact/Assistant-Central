@@ -5,6 +5,7 @@ fixture is labelled synthetic at every boundary. Staging never releases content.
 """
 import json
 
+from .mission_budget import balance
 from .crypto import canonical, digest
 from .provider import ResponsesAdapter, ProviderBudget, ProviderDenied
 from .runtime import VERSION as RUNTIME_VERSION, RuntimeDenied, hash_id
@@ -140,6 +141,12 @@ class SyntheticWorkLoop:
 
     def _status(self, session, row):
         result = self.adapter._status(row)
+        review = json.loads(row['review'])
+        quote = review.get('mission_quote')
+        if quote:
+            binding = review['binding']
+            result['mission_balance'] = balance(self.runtime.db, row['owner'], binding['provider'],
+                                                binding['context'], quote['cap_microusd'])
         mapping = self._mapping(row['id'])
         result.update({'artifact_id': mapping['artifact_id'] if mapping else None,
                        'artifact_state': self.runtime._status(self.runtime._row(mapping['artifact_id'])[0])['state'] if mapping else None,
@@ -154,7 +161,8 @@ class SyntheticWorkLoop:
                     actions.extend(('review', 'approve'))
                 elif row['state'] == 'approved' and row['expires'] > self.runtime._now():
                     actions.append('review')
-                    if self.runtime.db.execute('SELECT COUNT(*) FROM pilot_provider_runs WHERE claimed_at IS NOT NULL').fetchone()[0] < self.adapter.budget.max_requests:
+                    funded = not quote or result['mission_balance']['available_microusd'] >= quote['reserve_microusd']
+                    if funded and self.runtime.db.execute('SELECT COUNT(*) FROM pilot_provider_runs WHERE claimed_at IS NOT NULL').fetchone()[0] < self.adapter.budget.max_requests:
                         actions.append('run')
                 elif row['state'] == 'completed':
                     preview = self._result_review(session, row)

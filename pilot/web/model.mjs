@@ -50,7 +50,7 @@ export function validateState(value) {
   if(value.transfers!==undefined)validateTransfers(value.transfers);
   return value;
 }
-export function fixturePermission(value, context='') { return value?.provider==='openai' && value.model===FIXTURE_GRANT.model && value.max_output_tokens===128 && (context.startsWith('ac01c0de5eed0001') ? Object.keys(value).length===4 && value.projection==='mission-brief-only/1' : Object.keys(value).length===3); }
+export function fixturePermission(value, context='') { return value?.provider==='openai' && value.model===FIXTURE_GRANT.model && value.max_output_tokens===128 && (Object.keys(value).length===3 || (context.startsWith('ac01c0de5eed0001') && Object.keys(value).length===4 && value.projection==='mission-brief-only/1')); }
 export function canPrepareWorkflow(state,item,review,now=Date.now()/1000) {
   return workflowEnabled(state) && item.direction==='incoming' && item.kind==='task' && item.state==='accepted' && item.expires>now && state.peers.some(peer=>peer.peer_id===item.peer_id&&isPeerActive(peer)) && review.content!==null && fixturePermission(review.source_permissions?.provider_disclosure,item.context) && !state.workflow.runs.some(run=>run.item_id===item.id);
 }

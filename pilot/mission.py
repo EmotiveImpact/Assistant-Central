@@ -59,6 +59,7 @@ def agreement_content(value):
 
 def read_agreement(statement):
     value = json.loads(statement['content'])
+    check(type(value) is dict and set(value) == {'domain', 'terms'})
     check(agreement_content(value['terms']) == statement['content'])
     return value['terms']
 
@@ -86,8 +87,10 @@ def direct_task_text(brief, offer):
 def task_details(text, context):
     check(text.startswith(TASK_PREFIX))
     value = json.loads(text[len(TASK_PREFIX):])
+    check(type(value) is dict)
     if 'offer' in value:
         offer = value['offer']
+        check(type(offer) is dict and set(offer) == {'domain','requester','task_id','expires','terms'})
         check(offer == direct_offer(offer['requester'], offer['task_id'], offer['expires'], offer['terms']))
         limit, commitment = offer['terms']['cap_microusd'], digest(offer)
         check(direct_task_text(value['brief'], offer) == text)
@@ -107,8 +110,7 @@ def validate_task(body):
 
 
 def fixture_request(request, context):
-    if not context.startswith(CONTEXT_PREFIX):
-        return request, None
+    check(context.startswith(CONTEXT_PREFIX))
     value, limit = task_details(request['input'], context)
     check(request['model'] == 'synthetic-research-v1' and request['max_output_tokens'] == 128)
     wire_request = {**request, 'input': value['brief']}

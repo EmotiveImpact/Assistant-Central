@@ -54,9 +54,12 @@ class PeerMissionTests(unittest.TestCase):
             run = pilot.prepare(task)['run_id']
             review = pilot.workflow(run,'review')['review']
             self.assertEqual(review['request']['input'],offer['brief'])
+            self.assertEqual(pilot.workflow(run)['mission_balance']['available_microusd'],276)
             approved = pilot.approve(run)
             result = pilot.workflow(run,'run',{'review_digest':approved})
             self.assertEqual(result['mission_usage']['held_microusd'],0)
+            self.assertEqual(result['mission_balance']['spent_microusd'],20)
+            self.assertEqual(result['mission_balance']['available_microusd'],256)
             art = pilot.workflow(run,'stage',{'review_digest':pilot.workflow(run,'result')['review_digest']})['artifact_id']
             pilot.item_action(art,'release',True)
             pilot.settle()

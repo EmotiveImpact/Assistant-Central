@@ -16,7 +16,7 @@ import urllib.error
 import urllib.request
 
 from .storage import RecordStorage
-from .mission import fixture_request
+from .mission import PROJECTION, fixture_request
 from . import mission_budget
 
 ENDPOINT = "https://api.openai.com/v1/responses"
@@ -236,7 +236,11 @@ class ResponsesAdapter:
             grant = self._authorise(token, binding)
         except Exception:
             raise ProviderDenied("Current accepted task and exact source provider authority required") from None
-        if (type(grant) is not dict or set(grant) != {"task_text", "context", "recipient", "synthetic_only"}
+        expected_fields = {"task_text", "context", "recipient", "synthetic_only"}
+        projected = type(grant) is dict and grant.get("projection") == PROJECTION
+        if projected:
+            expected_fields.add("projection")
+        if (type(grant) is not dict or set(grant) != expected_fields
                 or grant["context"] != binding["context"] or grant["recipient"] != identity[1]
                 or grant["synthetic_only"] is not True):
             raise ProviderDenied("Runtime provider authority returned an invalid binding")
@@ -245,6 +249,8 @@ class ResponsesAdapter:
                 "max_output_tokens": binding["max_output_tokens"], "tools": [], "tool_choice": "none",
                 "store": False, "stream": False, "background": False, "truncation": "disabled"}
 
+        if not projected:
+            return request, None
         try:
             wire_request, quote = fixture_request(request, binding["context"])
         except (KeyError, TypeError, ValueError, RecursionError):
@@ -268,8 +274,9 @@ class ResponsesAdapter:
 
         if row["claimed_at"] is not None and self.db.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name='pilot_mission_usage'").fetchone():
-            if self.db.execute("SELECT 1 FROM pilot_mission_usage WHERE run_id=?", (row["id"],)).fetchone():
-                value["mission_usage"] = mission_budget.receipt(self.db, row["id"])
+            receipt = mission_budget.receipt(self.db, row["id"])
+            if receipt is not None:
+                value["mission_usage"] = receipt
         return value
 
     def prepare(self, token, run_id, binding):

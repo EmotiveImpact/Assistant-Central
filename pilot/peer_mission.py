@@ -10,7 +10,8 @@ def propose(runtime, token, agreed, brief, task_id, expires, permit_fixture):
     offer = direct_offer(runtime.fingerprint, task_id, expires, agreed)
     context = mission_context(digest(offer), agreed['cap_microusd'])
     grant = {**FIXTURE_GRANT, 'projection': PROJECTION} if permit_fixture else None
-    return runtime.propose(token, agreed['executor'], 'task', 'Peer mission',
+    title = agreed['goal'].encode('utf-8')[:128].decode('utf-8', errors='ignore')
+    return runtime.propose(token, agreed['executor'], 'task', title,
                            direct_task_text(brief, offer), context, task_id, expires,
                            provider_disclosure=grant)
 

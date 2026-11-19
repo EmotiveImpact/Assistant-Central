@@ -247,7 +247,7 @@ async function openReview(item) {
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
     const parent=state.items.find(candidate=>candidate.id===item.parent_id);
-    if(item.kind==='artifact' && item.direction==='incoming' && ['pending','accepted'].includes(item.state) && parent?.context.startsWith('ac01c0de5eed0001') && parent.title==='Peer mission') {
+    if(item.kind==='artifact' && item.direction==='incoming' && ['pending','accepted'].includes(item.state) && parent?.peer_mission===true) {
       const current=selected;
       $('review-actions').append(button('Check mission evidence','button secondary',async()=>{
         if(busy||selected!==current)return;
@@ -302,7 +302,8 @@ async function openWorkflow(item,runId) {
       $('review-scope').textContent='Approve only this exact request for the local synthetic fixture. Approval does not run it. Running is a separate one-shot action and does not publish or release the result.';
       if(value.review.mission_quote) {
         const q=value.review.mission_quote;
-        detail($('review-details'),'Simulated reservation',q.reserve_microusd+' of '+q.cap_microusd+' millionths of a US dollar');
+        detail($('review-details'),'Simulated reservation',q.reserve_microusd+' millionths of a US dollar');
+        if(run.mission_balance) detail($('review-details'),'Available simulated budget',run.mission_balance.available_microusd+' of '+q.cap_microusd+' millionths of a US dollar');
       }
       if(run.allowed_actions.includes('approve'))$('review-actions').append(button('Approve synthetic request','button primary',()=>workflowAction('approve')));
       if(run.allowed_actions.includes('run'))$('review-actions').append(button('Run synthetic fixture once','button primary',()=>workflowAction('run')));
