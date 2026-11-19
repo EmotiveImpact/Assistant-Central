@@ -4,7 +4,7 @@ import re
 from conversation.ledger import ConversationDenied, need
 from conversation.proposals import LocalProposals
 from pilot.crypto import digest
-from pilot.mission import AGREEMENT, agreement_content, evaluate, mission_context, read_agreement, task_text
+from pilot.mission import AGREEMENT, PROJECTION, agreement_content, evaluate, mission_context, read_agreement, task_text
 from pilot.server import exact
 from pilot.workflow import FIXTURE_GRANT
 
@@ -69,7 +69,7 @@ class MissionService:
         agreed = read_agreement(statement)
         commitment = digest(statement)
         if action == 'inspect':
-            return {**view, 'mission_digest': commitment}
+            return {**view, 'mission_digest': commitment, 'task_context': mission_context(commitment, agreed['cap_microusd'])}
         if action == 'withdraw':
             need(body['proposal_digest'] == commitment)
             return api.revoke(*actor, pid)
@@ -87,7 +87,7 @@ class MissionService:
             return runtime.propose(session, agreed['executor'], 'task', 'Mission task',
                                    task_text(body['brief'], agreed['cap_microusd'], commitment),
                                    mission_context(commitment, agreed['cap_microusd']), body['task_id'],
-                                   statement['expires_at'], provider_disclosure=FIXTURE_GRANT)
+                                   statement['expires_at'], provider_disclosure={**FIXTURE_GRANT, 'projection': PROJECTION})
         with runtime._transaction(session) as checks:
             artifact_id = body['artifact_id']
             row, artifact = runtime._row(artifact_id)

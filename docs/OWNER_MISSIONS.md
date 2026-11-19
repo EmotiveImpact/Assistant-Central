@@ -21,3 +21,16 @@ python -B -m unittest pilot.tests.test_mission_budget workspace_ui.tests.test_mi
 The handoff check exercises separate local account approvals through the owner HTTP service, then closes the coordinator before opening the requester and executor stores in two different loopback processes. It releases and exchanges exact packets, performs one synthetic run, restarts the coordinator, evaluates the pending return and explicitly rejects it. It verifies that one passing check, one failing check and one owner-review check cause no automatic decision. This uses a trusted host and test accounts. Approval withdrawal or revision prevents fresh mission drafts. A previously released task has its own signed lifetime and cancellation path. Revoking discussion agreement alone cannot recall it.
 
 The separate SDK tests exercise inert drafts. Independent human owners, operational host enrolment, paid models and production hosting need separate acceptance.
+
+### Direct handoff across two owner runtimes
+
+For a bilateral task, open **New proposal** and select **Peer mission**. The requester enters the terms they intend to share, the executing peer, a check and the maximum simulated cost. The full direct offer goes to the named peer only after the requester reviews and releases it. Its signed fields bind the owner identities, offer, expiry and budget. On supported receivers, the explicit provider permission permits only the brief. A receiver running the old protocol refuses the new permission shape. The requester can omit provider permission altogether. A room agreement and access to another owner's vault are unnecessary for this direct route. Each direct offer is its own immutable task. To stop a released offer, use its existing cancellation operation and inspect delivery.
+
+Both owner runtimes can use the existing loopback owner API and separately configured peer transport. After receipt, the executing owner decides on the task and separately on any run. An incoming return can be checked directly in its review dialog. The evidence uses the requester's retained original offer and the exact signed return, even if there is no shared conversation coordinator. A new offer has a separate budget.
+
+```sh
+npm ci --prefix agent_bridge --ignore-scripts --no-audit --no-fund
+python -B -m unittest workspace_ui.tests.test_peer_mission -v
+```
+
+This additional test uses the official OpenAI Agents runner and Cursor/Grok SDK host to prepare owner-local inert notes alongside an actual two-process handoff. The owners select a common fictional task reference. No draft is promoted into a provider request. The test denies an offer without disclosure permission, then exercises a separately authorised offer through acceptance, fixture execution, release, deterministic evidence and recipient acceptance. The SDK paths use a deterministic double and a no-model tool invocation. No model provider was contacted.

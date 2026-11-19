@@ -42,7 +42,7 @@ function notice(message,success=false) { $('notice').textContent=message;$('noti
 function setBusy(value) { busy=value; document.querySelectorAll('button').forEach(node=>{ if(!node.classList.contains('close-dialog'))node.disabled=value; });if(!value)restorePanel(); }
 const restorePanel=restoreWhenIdle({session:()=>generation,eligible:()=>Boolean(token&&state&&!busy&&!document.hidden&&['conversations','host-drafts'].includes(currentView)&&!$('item-list').childElementCount),restore:()=>render()});
 const operations=operationGate(setBusy);
-const conversations=createConversations({request,gate:operations.scope(),session:()=>generation,restore:()=>{if(token&&currentView==='conversations')render();},unknownFailure:message=>new RequestFailure(message,{unknown:true}),busy:()=>busy,uncertain:()=>uncertainty.pending(),failed:(error,operation)=>handleFailure(error,'notice','conversations',operation),active:()=>Boolean(token&&currentView==='conversations'&&!document.hidden)});
+const conversations=createConversations({request,items:()=>state?.items??[],gate:operations.scope(),session:()=>generation,restore:()=>{if(token&&currentView==='conversations')render();},unknownFailure:message=>new RequestFailure(message,{unknown:true}),busy:()=>busy,uncertain:()=>uncertainty.pending(),failed:(error,operation)=>handleFailure(error,'notice','conversations',operation),active:()=>Boolean(token&&currentView==='conversations'&&!document.hidden)});
 const hostDrafts=createHostDrafts({request,gate:operations.scope(),restore:()=>{if(token&&currentView==='host-drafts')render();},session:()=>generation,owner:()=>state?.identity.fingerprint,unknownFailure:message=>new RequestFailure(message,{unknown:true}),busy:()=>busy,uncertain:()=>uncertainty.pending(),failed:(error,operation)=>handleFailure(error,'notice','host-drafts',operation),active:()=>Boolean(token&&currentView==='host-drafts'&&!document.hidden)});
 function resetSession(message='') {
   conversations.reset({sessionEnded:true});
@@ -246,6 +246,21 @@ async function openReview(item) {
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
+    const parent=state.items.find(candidate=>candidate.id===item.parent_id);
+    if(item.kind==='artifact' && item.direction==='incoming' && ['pending','accepted'].includes(item.state) && parent?.context.startsWith('ac01c0de5eed0001') && parent.title==='Peer mission') {
+      const current=selected;
+      $('review-actions').append(button('Check mission evidence','button secondary',async()=>{
+        if(busy||selected!==current)return;
+        const unlock=operations.acquire();
+        try {
+          const report=await request('/api/items/'+encodeURIComponent(item.id)+'/mission-evidence');
+          if(epoch!==generation || selected!==current || !$('review-dialog').open)return;
+          if(report.artifact_id!==item.id || report.parent_task_id!==item.parent_id || report.recipient_decision_required!==true)throw new Error('Evidence mismatch');
+          $('review-message').textContent=report.findings.map(f=>f.kind+' ('+f.value+'): '+f.status).join(' · ');
+        }catch(error){if(epoch===generation&&selected===current)handleFailure(error,'review-message');}
+        finally{unlock();}
+      }));
+    }
     if(canPrepareWorkflow(state,item,review))$('review-actions').append(button('Prepare synthetic run','button secondary',()=>prepareWorkflow(item)));
     if(!review.allowed_actions.length)$('review-actions').append(button('Close','button secondary',()=> $('review-dialog').close()));
     $('review-dialog').showModal();
@@ -333,7 +348,12 @@ function prepareCompose(){
 }
 function configureKind(){
   const form=$('compose-form'),artifact=form.elements.kind.value==='artifact';$('parent-field').hidden=!artifact;$('proposal-parent').required=artifact;
-  $('workflow-permission-field').hidden=artifact||!workflowEnabled(state);if(artifact||!workflowEnabled(state))form.elements.synthetic_run.checked=false;
+  const mission=form.elements.kind.value==='mission';
+  $('mission-fields').hidden=!mission;
+  for(const key of ['mission_deliverable','mission_value','mission_budget'])form.elements[key].required=mission;
+  form.elements.context.closest('label').hidden=mission;
+  $('workflow-permission-field').hidden=artifact||(!mission&&!workflowEnabled(state));
+  if($('workflow-permission-field').hidden)form.elements.synthetic_run.checked=false;
   form.elements.context.readOnly=artifact;form.elements.task_id.readOnly=artifact;form.elements.peer_id.disabled=artifact;
   $('compose-message').textContent='';
   if(artifact){
@@ -375,7 +395,17 @@ $('proposal-kind').addEventListener('change',configureKind);$('proposal-parent')
 $('compose-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertainty.pending())return;const form=event.currentTarget;const fields=Object.fromEntries(new FormData(form));fields.peer_id=form.elements.peer_id.value;
   if(fields.kind==='artifact')fields.parent_expires=state.items.find(item=>item.id===fields.parent_id)?.expires;
-  try {await performWrite('/api/proposals',proposalBody(fields),{target:'compose-message',onSuccess:()=>{$('compose-dialog').close();currentView='outbox';currentFilter='all';searchQuery='';$('search-input').value='';history.replaceState(null,'','#outbox');render();notice('Proposal prepared. Open it to review the exact content before release.',true);}});}catch(error){$('compose-message').textContent=error.message;}
+  try {
+    let path='/api/proposals', body;
+    if(fields.kind==='mission'){
+      if(fields.synthetic!=='on')throw new Error('Confirm that you may share this fictional brief.');
+      const criterion=fields.mission_check==='max_utf8_bytes'?Number(fields.mission_value):fields.mission_value;
+      path='/api/mission-offers';
+      body={agreed:{goal:fields.title,deliverable:fields.mission_deliverable,executor:fields.peer_id,
+        criteria:[{kind:fields.mission_check,value:criterion}],cap_microusd:Number(fields.mission_budget)},
+        brief:fields.text,task_id:fields.task_id,expires:Math.floor(Date.now()/1000)+Number(fields.minutes)*60,permit_fixture:fields.synthetic_run==='on'};
+    }else body=proposalBody(fields);
+    await performWrite(path,body,{target:'compose-message',onSuccess:()=>{$('compose-dialog').close();currentView='outbox';currentFilter='all';searchQuery='';$('search-input').value='';history.replaceState(null,'','#outbox');render();notice('Proposal prepared. Open it to review the exact content before release.',true);}});}catch(error){$('compose-message').textContent=error.message;}
 });
 $('peer-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertainty.pending())return;

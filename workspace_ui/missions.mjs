@@ -1,5 +1,5 @@
 // A mission operates inside the current conversation's session and operation gate.
-export function openMissions({dialog, room, principal, name, call, close, node, btn, field, select}) {
+export function openMissions({dialog, room, principal, name, call, close, node, btn, field, select, items}) {
   const route = (action, body, show, write = false) => call(action, body, value => {
     if (dialog.open) show(value);
   }, write);
@@ -77,8 +77,9 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
         controls.push(field('New fictional brief to share with the executing owner and fixture',brief),
           btn('Create task for separate release',()=>{if(brief.value.trim())route('draft',{proposal_id:pid,proposal_digest:view.mission_digest,brief:brief.value,task_id:id()},
             task=>section('Task ready for release',node('p','Open the outbox to review this draft.'),node('code',task.id)),true);}));
-        const artifact=input(64);
-        controls.push(field('Returned artefact ID',artifact),btn('Check returned artefact',()=>route('evaluate',{proposal_id:pid,artifact_id:artifact.value},
+        const returns=items().filter(item=>item.context===view.task_context && item.direction==='incoming' && item.kind==='artifact' && ['pending','accepted'].includes(item.state));
+        const artifact=select(returns.map(item=>[item.id,item.title+' · '+item.id.slice(0,12)]));
+        if(returns.length) controls.push(field('Returned artefact',artifact),btn('Check returned artefact',()=>route('evaluate',{proposal_id:pid,artifact_id:artifact.value},
           report=>section('Evidence for the returned artefact',node('pre',JSON.stringify(report,null,2),'artifact-content'),node('p','Review the return in your inbox to accept or reject it.')))));
       }
       section(t.goal,node('p',t.deliverable),node('p','Executor: '+name(t.executor)),

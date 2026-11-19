@@ -97,7 +97,7 @@ export async function inspectMutation(write,inspect,unknownFailure){
   try{await write();returned=true;return await inspect();}
   catch(error){throw returned&&!error.unauthorised?unknownFailure('The operation returned, but its saved state could not be inspected. Refresh before acting again.'):error;}
 }
-export function createConversations({request,busy,uncertain=()=>false,setBusy,gate=operationGate(setBusy),failed,active,unknownFailure,session,restore}){
+export function createConversations({request,items=()=>[],busy,uncertain=()=>false,setBusy,gate=operationGate(setBusy),failed,active,unknownFailure,session,restore}){
   let epoch=0,root=null,catalogue=null,room=null,messages=[],query='',after=null,timer=null,review=null,composer=null;
   const dialog=document.getElementById('conversation-dialog');
   const clearDialog=()=>{review=null;dialog.replaceChildren();if(dialog.open)dialog.close();};
@@ -156,7 +156,7 @@ export function createConversations({request,busy,uncertain=()=>false,setBusy,ga
     panel.append(node('h2',room.mode==='group'?'Group conversation':'Direct conversation'),node('p',room.id,'peer-fingerprint'));
     panel.append(btn('Mission agreements', () => {
       const bound=binding(), base=route('/missions/'), principal=catalogue.principal;
-      openMissions({dialog,room,principal,name,node,btn,field,select,close:clearDialog,
+      openMissions({dialog,room,principal,name,node,btn,field,select,items,close:clearDialog,
         call:async(action,body,show,write)=>{
           const stamp=epoch;
           let value;

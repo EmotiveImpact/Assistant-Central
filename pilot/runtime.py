@@ -15,6 +15,7 @@ import stat
 import threading
 import time
 
+from .mission import CONTEXT_PREFIX, PROJECTION, validate_task
 from .storage import RecordStorage, StoreLease
 from .crypto import canonical, digest, fingerprint, packet_header, seal, token, TransportDenied
 from .transport import PeerExchange
@@ -192,10 +193,15 @@ class PilotRuntime:
             self._event('peer_revoked', peer=peer_id)
 
     @staticmethod
-    def _provider(value):
+    def _provider(value, context):
+        hash_id(context)
         if value is None:
             return None
-        need(type(value) is dict and set(value) == {'provider', 'model', 'max_output_tokens'},
+        fields = {'provider', 'model', 'max_output_tokens'}
+        if context.startswith(CONTEXT_PREFIX):
+            fields.add('projection')
+            need(type(value) is dict and value.get('projection') == PROJECTION)
+        need(type(value) is dict and set(value) == fields,
              'Provider disclosure must name its exact bounded route')
         need(value['provider'] == 'openai', 'Unsupported provider disclosure route')
         text(value['model'], 128)
@@ -251,7 +257,12 @@ class PilotRuntime:
              'Proposal is future dated or expired')
         permissions = body['source_permissions']
         need(type(permissions) is dict, 'Exact source permissions are required')
-        provider = self._provider(permissions.get('provider_disclosure'))
+        if body['kind'] == 'task' and body['context'].startswith(CONTEXT_PREFIX):
+            try:
+                validate_task(body)
+            except (KeyError, TypeError, ValueError, RecursionError):
+                raise RuntimeDenied('Invalid mission task') from None
+        provider = self._provider(permissions.get('provider_disclosure'), body['context'])
         need(body['kind'] == 'task' or provider is None, 'Returned artifacts cannot grant onward provider disclosure')
         need(permissions == self._permissions(body, provider),
              'Unverified inherited sources or substituted source permissions are forbidden')
@@ -268,7 +279,7 @@ class PilotRuntime:
                     'recipient': recipient, 'context': context, 'task_id': task_id, 'parent_id': parent_id,
                     'title': title, 'text': text, 'artifact_digest': digest({'text': text}),
                     'created_at': now, 'expires': expires}
-            body['source_permissions'] = self._permissions(body, self._provider(provider_disclosure))
+            body['source_permissions'] = self._permissions(body, self._provider(provider_disclosure, context))
             need(source_permissions is None or source_permissions == body['source_permissions'],
                  'Caller-supplied source rights cannot broaden exact authority')
             return self._stage_proposal(body)
@@ -582,7 +593,10 @@ class PilotRuntime:
              'Provider work requires a currently accepted incoming task')
         self._validate_body(body,self.exchange.peer_public(row['peer_id']),self.identity,sending=False)
         grant = body['source_permissions']['provider_disclosure']
-        need(grant is not None and grant=={key:binding[key] for key in ('provider','model','max_output_tokens')}
+        expected = {key:binding[key] for key in ('provider','model','max_output_tokens')}
+        if body['context'].startswith(CONTEXT_PREFIX):
+            expected['projection'] = PROJECTION
+        need(grant is not None and grant==expected
              and binding['context']==body['context'] and binding['payload_digest']==body['artifact_digest'],
              'Exact signed direct-source provider disclosure is missing or changed')
         return {'task_text':body['text'],'context':body['context'],'recipient':self.identity['agent_id'],
