@@ -5,6 +5,12 @@ import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
+// The product name is a placeholder while naming is decided. Change it here only.
+export const PRODUCT={short:'Central',full:'Assistant Central'};
+for(const node of document.querySelectorAll('[data-product]'))node.textContent=PRODUCT[node.dataset.product]??PRODUCT.short;
+for(const node of document.querySelectorAll('[data-product-label]'))node.setAttribute('aria-label',node.dataset.productLabel.replace('{product}',PRODUCT.short));
+document.title=PRODUCT.short+' · Your assistant workspace';
+
 const $ = id => document.getElementById(id);
 const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
 function setNavigation(open,{restoreFocus=false}={}){
@@ -47,7 +53,7 @@ function workIcon(kind,className,state) {
 function nameAvatar(name,className='peer-avatar') {
   const label=plain(name,'?'),avatar=text('span',label.slice(0,1).toUpperCase(),className);
   let hash=0;for(const character of label.toLowerCase())hash=(hash*31+character.codePointAt(0))>>>0;
-  avatar.dataset.tone=['indigo','amber','teal','rose'][hash%4];avatar.setAttribute('aria-hidden','true');return avatar;
+  avatar.dataset.tone=['indigo','amber','teal','rose'][hash%4];avatar.dataset.kind='assistant';avatar.setAttribute('aria-hidden','true');return avatar;
 }
 function datetime(value) { const time=finiteDate(value); return time===null?'Time not supplied':new Date(time*1000).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function peerName(peerId) { const peer=state?.peers.find(peer=>peer.peer_id===peerId); return peer ? `${plain(peer.agent_id,'Assistant')} · ${plain(peer.owner_id,'Owner')}` : plain(peerId,'Unknown peer'); }
