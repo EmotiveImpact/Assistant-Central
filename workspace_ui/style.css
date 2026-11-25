@@ -263,3 +263,8 @@ input,textarea,select{border-color:#34343a;font-size:14px;background:#08090a;col
   .dialog-header{padding:20px}.dialog-body{padding:20px}.dialog-footer{padding:16px 20px;gap:8px}.dialog-footer .button{min-height:40px}.artifact-content{padding:16px;font-size:12px}.review-details{font-size:13px;grid-template-columns:100px minmax(0,1fr)}.login-system{display:none}.login-card{padding:24px}.login-layout{gap:32px}.login-screen{padding:24px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+
+.mission-summary { display: grid; grid-template-columns: minmax(8rem, max-content) 1fr; gap: .4rem 1rem; margin: 0; }
+.mission-summary dt { color: var(--muted, #8a8f98); }
+.mission-summary dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .mission-summary { grid-template-columns: 1fr; } .mission-summary dd { margin-bottom: .4rem; } }
