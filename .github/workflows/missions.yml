@@ -18,7 +18,7 @@ jobs:
       - name: Install pinned dependencies
         run: python -m pip install -r mission_approvals/requirements.txt cryptography==50.0.0
       - name: Run offline MCP 2026-07-28 tests
-        run: python -B -m unittest mission_approvals.tests.test_review mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts mission_cards.tests.test_budget -v
+        run: python -B -m unittest mission_approvals.tests.test_review mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts mission_cards.tests.test_budget mission_cards.tests.test_passkey -v
   a2a-extension:
     runs-on: ubuntu-latest
     timeout-minutes: 10
