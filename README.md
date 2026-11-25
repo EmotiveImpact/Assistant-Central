@@ -41,6 +41,10 @@ one exact artifact, without starting work or authenticating any human owner.
 GitHub Actions runs the same offline checks on pushes and pull requests. Check
 the exact commit's Actions result rather than assuming a local pass means CI passed.
 
+## Owner-reviewed missions
+
+Use the [mission guide](docs/OWNER_MISSIONS.md) to create a structured room agreement or send a directly authored mission to a pinned peer. Each route supports a separately approved, usage-limited fixture run and an evidence report on the returned artefact. Direct peer offers work without a shared conversation coordinator.
+
 ## Quick start
 
 The new team layer requires only Python 3.11+ and the standard library:

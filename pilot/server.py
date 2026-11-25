@@ -26,6 +26,7 @@ from .auth import LocalOwnerAuth, AuthError
 from .crypto import packet_header
 from .runtime import PilotRuntime
 from .workflow import SyntheticWorkLoop
+from . import peer_mission
 from .owner_transfer import OwnerTransfer, CONNECTION_ID, load_config
 
 MAX_BODY = 33792
@@ -325,6 +326,12 @@ class OwnerService:
             if method == "POST" and action == "import" and kind == "quarantine":
                 exact(body, ("review_digest",))
                 return self.transfers.receive(token, connection, identifier, body["review_digest"])
+        if path == "/api/mission-offers" and method == "POST":
+            exact(body, ("agreed", "brief", "task_id", "expires", "permit_fixture"))
+            return peer_mission.propose(self.runtime, token, **body)
+        evidence = re.fullmatch(r"/api/items/([a-f0-9]{64})/mission-evidence", path)
+        if evidence and method == "GET":
+            return peer_mission.evaluate_return(self.runtime, token, evidence[1])
         if path == "/api/proposals" and method == "POST":
             exact(body, ("peer_id", "kind", "title", "text", "context", "task_id", "expires"),
                   ("parent_id", "provider_disclosure", "source_permissions"))

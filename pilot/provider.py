@@ -16,6 +16,8 @@ import urllib.error
 import urllib.request
 
 from .storage import RecordStorage
+from .mission import PROJECTION, fixture_request
+from . import mission_budget
 
 ENDPOINT = "https://api.openai.com/v1/responses"
 VERSION = "assistant-central-responses-pilot/1"
@@ -229,29 +231,53 @@ class ResponsesAdapter:
             raise ProviderDenied("Provider route is outside the finite budget")
         return json.loads(_canonical(binding))
 
-    def _request(self, token, binding, identity):
+    def _request_parts(self, token, binding, identity):
         try:
             grant = self._authorise(token, binding)
         except Exception:
             raise ProviderDenied("Current accepted task and exact source provider authority required") from None
-        if (type(grant) is not dict or set(grant) != {"task_text", "context", "recipient", "synthetic_only"}
+        expected_fields = {"task_text", "context", "recipient", "synthetic_only"}
+        projected = type(grant) is dict and grant.get("projection") == PROJECTION
+        if projected:
+            expected_fields.add("projection")
+        if (type(grant) is not dict or set(grant) != expected_fields
                 or grant["context"] != binding["context"] or grant["recipient"] != identity[1]
                 or grant["synthetic_only"] is not True):
             raise ProviderDenied("Runtime provider authority returned an invalid binding")
         text = _text(grant["task_text"], self.budget.max_input_bytes)
-        return {"model": binding["model"], "instructions": INSTRUCTIONS, "input": text,
+        request = {"model": binding["model"], "instructions": INSTRUCTIONS, "input": text,
                 "max_output_tokens": binding["max_output_tokens"], "tools": [], "tool_choice": "none",
                 "store": False, "stream": False, "background": False, "truncation": "disabled"}
+
+        if not projected:
+            return request, None
+        try:
+            wire_request, quote = fixture_request(request, binding["context"])
+        except (KeyError, TypeError, ValueError, RecursionError):
+            raise ProviderDenied("Invalid mission task or fixture pricing route") from None
+        if quote and (self.allow_live or type(self.transport) is OpenAIResponsesHTTP):
+            raise ProviderDenied("Simulated mission prices cannot authorise a live request")
+        return wire_request, quote
+
+    def _request(self, token, binding, identity):
+        return self._request_parts(token, binding, identity)[0]
 
     def _status(self, row):
         state = row["state"]
         if state == "approved" and row["expires"] <= self._now():
             state = "expired"
-        return {"run_id": row["id"], "item_id": row["item_id"], "state": state, "review_digest": row["digest"],
+        value = {"run_id": row["id"], "item_id": row["item_id"], "state": state, "review_digest": row["digest"],
                 "expires": row["expires"], "claimed_at": row["claimed_at"], "cancel_requested": bool(row["cancelled"]),
                 "response_id": row["response_id"], "result_digest": row["result_digest"], "error_code": row["error_code"],
                 "retry_allowed": False, "remote_cancel_confirmed": False, "synthetic_only": True,
                 "authorises_publication": False, "live_provider_verified": False}
+
+        if row["claimed_at"] is not None and self.db.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='pilot_mission_usage'").fetchone():
+            receipt = mission_budget.receipt(self.db, row["id"])
+            if receipt is not None:
+                value["mission_usage"] = receipt
+        return value
 
     def prepare(self, token, run_id, binding):
         _identifier(run_id); binding = self._binding(binding)
@@ -263,11 +289,13 @@ class ResponsesAdapter:
                 if row["id"] != run_id or row["binding"] != _canonical(binding):
                     raise ProviderDenied("Accepted input and provider run cannot be aliased or retargeted")
                 return self._status(row)
-            request = self._request(token, binding, identity)
+            request, quote = self._request_parts(token, binding, identity)
             review = {"domain": VERSION + "/review", "run_id": run_id, "owner": identity[0], "agent": identity[1],
                       "binding": binding, "endpoint": ENDPOINT, "request": request, "budget": asdict(self.budget),
                       "synthetic_only": True, "scope": "One text-only model request; no tools or publication",
                       "retention_note": "store:false disables response retrieval storage; it is not a zero-retention guarantee"}
+            if quote:
+                review["mission_quote"] = quote
             self.db.execute("""INSERT INTO pilot_provider_runs
                 (id,item_id,owner,agent,binding,request,review,digest,state)
                 VALUES(?,?,?,?,?,?,?,?,'prepared')""",
@@ -317,8 +345,9 @@ class ResponsesAdapter:
             # Request construction can take time. Re-read source/task authority
             # after it and immediately before commit, not merely before the
             # claim was written. Any refusal rolls back that claim and budget.
-            approved_request = self._request(token, json.loads(current["binding"]), identity)
-            if (_canonical(approved_request) != current["request"]
+            approved_request, current_quote = self._request_parts(token, json.loads(current["binding"]), identity)
+            if (current_quote != json.loads(current["review"]).get("mission_quote")
+                    or _canonical(approved_request) != current["request"]
                     or current["expires"] <= self._now()):
                 raise ProviderDenied("Provider dispatch authority expired or changed")
         # No payload/credential reaches HTTP before this transaction commits.
@@ -329,9 +358,13 @@ class ResponsesAdapter:
                     raise ProviderDenied("A current unclaimed provider approval is required")
                 if self.db.execute("SELECT COUNT(*) FROM pilot_provider_runs WHERE claimed_at IS NOT NULL").fetchone()[0] >= self.budget.max_requests:
                     raise ProviderDenied("Provider request budget exhausted")
-                request = self._request(token, json.loads(row["binding"]), identity)
+                binding = json.loads(row["binding"])
+                request = self._request(token, binding, identity)
+                quote = json.loads(row["review"]).get("mission_quote")
                 if _canonical(request) != row["request"]:
                     raise ProviderDenied("Provider inputs changed")
+                if quote:
+                    mission_budget.reserve(self.db, row, binding, quote)
                 self.db.execute("UPDATE pilot_provider_runs SET state='uncertain',claimed_at=? WHERE id=?", (self._now(), run_id))
         except ProviderDenied:
             raise
@@ -346,10 +379,12 @@ class ResponsesAdapter:
             self._failure(run_id, "http_error")
             raise ProviderOutcomeUnknown("Provider response did not establish a completed result; do not redispatch.")
         try:
-            response_id, result = self._parse_response(response, request["max_output_tokens"])
+            response_id, result, output_tokens = self._parse_response(response, request["max_output_tokens"])
             with self._transaction():
                 self.db.execute("""UPDATE pilot_provider_runs SET state='completed',response_id=?,result=?,result_digest=?
                     WHERE id=? AND state='uncertain'""", (response_id, self.storage.seal("pilot_provider_runs", run_id, "result", result), _digest({"text": result}), run_id))
+                if quote:
+                    mission_budget.settle(self.db, run_id, output_tokens)
                 # No plaintext must be opened after a response arrives: the owner
                 # may have locked or expired while the single request was in flight.
                 cursor = self.db.execute("SELECT * FROM pilot_provider_runs WHERE id=?", (run_id,))
@@ -402,7 +437,7 @@ class ResponsesAdapter:
                 for part in item["content"]:
                     if type(part) is not dict or part.get("type") != "output_text": raise ValueError()
                     texts.append(_text(part["text"], 32768))
-            return response_id, _text("\n".join(texts), 32768)
+            return response_id, _text("\n".join(texts), 32768), tokens
         except (ValueError, TypeError, KeyError, UnicodeError, RecursionError):
             raise ProviderDenied("Invalid bounded provider response") from None
 

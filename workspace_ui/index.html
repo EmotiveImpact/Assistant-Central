@@ -54,9 +54,15 @@
       <div class="dialog-body form-grid">
         <p class="form-intro">Create the exact proposal first. You will review it separately before release.</p>
         <label>Trusted recipient<select id="proposal-peer" name="peer_id" required></select></label>
-        <label>Proposal type<select id="proposal-kind" name="kind"><option value="task">Task request</option><option value="artifact">Artifact</option></select></label>
+        <label>Proposal type<select id="proposal-kind" name="kind"><option value="task">Task request</option><option value="artifact">Artifact</option><option value="mission">Peer mission</option></select></label>
         <label id="parent-field" class="full" hidden>Accepted task<select id="proposal-parent" name="parent_id"></select></label>
         <label class="full">Title<input name="title" maxlength="120" required placeholder="A short, recognisable name"></label>
+        <fieldset id="mission-fields" class="form-grid full" hidden><legend>Mission terms shared with this peer</legend>
+          <label class="full">Deliverable<input name="mission_deliverable" maxlength="512"></label>
+          <label>Success check<select name="mission_check"><option value="contains">Contains text</option><option value="human_review">Owner judgement</option><option value="max_utf8_bytes">Maximum UTF-8 bytes</option><option value="sha256">Exact SHA-256</option></select></label>
+          <label>Expected value<input name="mission_value" maxlength="256"></label>
+          <label>Simulated budget in millionths of a US dollar<input name="mission_budget" type="number" min="0" max="1000000000" step="1" value="300"></label>
+        </fieldset>
         <label class="full">Exact content<textarea name="text" rows="6" maxlength="4096" required placeholder="Describe the fictional task or paste the exact artifact."></textarea></label>
         <label class="full">Task reference<input name="task_id" maxlength="96" required placeholder="A unique task reference"></label>
         <label class="full">Exact context<input name="context" maxlength="64" pattern="[a-f0-9]{64}" required spellcheck="false" placeholder="64-character task context"></label>

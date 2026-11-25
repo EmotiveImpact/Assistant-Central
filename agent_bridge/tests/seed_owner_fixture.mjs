@@ -9,6 +9,13 @@ const store=new DraftStore(input.launch.storePath,Buffer.from(input.launch.keyHe
 let mcp;
 try {
  if(input.operation==='revoke') {store.revoke(input.launch.binding);process.stdout.write('{"revoked":true}');}
+ else if(input.operation==='cursor-seed') {
+  store.provision(input.launch.binding);
+  const {prepareCursorDraft}=await import('./cursor_draft.mjs');
+  await prepareCursorDraft(input);
+  const saved=store.dispatch(input.launch.binding,'create_task_draft',input.draft);
+  process.stdout.write(JSON.stringify({draftId:saved.draftId,officialCursorHost:true,mcp:true}));
+ }
  else {
   store.provision(input.launch.binding);
   const server=fileURLToPath(new URL('../src/stdio.ts',import.meta.url));

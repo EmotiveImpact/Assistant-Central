@@ -25,6 +25,7 @@ STATIC_FILES = {
     "/host_drafts.mjs": (ROOT / "host_drafts.mjs", "text/javascript; charset=utf-8"),
     "/projections.mjs": (ROOT / "projections.mjs", "text/javascript; charset=utf-8"),
     "/model.mjs": (WEB / "model.mjs", "text/javascript; charset=utf-8"),
+    "/missions.mjs": (ROOT / "missions.mjs", "text/javascript; charset=utf-8"),
     "/conversations.mjs": (ROOT / "conversations.mjs", "text/javascript; charset=utf-8"),
     "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
 }
