@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission card</title>
+<style>
+:root{--bg:#ffffff;--ink:#14201f;--muted:#56656a;--line:#d9e2e2;--accent:#0d6b67;--soft:#e2f1ef;--warn:#a85a00;--warn-soft:#fbefdf;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#16211f;--ink:#e4eeec;--muted:#9aaeab;--line:#28403c;--accent:#5cc4b9;--soft:#183331;--warn:#f0a650;--warn-soft:#3a2a14;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{padding:14px 16px;max-width:640px}
+h1{font-size:1.05rem;margin:0 0 2px}
+.meta{color:var(--muted);font-size:.8rem;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.state{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:99px;background:var(--soft);color:var(--accent);font-size:.78rem;font-weight:600}
+h2{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px;font-weight:600}
+.owner{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.owner b{display:block;margin-bottom:4px}
+ul{margin:0;padding-left:18px}
+li{margin:2px 0}
+.kind{font-weight:600}
+.waiting{border:1px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 12px}
+.peer{color:var(--muted);font-size:.8rem;margin-top:12px}
+#empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <p id="empty">Waiting for the mission card…</p>
+  <section id="card" hidden>
+    <h1 id="goal"></h1>
+    <div class="meta" id="ids"></div>
+    <span class="state" id="state"></span>
+    <h2>Constraints</h2>
+    <div id="owners"></div>
+    <div id="waitwrap" hidden><h2>Waiting on you</h2><div class="waiting"><ul id="waiting"></ul></div></div>
+    <p class="peer">Constraint text is written by the people on this mission and is shown exactly as written. To acknowledge or accept, ask your assistant; you will be asked to confirm with a code.</p>
+  </section>
+</main>
+<script>
+// Display-only MCP App. Every value is inserted with textContent, never as HTML.
+(function () {
+  const el = (id) => document.getElementById(id);
+  const words = { must: 'Must', must_not: 'Must not' };
+  function render(data) {
+    if (!data || typeof data !== 'object' || !data.snapshot) return;
+    const snap = data.snapshot;
+    el('empty').hidden = true; el('card').hidden = false;
+    el('goal').textContent = String(snap.goal || '');
+    el('ids').textContent = 'Mission ' + String(snap.mission_id || '') + ' · fingerprint ' + String(data.card_digest || '');
+    el('state').textContent = String(data.state || '').replace(/_/g, ' ');
+    const owners = el('owners'); owners.replaceChildren();
+    const constraints = Array.isArray(snap.constraints) ? snap.constraints : [];
+    for (const [id, label] of Object.entries(snap.owners || {})) {
+      const mine = constraints.filter((c) => c && c.owner === id);
+      const box = document.createElement('div'); box.className = 'owner';
+      const name = document.createElement('b'); name.textContent = 'From ' + String(label); box.append(name);
+      const list = document.createElement('ul');
+      if (!mine.length) { const li = document.createElement('li'); li.textContent = 'No constraints'; list.append(li); }
+      for (const c of mine) {
+        const li = document.createElement('li');
+        const k = document.createElement('span'); k.className = 'kind';
+        k.textContent = String(c.id) + '. ' + (words[c.kind] || '?') + ': ';
+        li.append(k, document.createTextNode(String(c.text)));
+        list.append(li);
+      }
+      box.append(list); owners.append(box);
+    }
+    const waiting = Array.isArray(data.waiting_on_you) ? data.waiting_on_you : [];
+    el('waitwrap').hidden = !waiting.length;
+    el('waiting').replaceChildren(...waiting.map((w) => { const li = document.createElement('li'); li.textContent = String(w); return li; }));
+  }
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent) return;
+    const msg = event.data;
+    if (msg && msg.jsonrpc === '2.0' && msg.method === 'ui/notifications/tool-result') {
+      render(msg.params && msg.params.structuredContent);
+    }
+  });
+  window.parent.postMessage({ jsonrpc: '2.0', id: 1, method: 'ui/initialize',
+    params: { appInfo: { name: 'assistant-central-mission-card', version: '1.0.0' }, appCapabilities: {} } }, '*');
+  window.__render = render;  // used by offline tests only
+})();
+</script>
+</body>
+</html>
