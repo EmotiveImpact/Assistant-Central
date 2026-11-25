@@ -33,6 +33,10 @@ Every message an assistant sends is wrapped by `label.py` with a human-readable 
 
 `tools.py` registers MCP tools on any `MCPServer`, for example the one from `mission_approvals.server.build_server`. Adding a constraint, acknowledging a card and accepting or returning a delivery go through an elicitation round (MCP 2026-07-28), so only the owner can take those steps.
 
+## Card view inside the assistant (MCP App)
+
+`app.py` returns an MCP Apps extension (`io.modelcontextprotocol/ui`) with one display-only tool, `show_mission_card`, bound to `ui://assistant-central/mission-card.html` (`card_app.html`). Hosts that support MCP Apps show the card visually; others get the same content as text. The page inserts every value as text, never HTML, and has no buttons that commit anything, so acknowledging and accepting still go through the elicitation tools and their confirmation code. Use it with `MCPServer(name, extensions=[card_app(book, owner_id)])`. The browser check `tests/card_app_check.mjs` needs Playwright and runs locally; the postMessage method names follow the ext-apps draft and should be rechecked against a real host.
+
 ## Limits
 
 - The host decides who is speaking: it must authenticate the sender before posting to a log. Elicited approvals in `tools.py` are not yet wired to receipt signing on the owner's device.
@@ -42,5 +46,5 @@ Every message an assistant sends is wrapped by `label.py` with a human-readable 
 
 ```sh
 pip install -r mission_approvals/requirements.txt cryptography==50.0.0
-python -m unittest mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts mission_cards.tests.test_budget mission_cards.tests.test_passkey
+python -m unittest mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts mission_cards.tests.test_budget mission_cards.tests.test_passkey mission_cards.tests.test_app
 ```
