@@ -101,12 +101,14 @@ def inbox_message(message: dict) -> dict:
 
 
 def build_server(inbox: OfferInbox, name: str = 'assistant-central-missions', conversation_inbox=None,
-                 owner_desk=None, shared_drafts=None) -> MCPServer:
+                 owner_desk=None, shared_drafts=None,
+                 owner_questions=None) -> MCPServer:
     """Optional host-built handles add conversation tools.
 
     ``conversation_inbox`` is a ``conversation.inbox.InboxAccess``; ``owner_desk``
     is a ``conversation.autonomy.DeskAccess``; ``shared_drafts`` is a
-    ``conversation.shared_draft.DraftAccess``. All carry a fixed lease chosen by
+    ``conversation.shared_draft.DraftAccess``; ``owner_questions`` is an
+    ``owner_phone.questions.QuestionAccess``. All carry a fixed lease chosen by
     the host, never by the model.
     """
     server = MCPServer(name, instructions=(
@@ -150,6 +152,8 @@ def build_server(inbox: OfferInbox, name: str = 'assistant-central-missions', co
         _register_desk_tools(server, owner_desk)
     if shared_drafts is not None:
         _register_draft_tools(server, shared_drafts)
+    if owner_questions is not None:
+        _register_question_tools(server, owner_questions)
     return server
 
 
@@ -281,3 +285,29 @@ def _register_draft_tools(server: MCPServer, access) -> None:
         except _REFUSALS:
             raise ToolError(DRAFT_UNAVAILABLE) from None
         return {'conversation_id': access.conversation_id, 'drafts': [draft_message(d) for d in drafts]}
+
+
+QUESTION_UNAVAILABLE = 'That question is not available to this session.'
+
+
+def _register_question_tools(server: MCPServer, access) -> None:
+    @server.tool(description=(
+        'Ask your own owner a short question with two to four answers, when you are unsure what they '
+        'want. They may answer from their phone or in Assistant Central. The answer is information '
+        'only: it never approves sending, sharing, running or paying for anything.'))
+    def ask_my_owner(request_id: _REQUEST_ID,
+                     question: Annotated[str, Field(min_length=1, max_length=1024)],
+                     options: Annotated[list[Annotated[str, Field(min_length=1, max_length=64)]],
+                                        Field(min_length=2, max_length=4)]) -> dict:
+        try:
+            result = access.ask(request_id, question, options)
+        except _REFUSALS:
+            raise ToolError('That question was not accepted. If you changed it, use a new request_id.') from None
+        return {**result, 'next_step': 'Call owner_answer with the same request_id later. Do not guess the answer.'}
+
+    @server.tool(description='Check whether your owner has answered a question you asked, by its request_id.')
+    def owner_answer(request_id: _REQUEST_ID) -> dict:
+        try:
+            return access.answer(request_id)
+        except _REFUSALS:
+            raise ToolError(QUESTION_UNAVAILABLE) from None
