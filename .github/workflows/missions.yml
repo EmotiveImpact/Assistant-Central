@@ -1,0 +1,21 @@
+name: Mission approvals and cards
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  missions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned dependencies
+        run: python -m pip install -r mission_approvals/requirements.txt cryptography==50.0.0
+      - name: Run offline MCP 2026-07-28 tests
+        run: python -B -m unittest mission_approvals.tests.test_review mission_cards.tests.test_cards mission_cards.tests.test_tools -v
