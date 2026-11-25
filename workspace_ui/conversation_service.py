@@ -14,6 +14,7 @@ import re
 import time
 
 from .mission_service import MissionService, ROUTE as MISSION_ROUTE
+from .approval_service import ApprovalService
 from conversation import ConversationLedger, ContextBinding
 from conversation.ledger import need, identifier
 from pilot.auth import AuthError, _private_path
@@ -63,6 +64,7 @@ class ConversationService:
         self.ledger = None
         self.reviews = {}
         self.missions = MissionService(self)
+        self.approvals = None
         self.extra_services = []
         try:
             primary_id = fingerprint(primary.auth.public_identity())
@@ -82,7 +84,10 @@ class ConversationService:
             need(config.directory not in [s.auth.directory for s in self.services.values()])
             self.ledger = ConversationLedger(config.directory, primary.auth,
                                             {key: s.auth for key, s in self.services.items()})
+            self.approvals = ApprovalService(self, config.directory.with_name(config.directory.name + '-approvals'))
         except BaseException:
+            if self.approvals is not None:
+                self.approvals.close()
             for service in reversed(self.extra_services):
                 service.close()
             if self.ledger is not None:
@@ -91,6 +96,8 @@ class ConversationService:
 
     def close(self):
         self.reviews.clear()
+        if self.approvals is not None:
+            self.approvals.close()
         if self.ledger is not None:
             self.ledger.close()
         for service in reversed(self.extra_services):
@@ -136,6 +143,10 @@ class ConversationService:
         principal, service = self.actor(token)
         if path == '/api/session' and method == 'DELETE':
             self.reviews = {k: v for k, v in self.reviews.items() if v['session'] != self.session_key(token)}
+        if path.startswith('/api/approvals'):
+            result = self.approvals.call(principal, token, method, path, body)
+            need(len(encode(result)) <= MAX_RESPONSE)
+            return result
         if path.startswith('/api/conversations'):
             result = self.conversation_call(principal, token, method, path, body)
             need(len(encode(result)) <= MAX_RESPONSE)
@@ -145,6 +156,7 @@ class ConversationService:
             result['conversations'] = {'enabled': True, 'local_host_only': True,
                                        'coordinator': self.public_actor(self.ledger.storage_owner),
                                        'provider_history_authorised': False}
+            result['approvals'] = {'enabled': True}
         return result
 
     def conversation_call(self, principal, token, method, path, body):
