@@ -70,7 +70,7 @@ def sign(statement: dict, private_key: Ed25519PrivateKey) -> dict:
             'signatures': [{'keyid': key_id(private_key.public_key()), 'sig': _b64(signature)}]}
 
 
-def verify(envelope: object, owner_keys: dict) -> dict:
+def verify(envelope: object, owner_keys: dict, predicate_type: str = PREDICATE_TYPE) -> dict:
     """Check an envelope against the owners' registered public keys.
 
     ``owner_keys`` maps owner id to Ed25519PublicKey. The signer must be the owner named
@@ -83,8 +83,9 @@ def verify(envelope: object, owner_keys: dict) -> dict:
     except ValueError:
         raise CardError('Receipt payload is not JSON') from None
     need(type(statement) is dict and statement.get('_type') == STATEMENT_TYPE
-         and statement.get('predicateType') == PREDICATE_TYPE, 'Not a mission step receipt')
+         and statement.get('predicateType') == predicate_type, 'Not the expected kind of receipt')
     need(canonical(statement) == payload, 'Receipt payload is not canonical')
+    need(type(statement.get('predicate')) is dict, 'Receipt has no predicate')
     actor = statement['predicate'].get('actor')
     public_key = owner_keys.get(actor)
     need(public_key is not None, 'No registered key for the owner who took this step')

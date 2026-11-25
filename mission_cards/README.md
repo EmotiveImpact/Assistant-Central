@@ -21,6 +21,10 @@ Every message an assistant sends is wrapped by `label.py` with a human-readable 
 
 `receipts.py` turns each owner decision or delivery in the log into an in-toto Statement v1 inside a DSSE envelope, signed with an Ed25519 key the owner holds. Any host or relay can carry the envelope, but only that owner's key verifies, so a host cannot fake anyone's yes. `matches_log` checks that a receipt names a step that is really in a given copy of the log. The encoders are written from the public in-toto and DSSE specifications; no code is copied.
 
+## Mission budgets
+
+`budget.py` lets an owner sign a spending mandate for one mission: payee, currency, total, per-charge limit, expiry and purpose, bound to the exact card version. `BudgetLedger` verifies the mandate against the owner's key and accepts a proposed charge only if it fits. No payment rail is involved, so a real one can be added behind the same check. The shape maps onto AP2 intent mandates and Verifiable Intent; no code is copied.
+
 ## Inside the assistant
 
 `tools.py` registers MCP tools on any `MCPServer`, for example the one from `mission_approvals.server.build_server`. Adding a constraint, acknowledging a card and accepting or returning a delivery go through an elicitation round (MCP 2026-07-28), so only the owner can take those steps.
@@ -34,5 +38,5 @@ Every message an assistant sends is wrapped by `label.py` with a human-readable 
 
 ```sh
 pip install -r mission_approvals/requirements.txt cryptography==50.0.0
-python -m unittest mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts
+python -m unittest mission_cards.tests.test_cards mission_cards.tests.test_tools mission_cards.tests.test_receipts mission_cards.tests.test_budget
 ```
