@@ -6,7 +6,7 @@ import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
 // The product name is a placeholder while naming is decided. Change it here only.
-export const PRODUCT={short:'Central',full:'Assistant Central'};
+export const PRODUCT={short:'Parlu',full:'Parlu'};
 for(const node of document.querySelectorAll('[data-product]'))node.textContent=PRODUCT[node.dataset.product]??PRODUCT.short;
 for(const node of document.querySelectorAll('[data-product-label]'))node.setAttribute('aria-label',node.dataset.productLabel.replace('{product}',PRODUCT.short));
 document.title=PRODUCT.short+' · Your assistant workspace';
