@@ -180,6 +180,20 @@ class InboxStore:
             finally:
                 self._commit_or_rollback(error)
 
+    def check_lease(self, session, lease):
+        """Confirm a lease is current for its owner's live session; returns its epoch."""
+        with self._lock:
+            self._authenticate(self._key(lease)[0], session)
+            error = None
+            self._write()
+            try:
+                return self._live(lease)['epoch']
+            except BaseException as exc:
+                error = exc
+                raise
+            finally:
+                self._commit_or_rollback(error)
+
     def revoke(self, session, lease):
         """Terminal for this generation. Retained cursor and deliveries remain."""
         with self._lock:

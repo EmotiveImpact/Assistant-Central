@@ -9,7 +9,7 @@ import re
 from pilot.crypto import digest
 from pilot.source_grants import (GrantDenied, MAX_LIFETIME, MAX_SOURCES,
                                  _snapshot, commitment, disclosure_plan)
-from .ledger import (ConversationDenied, ConversationLedger, bounded_text,
+from .ledger import (KINDS, SOURCE_FREE_KINDS, ConversationDenied, ConversationLedger, bounded_text,
                      identifier, need)
 
 VERSION = 'assistant-central-conversation-disclosure-review/1'
@@ -79,10 +79,10 @@ class ConversationDisclosureReviews:
             body = signed['body']
             need(body['conversation_id'] == conversation_id)
             bounded_text(body['text'])
-            need(body['kind'] in ('message', 'quote', 'summary'))
+            need(body['kind'] in KINDS)
             sources = body['sources']
             need(type(sources) is list and len(sources) <= MAX_SOURCES)
-            need(body['kind'] == 'message' or bool(sources))
+            need(body['kind'] in SOURCE_FREE_KINDS or bool(sources))
             direct = set()
             for source in sources:
                 need(type(source) is dict and set(source) == {'id', 'digest'})

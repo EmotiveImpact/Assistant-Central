@@ -28,6 +28,10 @@ MAX_MEMBERS = 32
 MAX_SOURCES = 32
 MAX_TEXT = 16384
 MAX_GRANT_SECONDS = 86400
+# 'assistant' marks a message an owner's assistant sent under a standing
+# owner policy, without per-message review. It is still signed by the owner.
+KINDS = ('message', 'assistant', 'quote', 'summary')
+SOURCE_FREE_KINDS = ('message', 'assistant')
 _ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}\Z')
 
 
@@ -436,9 +440,9 @@ class ConversationLedger:
 
     def append(self, principal, session, binding, *, request_id, text, kind='message', source_ids=()):
         identifier(request_id); bounded_text(text)
-        need(kind in ('message', 'quote', 'summary') and type(source_ids) in (list, tuple) and len(source_ids) <= MAX_SOURCES)
+        need(kind in KINDS and type(source_ids) in (list, tuple) and len(source_ids) <= MAX_SOURCES)
         need(all(type(x) is str for x in source_ids) and len(set(source_ids)) == len(source_ids))
-        need(kind == 'message' or bool(source_ids))
+        need(kind in SOURCE_FREE_KINDS or bool(source_ids))
         for source in source_ids:
             identifier(source)
         request = {'kind': kind, 'text': text, 'source_ids': list(source_ids)}
@@ -499,11 +503,11 @@ class ConversationLedger:
             need(body['author'] == principal and body['conversation_id'] == binding.conversation_id
                  and body['request_id'] == request_id)
             bounded_text(body['text'])
-            need(body['kind'] in ('message', 'quote', 'summary'))
+            need(body['kind'] in KINDS)
             need(type(body['sources']) is list and len(body['sources']) <= MAX_SOURCES
                  and all(type(source) is dict and set(source) == {'id', 'digest'} for source in body['sources']))
             source_ids = [identifier(source['id']) for source in body['sources']]
-            need(len(set(source_ids)) == len(source_ids) and (body['kind'] == 'message' or bool(source_ids)))
+            need(len(set(source_ids)) == len(source_ids) and (body['kind'] in SOURCE_FREE_KINDS or bool(source_ids)))
             retained_request = {'kind': body['kind'], 'text': body['text'],
                                 'source_ids': source_ids}
             # An indexed digest alone is insufficient, even with a valid body
