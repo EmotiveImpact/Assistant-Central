@@ -29,6 +29,7 @@ from pilot.crypto import canonical, digest, fingerprint
 from pilot.storage import RecordStorage
 
 from .inbox import AssistantLease, InboxStore
+from .timeline import record_safely
 from .ledger import (ConversationDenied, ConversationLedger, ConversationOutcomeUnknown,
                      bounded_text, identifier, need)
 
@@ -52,7 +53,8 @@ class _DeskStorage(RecordStorage):
 class OwnerDesk:
     """One owner's policies, guidance and pending assistant drafts."""
 
-    def __init__(self, directory, ledger, inbox, principal):
+    def __init__(self, directory, ledger, inbox, principal, timeline=None):
+        self.timeline = timeline
         need(type(ledger) is ConversationLedger and type(inbox) is InboxStore and inbox.ledger is ledger)
         need(type(principal) is str and principal in ledger.actors)
         self.ledger, self.inbox, self.principal = ledger, inbox, principal
@@ -139,7 +141,12 @@ class OwnerDesk:
                 version = 1 if old is None else old['version'] + 1
                 self.db.execute('INSERT OR REPLACE INTO desk_policies VALUES(?,?,?,?,?,?,?,?,0,0)',
                                 (assistant_id, conversation_id, version, mode, every, max_auto, max_bytes, now + ttl))
-                return self._policy_view(assistant_id, conversation_id, now)
+                view = self._policy_view(assistant_id, conversation_id, now)
+            record_safely(self.timeline, 'policy_changed', conversation_id, role='you',
+                          ref=f'policy:{assistant_id}:{conversation_id}:{version}',
+                          detail={'assistant_id': assistant_id, 'mode': mode, 'every': every, 'max_auto': max_auto,
+                                  'max_bytes': max_bytes, 'expires_at': now + ttl})
+            return view
 
     def clear_policy(self, session, assistant_id, conversation_id):
         """Back to the default: review every message."""
@@ -147,9 +154,12 @@ class OwnerDesk:
         with self._lock:
             self._owner(session)
             with self._txn():
-                self._now()
+                now = self._now()
                 self.db.execute('DELETE FROM desk_policies WHERE assistant_id=? AND conversation_id=?',
                                 (assistant_id, conversation_id))
+            record_safely(self.timeline, 'policy_changed', conversation_id, role='you',
+                          ref=f'policy-clear:{assistant_id}:{conversation_id}:{now}',
+                          detail={'assistant_id': assistant_id, 'mode': 'review_each'})
 
     def policy(self, session, assistant_id, conversation_id):
         identifier(assistant_id); identifier(conversation_id)
@@ -180,7 +190,9 @@ class OwnerDesk:
                 self.db.execute('INSERT INTO desk_guidance VALUES(?,?,?,?,?)',
                                 (note_id, assistant_id, conversation_id, now,
                                  self.storage.seal('desk_guidance', note_id, 'body', text)))
-                return {'id': note_id}
+            record_safely(self.timeline, 'guidance_changed', conversation_id, role='you',
+                          ref=f'guidance:{note_id}:added', detail={'assistant_id': assistant_id, 'note_id': note_id})
+            return {'id': note_id}
 
     def remove_guidance(self, session, note_id):
         identifier(note_id)
@@ -188,7 +200,11 @@ class OwnerDesk:
             self._owner(session)
             with self._txn():
                 self._now()
-                need(self.db.execute('DELETE FROM desk_guidance WHERE id=?', (note_id,)).rowcount == 1)
+                row = self.db.execute('SELECT assistant_id,conversation_id FROM desk_guidance WHERE id=?', (note_id,)).fetchone()
+                need(row is not None)
+                self.db.execute('DELETE FROM desk_guidance WHERE id=?', (note_id,))
+            record_safely(self.timeline, 'guidance_changed', row['conversation_id'], role='you',
+                          ref=f'guidance:{note_id}:removed', detail={'assistant_id': row['assistant_id'], 'note_id': note_id})
 
     def _guidance(self, assistant_id, conversation_id):
         return [{'id': row['id'], 'text': self.storage.open('desk_guidance', row['id'], 'body', row['body'])}
@@ -238,6 +254,9 @@ class OwnerDesk:
                                     (draft['id'], assistant_id, conversation_id, request_id, text_digest,
                                      draft['state'], draft['auto'], now,
                                      self.storage.seal('desk_drafts', draft['id'], 'body', text)))
+            record_safely(self.timeline, 'message_proposed', conversation_id, role='your_assistant',
+                          ref='draft:' + draft['id'], detail={'draft_id': draft['id'], 'assistant_id': assistant_id,
+                                                              'request_id': request_id, 'under_policy': bool(draft['auto'])})
             if draft['state'] in ('sending', 'uncertain'):
                 # Retry with the same kind so the ledger's exact-request dedupe holds.
                 draft = self._send(session, draft, text, kind='assistant' if draft['auto'] else 'message')
@@ -273,6 +292,13 @@ class OwnerDesk:
                 # A definite refusal sent nothing: return the allowance.
                 self.db.execute('UPDATE desk_policies SET auto_used=MAX(auto_used-1,0),streak=MAX(streak-1,0) WHERE assistant_id=? AND conversation_id=?',
                                 (draft['assistant_id'], draft['conversation_id']))
+        if state in ('sent', 'failed'):
+            entry = 'message_failed' if state == 'failed' else (
+                'message_sent_by_assistant' if kind == 'assistant' else 'message_approved')
+            role = {'message_failed': 'system', 'message_sent_by_assistant': 'your_assistant'}.get(entry, 'you')
+            record_safely(self.timeline, entry, draft['conversation_id'], role=role,
+                          ref='draft:' + draft['id'],
+                          detail={'draft_id': draft['id'], 'message_id': event_id, 'assistant_id': draft['assistant_id']})
         return {**draft, 'state': state, 'event_id': event_id}
 
     def status_for(self, session, lease, request_id):
@@ -326,6 +352,9 @@ class OwnerDesk:
                 self._now()
                 need(self.db.execute("UPDATE desk_drafts SET state='declined' WHERE id=? AND state='awaiting_owner'",
                                      (draft_id,)).rowcount == 1)
+                row = self.db.execute('SELECT assistant_id,conversation_id FROM desk_drafts WHERE id=?', (draft_id,)).fetchone()
+            record_safely(self.timeline, 'message_declined', row['conversation_id'], role='you', ref='draft:' + draft_id,
+                          detail={'draft_id': draft_id, 'assistant_id': row['assistant_id']})
 
 
 class _Txn:

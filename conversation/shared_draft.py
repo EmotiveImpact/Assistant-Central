@@ -15,6 +15,7 @@ import math
 from .inbox import AssistantLease, InboxStore
 from .ledger import MAX_GRANT_SECONDS, bounded_text, identifier, need
 from .proposals import LocalProposals
+from .timeline import record_safely
 
 DEFAULT_SECONDS = 86400
 
@@ -38,7 +39,8 @@ class DraftAccess:
     host callback, so a model cannot choose the owner or the conversation.
     """
 
-    def __init__(self, proposals, inbox, lease, session_provider):
+    def __init__(self, proposals, inbox, lease, session_provider, timeline=None):
+        self._timeline = timeline
         need(type(proposals) is LocalProposals and type(inbox) is InboxStore and proposals.ledger is inbox.ledger)
         need(type(lease) is AssistantLease and callable(session_provider))
         self._proposals, self._inbox, self._lease, self._session = proposals, inbox, lease, session_provider
@@ -65,8 +67,16 @@ class DraftAccess:
             need(existing['proposal']['statement']['content'] == text
                  and existing['proposal']['statement']['previous'] is None)
             return draft_view(existing)
-        return draft_view(self._proposals.create(self._lease.principal, session, binding, request_id=request_id,
+        view = draft_view(self._proposals.create(self._lease.principal, session, binding, request_id=request_id,
                                                  content=text, expires_at=self._expiry(seconds)))
+        self._record('draft_started', view)
+        return view
+
+    def _record(self, kind, view, responds_to=None):
+        record_safely(self._timeline, kind, self._lease.conversation_id, role='your_assistant',
+                      ref='proposal:' + view['draft_id'],
+                      detail={'draft_id': view['draft_id'], 'series_id': view['series_id'], 'revision': view['revision'],
+                              'responds_to': responds_to, 'assistant_id': self._lease.assistant_id})
 
     def revise(self, request_id, draft_id, text, *, seconds=DEFAULT_SECONDS):
         """Revise your owner's own draft, or suggest changes to another person's as a new draft."""
@@ -81,7 +91,9 @@ class DraftAccess:
         own = base['author'] == principal
         result = self._proposals.create(principal, session, binding, request_id=request_id, content=text,
                                         expires_at=self._expiry(seconds), replaces=draft_id if own else None)
-        return {**draft_view(result), 'responds_to': draft_id, 'kind': 'revision' if own else 'suggestion'}
+        view = {**draft_view(result), 'responds_to': draft_id, 'kind': 'revision' if own else 'suggestion'}
+        self._record('draft_revised' if own else 'draft_suggested', view, draft_id)
+        return view
 
     def view(self, draft_id):
         identifier(draft_id)

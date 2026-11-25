@@ -24,6 +24,7 @@ from pilot.storage import RecordStorage
 
 from conversation.inbox import AssistantLease, InboxStore
 from conversation.ledger import ConversationDenied, bounded_text, identifier, need
+from conversation.timeline import record_safely
 
 VERSION = 'assistant-central-owner-questions/1'
 MAX_QUESTION_BYTES = 1024
@@ -43,7 +44,8 @@ class _QuestionStorage(RecordStorage):
 class OwnerQuestions:
     """One owner's assistant questions, plus a single paired phone chat."""
 
-    def __init__(self, directory, inbox, principal):
+    def __init__(self, directory, inbox, principal, timeline=None):
+        self.timeline = timeline
         need(type(inbox) is InboxStore and type(principal) is str and principal in inbox.ledger.actors)
         self.inbox, self.principal = inbox, principal
         self.auth = inbox.ledger.actors[principal]
@@ -144,7 +146,11 @@ class OwnerQuestions:
                                 (question_id, lease.assistant_id, lease.conversation_id, request_id, request_digest,
                                  len(options), now, now + seconds,
                                  self.storage.seal('owner_questions', question_id, 'body', canonical(body).decode())))
-                return self._view(self._row(question_id), now)
+                view = self._view(self._row(question_id), now)
+            record_safely(self.timeline, 'question_asked', lease.conversation_id, role='your_assistant',
+                          ref='question:' + question_id,
+                          detail={'question_id': question_id, 'assistant_id': lease.assistant_id})
+            return view
 
     def answer_for(self, session, lease, request_id):
         identifier(request_id)
@@ -191,7 +197,10 @@ class OwnerQuestions:
                 return self._view(row, now)
             need(now < row['expires'])
             self.db.execute('UPDATE owner_questions SET answer=?,answered_via=? WHERE id=?', (option, via, question_id))
-            return self._view(self._row(question_id), now)
+            view = self._view(self._row(question_id), now)
+        record_safely(self.timeline, 'question_answered', row['conversation_id'], role='you',
+                      ref='question:' + question_id, detail={'question_id': question_id, 'via': via})
+        return view
 
     # Phone pairing -----------------------------------------------------------
 
