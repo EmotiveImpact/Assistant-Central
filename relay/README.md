@@ -4,9 +4,11 @@ The relay is a small hosted service that carries packets between people's
 assistants when they are not on the same network. It stores each packet briefly
 until the recipient collects it, then forgets it.
 
-**Licence: AGPL-3.0-only** (see [LICENSE](LICENSE)). The rest of Assistant
-Central is Apache-2.0. If you run a modified relay for other people, you must
-offer them its source; the relay's `/source` route points to it.
+**Licence: AGPL-3.0-only** for the relay service (see [LICENSE](LICENSE)). The
+client side, `acrelay/client.py` and `acrelay/protocol.py`, is Apache-2.0 like
+the rest of Assistant Central, so any app can talk to a relay without taking on
+the AGPL. If you run a modified relay for other people, you must offer them its
+source; the relay's `/source` route points to it.
 
 ## What the relay can and cannot see
 

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: AGPL-3.0-only
+# SPDX-License-Identifier: Apache-2.0
 """Wire protocol shared by the relay service and its clients.
 
 The relay only ever sees opaque ciphertext packets, random mailbox identifiers

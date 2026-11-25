@@ -109,9 +109,11 @@ to run on Vercel with Postgres, or locally with SQLite.
 - Packets are opaque bytes. The relay holds at most 1,000 packets or 32 MiB per
   mailbox, for at most 14 days, and deletes them when the owner acknowledges.
 
-Today the pilot delivers packets through its explicit HTTPS mailbox and file
-exchange. Connecting the pilot's delivery to the relay client is the next step
-for the two-machine milestone.
+The pilot can deliver packets through the relay
+([`pilot/relay_carrier.py`](pilot/RELAY_CARRIER.md)), through its explicit HTTPS
+mailbox, or as files. Whichever carrier is used, the recipient still imports
+each packet through the authenticated file-exchange step, and only a signed
+receipt counts as delivery.
 
 ## Model calls
 

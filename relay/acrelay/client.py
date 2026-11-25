@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: AGPL-3.0-only
+# SPDX-License-Identifier: Apache-2.0
 """Owner-side client for the relay. Standard library HTTPS plus the shared protocol."""
 import json
 import time
