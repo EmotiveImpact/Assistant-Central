@@ -56,6 +56,10 @@ content. The demo password is `Fictional browser test password`.
 | `conversation/` | Durable direct and group conversations, owner-controlled history sharing and shared proposals |
 | `workspace_ui/` | Central, the browser workspace where each person reviews and decides |
 | `agent_bridge/` | The MCP bridge that lets an existing assistant join |
+| `mission_approvals/` | The assistant-facing MCP tools: inbox, proposing messages, shared drafts, asking the owner, mission offers |
+| `owner_phone/` | Ask the owner a question by phone (Telegram) |
+| `mission_cards/`, `a2a_extension/` | Mission cards, receipts and spending mandates, and an A2A protocol extension |
+| `relay/` | The hosted relay that carries encrypted packets between people (AGPL-3.0) |
 | `isolation/`, `network_acceptance/` | Tests that run owners in separate containers and networks |
 | `team/`, `integration/`, `execution/`, `prototypes/` | Earlier proofs of the same ideas, kept for reference |
 | `research/` | Notes comparing related projects, with pinned reference snapshots |
