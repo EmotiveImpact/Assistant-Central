@@ -1,0 +1,16 @@
+Assistant Central
+Copyright 2026 The Assistant Central Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It includes third-party material under its own licences:
+
+- prototypes/consent-v29/vendor/a4a: A4A code under the MIT licence. See
+  prototypes/consent-v29/vendor/a4a/LICENSE and THIRD_PARTY_LICENSES.md.
+- prototypes/consent-v29/vendor/a4a_sdk/nip44_vectors.LICENSE.txt: public
+  NIP-44 test vector licence text.
+- workspace_ui/InterVariable.woff2: Inter typeface under the SIL Open Font
+  Licence 1.1. See workspace_ui/INTER-LICENSE.txt.
+- research/sources: pinned upstream snapshots kept for reference only, each
+  under its own MIT or Apache-2.0 licence, preserved in its licences/ folder.
+  They are not part of the Assistant Central software.

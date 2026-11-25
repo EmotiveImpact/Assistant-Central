@@ -21,3 +21,6 @@ in a private chat. Do not claim tests or behaviour that have not been verified.
 Use separate work branches. Keep synthetic decisions distinct from authenticated
 human consent and keep live provider activation explicit. Do not merge without
 Augustus's explicit approval. Use British English in documentation.
+
+Sign off every commit under the Developer Certificate of Origin (`git commit -s`)
+and keep test secrets obviously fictional. See [CONTRIBUTING](CONTRIBUTING.md).
