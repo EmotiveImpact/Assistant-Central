@@ -90,6 +90,8 @@ def render_offer(record: dict, offer_digest: str) -> str:
 
 
 INBOX_UNAVAILABLE = 'The conversation inbox is unavailable for this session.'
+# Refusals that must reach the model as a plain message, without internal detail.
+_REFUSALS = (ConversationDenied, ConversationOutcomeUnknown, AuthError)
 
 
 def inbox_message(message: dict) -> dict:
@@ -99,11 +101,12 @@ def inbox_message(message: dict) -> dict:
 
 
 def build_server(inbox: OfferInbox, name: str = 'assistant-central-missions', conversation_inbox=None,
-                 owner_desk=None) -> MCPServer:
+                 owner_desk=None, shared_drafts=None) -> MCPServer:
     """Optional host-built handles add conversation tools.
 
     ``conversation_inbox`` is a ``conversation.inbox.InboxAccess``; ``owner_desk``
-    is a ``conversation.autonomy.DeskAccess``. Both carry a fixed lease chosen by
+    is a ``conversation.autonomy.DeskAccess``; ``shared_drafts`` is a
+    ``conversation.shared_draft.DraftAccess``. All carry a fixed lease chosen by
     the host, never by the model.
     """
     server = MCPServer(name, instructions=(
@@ -145,6 +148,8 @@ def build_server(inbox: OfferInbox, name: str = 'assistant-central-missions', co
         _register_inbox_tools(server, conversation_inbox)
     if owner_desk is not None:
         _register_desk_tools(server, owner_desk)
+    if shared_drafts is not None:
+        _register_draft_tools(server, shared_drafts)
     return server
 
 
@@ -156,7 +161,7 @@ def _register_inbox_tools(server: MCPServer, access) -> None:
     def check_inbox(limit: Annotated[int, Field(ge=1, le=50)] = 20) -> dict:
         try:
             batch = access.pending(limit)
-        except (ConversationDenied, ConversationOutcomeUnknown):
+        except _REFUSALS:
             raise ToolError(INBOX_UNAVAILABLE) from None
         return {'conversation_id': access.conversation_id,
                 'messages': [inbox_message(m) for m in batch['messages']],
@@ -169,19 +174,18 @@ def _register_inbox_tools(server: MCPServer, access) -> None:
     def acknowledge_inbox(through_message_id: str) -> dict:
         try:
             return access.acknowledge(through_message_id)
-        except (ConversationDenied, ConversationOutcomeUnknown):
+        except _REFUSALS:
             raise ToolError('That message cannot be acknowledged: it was not delivered to this session.') from None
 
     @server.tool(description='Whether anything new is waiting. Returns no message content.')
     def inbox_status() -> dict:
         try:
             return {'pending': access.wake_hint()['pending']}
-        except (ConversationDenied, ConversationOutcomeUnknown):
+        except _REFUSALS:
             raise ToolError(INBOX_UNAVAILABLE) from None
 
 
 DESK_UNAVAILABLE = 'Your owner\'s desk is not available to this session right now.'
-_DESK_ERRORS = (ConversationDenied, ConversationOutcomeUnknown, AuthError)
 
 
 def _register_desk_tools(server: MCPServer, access) -> None:
@@ -191,7 +195,7 @@ def _register_desk_tools(server: MCPServer, access) -> None:
     def read_owner_guidance() -> dict:
         try:
             return access.guidance()
-        except _DESK_ERRORS:
+        except _REFUSALS:
             raise ToolError(DESK_UNAVAILABLE) from None
 
     @server.tool(description=(
@@ -203,7 +207,7 @@ def _register_desk_tools(server: MCPServer, access) -> None:
                         text: Annotated[str, Field(min_length=1, max_length=16384)]) -> dict:
         try:
             result = access.propose(request_id, text)
-        except _DESK_ERRORS:
+        except _REFUSALS:
             raise ToolError('That message was not accepted. If you changed the text, use a new request_id.') from None
         return {**result, 'next_step': _desk_next_step(result['state'])}
 
@@ -211,7 +215,7 @@ def _register_desk_tools(server: MCPServer, access) -> None:
     def message_status(request_id: Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]) -> dict:
         try:
             result = access.status(request_id)
-        except _DESK_ERRORS:
+        except _REFUSALS:
             raise ToolError('No message with that request_id is known to this session.') from None
         return {**result, 'next_step': _desk_next_step(result['state'])}
 
@@ -225,3 +229,55 @@ def _desk_next_step(state: str) -> str:
         'failed': 'The conversation refused this message. Nothing was sent.',
         'sending': 'Sending. Check message_status shortly.',
     }.get(state, 'Check message_status later.')
+
+
+_REQUEST_ID = Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]
+_DRAFT_ID = Annotated[str, Field(pattern=r'^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$')]
+_DRAFT_TEXT = Annotated[str, Field(min_length=1, max_length=16384)]
+DRAFT_UNAVAILABLE = 'That draft is not available to this session.'
+DRAFT_NEXT_STEP = ('Each person approves the exact current revision themselves, in Assistant Central. '
+                   'You cannot approve for anyone. A final draft is agreed text only: it sends, '
+                   'runs and pays for nothing.')
+
+
+def draft_message(view: dict) -> dict:
+    """Assistant-facing draft. Text may be written by another person."""
+    return {**view, 'text': _peer_text(view['text']), 'peer_authored_fields': ['text']}
+
+
+def _register_draft_tools(server: MCPServer, access) -> None:
+    @server.tool(description=(
+        'Start a shared draft beside the conversation, such as a plan, itinerary or reply that '
+        'everyone works on together. Reuse the same request_id to retry.'))
+    def start_draft(request_id: _REQUEST_ID, text: _DRAFT_TEXT) -> dict:
+        try:
+            view = access.start(request_id, text)
+        except _REFUSALS:
+            raise ToolError('That draft was not started. If you changed the text, use a new request_id.') from None
+        return {**draft_message(view), 'next_step': DRAFT_NEXT_STEP}
+
+    @server.tool(description=(
+        'Change a shared draft. If your owner wrote it, this makes a new revision and clears all '
+        'approvals. If someone else wrote it, this offers your version as a suggestion beside it.'))
+    def revise_draft(request_id: _REQUEST_ID, draft_id: _DRAFT_ID, text: _DRAFT_TEXT) -> dict:
+        try:
+            view = access.revise(request_id, draft_id, text)
+        except _REFUSALS:
+            raise ToolError('That change was not accepted. Check the draft is the latest revision, '
+                            'or use a new request_id if you changed the text.') from None
+        return {**draft_message(view), 'next_step': DRAFT_NEXT_STEP}
+
+    @server.tool(description='Read one shared draft: its exact text, revision and who has approved it.')
+    def view_draft(draft_id: _DRAFT_ID) -> dict:
+        try:
+            return draft_message(access.view(draft_id))
+        except _REFUSALS:
+            raise ToolError(DRAFT_UNAVAILABLE) from None
+
+    @server.tool(description='List the latest revision of each shared draft in this conversation, newest first.')
+    def list_drafts(limit: Annotated[int, Field(ge=1, le=50)] = 20) -> dict:
+        try:
+            drafts = access.list(limit)
+        except _REFUSALS:
+            raise ToolError(DRAFT_UNAVAILABLE) from None
+        return {'conversation_id': access.conversation_id, 'drafts': [draft_message(d) for d in drafts]}
