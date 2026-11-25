@@ -65,6 +65,7 @@ content. The demo password is `Fictional browser test password`.
 | `research/` | Notes comparing related projects, with pinned reference snapshots |
 | `docs/` | Design decisions, delivery status and verification records |
 
+For how the pieces fit together, read the [architecture overview](ARCHITECTURE.md).
 For the technical detail behind each guarantee, start with the
 [delivery guide](docs/DELIVERY.md) and the [decision record](docs/DECISIONS.md).
 
