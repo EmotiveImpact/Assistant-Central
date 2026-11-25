@@ -1,17 +1,25 @@
-# License status
+# Licence status
 
-The owner has not selected a project-wide license for the original Assistant
-Central code. Public visibility is not a new blanket MIT, Apache or GPL grant.
-Do not assume rights beyond applicable law and the repository host's terms.
+Original Assistant Central code in this repository is licensed under the
+[Apache License, Version 2.0](LICENSE). See [NOTICE](NOTICE) for attribution.
 
-Third-party notices remain with their code and data:
+Third-party material keeps its own licence:
 
-- `prototypes/consent-v29/vendor/a4a/LICENSE`: MIT notice for the included A4A code.
-- `prototypes/consent-v29/vendor/a4a/THIRD_PARTY_LICENSES.md`: upstream provenance
-  and license qualifications, including the NIP-44 vector metadata caveat.
+- `prototypes/consent-v29/vendor/a4a/`: MIT, with upstream provenance and the
+  NIP-44 vector caveat in `THIRD_PARTY_LICENSES.md`.
 - `prototypes/consent-v29/vendor/a4a_sdk/nip44_vectors.LICENSE.txt`: preserved
-  public vector license text.
-- `prototypes/consent-v29/UPSTREAM.json`: pinned sources and hashes.
+  public vector licence text.
+- `workspace_ui/InterVariable.woff2`: SIL Open Font Licence 1.1
+  (`workspace_ui/INTER-LICENSE.txt`).
+- `research/sources/`: reference snapshots of other projects, each under its
+  own MIT or Apache-2.0 licence. They are not part of the software and will be
+  removed once the research phase ends.
 
-These notices do not license unrelated original project code. Runtime dependency
-licenses remain the licenses of those packages. No package binaries are bundled.
+Runtime dependencies keep their own licences. No package binaries are bundled.
+
+## Planned hosted relay
+
+A future hosted relay, which connects people's assistants across the internet,
+is planned as a separate package under the GNU Affero General Public License
+v3. Everything outside that package stays Apache-2.0. Contributions are made
+under the Developer Certificate of Origin (see [CONTRIBUTING](CONTRIBUTING.md)).
