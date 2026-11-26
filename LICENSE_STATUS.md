@@ -5,9 +5,9 @@ Original Assistant Central code in this repository is licensed under the
 
 Third-party material keeps its own licence:
 
-- `prototypes/consent-v29/vendor/a4a/`: MIT, with upstream provenance and the
+- `archive/prototypes/consent-v29/vendor/a4a/`: MIT, with upstream provenance and the
   NIP-44 vector caveat in `THIRD_PARTY_LICENSES.md`.
-- `prototypes/consent-v29/vendor/a4a_sdk/nip44_vectors.LICENSE.txt`: preserved
+- `archive/prototypes/consent-v29/vendor/a4a_sdk/nip44_vectors.LICENSE.txt`: preserved
   public vector licence text.
 - `workspace_ui/InterVariable.woff2`: SIL Open Font Licence 1.1
   (`workspace_ui/INTER-LICENSE.txt`).
