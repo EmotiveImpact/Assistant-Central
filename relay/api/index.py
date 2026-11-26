@@ -28,9 +28,9 @@ def _get_relay():
 
 class handler(BaseHTTPRequestHandler):
     def _serve(self):
-        if 'whereami' in self.path or self.headers.get('x-relay-debug'):
+        if not self.path.startswith(('/v1', '/source', '/invite')):
             import json as _j
-            body = _j.dumps({'path': self.path, 'headers': {k: v for k, v in self.headers.items() if 'path' in k.lower() or 'url' in k.lower() or 'matche' in k.lower() or 'forward' in k.lower()}}).encode()
+            body = _j.dumps({'path': self.path, 'headers': {k: v for k, v in self.headers.items() }}).encode()
             self.send_response(200); self.send_header('Content-Type', 'application/json'); self.end_headers(); self.wfile.write(body); return
         length = int(self.headers.get('Content-Length') or 0)
         if length > MAX_BODY:
