@@ -23,6 +23,8 @@ Throughout, each person stays in charge:
   [Model Context Protocol](https://modelcontextprotocol.io), which most major
   assistants support.
 
+![A short tour of the Central workspace with fictional people and work](docs/demo.gif)
+
 ## Status: early pilot
 
 This is working, tested software, but **not yet a live service**. Today you
