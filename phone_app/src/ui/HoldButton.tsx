@@ -1,21 +1,32 @@
-// Hold to agree. Money and consent need a deliberate press: the ring fills over about a
-// second, and letting go early does nothing. There is always a plain button alternative,
-// for screen readers and for anyone who cannot hold.
+// Hold to agree, as in the mock: a small ink button inside a soft double ring, with a coral
+// arc turning slowly around it. Press and hold and coral fills it over 0.85 seconds; let go
+// early and it drains away and nothing happens. There is always a plain two-step button, for
+// screen readers and for anyone who cannot hold.
 import React, { useEffect, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, Platform, Pressable, Text, View } from 'react-native';
+import { AccessibilityInfo, Platform, Pressable, Text, View } from 'react-native';
+import Animated, { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import Svg, { Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { colour, font } from './theme';
 import { Button } from './parts';
 
-export const HOLD_MS = 1000;
-const SIZE = 132, STROKE = 6, R = (SIZE - STROKE) / 2, LENGTH = 2 * Math.PI * R;
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+export const HOLD_MS = 850;
+const INK = 62, RING = 84, ARC = 40, LENGTH = 2 * Math.PI * ARC;
 
-const tap = (style: Haptics.ImpactFeedbackStyle) => { Haptics.impactAsync(style).catch(() => undefined); };
+const lower = (label: string) => label.charAt(0).toLowerCase() + label.slice(1);
 
-export function HoldButton({ label, onDone, disabled, hint }: { label: string; onDone: () => void; disabled?: boolean; hint?: string }) {
-  const progress = useRef(new Animated.Value(0)).current;
+export function HoldButton({ label, title, hint, onDone, disabled }: {
+  /** What a yes does, for example "Pay £120". */
+  label: string;
+  /** The line beside the button, for example "Hold to pay £120 with Tom". */
+  title?: string;
+  hint?: string;
+  onDone: () => void;
+  disabled?: boolean;
+}) {
+  const fill = useSharedValue(0);
+  const spin = useSharedValue(0);
   const fired = useRef(false);
   const [plain, setPlain] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -25,56 +36,79 @@ export function HoldButton({ label, onDone, disabled, hint }: { label: string; o
     if (Platform.OS === 'web') return; // The browser preview cannot tell; the plain button is one tap away.
     AccessibilityInfo.isScreenReaderEnabled().then(on => { if (on) setPlain(true); }).catch(() => undefined);
   }, []);
+  useEffect(() => {
+    spin.value = withRepeat(withTiming(360, { duration: 2400, easing: Easing.linear }), -1, false);
+    return () => cancelAnimation(spin);
+  }, [spin]);
 
+  const finish = () => {
+    if (fired.current) return;
+    fired.current = true;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    onDone();
+  };
   const start = () => {
     if (disabled || fired.current) return;
-    tap(Haptics.ImpactFeedbackStyle.Light);
-    Animated.timing(progress, { toValue: 1, duration: HOLD_MS, easing: Easing.linear, useNativeDriver: false }).start(({ finished }) => {
-      if (!finished || fired.current) return;
-      fired.current = true;
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
-      onDone();
-    });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+    fill.value = withTiming(1, { duration: HOLD_MS, easing: Easing.linear }, finished => { if (finished) scheduleOnRN(finish); });
   };
   const stop = () => {
     if (fired.current) return;
-    progress.stopAnimation();
-    Animated.timing(progress, { toValue: 0, duration: 180, useNativeDriver: false }).start();
+    cancelAnimation(fill);
+    fill.value = withTiming(0, { duration: 180 });
   };
+
+  const fillStyle = useAnimatedStyle(() => ({ transform: [{ scale: fill.value }] }));
+  const arcStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${spin.value}deg` }] }));
+
+  const words = (
+    <View style={{ flex: 1, gap: 3 }}>
+      {title ? <Text style={{ fontFamily: font.bold, fontSize: 14.5, lineHeight: 19, color: colour.text }}>{title}</Text> : null}
+      {hint ? <Text style={{ fontFamily: font.regular, fontSize: 12.5, lineHeight: 17, color: colour.muted }}>{hint}</Text> : null}
+      {!plain ? (
+        <Pressable accessibilityRole="button" onPress={() => setPlain(true)} hitSlop={8} style={{ alignSelf: 'flex-start', marginTop: 2 }}>
+          <Text style={{ color: colour.accentFg, fontFamily: font.semibold, fontSize: 12.5, textDecorationLine: 'underline' }}>Use a button instead</Text>
+        </Pressable>
+      ) : null}
+    </View>
+  );
 
   if (plain) {
     return (
       <View style={{ gap: 10, alignSelf: 'stretch' }}>
+        {title || hint ? words : null}
         {confirming
-          ? <Button label={`Yes, ${label.charAt(0).toLowerCase() + label.slice(1)}`} disabled={disabled} onPress={() => { if (!fired.current) { fired.current = true; onDone(); } }} />
+          ? <Button label={`Yes, ${lower(label)}`} disabled={disabled} onPress={finish} />
           : <Button label={label} kind="secondary" disabled={disabled} onPress={() => setConfirming(true)} />}
         {confirming ? <Button label="Not yet" kind="quiet" onPress={() => setConfirming(false)} /> : null}
       </View>
     );
   }
 
-  const offset = progress.interpolate({ inputRange: [0, 1], outputRange: [LENGTH, 0] });
   return (
-    <View style={{ alignItems: 'center', gap: 10 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
       <Pressable onPressIn={start} onPressOut={stop} disabled={disabled}
-        accessibilityRole="button" accessibilityLabel={`Hold to ${label.charAt(0).toLowerCase() + label.slice(1)}`}
+        accessibilityRole="button" accessibilityLabel={`Hold to ${lower(label)}`}
         accessibilityHint="Press and hold for about a second. Letting go early does nothing."
         accessibilityActions={[{ name: 'activate', label }]}
         onAccessibilityAction={() => setPlain(true)}
-        style={{ width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.5 : 1 }}>
-        <Svg width={SIZE} height={SIZE} style={{ position: 'absolute' }}>
-          <Circle cx={SIZE / 2} cy={SIZE / 2} r={R} stroke={colour.sunBg} strokeWidth={STROKE} fill="none" />
-          <AnimatedCircle cx={SIZE / 2} cy={SIZE / 2} r={R} stroke={colour.sun} strokeWidth={STROKE} fill="none"
-            strokeDasharray={`${LENGTH} ${LENGTH}`} strokeDashoffset={offset} strokeLinecap="round" transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`} />
-        </Svg>
-        <View style={{ width: SIZE - 30, height: SIZE - 30, borderRadius: SIZE, backgroundColor: colour.text, alignItems: 'center', justifyContent: 'center', padding: 8 }}>
-          <Text style={{ color: colour.onText, fontFamily: font.bold, fontSize: 16 }}>Hold</Text>
+        style={{ width: RING, height: RING, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.5 : 1 }}>
+        <Animated.View style={[{ position: 'absolute', width: RING, height: RING }, arcStyle]} pointerEvents="none">
+          <Svg width={RING} height={RING}>
+            <Circle cx={RING / 2} cy={RING / 2} r={ARC} stroke={colour.sun} strokeWidth={3} fill="none"
+              strokeDasharray={`${LENGTH / 2} ${LENGTH / 2}`} strokeLinecap="round" />
+          </Svg>
+        </Animated.View>
+        <View style={{ width: INK + 20, height: INK + 20, borderRadius: 50, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: INK + 14, height: INK + 14, borderRadius: 50, backgroundColor: colour.line, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: INK, height: INK, borderRadius: INK / 2, backgroundColor: colour.text, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <Animated.View style={[{ position: 'absolute', width: INK, height: INK, borderRadius: INK / 2, backgroundColor: colour.sun }, fillStyle]} />
+              <Text style={{ color: '#fff', fontFamily: font.extrabold, fontSize: 12.5 }}>Hold</Text>
+            </View>
+          </View>
         </View>
       </Pressable>
-      {hint ? <Text style={{ color: colour.muted, fontFamily: font.regular, fontSize: 13, textAlign: 'center' }}>{hint}</Text> : null}
-      <Pressable accessibilityRole="button" onPress={() => setPlain(true)} hitSlop={8}>
-        <Text style={{ color: colour.accentFg, fontFamily: font.semibold, fontSize: 13.5, textDecorationLine: 'underline' }}>Use a button instead</Text>
-      </Pressable>
+      {words}
     </View>
   );
 }

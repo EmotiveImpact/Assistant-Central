@@ -16,4 +16,4 @@
 - Verification: TypeScript check, Jest tests (API client, Home, demo flows), Android,
   iOS and web bundle exports in CI, the workspace server tests including
   `test_phone_host.py`, and screenshots of the running app (browser preview).
-- Status: first version implemented in PR #52.
+- Status: first version implemented in PR #52. Floating layers and motion from the mock (Reanimated, Gesture Handler, expo-blur) added in the follow-up PR.

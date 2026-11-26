@@ -6,6 +6,11 @@ app mock and the phone direction: "calm on the surface, deep on demand".
 Your assistant does the back and forth with other people's assistants. The phone brings you
 only the decisions:
 
+- **Floating layers**, as in the approved mock: decisions rise in a sheet over a dimmed Home
+  (drag it down to put it away), the + button fans out a menu, your circle drops a menu,
+  search floats at the top, and short notes rise above the frosted glass bar. Pages slide
+  in, cards swipe and spring, and assistants blink while they wait. Motion runs on the UI
+  thread with Reanimated and Gesture Handler.
 - **Home**: a short, honest paragraph with each person and their assistant inline, then one
   card at a time. Swipe right or tap to open it, left for the next. A swipe never agrees to
   anything by itself.

@@ -1,5 +1,5 @@
 // The small pieces every screen uses: text, the person circle, the bot, the pair, buttons.
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View, type PressableProps, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
 import { botTraits, COLOURS, SHAPES } from '../shared/web';
@@ -52,8 +52,24 @@ function Eyes({ e }: { e: Expression }) {
   return <G><Rect x={36} y={38} width={8} height={15} rx={4} fill={w} transform="rotate(10 40 45)" /><Rect x={56} y={38} width={8} height={15} rx={4} fill={w} transform="rotate(10 60 45)" /></G>;
 }
 
+/** Every few seconds, for a moment, as in the mock: assistants blink while they wait. */
+function useBlink(enabled: boolean) {
+  const [shut, setShut] = useState(false);
+  useEffect(() => {
+    if (!enabled) return;
+    let timer: ReturnType<typeof setTimeout>;
+    const next = () => {
+      timer = setTimeout(() => { setShut(true); timer = setTimeout(() => { setShut(false); next(); }, 130); }, 3200 + Math.random() * 3200);
+    };
+    next();
+    return () => clearTimeout(timer);
+  }, [enabled]);
+  return shut;
+}
+
 /** An assistant: a small two-eyed blob. Shape and colour come from its name, as on desktop. */
 export function Bot({ name, size = 32, e = 'idle' }: { name: string; size?: number; e?: Expression }) {
+  const shut = useBlink(e === 'idle' || e === 'look' || e === 'busy');
   const t = botTraits(name) as { shape: keyof typeof SHAPES; body: string };
   const d = SHAPES[t.shape];
   const round = t.shape === 'hex' ? { stroke: t.body, strokeWidth: 12, strokeLinejoin: 'round' as const } : {};
@@ -61,7 +77,7 @@ export function Bot({ name, size = 32, e = 'idle' }: { name: string; size?: numb
     <Svg width={size} height={size} viewBox="-10 -10 120 120" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {e === 'look' ? <Path d={d} fill="none" stroke={COLOURS.coral} strokeWidth={5} opacity={0.55} transform="translate(50 50) scale(1.16) translate(-50 -50)" /> : null}
       <Path d={d} fill={t.body} {...round} />
-      <Eyes e={e} />
+      <G transform={shut ? 'translate(0 46) scale(1 0.12) translate(0 -46)' : undefined}><Eyes e={e} /></G>
     </Svg>
   );
 }
