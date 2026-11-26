@@ -27,3 +27,21 @@ test('checks and terms are plain sentences', () => {
   assert.equal(rows[2][1], 'Bob');
   assert.match(rows[3][1], /^US\$0\.25 \(simulated/);
 });
+
+test('budgets show in the mission currency, never converted', async () => {
+  const {money, budgetOf, amountOf, ownerCurrency} = await import('../missions.mjs');
+  assert.equal(money(500000, 'GBP'), '£0.50');
+  assert.equal(money(300, 'EUR'), '€0.0003');
+  assert.deepEqual(budgetOf({cap_micro: 250000, currency: 'GBP'}), [250000, 'GBP']);
+  assert.deepEqual(budgetOf({cap_microusd: 250000}), [250000, 'USD']);
+  assert.deepEqual(amountOf({reserve_micro: 276, currency: 'GBP'}, 'reserve'), [276, 'GBP']);
+  assert.deepEqual(amountOf({reserve_microusd: 276}, 'reserve'), [276, 'USD']);
+  const {missionSummary} = await import('../missions.mjs');
+  const rows = missionSummary({goal: 'g', deliverable: 'd', executor: 'p1', cap_micro: 60_000_000, currency: 'GBP',
+    criteria: [{kind: 'contains', value: 'x'}]}, () => 'Tom');
+  assert.match(rows[3][1], /^£60\.00 \(simulated/);
+  assert.equal(ownerCurrency(['en-GB']), 'GBP');
+  assert.equal(ownerCurrency(['en-US']), 'USD');
+  assert.equal(ownerCurrency(['de-DE']), 'EUR');
+  assert.equal(ownerCurrency([]), 'GBP');
+});

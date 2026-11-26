@@ -4,7 +4,7 @@ import re
 from conversation.ledger import ConversationDenied, need
 from conversation.proposals import LocalProposals
 from pilot.crypto import digest
-from pilot.mission import AGREEMENT, PROJECTION, agreement_content, evaluate, mission_context, read_agreement, task_text
+from pilot.mission import AGREEMENT, PROJECTION, agreement_content, budget, evaluate, read_agreement, task_text, terms_context
 from pilot.server import exact
 from pilot.workflow import FIXTURE_GRANT
 
@@ -69,7 +69,7 @@ class MissionService:
         agreed = read_agreement(statement)
         commitment = digest(statement)
         if action == 'inspect':
-            return {**view, 'mission_digest': commitment, 'task_context': mission_context(commitment, agreed['cap_microusd'])}
+            return {**view, 'mission_digest': commitment, 'task_context': terms_context(commitment, agreed)}
         if action == 'withdraw':
             need(body['proposal_digest'] == commitment)
             return api.revoke(*actor, pid)
@@ -85,8 +85,8 @@ class MissionService:
             # Only an explicitly entered, original brief and public fixture budget
             # cross into the draft. No proposal prose or conversation sources.
             return runtime.propose(session, agreed['executor'], 'task', 'Mission task',
-                                   task_text(body['brief'], agreed['cap_microusd'], commitment),
-                                   mission_context(commitment, agreed['cap_microusd']), body['task_id'],
+                                   task_text(body['brief'], budget(agreed)[0], commitment, budget(agreed)[1]),
+                                   terms_context(commitment, agreed), body['task_id'],
                                    min(statement['expires_at'], runtime._now() + 3600), provider_disclosure={**FIXTURE_GRANT, 'projection': PROJECTION})
         with runtime._transaction(session) as checks:
             artifact_id = body['artifact_id']

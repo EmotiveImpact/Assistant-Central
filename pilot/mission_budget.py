@@ -1,8 +1,8 @@
 """Synthetic usage accounting in the provider's existing claim/result transactions."""
-from .mission import BASE_MICROUSD, OUTPUT_MICROUSD
+from .mission import BASE_MICROUSD, OUTPUT_MICROUSD, amount, money_keys
 
 
-def balance(db, owner, provider, context, limit):
+def balance(db, owner, provider, context, limit, unit=None):
     exists = db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='pilot_mission_usage'").fetchone()
     spent, held = 0, 0
     if exists:
@@ -12,8 +12,9 @@ def balance(db, owner, provider, context, limit):
         if row[0] is not None and (row[0] != limit or row[1] != limit):
             raise ValueError('Mission budget commitment mismatch')
         spent, held = row[2:]
-    return {'cap_microusd': limit, 'spent_microusd': spent, 'held_microusd': held,
-            'available_microusd': limit - spent - held, 'simulated': True}
+    k = money_keys(unit)
+    value = {'cap' + k: limit, 'spent' + k: spent, 'held' + k: held, 'available' + k: limit - spent - held, 'simulated': True}
+    return value if unit is None else {**value, 'currency': unit}
 
 
 def reserve(db, run, binding, quote):
@@ -24,10 +25,10 @@ def reserve(db, run, binding, quote):
         owner TEXT NOT NULL, provider TEXT NOT NULL, context TEXT NOT NULL, cap INTEGER NOT NULL,
         reserved INTEGER NOT NULL, actual INTEGER CHECK(actual BETWEEN 0 AND reserved))""")
     key = (run['owner'], binding['provider'], binding['context'])
-    limit, amount = quote['cap_microusd'], quote['reserve_microusd']
-    if balance(db, *key, limit)['available_microusd'] < amount:
+    limit, held, unit = amount(quote, 'cap'), amount(quote, 'reserve'), quote.get('currency')
+    if amount(balance(db, *key, limit, unit), 'available') < held:
         raise ProviderDenied('Mission usage limit reached')
-    db.execute('INSERT INTO pilot_mission_usage VALUES(?,?,?,?,?,?,NULL)', (run['id'], *key, limit, amount))
+    db.execute('INSERT INTO pilot_mission_usage VALUES(?,?,?,?,?,?,NULL)', (run['id'], *key, limit, held))
 
 
 def settle(db, run_id, output_tokens):
@@ -38,9 +39,18 @@ def settle(db, run_id, output_tokens):
         raise ValueError('Original usage reservation unavailable')
 
 
-def receipt(db, run_id):
+def in_currency(record, unit):
+    """Re-key a legacy-shaped usage record for a mission signed in an explicit currency."""
+    if unit is None or record is None:
+        return record
+    return {**{(k[:-3] if k.endswith('_microusd') else k): v for k, v in record.items()}, 'currency': unit}
+
+
+def receipt(db, run_id, unit=None):
     row = db.execute('SELECT cap,reserved,actual FROM pilot_mission_usage WHERE run_id=?', (run_id,)).fetchone()
     if row is None:
         return None
-    return {'simulated': True, 'cap_microusd': row[0], 'reserved_microusd': row[1],
-            'actual_microusd': row[2], 'held_microusd': row[1] if row[2] is None else 0}
+    k = money_keys(unit)
+    value = {'simulated': True, 'cap' + k: row[0], 'reserved' + k: row[1],
+             'actual' + k: row[2], 'held' + k: row[1] if row[2] is None else 0}
+    return value if unit is None else {**value, 'currency': unit}

@@ -61,7 +61,8 @@
           <label class="full">Deliverable<input name="mission_deliverable" maxlength="512"></label>
           <label>Success check<select name="mission_check"><option value="contains">Contains text</option><option value="human_review">Owner judgement</option><option value="max_utf8_bytes">Maximum UTF-8 bytes</option><option value="sha256">Exact SHA-256</option></select></label>
           <label>Expected value<input name="mission_value" maxlength="256"></label>
-          <label>Simulated budget in millionths of a US dollar<input name="mission_budget" type="number" min="0" max="1000000000" step="1" value="300"></label>
+          <label>Simulated spending limit<input name="mission_budget" inputmode="decimal" pattern="\d{1,6}(\.\d{1,6})?" maxlength="14" value="0.0003"></label>
+          <label>Currency<select name="mission_currency"><option value="GBP">GBP (£)</option><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option></select></label>
         </fieldset>
         <label class="full">Exact content<textarea name="text" rows="6" maxlength="4096" required placeholder="Describe the fictional task or paste the exact artifact."></textarea></label>
         <label class="full">Task reference<input name="task_id" maxlength="96" required placeholder="A unique task reference"></label>

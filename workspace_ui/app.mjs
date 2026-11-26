@@ -1,5 +1,7 @@
 import {operationGate,restoreWhenIdle,inspectionLatch,inspectSavedState,requestIsMutation} from './operations.mjs';
 import {createConversations,inspectMessageOutcome} from './conversations.mjs';
+import {money,amountOf,toMicro,ownerCurrency} from './missions.mjs';
+import {botFace} from './bots.mjs';
 import {createHostDrafts} from './host_drafts.mjs';
 import {createApprovals} from './approvals.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
@@ -11,6 +13,8 @@ export const PRODUCT={short:'Parlu',full:'Parlu'};
 for(const node of document.querySelectorAll('[data-product]'))node.textContent=PRODUCT[node.dataset.product]??PRODUCT.short;
 for(const node of document.querySelectorAll('[data-product-label]'))node.setAttribute('aria-label',node.dataset.productLabel.replace('{product}',PRODUCT.short));
 document.title=PRODUCT.short+' · Your assistant workspace';
+// The entrance shows four example assistants as their bot faces.
+for(const [index,node] of [...document.querySelectorAll('.entrance-avatars .peer-avatar')].entries()){node.textContent='';node.append(botFace(['Beacon','Atlas','Mira','Orbit'][index]??'Parlu'));}
 
 const $ = id => document.getElementById(id);
 const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
@@ -55,7 +59,8 @@ function workIcon(kind,className,state) {
 function nameAvatar(name,className='peer-avatar') {
   const label=plain(name,'?'),avatar=text('span',label.slice(0,1).toUpperCase(),className);
   let hash=0;for(const character of label.toLowerCase())hash=(hash*31+character.codePointAt(0))>>>0;
-  avatar.dataset.tone=['indigo','amber','teal','rose'][hash%4];avatar.dataset.kind='assistant';avatar.setAttribute('aria-hidden','true');return avatar;
+  avatar.dataset.tone=['indigo','amber','teal','rose'][hash%4];avatar.dataset.kind='assistant';avatar.setAttribute('aria-hidden','true');
+  avatar.dataset.initial=avatar.textContent;avatar.textContent='';avatar.append(botFace(label));return avatar;
 }
 function datetime(value) { const time=finiteDate(value); return time===null?'Time not supplied':new Date(time*1000).toLocaleString(undefined,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function peerName(peerId) { const peer=state?.peers.find(peer=>peer.peer_id===peerId); return peer ? `${plain(peer.agent_id,'Assistant')} · ${plain(peer.owner_id,'Owner')}` : plain(peerId,'Unknown peer'); }
@@ -328,8 +333,8 @@ async function openWorkflow(item,runId) {
       $('review-scope').textContent='Approve only this exact request for the local synthetic fixture. Approval does not run it. Running is a separate one-shot action and does not publish or release the result.';
       if(value.review.mission_quote) {
         const q=value.review.mission_quote;
-        detail($('review-details'),'Simulated reservation',q.reserve_microusd+' millionths of a US dollar');
-        if(run.mission_balance) detail($('review-details'),'Available simulated budget',run.mission_balance.available_microusd+' of '+q.cap_microusd+' millionths of a US dollar');
+        detail($('review-details'),'Simulated reservation',money(...amountOf(q,'reserve')));
+        if(run.mission_balance) detail($('review-details'),'Available simulated budget',money(...amountOf(run.mission_balance,'available'))+' of '+money(...amountOf(q,'cap')));
       }
       if(run.allowed_actions.includes('approve'))$('review-actions').append(button('Approve synthetic request','button primary',()=>workflowAction('approve')));
       if(run.allowed_actions.includes('run'))$('review-actions').append(button('Run synthetic fixture once','button primary',()=>workflowAction('run')));
@@ -339,7 +344,7 @@ async function openWorkflow(item,runId) {
       if(epoch!==generation)return;
       selectedWorkflow={item:{...item},run,review:value,mode:'result'};
       $('review-title').textContent='Review original synthetic result';$('review-content').textContent=value.content;
-      if(run.mission_usage) detail($('review-details'),'Simulated usage',run.mission_usage.actual_microusd+' millionths of a US dollar');
+      if(run.mission_usage) detail($('review-details'),'Simulated usage',money(...amountOf(run.mission_usage,'actual')));
       detail($('review-details'),'Artifact title',value.review.title);detail($('review-details'),'Valid until',datetime(value.review.expires));
       detail($('review-commitments'),'Result digest',value.review.result_digest);detail($('review-commitments'),'Result review',value.review_digest);detail($('review-commitments'),'Source permissions',value.review.source_permissions_digest);
       $('review-scope').textContent='Stage only this exact original fixture result as an artifact draft for the originating task owner. Staging does not release it. Review and release the resulting outbox item separately.';
@@ -371,7 +376,7 @@ function prepareCompose(){
   $('compose-form').reset();$('compose-message').textContent='';$('proposal-peer').replaceChildren();
   for(const peer of state.peers.filter(isPeerActive)){const option=text('option',`${plain(peer.agent_id,'Assistant')} · ${plain(peer.owner_id,'Owner')}`);option.value=peer.peer_id;$('proposal-peer').append(option);}
   const form=$('compose-form');form.elements.context.value=newContext();form.elements.task_id.value='task-'+crypto.randomUUID();form.elements.text.value='SYNTHETIC ONLY: ';
-  configureKind();openDialog('compose-dialog');
+  $('compose-form').elements.mission_currency.value=ownerCurrency();configureKind();openDialog('compose-dialog');
 }
 function configureKind(){
   const form=$('compose-form'),artifact=form.elements.kind.value==='artifact';$('parent-field').hidden=!artifact;$('proposal-parent').required=artifact;
@@ -427,9 +432,10 @@ $('compose-form').addEventListener('submit',async event=>{
     if(fields.kind==='mission'){
       if(fields.synthetic!=='on')throw new Error('Confirm that you may share this fictional brief.');
       const criterion=fields.mission_check==='max_utf8_bytes'?Number(fields.mission_value):fields.mission_value;
+      const cap=toMicro(fields.mission_budget);if(cap===null)throw new Error('Enter a spending limit such as 0.50.');
       path='/api/mission-offers';
       body={agreed:{goal:fields.title,deliverable:fields.mission_deliverable,executor:fields.peer_id,
-        criteria:[{kind:fields.mission_check,value:criterion}],cap_microusd:Number(fields.mission_budget)},
+        criteria:[{kind:fields.mission_check,value:criterion}],cap_micro:cap,currency:fields.mission_currency},
         brief:fields.text,task_id:fields.task_id,expires:Math.floor(Date.now()/1000)+Number(fields.minutes)*60,permit_fixture:fields.synthetic_run==='on'};
     }else body=proposalBody(fields);
     await performWrite(path,body,{target:'compose-message',onSuccess:()=>{$('compose-dialog').close();currentView='outbox';currentFilter='all';searchQuery='';$('search-input').value='';history.replaceState(null,'','#outbox');render();notice('Proposal prepared. Open it to review the exact content before release.',true);}});}catch(error){$('compose-message').textContent=error.message;}
