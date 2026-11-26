@@ -24,7 +24,7 @@ only the decisions:
 - **Team missions**: parts, people and receipts, with "Review and send" and "Check the result".
 - **Invite and join**: make an invite with a QR code and a short code to check, scan someone
   else's, or paste their link.
-- **Recents**, **Money and assistants**, **Settings** and the **evening story**.
+- **Recents**, **Assistants** (big cards in plain words, worded as on the web app), **Money**, **Settings** and the **evening story**.
 
 Customers never bring an AI key. Their own assistant does the thinking; Parlu runs no AI.
 

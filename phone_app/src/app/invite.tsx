@@ -57,7 +57,7 @@ export default function Invite() {
     try {
       const result = await act(b => b.acceptInvite(review.link, (review.value as Extract<InviteReview, { ok: true }>).review_digest));
       if (!result.joined) throw new Error(joinProblem(result.reason ?? 'cannot_add', review.value.inviter.owner_id));
-      setJoined(`Done. ${review.value.inviter.owner_id} will see your code and add you. You will see them in Money and assistants once they do.`);
+      setJoined(`Done. ${review.value.inviter.owner_id} will see your code and add you. You will see them in Assistants once they do.`);
       setReview(null); setPasted('');
     } catch (e) { setError(sayError(e)); } finally { setBusy(''); }
   };
