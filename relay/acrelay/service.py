@@ -13,6 +13,7 @@ from urllib.parse import parse_qs, urlsplit
 from .protocol import (HEX64, VERSION, RelayError, b64d, b64e, mailbox_id, token_hash, verify_signed)
 
 SOURCE_URL = 'https://github.com/EmotiveImpact/Assistant-Central/tree/main/relay'
+GUIDE_URL = 'https://github.com/EmotiveImpact/Assistant-Central/blob/main/docs/TWO_PEOPLE.md'
 MAX_BODY = 65536
 MAX_QUEUED = 1000
 MAX_QUEUED_BYTES = 32 * 1024 * 1024
@@ -54,6 +55,8 @@ class Relay:
                 return _json(200, {'licence': 'AGPL-3.0-only', 'source': self.source_url})
             if method == 'GET' and path == '/invite':
                 return self._invite_page()
+            if method == 'GET' and path == '/':
+                return self._home_page()
             if segments[:2] != ['v1', 'mailboxes']:
                 raise RelayError(404, 'not_found')
             if method == 'POST' and len(segments) == 2:
@@ -203,6 +206,20 @@ class Relay:
             tx.execute('INSERT INTO relay_packets VALUES(?,?,?,?,?,?,?)',
                        (mailbox, seq, packet, grant[0], now, now + RETENTION, encoded))
         return _json(202, {'packet_id': packet, 'stored_until': now + RETENTION})
+
+    def _home_page(self):
+        page = ('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
+                '<title>Parlu relay</title>'
+                '<body style="font:16px system-ui;max-width:36rem;margin:3rem auto;padding:0 1rem;'
+                'background:#fff;color:#1d1d1f">'
+                '<h1>Parlu relay is running</h1>'
+                '<p>This relay holds encrypted packets between people using Parlu until the other side '
+                'fetches them. It cannot read them, and there is nothing to sign in to here.</p>'
+                f'<p><a href="{GUIDE_URL}">How two people connect</a> &middot; '
+                '<a href="/v1/health">Health check</a> &middot; '
+                f'<a href="{self.source_url}">Source code (AGPL-3.0)</a></p>')
+        return 200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
+                     'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'"}, page.encode()
 
     def _invite_page(self):
         page = ('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
