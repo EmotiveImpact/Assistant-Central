@@ -1,0 +1,9 @@
+/* Public demo entrance, shown above everything else on the sign-in screen. */
+.demo-entry{display:flex;flex-direction:column;gap:14px;margin:28px 0 0;padding:22px;border-radius:24px;background:#e7f4f1;border:1px solid #bfe3db}
+.demo-entry strong{font-size:20px;line-height:26px;font-weight:700;color:#1b1a17}
+.demo-entry p{margin:0;font-size:15px;line-height:22px;color:#4a4740}
+.demo-entry button{appearance:none;border:0;border-radius:999px;background:#14897a;color:#fff;font:inherit;font-size:17px;font-weight:650;min-height:52px;padding:0 24px;cursor:pointer}
+.demo-entry button:focus-visible{outline:3px solid #1b1a17;outline-offset:3px}
+.demo-card-button{appearance:none;width:100%;border:0;border-radius:999px;background:#14897a;color:#fff;font:inherit;font-size:15px;font-weight:650;min-height:48px;margin-top:22px;cursor:pointer}
+.demo-or{display:block;text-align:center;font-size:12px;color:#7a766d;margin-top:18px}
+@media(min-width:701px){.demo-entry{flex-direction:row;align-items:center;justify-content:space-between}.demo-entry>div{max-width:640px}}

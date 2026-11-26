@@ -30,10 +30,31 @@ MAX_BODY = 64 * 1024
 # Only what the browser needs is passed on. Hop-by-hop and Vercel headers stay here.
 FORWARD = ('authorization', 'content-type', 'accept', 'accept-language')
 RETURN_SKIP = ('connection', 'transfer-encoding', 'content-length')
-NOTE_OLD = (b'<strong>Synthetic workspace</strong><span>Fictional content. '
-            b'Live provider calls disabled.</span>')
-NOTE_NEW = ('<strong>Public demo with fictional people</strong><span>Password: '
-            + PASSWORD + '. It starts fresh after a quiet spell.</span>').encode()
+HERE = os.path.dirname(os.path.abspath(__file__))
+# Demo-only files served by this wrapper. The app's own files come from its server.
+DEMO_FILES = {
+    '/hosted-demo.mjs': ('demo.mjs', 'text/javascript; charset=utf-8'),
+    '/hosted-demo.css': ('demo.css', 'text/css; charset=utf-8'),
+}
+PAGE_EDITS = (
+    # Load the demo entrance with the page (same-origin files, so the CSP is unchanged).
+    (b'<link rel="stylesheet" href="/style.css">',
+     b'<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/hosted-demo.css">'
+     b'<script type="module" src="/hosted-demo.mjs"></script>'),
+    # A one-tap way in, at the very top, before any marketing words.
+    (b'<div class="login-layout">',
+     b'<div class="demo-entry"><div><strong>Try Parlu now</strong><p>No sign-up and no password. '
+     b'You will be Blair, with three made-up people and their assistants. Anything you do resets '
+     b'after a while.</p></div><button type="button" data-demo-enter>Open the demo</button></div>'
+     b'<div class="login-layout">'),
+    (b'<h2 id="login-heading">Welcome to your workspace</h2><p>Your assistant. Your decisions.</p>',
+     b'<h2 id="login-heading">Welcome to the Parlu demo</h2><p>Tap the button to go straight in.</p>'
+     b'<button class="demo-card-button" type="button" data-demo-enter>Open the demo</button>'
+     b'<span class="demo-or">or type the demo password: ' + PASSWORD.encode() + b'</span>'),
+    (b'<strong>Synthetic workspace</strong><span>Fictional content. Live provider calls disabled.</span>',
+     b'<strong>Public demo with made-up people</strong><span>Everyone shares it, and it starts fresh '
+     b'after a quiet spell. Your own Parlu runs on your computer.</span>'),
+)
 
 _lock = threading.Lock()
 _server = None
@@ -79,6 +100,17 @@ class handler(BaseHTTPRequestHandler):
 
     def _serve(self):
         target = original_target(self.path)
+        if target in DEMO_FILES and self.command == 'GET':
+            name, kind = DEMO_FILES[target]
+            with open(os.path.join(HERE, name), 'rb') as stream:
+                data = stream.read()
+            self.send_response(200)
+            for key, value in (('Content-Type', kind), ('Content-Length', str(len(data))),
+                               ('Cache-Control', 'no-store'), ('X-Content-Type-Options', 'nosniff')):
+                self.send_header(key, value)
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if target is None or target.startswith('/peer/'):
             # Loopback peer mailboxes belong to a person's own computer, not the demo.
             return self._fail(404, 'not_found')
@@ -109,7 +141,8 @@ class handler(BaseHTTPRequestHandler):
         finally:
             connection.close()
         if target in ('/', '/index.html') and status == 200:
-            payload = payload.replace(NOTE_OLD, NOTE_NEW)
+            for before, after in PAGE_EDITS:
+                payload = payload.replace(before, after, 1)
         self.send_response(status)
         for name, value in reply_headers:
             if name.lower() not in RETURN_SKIP:
