@@ -20,44 +20,41 @@ Items 2 and 3 follow in their own pull requests from this same branch name.
 
 ## Boundaries
 
-- Base: `main` at `538f969` (after #48). Branch: `claude/project-thread-sfa2x7`.
-- Claimed files for this pull request (removing an assistant):
-  `pilot/server.py` (the revoke route), `pilot/runtime.py` (a rejection for a
-  removed sender stays local), `pilot/relay_link.py` (closing relay tokens),
-  `workspace_ui/relay_service.py`, `workspace_ui/app.mjs` and `style.css`
-  (the Remove section), and their tests.
-- No licence or README changes. No new hosted resources. The relay database
-  schema does not change.
-- The relay stays a mailbox. Removing someone never deletes history, and it
-  never sends anything to the removed person.
+- Base: `main` at `dff318b` (after #49). Branch: `claude/project-thread-sfa2x7`.
+- Claimed files for this pull request (questions on the owner's phone):
+  new `owner_phone/runner.py`, small changes to `owner_phone/telegram.py` and
+  its README, `workspace_ui/approval_service.py`,
+  `workspace_ui/conversation_service.py`, `workspace_ui/server.py`, new
+  `workspace_ui/phone.mjs`, `app.mjs` and `style.css`, their tests, and the
+  workspace workflow's Node test list.
+- No licence or README changes at the repository root. No new hosted
+  resources: the host brings their own Telegram bot token, and nothing runs
+  unless the host names a phone mode in its private configuration.
+- The phone only answers questions an assistant has already asked. It never
+  agrees to work, releases a packet or reads anything else.
 
 ## Planned verification
 
-- Python unit tests over a real local relay: removing a linked person closes
-  their send token; a close the relay missed, or refused, is kept and finished
-  on a later sync; a removal made while Parlu ran without a relay is closed on
-  the next sync; work from a removed person can still be rejected, locally.
-- Workspace route tests for the revoke route with and without a relay.
-- The Chromium test adds Maya through an invite link and then removes her
-  assistant through the folded, two-step Remove section.
+- Python tests over real HTTP with a fictional bot that never reaches the
+  internet: pair from Parlu, the pairing message from the phone, a question
+  sent once to the paired chat, a tap answering it, unpairing, a missing bot
+  token reported plainly, and other local accounts refused.
+- Node tests for the panel's status checks and the Telegram start link.
 
 ## Status
 
-Merged: invite links with QR pairing (#48).
+Merged: invite links with QR pairing (#48) and removing an assistant (#49).
 
-In this pull request: revoking an assistant from the app.
+In this pull request: questions on the owner's phone.
 
-- `POST /api/peers/<fingerprint>/revoke` on the owner server. A revoked pin is
-  final and cannot be added again, nor can a new key with the same owner and
-  assistant names.
-- With a relay, the same route also closes that person's relay token. If the
-  relay cannot be reached or refuses, the close is kept and finished on the
-  next sync. Each sync also closes tokens for anyone removed while the relay
-  was off.
-- A proposal still waiting from a removed person can be rejected; the
-  rejection is recorded locally and nothing is sent.
-- App: a folded Remove section on each assistant's panel, with a hold and a
-  plain button.
+- `GET /api/approvals/phone`, `POST /api/approvals/phone/pair` and
+  `POST /api/approvals/phone/unpair` for the person who runs this copy of
+  Parlu.
+- A background runner long-polls Telegram while Parlu is open, sends each new
+  question once and takes answer taps, backing off when Telegram cannot be
+  reached.
+- App: "Questions on your phone" in Settings, with a QR code and an "Open
+  Telegram" link for pairing, and Unpair.
 
-Next: phone questions in the app, then team mission records (per-part rules,
-merge approvals, access grants and compute spend).
+Next: team mission records (per-part rules, merge approvals, access grants and
+compute spend).

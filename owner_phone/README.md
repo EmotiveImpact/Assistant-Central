@@ -2,13 +2,13 @@
 
 When an assistant is unsure what its owner wants, it can ask a short question
 with two to four answers. The owner answers from their phone (Telegram) or in
-Assistant Central.
+Parlu.
 
 ## What an answer means
 
 An answer is information for the assistant. It never approves sending,
 sharing, running or paying for anything: those keep their own exact owner
-reviews in Central, with the owner's own session.
+reviews in Parlu, with the owner's own session.
 
 ## Privacy
 
@@ -18,7 +18,7 @@ the adapter has two modes:
 
 | Mode | What reaches Telegram |
 | --- | --- |
-| `notice` (default) | Only "Your assistant has a question". The owner answers in Central. |
+| `notice` (default) | Only "Your assistant has a question". The owner answers in Parlu. |
 | `full` | The question and its answers, with a button for each. |
 
 Reminders about waiting reviews (`nudge`) never include any content.
@@ -27,12 +27,25 @@ Reminders about waiting reviews (`nudge`) never include any content.
 
 1. Create a bot with Telegram's @BotFather and put its token in the host's
    `TELEGRAM_BOT_TOKEN` environment variable.
-2. In Central, start pairing. You get a one-time code that lasts ten minutes.
-3. Send `/start <code>` to your bot in a private chat. Only that chat is accepted
-   from then on. Unpair at any time.
-4. The host runs `TelegramPhone.poll_once()` in a loop and calls
-   `send_waiting()` after an assistant asks. Long polling needs no public
-   web address.
+2. Add `"phone": {"telegram": "notice"}` (or `"full"`) to Parlu's private
+   conversation configuration and start Parlu as usual. While Parlu runs, it
+   long-polls the bot (no public web address needed) and sends each new
+   question once to the paired chat. Only the person who runs that copy of
+   Parlu gets the bot.
+3. In Parlu, open **Settings**, then **Questions on your phone**, then
+   **Pair your phone**. Scan the QR code or tap **Open Telegram**, and press
+   Start. The one-time code lasts ten minutes, and only that chat is accepted
+   from then on. Unpair at any time from the same panel.
+
+Pairing only connects the phone. An assistant asks its owner through the
+`ask_my_owner` tool, which the host gives it from the same question store
+(see `mission_approvals/server.py`); questions it asks there reach the phone.
+
+A tap is saved even while nobody is signed in to Parlu: it is recorded by its
+answer number, so the question's words stay sealed until the owner signs in.
+
+Hosts that run their own loop can still call `TelegramPhone.poll_once()` and
+`send_waiting()` directly; `owner_phone/runner.py` is that loop.
 
 Each answer button carries a keyed tag bound to one question and one answer,
 so a forged or altered button is refused. Taps from any other chat are ignored.

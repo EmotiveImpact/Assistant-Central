@@ -12,6 +12,7 @@ Only the one chat the owner paired with a one-time code is accepted.
 """
 import json
 import os
+import re
 import urllib.request
 
 from conversation.ledger import ConversationDenied, need
@@ -20,7 +21,7 @@ from .questions import OwnerQuestions
 
 API_BASE = 'https://api.telegram.org'
 MODES = ('notice', 'full')
-NOTICE_TEXT = 'Your assistant has a question for you. Open Assistant Central to answer it.'
+NOTICE_TEXT = 'Your assistant has a question for you. Open Parlu to answer it.'
 ANSWER_NOTE = 'Your answer is information for your assistant. It does not approve sending, sharing, running or paying for anything.'
 
 
@@ -53,15 +54,24 @@ class TelegramPhone:
             raise TelegramError(f'Telegram {method} was refused')
         return result.get('result')
 
+    def bot_name(self):
+        """The bot's public username, for a t.me pairing link. ``None`` if Telegram gives none."""
+        me = self._call('getMe', {}, timeout=10)
+        name = me.get('username') if type(me) is dict else None
+        return name if type(name) is str and re.fullmatch(r'[A-Za-z0-9_]{5,32}', name) else None
+
     # Outbound --------------------------------------------------------------
 
     def send_waiting(self):
         """Send each new question once to the paired chat. Returns how many were sent."""
-        chat = self.questions.paired_chat()
-        if chat is None:
+        if self.questions.paired_chat() is None:
             return 0
         sent = 0
         for question in self.questions.unsent_for_phone():
+            # Read the pairing again for every message: an Unpair or a new phone takes effect at once.
+            chat = self.questions.paired_chat()
+            if chat is None:
+                break
             self._call('sendMessage', self._question_message(chat, question))
             self.questions.mark_sent_to_phone(question['question_id'])
             sent += 1
@@ -83,7 +93,7 @@ class TelegramPhone:
         if chat is None:
             return False
         noun = 'item is' if waiting == 1 else 'items are'
-        self._call('sendMessage', {'chat_id': chat, 'text': f'{waiting} {noun} waiting for your review in Assistant Central.'})
+        self._call('sendMessage', {'chat_id': chat, 'text': f'{waiting} {noun} waiting for your review in Parlu.'})
         return True
 
     # Inbound ---------------------------------------------------------------
@@ -120,7 +130,7 @@ class TelegramPhone:
             self.questions.complete_pairing(str(chat['id']), text.split(' ', 1)[1].strip())
             reply = 'Paired. Your assistant can now ask you questions here.'
         except ConversationDenied:
-            reply = 'That pairing code is not valid. Create a new one in Assistant Central.'
+            reply = 'That pairing code is not valid. Create a new one in Parlu.'
         self._call('sendMessage', {'chat_id': chat['id'], 'text': reply})
 
     def _handle_button(self, query):
@@ -128,8 +138,12 @@ class TelegramPhone:
         prefix, question_id, option, tag = query['data'].split(':')
         need(prefix == 'a' and option.isdigit())
         try:
-            result = self.questions.answer_from_phone(chat, question_id, int(option), tag)
-            note = f"Answered: {result['answer']}"
+            self.questions.answer_from_phone(chat, question_id, int(option), tag)
+            # Echo the words of the button that was tapped; the saved answer itself is only its number.
+            buttons = query.get('message', {}).get('reply_markup', {}).get('inline_keyboard', [])
+            words = next((b.get('text') for row in buttons if type(row) is list for b in row
+                          if type(b) is dict and b.get('callback_data') == query['data']), None)
+            note = f'Answered: {words}' if type(words) is str else 'Answer saved.'
         except ConversationDenied:
             note = 'That question can no longer be answered here.'
         self._call('answerCallbackQuery', {'callback_query_id': query['id'], 'text': note[:200]})

@@ -1,6 +1,7 @@
 """Owner questions and the Telegram adapter with a fake Bot API. Fictional identities."""
 import sqlite3
 import unittest
+from unittest import mock
 from contextlib import closing
 
 from conversation import ConversationDenied
@@ -51,9 +52,10 @@ class QuestionCase(InboxCase):
         code = self.questions.start_pairing(self.sessions['bob'])['code']
         phone.handle({'update_id': 1, 'message': {'chat': {'id': chat_id, 'type': 'private'}, 'text': f'/start {code}'}})
 
-    def tap(self, phone, payload, chat_id=777):
-        phone.handle({'update_id': 2, 'callback_query': {'id': 'cb1', 'data': payload,
-                                                          'message': {'chat': {'id': chat_id}}}})
+    def tap(self, phone, payload, chat_id=777, markup=None):
+        # Telegram sends back the message the button was on, buttons included.
+        message = {'chat': {'id': chat_id}, **({'reply_markup': markup} if markup else {})}
+        phone.handle({'update_id': 2, 'callback_query': {'id': 'cb1', 'data': payload, 'message': message}})
 
 
 class QuestionTests(QuestionCase):
@@ -111,10 +113,46 @@ class TelegramTests(QuestionCase):
         buttons = [row[0] for row in message['reply_markup']['inline_keyboard']]
         self.assertEqual([b['text'] for b in buttons], ['Friday', 'Saturday'])
         self.assertTrue(all(len(b['callback_data'].encode()) <= 64 for b in buttons))
-        self.tap(phone, buttons[0]['callback_data'])
+        self.tap(phone, buttons[0]['callback_data'], markup=message['reply_markup'])
         answer = self.access.answer('q1')
         self.assertEqual((answer['answer'], answer['answered_via']), ('Friday', 'phone'))
         self.assertIn('Answered: Friday', self.bot.sent('answerCallbackQuery')[-1]['text'])
+
+    def test_a_tap_counts_while_parlu_is_locked_and_unpair_stops_the_next_message(self):
+        phone = self.phone('full')
+        self.pair(phone)
+        self.ask()
+        phone.send_waiting()
+        callback = self.bot.sent()[-1]['reply_markup']['inline_keyboard'][1][0]['callback_data']
+        with mock.patch.object(self.questions.storage, 'open', side_effect=ConversationDenied('locked')):
+            self.tap(phone, callback)  # The question text cannot be read, and is not needed.
+        self.assertEqual(self.bot.sent('answerCallbackQuery')[-1]['text'], 'Answer saved.')
+        self.assertEqual(self.access.answer('q1')['answer'], 'Saturday')
+        # A batch reads the pairing before every message, so an Unpair mid-batch sends nothing more.
+        self.ask('q2'); self.ask('q3')
+        before = len(self.bot.sent())
+        real = phone._call
+        def unpair_after_first(method, payload, **options):
+            result = real(method, payload, **options)
+            if method == 'sendMessage':
+                self.questions.unpair(self.sessions['bob'])
+            return result
+        with mock.patch.object(phone, '_call', side_effect=unpair_after_first):
+            self.assertEqual(phone.send_waiting(), 1)
+        self.assertEqual(len(self.bot.sent()), before + 1)
+
+    def test_replacement_pairing_reports_when_the_new_code_is_used(self):
+        phone = self.phone('full')
+        self.pair(phone)
+        first = self.questions.phone_status(self.sessions['bob'])
+        made = self.questions.start_pairing(self.sessions['bob'])
+        waiting = self.questions.phone_status(self.sessions['bob'])
+        self.assertEqual((waiting['paired'], waiting['pairing_open'], waiting['paired_at']), (True, True, first['paired_at']))
+        phone.handle({'update_id': 9, 'message': {'chat': {'id': 888, 'type': 'private'}, 'text': '/start ' + made['code']}})
+        done = self.questions.phone_status(self.sessions['bob'])
+        self.assertFalse(done['pairing_open'])
+        self.assertGreaterEqual(done['paired_at'], made['started_at'])
+        self.assertEqual(self.questions.paired_chat(), '888')
 
     def test_notice_mode_sends_no_question_text(self):
         phone = self.phone('notice')
@@ -169,8 +207,33 @@ class TelegramTests(QuestionCase):
         phone = self.phone()
         self.pair(phone)
         self.assertTrue(phone.nudge(3))
-        self.assertEqual(self.bot.sent()[-1]['text'], '3 items are waiting for your review in Assistant Central.')
+        self.assertEqual(self.bot.sent()[-1]['text'], '3 items are waiting for your review in Parlu.')
 
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class RunnerTests(QuestionCase):
+    def test_a_refused_message_never_stops_the_bot_hearing_a_new_phone(self):
+        from owner_phone.runner import PhoneRunner
+        old_chat_blocked = self.bot
+
+        def post(url, payload, timeout):
+            if url.endswith('/sendMessage') and payload.get('chat_id') == '777':
+                return {'ok': False, 'description': 'Forbidden: bot was blocked by the user'}
+            if url.endswith('/getMe'):
+                return {'ok': True, 'result': {'username': 'parlu_fictional_bot'}}
+            return old_chat_blocked(url, payload, timeout)
+
+        runner = PhoneRunner(self.questions, 'full', token=TOKEN, post=post)
+        self.pair(runner.phone)
+        self.ask()
+        code = self.questions.start_pairing(self.sessions['bob'])['code']
+        self.bot.updates = [{'update_id': 5, 'message': {'chat': {'id': 888, 'type': 'private'}, 'text': f'/start {code}'}}]
+        with self.assertRaises(TelegramError):
+            runner.step()  # The old chat refused the question, but the new phone was still heard.
+        self.assertEqual(self.questions.paired_chat(), '888')
+        runner.step()
+        self.assertEqual(self.bot.sent()[-1]['chat_id'], '888')
+        self.assertIn('which day', self.bot.sent()[-1]['text'])

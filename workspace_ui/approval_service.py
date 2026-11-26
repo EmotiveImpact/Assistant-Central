@@ -17,23 +17,35 @@ from conversation.proposals import LocalProposals
 from conversation.shared_draft import draft_view
 from conversation.timeline import OwnerTimeline
 from owner_phone.questions import OwnerQuestions
+from owner_phone.runner import PhoneRunner
 from pilot.server import RequestDenied, exact
 
 MISSION_PREFIX = '{"domain":"assistant-central/mission-agreement/'
 ROUTE = re.compile(r'/api/approvals(?:/(messages|questions|drafts)/([A-Za-z0-9_-]{1,64})/(approve|decline|answer|review))?')
 SETTINGS = re.compile(r'/api/approvals/(policy|guidance|timeline)')
+PHONE = re.compile(r'/api/approvals/phone(?:/(pair|unpair))?')
 
 
 class ApprovalService:
-    def __init__(self, host, directory):
+    def __init__(self, host, directory, *, phone=None):
         self.host = host
         self.directory = Path(directory)
         self.directory.mkdir(mode=0o700, exist_ok=True)
         self.inbox = InboxStore(self.directory / 'inbox', host.ledger)
         self._owners = {}
         self._reviews = {}
+        self.phone, self.phone_problem = None, None
+        if phone is not None:
+            # One bot serves the person who runs this copy of Parlu, never the other local accounts.
+            _, questions, _ = self.owner(host.ledger.storage_owner)
+            try:
+                self.phone = PhoneRunner(questions, phone['telegram']).start()
+            except ConversationDenied:
+                self.phone_problem = 'no_bot_token'
 
     def close(self):
+        if self.phone is not None:
+            self.phone.close()
         for desk, questions, timeline in self._owners.values():
             desk.close(); questions.close(); timeline.close()
         self._owners.clear()
@@ -91,7 +103,28 @@ class ApprovalService:
 
     # Decisions ----------------------------------------------------------------
 
+    def _phone(self, principal, token, method, action, body):
+        _, questions, _ = self.owner(principal)
+        mine = principal == self.host.ledger.storage_owner
+        if action is None and method == 'GET':
+            status = questions.phone_status(token)  # Also checks the owner's session.
+            if not mine or self.phone is None:
+                return {**status, 'available': False, 'reason': self.phone_problem if mine and self.phone_problem else 'not_set_up'}
+            return {**status, **self.phone.status()}
+        need(method == 'POST' and mine and self.phone is not None)
+        exact(body, ())
+        if action == 'unpair':
+            questions.unpair(token)
+            return {'paired': False}
+        made = questions.start_pairing(token)
+        bot = self.phone.bot
+        # Telegram turns this link into "/start <code>" in a private chat with the bot.
+        return {**made, 'bot': bot, 'start_link': f'https://t.me/{bot}?start={made["code"]}' if bot else None}
+
     def call(self, principal, token, method, path, body):
+        phone = PHONE.fullmatch(path)
+        if phone:
+            return self._phone(principal, token, method, phone[1], body)
         settings = SETTINGS.fullmatch(path)
         if settings:
             return self._settings(principal, token, method, settings[1], body)

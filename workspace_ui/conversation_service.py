@@ -28,8 +28,13 @@ MAX_RESPONSE = 1024 * 1024
 
 class ConversationConfig:
     def __init__(self, value):
-        exact(value, ('version', 'directory', 'actors'))
+        exact(value, ('version', 'directory', 'actors'), ('phone',))
         need(value['version'] == VERSION and type(value['actors']) is list and 1 <= len(value['actors']) <= 31)
+        # Optional: the host's own Telegram bot for owner questions, e.g. {"telegram": "notice"}.
+        self.phone = value.get('phone')
+        if self.phone is not None:
+            exact(self.phone, ('telegram',))
+            need(self.phone['telegram'] in ('notice', 'full'))
         self.directory = self.path(value['directory'])
         self.actors = []
         for item in value['actors']:
@@ -84,7 +89,8 @@ class ConversationService:
             need(config.directory not in [s.auth.directory for s in self.services.values()])
             self.ledger = ConversationLedger(config.directory, primary.auth,
                                             {key: s.auth for key, s in self.services.items()})
-            self.approvals = ApprovalService(self, config.directory.with_name(config.directory.name + '-approvals'))
+            self.approvals = ApprovalService(self, config.directory.with_name(config.directory.name + '-approvals'),
+                                             phone=config.phone)
         except BaseException:
             if self.approvals is not None:
                 self.approvals.close()
