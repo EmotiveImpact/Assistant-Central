@@ -126,6 +126,14 @@ class RelayCarrierTests(unittest.TestCase):
         self.assertEqual(run('send', '--invite', link, '--recipient', self.a[2].fingerprint,
                              '--file', str(self.packet))[0], 1)
 
+    def test_live_check_against_local_relay(self):
+        from pilot import relay_live_check
+        lines = []
+        url = f'http://127.0.0.1:{self.server.server_port}'
+        self.assertTrue(relay_live_check.run(url, say=lines.append))
+        self.assertEqual(lines[-1], 'Relay check passed.')
+        self.assertEqual(relay_live_check.main(['ftp://nowhere']), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

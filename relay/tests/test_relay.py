@@ -134,6 +134,11 @@ class RelayTests(RelayCase):
         self.assertEqual(status, 200)
         self.assertIn("default-src 'none'", headers['Content-Security-Policy'])
         self.assertIn(b'never sent here', page)
+        status, headers, page = self.relay.handle('GET', '/', {}, b'')
+        self.assertEqual(status, 200)
+        self.assertIn("default-src 'none'", headers['Content-Security-Policy'])
+        self.assertIn(b'Parlu relay is running', page)
+        self.assertEqual(self.relay.handle('POST', '/', {}, b'')[0], 404)
 
     def test_parse_invite_rejects_tampered_links(self):
         link = self.invite()['link']
