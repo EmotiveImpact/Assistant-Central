@@ -1,0 +1,10 @@
+{
+  "builds": [
+    {
+      "src": "hosted/index.py",
+      "use": "@vercel/python",
+      "config": { "excludeFiles": "{.git,archive,research,docs,sdk,node_modules}/**" }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "/hosted/index.py?parlu_path=$1" }]
+}
