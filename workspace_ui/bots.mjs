@@ -27,7 +27,8 @@ export function botTraits(name) {
 }
 
 function el(name, attributes, parent) {
-  const node = document.createElementNS(SVG, name);
+  // Minimal test documents may lack SVG support; the face is decorative, so fall back quietly.
+  const node = typeof document.createElementNS === 'function' ? document.createElementNS(SVG, name) : document.createElement(name);
   for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, String(value));
   parent?.append(node);
   return node;
