@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {STEPS,partStep,splitTitle,teamsOf,teamCounts,teamLine,stepShare,planParts} from '../team.mjs';
+import {STEPS,partStep,splitTitle,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead} from '../team.mjs';
 
 const task=(id,peer,state,title,extra={})=>({id,kind:'task',direction:'outgoing',peer_id:peer,state,title,context:'c1',created_at:String(100+Number(id.slice(1))),...extra});
 const result=(id,parent,state,at=500)=>({id,kind:'artifact',direction:'incoming',parent_id:parent,state,created_at:String(at)});
@@ -79,4 +79,19 @@ test('planning a team mission checks every part before anything is created',()=>
   assert.throws(()=>planParts('M',[rows[0],{title:'B',peer_id:'p2',text:''}]),/name, an assistant and a brief/);
   assert.throws(()=>planParts('M',Array.from({length:7},(_,i)=>({title:'P'+i,peer_id:'p'+i,text:'t'}))),/six parts/);
   assert.throws(()=>planParts('M',[rows[0],{title:'x'.repeat(120),peer_id:'p2',text:'t'}]),/part name short/);
+});
+
+test('an item knows which team mission it belongs to',()=>{
+  const items=[task('t1','p1','accepted','Supper club app: Card deposits'),task('t2','p2','draft','Supper club app: Calendar sync'),
+    result('r1','t1','pending'),task('t9','p1','draft','Alone: A',{context:'c9'}),result('r9','t9','pending')];
+  const state={items};
+  const part=partOf(state,items[1]);
+  assert.equal(part.team.title,'Supper club app');assert.equal(part.part.title,'Calendar sync');assert.equal(part.result,false);
+  assert.equal(partLead(part),'Calendar sync, part of Supper club app');
+  const returned=partOf(state,items[2]);
+  assert.equal(returned.result,true);
+  assert.equal(partLead(returned),'Result for Card deposits, part of Supper club app');
+  // Work outside any team mission says nothing.
+  assert.equal(partOf(state,items[3]),null);assert.equal(partOf(state,items[4]),null);assert.equal(partOf(state,undefined),null);
+  assert.equal(partLead(null),'');
 });

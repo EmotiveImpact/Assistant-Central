@@ -49,6 +49,22 @@ export function teamsOf(state){
   return teams.sort((a,b)=>b.created_at-a.created_at);
 }
 
+// The team mission an item belongs to: one of its parts, or a result returned for a part.
+export function partOf(state,item){
+  if(!item)return null;
+  for(const team of teamsOf(state)){
+    const part=team.parts.find(entry=>entry.item.id===item.id||(item.kind==='artifact'&&item.direction==='incoming'&&item.parent_id===entry.item.id));
+    if(part)return {team,part,result:part.item.id!==item.id};
+  }
+  return null;
+}
+
+// One short line for a Home card, so a result reads as part of the bigger piece of work.
+export function partLead(found){
+  if(!found)return '';
+  return found.result?`Result for ${found.part.title}, part of ${found.team.title}`:`${found.part.title}, part of ${found.team.title}`;
+}
+
 export function teamCounts(team){
   const counts=Object.fromEntries([...STEPS,'Stopped'].map(step=>[step,0]));
   for(const part of team.parts)counts[part.step]+=1;

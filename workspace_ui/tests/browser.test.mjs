@@ -144,6 +144,17 @@ try {
   assert.equal(await page.locator('#inspect-title').textContent(),'Orbit');
   assert.match(await page.locator('#inspect-body').textContent(),/Fingerprint[0-9a-f]{64}/);
   assert.equal(await page.locator('#inspect-title').evaluate(node=>node===document.activeElement),true,'opening the panel moves focus to its heading');
+  // From an assistant you can start work with it already chosen. Opening a form never writes.
+  await page.locator('#inspect').getByRole('button',{name:'Propose work',exact:true}).click();
+  await page.locator('#compose-dialog').waitFor({state:'visible'});
+  assert.match(await page.locator('#proposal-peer option:checked').textContent(),/^Orbit/);
+  await page.keyboard.press('Escape');await page.locator('#compose-dialog').waitFor({state:'hidden'});
+  await page.locator('#inspect').getByRole('button',{name:'Start a team mission',exact:true}).click();
+  await page.locator('#team-dialog').waitFor({state:'visible'});
+  const chosen=await page.locator('#team-parts [name="part_peer"]').evaluateAll(nodes=>nodes.map(node=>node.selectedOptions[0].textContent));
+  assert.match(chosen[0],/^Orbit/);assert.notEqual(chosen[0],chosen[1],'the second part starts with a different assistant');
+  await page.keyboard.press('Escape');await page.locator('#team-dialog').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#inspect').isVisible(),true,'closing a form leaves the panel open');
   await page.locator('#inspect-pin').click();
   assert.equal(await page.locator('#inspect-pin').getAttribute('aria-pressed'),'true');
   await nav('money');

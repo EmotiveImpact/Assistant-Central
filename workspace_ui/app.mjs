@@ -9,7 +9,7 @@ import {createApprovals,validateListing} from './approvals.mjs';
 import {homeQueue,CARD,askerOf,moreLine,closingLine} from './queue.mjs';
 import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
 import {holdButton} from './hold.mjs';
-import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts} from './team.mjs';
+import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
@@ -224,6 +224,8 @@ function openAssistantPanel(peer){
     if(!work.length)shared.append(text('p','No shared work yet.','inspect-note'));
     for(const item of work.slice(0,6)){const row=button('','inspect-item',()=>openReview(item));row.append(text('span',plain(item.title,'Untitled')),badge(item.state));shared.append(row);}
     const mode=panelSection(body,'Sending mode');mode.append(text('p','Every proposal from this assistant waits for your exact decision. Sending modes and private notes for conversations live in Approvals.','inspect-note'));
+    if(isPeerActive(peer)){const actions=text('div','','inspect-actions');actions.append(button('Propose work','button primary',()=>prepareCompose(peer.peer_id)));
+      if(state.peers.filter(isPeerActive).length>1)actions.append(button('Start a team mission','button secondary',()=>openTeamDialog(peer.peer_id)));body.append(actions);}
   });
 }
 function openMissionPanel(item){
@@ -339,24 +341,25 @@ function openPartPanel(team,part){
     body.append(button('Open the exact proposal','button secondary',()=>openReview(part.item)));
   });
 }
-function teamRow(index){
+function teamRow(index,first){
   const row=text('fieldset','','team-part-row');row.append(text('legend',`Part ${index+1}`));
   const name=text('label','Part name');const nameInput=text('input','');nameInput.name='part_title';nameInput.maxLength=50;nameInput.placeholder='For example, Card deposits';name.append(nameInput);
   const who=text('label','Assistant');const select=text('select','');select.name='part_peer';
   const active=state.peers.filter(isPeerActive);
   for(const peer of active){const option=text('option',`${plain(peer.agent_id,'Assistant')}, ${cap(plain(peer.owner_id,'Owner'))}'s assistant`);option.value=peer.peer_id;select.append(option);}
-  if(active.length)select.selectedIndex=index%active.length;who.append(select);
+  const order=first&&active.some(peer=>peer.peer_id===first)?[first,...active.filter(peer=>peer.peer_id!==first).map(peer=>peer.peer_id)]:active.map(peer=>peer.peer_id);
+  if(order.length)select.value=order[index%order.length];who.append(select);
   const brief=text('label','Brief','full');const area=text('textarea','');area.name='part_text';area.rows=2;area.maxLength=4096;area.value='SYNTHETIC ONLY: ';brief.append(area);
   row.append(name,who,brief);return row;
 }
-function openTeamDialog(){
+function openTeamDialog(first){
   if(!state||busy||uncertainty.pending())return;
   if(state.peers.filter(isPeerActive).length<2){navigate('peers');notice('A team mission needs at least two enrolled assistants. Enrol another trusted peer first.');return;}
-  const form=$('team-form');form.reset();$('team-message').textContent='';$('team-parts').replaceChildren(teamRow(0),teamRow(1));
+  const form=$('team-form');form.reset();$('team-message').textContent='';const lead=typeof first==='string'?first:undefined;$('team-form').dataset.first=lead??'';$('team-parts').replaceChildren(teamRow(0,lead),teamRow(1,lead));
   $('team-intro').textContent=`${plain(state.identity.agent_id,'Your assistant')} leads. Each part becomes a proposal you review and send on its own, and each assistant decides for itself. Nothing is sent yet.`;
   $('team-add-part').hidden=false;openDialog('team-dialog');
 }
-$('team-add-part').addEventListener('click',()=>{const parts=$('team-parts');if(parts.children.length>=6)return;parts.append(teamRow(parts.children.length));$('team-add-part').hidden=parts.children.length>=6;});
+$('team-add-part').addEventListener('click',()=>{const parts=$('team-parts');if(parts.children.length>=6)return;parts.append(teamRow(parts.children.length,$('team-form').dataset.first||undefined));$('team-add-part').hidden=parts.children.length>=6;});
 $('team-form').addEventListener('submit',async event=>{
   event.preventDefault();if(busy||uncertainty.pending())return;
   const form=event.currentTarget;
@@ -480,6 +483,7 @@ function renderHome(){
     const head=text('div','','home-card-head'),label=text('span','','home-card-who');label.append(text('strong',ask.yours?`${a}, your assistant`:`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
     head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),label);card.append(head);
     if(copy.lead)card.append(text('p',copy.lead.charAt(0)===copy.lead.charAt(0).toUpperCase()?copy.lead:`${a} ${copy.lead}`,'home-card-lead'));
+    const belongs=entry.kind==='proposal'?partLead(partOf(state,entry.item)):'';if(belongs){const lead=text('p',belongs,'home-card-lead');lead.dataset.team='true';card.append(lead);}
     card.append(text('p',entry.title,'home-card-title'));
     const open=()=>entry.kind==='proposal'?openReview(entry.item):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
@@ -702,12 +706,13 @@ async function workflowAction(action) {
 }
 function openDialog(id) { if(busy||uncertainty.pending())return;$(id).showModal(); }
 function newContext(){return Array.from(crypto.getRandomValues(new Uint8Array(32)),byte=>byte.toString(16).padStart(2,'0')).join('');}
-function prepareCompose(){
+function prepareCompose(peerId){
   if(busy||uncertainty.pending())return;
   if(!state.peers.some(isPeerActive)){navigate('peers');notice('Enrol an active trusted peer before preparing a proposal.');return;}
   $('compose-form').reset();$('compose-message').textContent='';$('proposal-peer').replaceChildren();
   for(const peer of state.peers.filter(isPeerActive)){const option=text('option',`${plain(peer.agent_id,'Assistant')} · ${plain(peer.owner_id,'Owner')}`);option.value=peer.peer_id;$('proposal-peer').append(option);}
   const form=$('compose-form');form.elements.context.value=newContext();form.elements.task_id.value='task-'+crypto.randomUUID();form.elements.text.value='SYNTHETIC ONLY: ';
+  if(typeof peerId==='string'&&[...$('proposal-peer').options].some(option=>option.value===peerId))$('proposal-peer').value=peerId;
   $('compose-form').elements.mission_currency.value=ownerCurrency();configureKind();openDialog('compose-dialog');
 }
 function configureKind(){
