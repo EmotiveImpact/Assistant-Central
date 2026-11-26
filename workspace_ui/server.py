@@ -30,6 +30,7 @@ STATIC_FILES = {
     "/conversations.mjs": (ROOT / "conversations.mjs", "text/javascript; charset=utf-8"),
     "/bots.mjs": (ROOT / "bots.mjs", "text/javascript; charset=utf-8"),
     "/hold.mjs": (ROOT / "hold.mjs", "text/javascript; charset=utf-8"),
+    "/home.mjs": (ROOT / "home.mjs", "text/javascript; charset=utf-8"),
     "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
     "/InterVariable.woff2": (ROOT / "InterVariable.woff2", "font/woff2"),
     "/PlusJakartaSansVariable.woff2": (ROOT / "PlusJakartaSansVariable.woff2", "font/woff2"),

@@ -1,6 +1,7 @@
 import {operationGate,restoreWhenIdle,inspectionLatch,inspectSavedState,requestIsMutation} from './operations.mjs';
 import {createConversations,inspectMessageOutcome} from './conversations.mjs';
 import {money,amountOf,toMicro,ownerCurrency} from './missions.mjs';
+import {homeGreeting,isEvening,budgetSummary,doneToday,doneLine,eveningSummary,shortKey} from './home.mjs';
 import {botFace,ownerPair} from './bots.mjs';
 import {createHostDrafts} from './host_drafts.mjs';
 import {createApprovals} from './approvals.mjs';
@@ -77,7 +78,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats','home-when','home-paragraph','home-cards'])$(id).replaceChildren();homeOffset=0;
+  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats','home-when','home-paragraph','home-cards','done-rows','money-panel','keys-panel'])$(id)?.replaceChildren();homeOffset=0;storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -207,7 +208,7 @@ function overviewItem(item) {
   row.append(main,badge(item.state),text('span','↗','overview-arrow'));return row;
 }
 let homeOffset=0;
-function homeGreeting(hour=new Date().getHours()){return hour<5?'Evening':hour<12?'Morning':hour<18?'Afternoon':'Evening';}
+let storyOffset=0,moneyTab='money';
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
@@ -216,9 +217,10 @@ function renderHome(allAttention){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
   say.replaceChildren();cards.replaceChildren();
   const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined;
-  const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting()} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
-  if(!n){const b=text('b','Nothing in your inbox needs you right now.');say.append(b);return;}
+  const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined,hour=new Date().getHours(),done=doneToday(state.items);
+  const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting(hour)} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
+  if(isEvening(hour)&&done.length)say.append(text('span',eveningSummary(done,peerOf)+' '));
+  if(!n){say.append(text('b','Nothing in your inbox needs you right now.'));if(isEvening(hour)&&done.length)renderStory(done);return;}
   const peer=peerOf(first),owner=cap(plain(peer?.owner_id,'Someone')),agent=plain(peer?.agent_id,'their assistant');
   say.append(text('span',`${owner}'s `),ownerPair(owner,agent,'owner-pair inline','look'),text('span',` ${agent} sent `),text('b',plain(first.title,'a proposal')));
   say.append(text('span',n>1?` and ${n-1} more ${n===2?'waits':'wait'} for your review. `:' and it needs your decision. '));
@@ -238,13 +240,69 @@ function renderHome(allAttention){
     cards.append(card);
   });
 }
+// The evening story: one finished piece of work at a time, with the owner's reaction.
+// Neither button changes a permission here: "Don't do that again" takes the owner to
+// Approvals, where the sending mode and private notes actually live.
+function renderStory(done){
+  const cards=$('home-cards'),item=done[storyOffset%done.length],p=peerOf(item);
+  const o=cap(plain(p?.owner_id,'You')),a=plain(p?.agent_id,state.identity.agent_id);
+  const card=text('article','','home-card story-card depth-0');card.dataset.itemId=item.id;
+  const head=text('div','','home-card-head');const who=text('span','','home-card-who');who.append(text('strong',`${a}, ${o}'s assistant`),text('small',done.length>1?`Story ${storyOffset%done.length+1} of ${done.length}`:'Today'));
+  head.append(ownerPair(o,a,'owner-pair','done'),who);
+  card.append(head,text('p',plain(item.title,'Untitled'),'home-card-title'),text('p',doneLine(item,p)+'.','story-line'));
+  const actions=text('div','','home-card-actions');
+  actions.append(button('Don’t do that again','button home-later',()=>{navigate('approvals');notice(`Choose how ${a} sends, or add a private note, so it checks with you next time.`);}));
+  actions.append(button(done.length>1?'Good, next':'Good','button primary home-good',()=>{storyOffset++;if(done.length>1)renderStory(done);else card.classList.add('story-seen');}));
+  card.append(actions);cards.replaceChildren(card);
+}
+// Done today: work someone agreed today, newest first, with its signed receipt.
+function renderDone(){
+  const rows=$('done-rows');if(!rows)return;rows.replaceChildren();
+  const done=doneToday(state.items);$('done-count').textContent=done.length;
+  if(!done.length){rows.append(text('p','Nothing agreed yet today. Finished work appears here.','done-empty'));return;}
+  for(const item of done.slice(0,4)){
+    const p=peerOf(item),o=cap(plain(p?.owner_id,'You')),a=plain(p?.agent_id,state.identity.agent_id);
+    const row=button('','done-row',()=>openReview(item));row.dataset.itemId=item.id;
+    const main=text('span','','done-main');main.append(text('strong',plain(item.title,'Untitled')),text('span',doneLine(item,p),'done-meta'));
+    row.append(ownerPair(o,a,'owner-pair','done'),main);
+    if(item.decision_digest)row.append(text('span','Receipt','badge receipt-badge'));
+    rows.append(row);
+  }
+}
+// Money and keys: real mission budgets only, and who holds which signing key.
+function renderMoney(){
+  const panel=$('money-panel'),keys=$('keys-panel');if(!panel||!keys)return;
+  panel.replaceChildren();keys.replaceChildren();
+  const totals=budgetSummary(state.workflow?.runs??[],state.items);
+  if(!totals.length){
+    panel.append(text('strong','No budgets yet','money-figure empty'),text('p','A budget appears here once you agree a mission with a spending limit.','money-note'));
+    panel.append(button('Set up a mission','button secondary money-start',()=>{if(state.peers.some(isPeerActive)){prepareCompose();const kind=$('compose-form').elements.kind;kind.value='mission';configureKind();}else navigate('peers');}));
+  }else{
+    const main=totals[0];
+    panel.append(text('strong',money(main.available,main.currency),'money-figure'),text('span',`Left across ${main.budgets===1?'one budget':main.budgets+' budgets'}`,'money-label'));
+    const bar=text('div','','money-bar');const fill=text('span','','money-fill');fill.style.width=`${main.cap?Math.min(100,Math.round((main.spent+main.held)/main.cap*100)):0}%`;bar.append(fill);
+    bar.setAttribute('role','img');bar.setAttribute('aria-label',`${money(main.spent+main.held,main.currency)} used or held of ${money(main.cap,main.currency)}`);
+    panel.append(bar,text('p',`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} · Limit ${money(main.cap,main.currency)}`,'money-note'));
+    for(const other of totals.slice(1))panel.append(text('p',`Also ${money(other.available,other.currency)} left in ${other.currency}`,'money-note'));
+    panel.append(text('p','Simulated spending. No real payment is made.','money-note muted'));
+  }
+  const holders=[{agent_id:state.identity.agent_id,owner_id:state.identity.owner_id,fingerprint:state.identity.fingerprint,you:true},...state.peers];
+  for(const h of holders){
+    const row=text('div','','key-row');const o=cap(plain(h.owner_id,'Owner')),a=plain(h.agent_id,'Assistant');
+    const main=text('span','','key-main');main.append(text('strong',h.you?`${a}, your assistant`:`${a}, ${o}'s`),text('span','Key '+shortKey(h.fingerprint),'key-print'));
+    row.append(ownerPair(o,a),main,text('span',h.you?'Yours':isPeerActive(h)?'Trusted':h.state==='revoked'?'Revoked':'Unverified','key-state'));keys.append(row);
+  }
+  for(const tab of document.querySelectorAll('[data-money]')){const on=tab.dataset.money===moneyTab;tab.classList.toggle('selected',on);tab.setAttribute('aria-selected',String(on));}
+  panel.hidden=moneyTab!=='money';keys.hidden=moneyTab!=='keys';
+}
 function renderOverview(totals) {
   for(const id of ['overview-stats','overview-attention','overview-work','overview-network','overview-events'])$(id).replaceChildren();
   const stats=[['Needs your review',totals.pending,'Incoming proposals','inbox','pending'],['Accepted tasks',totals.acceptedTasks,'Work agreed by its recipient','tasks','accepted'],['Artifacts',totals.artifacts,'Drafts and received work','artifacts','all'],['Trusted assistants',totals.peers,'Individually enrolled','peers','all']];
   const metricSymbols={inbox:'i-inbox',tasks:'i-tasks',artifacts:'i-artifacts',peers:'i-peers'};
   for(const [label,value,note,view,filter] of stats){const tile=button('','overview-metric',()=>navigate(view,{filter}));tile.append(symbolIcon(metricSymbols[view],'metric-icon'),text('span',label,'metric-label'),text('strong',value,'metric-value'),text('span',note,'metric-note'));$('overview-stats').append(tile);}
   const allAttention=attentionItems(state),attention=allAttention.slice(0,3);
-  renderHome(allAttention);
+  renderHome(allAttention);renderDone();renderMoney();
+  if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
   if($('attention-count'))$('attention-count').textContent=allAttention.length;
   if(attention.length)for(const item of attention)$('overview-attention').append(overviewItem(item));
   else empty('✓','You’re all caught up.','New requests will appear here after you sync the exchange.',undefined,$('overview-attention'));
@@ -454,6 +512,9 @@ $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSucce
 $('new-proposal').addEventListener('click',prepareCompose);
 function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
+$('money-card')?.addEventListener('click',event=>{const tab=event.target.closest('[data-money]')?.dataset.money;if(!tab)return;moneyTab=tab;renderMoney();});
+// The Ask bar drafts a proposal from what you typed. Nothing is sent until you review it.
+$('home-ask')?.addEventListener('submit',event=>{event.preventDefault();const typed=$('home-ask-input').value.trim();prepareCompose();const form=$('compose-form');if(!$('compose-dialog').open)return;if(typed){form.elements.title.value=typed.slice(0,120);form.elements.text.value='SYNTHETIC ONLY: '+typed;}$('home-ask-input').value='';});
 $('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
