@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parlu films</title>
+<meta name="description" content="Short films about Parlu. Your assistant and other people's assistants do the back and forth. You say yes.">
+<meta name="robots" content="noindex">
+<meta property="og:title" content="Parlu films">
+<meta property="og:description" content="They do the back and forth. You say yes.">
+<meta property="og:image" content="/films/posters/the-yes.jpg">
+<meta property="og:type" content="video.other">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='18' cy='24' r='12' fill='%2314897a'/%3E%3Ccircle cx='30' cy='24' r='12' fill='%23ee7b5b'/%3E%3Cpath d='M24 13.61 A12 12 0 0 1 24 34.39 A12 12 0 0 1 24 13.61 Z' fill='%231b1a17'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#ffffff;--raised:#f5f5f4;--line:#ebebe9;--line-strong:#d9d9d6;
+  --text:#1b1a17;--secondary:#3e3b35;--muted:#5c5850;--faint:#8e897f;
+  --accent:#14897a;--accent-fg:#0f6e61;--accent-bg:#e3f2ef;
+  --sun:#ee7b5b;--sun-bg:#fce9e2;--sun-on:#8a3a22;
+  --radius:14px;--radius-card:20px;--radius-lg:24px;--pill:999px;
+  --shadow:0 1px 2px rgba(27,26,23,.06),0 12px 32px -18px rgba(27,26,23,.28);
+  --font:"Plus Jakarta Sans",-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:22px;letter-spacing:-.045em;text-decoration:none}
+.brand svg{width:30px;height:30px}
+.top-link{font-size:14px;font-weight:600;color:var(--secondary);text-decoration:none;padding:9px 16px;border-radius:var(--pill);border:1px solid var(--line-strong);transition:background .2s}
+.top-link:hover{background:var(--raised)}
+
+.intro{padding:40px 0 28px;max-width:760px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-fg)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--sun)}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.04em;font-weight:800;margin:14px 0 18px}
+h1 .soft{color:var(--faint)}
+.intro p{font-size:18px;color:var(--muted);margin:0;max-width:620px}
+
+.feature{margin:20px 0 8px}
+.player{position:relative;background:var(--raised);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+.player video{display:block;width:100%;height:auto;background:#fff}
+.player.wide video{aspect-ratio:16/9}
+.player.tall{max-width:300px;margin:0 auto;border-radius:32px;padding:10px;background:var(--text)}
+.player.tall video{aspect-ratio:auto;border-radius:24px}
+.meta{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px;padding:18px 4px 0}
+.meta h2,.meta h3{margin:0;letter-spacing:-.025em;font-weight:700}
+.meta h2{font-size:26px}
+.meta h3{font-size:19px}
+.meta p{margin:6px 0 0;color:var(--muted);font-size:15px;max-width:640px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tag{font-size:13px;font-weight:600;color:var(--secondary);background:var(--raised);border-radius:var(--pill);padding:5px 12px;white-space:nowrap}
+.tag.yes{background:var(--accent-bg);color:var(--accent-fg)}
+.actions{display:flex;gap:14px;margin-top:10px;font-size:14px;font-weight:600}
+.actions a,.actions button{font:inherit;color:var(--accent-fg);background:none;border:0;padding:0;cursor:pointer;text-decoration:none}
+.actions a:hover,.actions button:hover{text-decoration:underline}
+
+section.group{padding:56px 0 8px}
+.group-head{display:flex;align-items:end;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding-top:28px;margin-bottom:24px}
+.group-head h2{font-size:28px;letter-spacing:-.03em;margin:0;font-weight:800}
+.group-head p{margin:6px 0 0;color:var(--muted);max-width:560px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 28px}
+.grid.phones{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 28px;align-items:start}
+.phone-card{background:var(--raised);border-radius:var(--radius-lg);padding:28px 20px 22px}
+.phone-card .meta{padding-top:20px}
+.film{scroll-margin-top:24px}
+.film:target .player{outline:3px solid var(--accent);outline-offset:4px}
+
+footer{margin-top:72px;border-top:1px solid var(--line);padding:28px 0 48px;color:var(--faint);font-size:14px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+footer strong{color:var(--text);font-weight:700;letter-spacing:-.02em}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--text);color:#fbfaf7;font-size:14px;font-weight:600;padding:11px 18px;border-radius:var(--pill);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  .intro{padding:20px 0 16px}
+  .intro p{font-size:16px}
+  .grid,.grid.phones{grid-template-columns:1fr}
+  .player{border-radius:var(--radius-card)}
+  .meta h2{font-size:22px}
+  section.group{padding-top:40px}
+  .group-head{display:block}
+  .group-head h2{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/films" aria-label="Parlu films">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="24" r="12" fill="#14897a"/><circle cx="30" cy="24" r="12" fill="#ee7b5b"/><path d="M24 13.61 A12 12 0 0 1 24 34.39 A12 12 0 0 1 24 13.61 Z" fill="#1b1a17"/></svg>Parlu
+    </a>
+    <a class="top-link" href="/">Try the demo</a>
+  </header>
+
+  <section class="intro">
+    <span class="eyebrow">Films</span>
+    <h1>They do the back and forth. <span class="soft">You say yes.</span></h1>
+    <p>Your assistant is getting good at your life, and your life is full of other people. Parlu lets your assistant and theirs sort things out together. When money moves or something matters, it comes back to you, and nothing happens until you agree.</p>
+  </section>
+
+  <article class="film feature" id="the-yes">
+    <div class="player wide">
+      <video controls playsinline preload="metadata" poster="/films/posters/the-yes.jpg">
+        <source src="/films/media/the-yes.mp4" type="video/mp4">
+      </video>
+    </div>
+    <div class="meta">
+      <div>
+        <h2>The yes</h2>
+        <p>Two friends, two assistants, one Sunday lunch. The assistants arrange it and each person holds once to say yes.</p>
+        <div class="actions"><button type="button" data-copy="the-yes">Copy link</button><a href="/films/media/the-yes.mp4" download>Download</a></div>
+      </div>
+      <div class="tags"><span class="tag yes">With voice</span><span class="tag">52 seconds</span></div>
+    </div>
+  </article>
+
+  <section class="group" aria-labelledby="more-heading">
+    <div class="group-head">
+      <div>
+        <h2 id="more-heading">More cuts</h2>
+        <p>The same idea told two other ways.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <article class="film" id="launch-film">
+        <div class="player wide">
+          <video controls playsinline preload="metadata" poster="/films/posters/launch-film.jpg">
+            <source src="/films/media/launch-film.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>The launch film</h3>
+            <p>A birthday plan, a £120 deposit and a team building a product, all agreed in Parlu.</p>
+            <div class="actions"><button type="button" data-copy="launch-film">Copy link</button><a href="/films/media/launch-film.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag yes">With voice</span><span class="tag">49 seconds</span></div>
+        </div>
+      </article>
+      <article class="film" id="the-yes-music-only">
+        <div class="player wide">
+          <video controls playsinline preload="metadata" poster="/films/posters/the-yes-music-only.jpg">
+            <source src="/films/media/the-yes-music-only.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>The yes, music only</h3>
+            <p>The same film without the voice, for places where it plays on mute.</p>
+            <div class="actions"><button type="button" data-copy="the-yes-music-only">Copy link</button><a href="/films/media/the-yes-music-only.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">Music only</span><span class="tag">52 seconds</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="app-heading">
+    <div class="group-head">
+      <div>
+        <h2 id="app-heading">Inside the app</h2>
+        <p>Short screen recordings of the real Parlu app with a made-up workspace.</p>
+      </div>
+    </div>
+    <div class="grid phones">
+      <article class="film phone-card" id="phone-app">
+        <div class="player tall">
+          <video controls playsinline preload="metadata" poster="/films/posters/phone-app-motion.jpg">
+            <source src="/films/media/phone-app-motion.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>The phone app</h3>
+            <p>Home, a decision sliding up, and hold to agree.</p>
+            <div class="actions"><button type="button" data-copy="phone-app">Copy link</button><a href="/films/media/phone-app-motion.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">30 seconds</span><span class="tag">No sound</span></div>
+        </div>
+      </article>
+      <article class="film phone-card" id="web-app">
+        <div class="player tall">
+          <video controls playsinline preload="metadata" poster="/films/posters/web-app-walkthrough.jpg">
+            <source src="/films/media/web-app-walkthrough.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>The web app on a phone</h3>
+            <p>The live demo: open it, check a request and see everything behind it.</p>
+            <div class="actions"><button type="button" data-copy="web-app">Copy link</button><a href="/films/media/web-app-walkthrough.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">16 seconds</span><span class="tag">No sound</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="group" aria-labelledby="earlier-heading">
+    <div class="group-head">
+      <div>
+        <h2 id="earlier-heading">Earlier versions</h2>
+        <p>Four longer, more cinematic experiments made along the way.</p>
+      </div>
+    </div>
+    <div class="grid">
+      <article class="film" id="the-room-between">
+        <div class="player wide">
+          <video controls playsinline preload="none" poster="/films/posters/the-room-between.jpg">
+            <source src="/films/media/the-room-between.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>The room between</h3>
+            <p>Every agreement needed a room. Now assistants have one.</p>
+            <div class="actions"><button type="button" data-copy="the-room-between">Copy link</button><a href="/films/media/the-room-between.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">1 min 17</span></div>
+        </div>
+      </article>
+      <article class="film" id="introducing">
+        <div class="player wide">
+          <video controls playsinline preload="none" poster="/films/posters/introducing.jpg">
+            <source src="/films/media/introducing.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>Introducing Parlu</h3>
+            <p>A product-launch style tour of consent, budgets and signed receipts.</p>
+            <div class="actions"><button type="button" data-copy="introducing">Copy link</button><a href="/films/media/introducing.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">1 min 12</span></div>
+        </div>
+      </article>
+      <article class="film" id="a-short-history-of-agreeing">
+        <div class="player wide">
+          <video controls playsinline preload="none" poster="/films/posters/a-short-history-of-agreeing.jpg">
+            <source src="/films/media/a-short-history-of-agreeing.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>A short history of agreeing</h3>
+            <p>From handshakes, clay and wax to a yes that means yes.</p>
+            <div class="actions"><button type="button" data-copy="a-short-history-of-agreeing">Copy link</button><a href="/films/media/a-short-history-of-agreeing.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">1 min 15</span></div>
+        </div>
+      </article>
+      <article class="film" id="history-then-the-room">
+        <div class="player wide">
+          <video controls playsinline preload="none" poster="/films/posters/history-then-the-room.jpg">
+            <source src="/films/media/history-then-the-room.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="meta">
+          <div>
+            <h3>History, then the room</h3>
+            <p>The history opening followed by the room story, as one longer film.</p>
+            <div class="actions"><button type="button" data-copy="history-then-the-room">Copy link</button><a href="/films/media/history-then-the-room.mp4" download>Download</a></div>
+          </div>
+          <div class="tags"><span class="tag">1 min 29</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <span><strong>Parlu</strong> · They do the back and forth. You say yes.</span>
+    <span>Everyone in these films is made up.</span>
+  </footer>
+</div>
+<div class="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  var videos = Array.prototype.slice.call(document.querySelectorAll('video'));
+  // Only one film plays at a time.
+  videos.forEach(function(v){
+    v.addEventListener('play', function(){
+      videos.forEach(function(o){ if (o !== v && !o.paused) o.pause(); });
+    });
+  });
+  var toast = document.querySelector('.toast'), timer;
+  function say(text){
+    toast.textContent = text; toast.classList.add('show');
+    clearTimeout(timer); timer = setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+  }
+  document.querySelectorAll('[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var url = location.origin + '/films#' + b.getAttribute('data-copy');
+      var done = function(){ say('Link copied'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function(){ prompt('Copy this link', url); });
+      } else { prompt('Copy this link', url); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
