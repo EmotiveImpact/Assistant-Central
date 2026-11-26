@@ -12,6 +12,7 @@ Only the one chat the owner paired with a one-time code is accepted.
 """
 import json
 import os
+import re
 import urllib.request
 
 from conversation.ledger import ConversationDenied, need
@@ -20,7 +21,7 @@ from .questions import OwnerQuestions
 
 API_BASE = 'https://api.telegram.org'
 MODES = ('notice', 'full')
-NOTICE_TEXT = 'Your assistant has a question for you. Open Assistant Central to answer it.'
+NOTICE_TEXT = 'Your assistant has a question for you. Open Parlu to answer it.'
 ANSWER_NOTE = 'Your answer is information for your assistant. It does not approve sending, sharing, running or paying for anything.'
 
 
@@ -53,6 +54,12 @@ class TelegramPhone:
             raise TelegramError(f'Telegram {method} was refused')
         return result.get('result')
 
+    def bot_name(self):
+        """The bot's public username, for a t.me pairing link. ``None`` if Telegram gives none."""
+        me = self._call('getMe', {}, timeout=10)
+        name = me.get('username') if type(me) is dict else None
+        return name if type(name) is str and re.fullmatch(r'[A-Za-z0-9_]{5,32}', name) else None
+
     # Outbound --------------------------------------------------------------
 
     def send_waiting(self):
@@ -83,7 +90,7 @@ class TelegramPhone:
         if chat is None:
             return False
         noun = 'item is' if waiting == 1 else 'items are'
-        self._call('sendMessage', {'chat_id': chat, 'text': f'{waiting} {noun} waiting for your review in Assistant Central.'})
+        self._call('sendMessage', {'chat_id': chat, 'text': f'{waiting} {noun} waiting for your review in Parlu.'})
         return True
 
     # Inbound ---------------------------------------------------------------
@@ -120,7 +127,7 @@ class TelegramPhone:
             self.questions.complete_pairing(str(chat['id']), text.split(' ', 1)[1].strip())
             reply = 'Paired. Your assistant can now ask you questions here.'
         except ConversationDenied:
-            reply = 'That pairing code is not valid. Create a new one in Assistant Central.'
+            reply = 'That pairing code is not valid. Create a new one in Parlu.'
         self._call('sendMessage', {'chat_id': chat['id'], 'text': reply})
 
     def _handle_button(self, query):

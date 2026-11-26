@@ -169,7 +169,7 @@ class TelegramTests(QuestionCase):
         phone = self.phone()
         self.pair(phone)
         self.assertTrue(phone.nudge(3))
-        self.assertEqual(self.bot.sent()[-1]['text'], '3 items are waiting for your review in Assistant Central.')
+        self.assertEqual(self.bot.sent()[-1]['text'], '3 items are waiting for your review in Parlu.')
 
 
 if __name__ == '__main__':

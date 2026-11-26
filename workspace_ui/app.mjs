@@ -13,6 +13,7 @@ import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,re
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
 import {qrMatrix,qrPath} from './qr.mjs';
+import {validatePhone,startLink,phoneNote,ANSWER_LIMIT} from './phone.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
@@ -254,10 +255,49 @@ function openSettingsPanel(refresh){
     line(people,relayEnabled(state)?'Add an assistant by fingerprint':'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
     // Sending modes and private notes are set on a message waiting in Approvals, nowhere else.
     if(state.approvals?.enabled===true)line(people,'Sending modes and private notes','In Approvals',()=>go('approvals'));
+    if(state.approvals?.enabled===true)line(people,'Questions on your phone','Telegram',()=>openPhonePanel());
     const device=panelSection(body,'This device');
     line(device,'Workspace status',$('connection-status').textContent||'Not checked yet',()=>openStatusPanel());
     line(device,'Lock and sign out','Clears this browser',()=>$('logout').click());
   },()=>openSettingsPanel(true),refresh);
+}
+// Questions on your phone: pair this copy of Parlu with one private chat with the host's bot.
+// The panel reads the status fresh each time it opens, and never shows the bot token.
+async function openPhonePanel(refresh){
+  if(busy||uncertainty.pending())return;const epoch=generation;
+  let status;try{status=validatePhone(await request('/api/approvals/phone'));}catch(error){if(epoch===generation)handleFailure(error);return;}
+  if(epoch!==generation)return;
+  showPanel('phone','Questions on your phone',status.paired?'Paired with Telegram':'Not paired',body=>{
+    const about=panelSection(body);about.append(text('p',phoneNote(status),'inspect-note'),text('p',ANSWER_LIMIT,'inspect-note'));
+    if(!status.available)return;
+    const actions=text('div','','inspect-actions');
+    actions.append(button(status.paired?'Pair a different phone':'Pair your phone',status.paired?'button secondary':'button primary',()=>pairPhone(body)));
+    if(status.paired)actions.append(button('Unpair','button secondary',()=>performWrite('/api/approvals/phone/unpair',{},{onSuccess:()=>{notice('Your phone is unpaired. Questions now wait only in Approvals.',true);openPhonePanel(true);}})));
+    body.append(actions);
+  },()=>openPhonePanel(true),refresh);
+}
+async function pairPhone(body){
+  if(busy||uncertainty.pending())return;const epoch=generation;const release=operations.acquire();
+  let made;try{made=await request('/api/approvals/phone/pair',{method:'POST',body:{}});}catch(error){if(epoch===generation)handleFailure(error);return;}finally{release();}
+  if(epoch!==generation||!body.isConnected)return;
+  body.querySelector('.phone-pair')?.remove();
+  const box=panelSection(body,'Pair your phone');box.classList.add('phone-pair');
+  const link=startLink(made);
+  if(link){
+    const qr=text('div','','invite-qr');drawQr(qr,link);
+    const open=text('a','Open Telegram','button primary');open.href=link;open.target='_blank';open.rel='noopener noreferrer';
+    box.append(text('p','Scan this with your phone, or open it there. Telegram asks you to press Start.','inspect-note'),qr,open);
+  }
+  box.append(text('p',link?'Or send this to the bot yourself:':'Send this to your Parlu bot in Telegram:','inspect-note'),text('code',`/start ${made.code}`,'pair-code phone-code'),
+    text('p',`The code works once and ${expiresIn(made.expires_at)==='Expired'?'has expired':'expires '+expiresIn(made.expires_at).toLowerCase()}.`,'inspect-note'));
+  // Check back while the code can still be used and this panel is open.
+  const until=made.expires_at*1000;
+  const check=async()=>{
+    if(!box.isConnected||Date.now()>until||epoch!==generation)return;
+    try{const status=validatePhone(await request('/api/approvals/phone'));if(status.paired){notice('Your phone is paired. New questions reach it as they arrive.',true);openPhonePanel(true);return;}}catch{}
+    setTimeout(check,3000);
+  };
+  setTimeout(check,3000);
 }
 function openAssistantPanel(peer,refresh){
   const o=cap(plain(peer.owner_id,'Owner')),a=plain(peer.agent_id,'Assistant');
