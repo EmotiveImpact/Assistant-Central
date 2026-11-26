@@ -219,7 +219,7 @@ function renderHome(allAttention){
   const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined,hour=new Date().getHours(),done=doneToday(state.items);
   const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting(hour)} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
-  if(isEvening(hour)&&done.length)say.append(text('span',eveningSummary(done,peerOf)+' '));
+  if(!n&&isEvening(hour)&&done.length)say.append(text('span',eveningSummary(done,peerOf)+' '));
   if(!n){say.append(text('b','Nothing in your inbox needs you right now.'));if(isEvening(hour)&&done.length)renderStory(done);return;}
   const peer=peerOf(first),owner=cap(plain(peer?.owner_id,'Someone')),agent=plain(peer?.agent_id,'their assistant');
   say.append(text('span',`${owner}'s `),ownerPair(owner,agent,'owner-pair inline','look'),text('span',` ${agent} sent `),text('b',plain(first.title,'a proposal')));
@@ -241,8 +241,8 @@ function renderHome(allAttention){
   });
 }
 // The evening story: one finished piece of work at a time, with the owner's reaction.
-// Neither button changes a permission here: "Don't do that again" takes the owner to
-// Approvals, where the sending mode and private notes actually live.
+// Neither button changes a permission: in this workspace nothing runs without the owner's
+// yes, so "Don't do that again" reopens what was agreed, where it can be cancelled.
 function renderStory(done){
   const cards=$('home-cards'),item=done[storyOffset%done.length],p=peerOf(item);
   const o=cap(plain(p?.owner_id,'You')),a=plain(p?.agent_id,state.identity.agent_id);
@@ -251,7 +251,7 @@ function renderStory(done){
   head.append(ownerPair(o,a,'owner-pair','done'),who);
   card.append(head,text('p',plain(item.title,'Untitled'),'home-card-title'),text('p',doneLine(item,p)+'.','story-line'));
   const actions=text('div','','home-card-actions');
-  actions.append(button('Don’t do that again','button home-later',()=>{navigate('approvals');notice(`Choose how ${a} sends, or add a private note, so it checks with you next time.`);}));
+  actions.append(button('Don’t do that again','button home-later',()=>{notice(`${a} can’t start anything without your yes. Here is what was agreed, so you can cancel it or decline the next one.`);openReview(item);}));
   actions.append(button(done.length>1?'Good, next':'Good','button primary home-good',()=>{storyOffset++;if(done.length>1)renderStory(done);else card.classList.add('story-seen');}));
   card.append(actions);cards.replaceChildren(card);
 }
@@ -268,6 +268,7 @@ function renderDone(){
     if(item.decision_digest)row.append(text('span','Receipt','badge receipt-badge'));
     rows.append(row);
   }
+  if(done.length>4)rows.append(button(`See all ${done.length} in All work`,'text-button done-more',()=>navigate('tasks',{filter:'accepted'})));
 }
 // Money and keys: real mission budgets only, and who holds which signing key.
 function renderMoney(){
@@ -278,12 +279,17 @@ function renderMoney(){
     panel.append(text('strong','No budgets yet','money-figure empty'),text('p','A budget appears here once you agree a mission with a spending limit.','money-note'));
     panel.append(button('Set up a mission','button secondary money-start',()=>{if(state.peers.some(isPeerActive)){prepareCompose();const kind=$('compose-form').elements.kind;kind.value='mission';configureKind();}else navigate('peers');}));
   }else{
-    const main=totals[0];
-    panel.append(text('strong',money(main.available,main.currency),'money-figure'),text('span',`Left across ${main.budgets===1?'one budget':main.budgets+' budgets'}`,'money-label'));
+    const main=totals[0],budgets=main.budgets===1?'one budget':main.budgets+' budgets';
+    if(main.unknown){
+      panel.append(text('strong',money(main.cap,main.currency),'money-figure'),text('span',`Agreed across ${budgets}`,'money-label'));
+      panel.append(text('p',main.unknown===main.budgets?'Spending shows here once the work runs on this workspace.':`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} where visible here`,'money-note'));
+    }else{
+    panel.append(text('strong',money(main.available,main.currency),'money-figure'),text('span',`Left across ${budgets}`,'money-label'));
     const bar=text('div','','money-bar');const fill=text('span','','money-fill');fill.style.width=`${main.cap?Math.min(100,Math.round((main.spent+main.held)/main.cap*100)):0}%`;bar.append(fill);
     bar.setAttribute('role','img');bar.setAttribute('aria-label',`${money(main.spent+main.held,main.currency)} used or held of ${money(main.cap,main.currency)}`);
     panel.append(bar,text('p',`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} · Limit ${money(main.cap,main.currency)}`,'money-note'));
-    for(const other of totals.slice(1))panel.append(text('p',`Also ${money(other.available,other.currency)} left in ${other.currency}`,'money-note'));
+    }
+    for(const other of totals.slice(1))panel.append(text('p',other.unknown?`Also ${money(other.cap,other.currency)} agreed in ${other.currency}`:`Also ${money(other.available,other.currency)} left in ${other.currency}`,'money-note'));
     panel.append(text('p','Simulated spending. No real payment is made.','money-note muted'));
   }
   const holders=[{agent_id:state.identity.agent_id,owner_id:state.identity.owner_id,fingerprint:state.identity.fingerprint,you:true},...state.peers];

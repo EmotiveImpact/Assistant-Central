@@ -10,24 +10,39 @@ export function isEvening(hour) { return homeGreeting(hour) === 'Evening'; }
 
 function startOfDay(now) { const day = new Date(now); day.setHours(0, 0, 0, 0); return day.getTime() / 1000; }
 
-// One total per currency across every mission budget, counting each agreement once.
+const decided = item => item?.historical_state ?? item?.state;
+
+// One total per currency across every agreed mission budget, counting each agreement once.
+// The limit comes from the signed mission terms; spending is joined from this workspace's
+// own runs where they exist. Where no run is visible here, spending is unknown, not zero.
 // Amounts stay in their own currency: nothing is converted or added across currencies.
 export function budgetSummary(runs = [], items = []) {
   const contexts = new Map(items.map(item => [item.id, item.context]));
-  const seen = new Set(), totals = new Map();
+  const balances = new Map();
   for (const run of runs) {
     const balance = run?.mission_balance;
     if (!balance || typeof balance !== 'object') continue;
     const key = contexts.get(run.item_id) ?? run.run_id;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const [cap, currency] = amountOf(balance, 'cap');
-    const total = totals.get(currency) ?? {currency, cap: 0, spent: 0, held: 0, available: 0, budgets: 0};
+    if (!balances.has(key)) balances.set(key, balance);
+  }
+  const agreements = new Map();
+  for (const item of items) {
+    if (item.kind !== 'task' || decided(item) !== 'accepted' || !item.mission_cap) continue;
+    if (!agreements.has(item.context)) agreements.set(item.context, item.mission_cap);
+  }
+  for (const [key, balance] of balances) if (!agreements.has(key)) agreements.set(key, null);
+  const totals = new Map();
+  for (const [key, terms] of agreements) {
+    const balance = balances.get(key);
+    const [cap, currency] = balance ? amountOf(balance, 'cap') : [terms.cap_micro, terms.currency];
+    const total = totals.get(currency) ?? {currency, cap: 0, spent: 0, held: 0, available: 0, budgets: 0, unknown: 0};
     total.cap += Number(cap) || 0;
-    total.spent += Number(amountOf(balance, 'spent')[0]) || 0;
-    total.held += Number(amountOf(balance, 'held')[0]) || 0;
-    total.available += Number(amountOf(balance, 'available')[0]) || 0;
     total.budgets += 1;
+    if (balance) {
+      total.spent += Number(amountOf(balance, 'spent')[0]) || 0;
+      total.held += Number(amountOf(balance, 'held')[0]) || 0;
+      total.available += Number(amountOf(balance, 'available')[0]) || 0;
+    } else total.unknown += 1;
     totals.set(currency, total);
   }
   return [...totals.values()].sort((a, b) => b.cap - a.cap);
@@ -38,14 +53,14 @@ export function budgetSummary(runs = [], items = []) {
 export function doneToday(items = [], now = Date.now()) {
   const since = startOfDay(now);
   return items
-    .filter(item => item.state === 'accepted' && Number(item.created_at) >= since && Number(item.created_at) <= now / 1000 + 60)
+    .filter(item => decided(item) === 'accepted' && Number(item.created_at) >= since && Number(item.created_at) <= now / 1000 + 60)
     .sort((a, b) => b.created_at - a.created_at);
 }
 
 // Who did it, in words: "You agreed", or the peer's assistant.
 export function doneLine(item, peer) {
   const agent = peer?.agent_id || 'Their assistant';
-  if (item.kind === 'artifact') return `${agent} delivered it and you accepted`;
+  if (item.kind === 'artifact') return item.direction === 'outgoing' ? `You delivered it and ${agent} accepted` : `${agent} delivered it and you accepted`;
   return item.direction === 'outgoing' ? `${agent} agreed to do it` : 'You agreed to it';
 }
 

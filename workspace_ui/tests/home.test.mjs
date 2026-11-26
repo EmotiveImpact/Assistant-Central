@@ -23,6 +23,12 @@ test('budgets count each agreement once and never mix currencies', () => {
   const totals = budgetSummary(runs, items);
   assert.deepEqual(totals.map(t => [t.currency, t.cap, t.available, t.budgets]), [['GBP', 400e6, 195e6, 1], ['USD', 2e6, 1e6, 1]]);
   assert.deepEqual(budgetSummary([], items), []);
+  // Agreed mission terms count even with no run here; their spending is unknown, not zero.
+  const agreed = [{id: 'm', kind: 'task', context: 'c9', state: 'expired', historical_state: 'accepted', mission_cap: {cap_micro: 5e5, currency: 'GBP'}},
+    {id: 'n', kind: 'task', context: 'c1', state: 'accepted', mission_cap: {cap_micro: 400e6, currency: 'GBP'}},
+    {id: 'p', kind: 'task', context: 'c8', state: 'pending', mission_cap: {cap_micro: 9e6, currency: 'GBP'}}];
+  const mixed = budgetSummary(runs, [...items, ...agreed]);
+  assert.deepEqual(mixed.map(t => [t.currency, t.cap, t.budgets, t.unknown]), [['GBP', 400.5e6, 2, 1], ['USD', 2e6, 1, 0]]);
 });
 
 test('done today lists only work agreed today, newest first', () => {
@@ -33,8 +39,9 @@ test('done today lists only work agreed today, newest first', () => {
     {id: 'first', state: 'accepted', created_at: today},
     {id: 'second', state: 'accepted', created_at: today + 60},
     {id: 'rejected', state: 'rejected', created_at: today},
+    {id: 'expired', state: 'expired', historical_state: 'accepted', created_at: today - 60},
   ];
-  assert.deepEqual(doneToday(items, now).map(i => i.id), ['second', 'first']);
+  assert.deepEqual(doneToday(items, now).map(i => i.id), ['second', 'first', 'expired']);
 });
 
 test('done lines and the evening sentence say who did what', () => {
@@ -42,6 +49,7 @@ test('done lines and the evening sentence say who did what', () => {
   assert.equal(doneLine({kind: 'task', direction: 'outgoing'}, mira), 'Mira agreed to do it');
   assert.equal(doneLine({kind: 'task', direction: 'incoming'}, mira), 'You agreed to it');
   assert.equal(doneLine({kind: 'artifact', direction: 'incoming'}, mira), 'Mira delivered it and you accepted');
+  assert.equal(doneLine({kind: 'artifact', direction: 'outgoing'}, mira), 'You delivered it and Mira accepted');
   assert.equal(eveningSummary([], () => mira), 'Nothing was agreed today.');
   assert.equal(eveningSummary([{title: 'Brief'}, {title: 'Plan'}], () => mira), '2 pieces of work were agreed today, most recently “Brief” with Mira.');
   assert.equal(shortKey('3f68d2d3aa'), '3f68 d2d3');

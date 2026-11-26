@@ -45,7 +45,7 @@ One app whose screens are states, not separate apps. Source: `/mnt/project-files
 
 ### Money, Done today, Ask bar and the evening story
 
-- **Money and keys** sits at the top of the right rail. The figure is the amount left across real mission budgets, one currency at a time, never converted. With no mission budget it says "No budgets yet" and offers to set one up. The Keys tab lists who holds which signing key (short fingerprint) beside each owner and bot.
-- **Done today** lists work someone agreed today, newest first, with a Receipt badge when a signed decision exists. The time is the proposal's, which is what is saved.
+- **Money and keys** sits at the top of the right rail. Budgets come from accepted mission terms (the signed spending limit). Where this workspace runs the work, the figure is the amount left; where it cannot see the spending, it shows the amount agreed and says so. One currency at a time, never converted. With no mission budget it says "No budgets yet" and offers to set one up. The Keys tab lists who holds which signing key (short fingerprint) beside each owner and bot.
+- **Done today** lists work someone agreed today, newest first, with a Receipt badge when a signed decision exists. It shows four and links to the rest in All work. The time is the proposal's, which is what is saved.
 - **Ask bar** drafts a proposal from what you typed. Nothing is sent until you review it.
-- **Evening story** (from 18:00, when nothing is waiting) sums up the day in one line and shows one finished piece of work at a time. "Good" moves on. "Don't do that again" opens Approvals, where the sending mode and private notes live; it does not change a permission by itself.
+- **Evening story** (from 18:00, when nothing is waiting) sums up the day; while decisions wait, Home stays on the decisions in one line and shows one finished piece of work at a time. "Good" moves on. "Don't do that again" reopens what was agreed, where it can be cancelled; it does not change a permission by itself, because nothing runs here without the owner's yes. Wiring it to the autonomy dial needs a per-assistant setting and comes next.

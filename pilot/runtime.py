@@ -559,8 +559,10 @@ class PilotRuntime:
         active = not row['cancelled'] and row['expires'] > self._now()
         direct = {}
         if body['kind'] == 'task' and body['context'].startswith(CONTEXT_PREFIX) and body['text'].startswith(TASK_PREFIX):
-            value, _ = task_details(body['text'], body['context'])
+            value, (limit, unit) = task_details(body['text'], body['context'])
             direct['peer_mission'] = 'offer' in value
+            if type(limit) is int:
+                direct['mission_cap'] = {'cap_micro': limit, 'currency': unit or 'USD'}
         return {**direct, 'id':row['id'],'direction':row['direction'],'kind':row['kind'],
                 'state':'cancelled' if row['cancelled'] else ('expired' if not active else row['state']),
                 'historical_state':row['state'],'title':body['title'],'peer_id':row['peer_id'],

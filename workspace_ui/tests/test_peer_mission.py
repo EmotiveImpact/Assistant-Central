@@ -39,6 +39,10 @@ class PeerMissionTests(unittest.TestCase):
             pilot.item_action(denied,'release')
             pilot.settle()
             pilot.item_action(denied,'decision',True,'accept')
+            # Both owners see the signed spending limit, even with no run to report usage.
+            for side in (False, True):
+                agreed = next(item for item in pilot.state(side)['items'] if item['id'] == denied)
+                self.assertEqual(agreed['mission_cap'], {'cap_micro':276,'currency':'USD'})
             with self.assertRaises(AssertionError):
                 pilot.prepare(denied)
             local_sdk_note(False,'seed','officialRunner','peer-two')

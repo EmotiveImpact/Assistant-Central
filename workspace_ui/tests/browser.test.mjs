@@ -306,7 +306,7 @@ try {
   // In the evening, with nothing left to decide, a story about the day replaces the stack.
   const pendingLeft=Number(await page.locator('#attention-count').textContent());
   if(pendingLeft===0){
-    const evening=new Date();evening.setHours(19,30,0,0);await page.clock.setFixedTime(evening);
+    const evening=new Date();evening.setHours(19,30,0,0);if(evening<Date.now())evening.setTime(Date.now()+60000);await page.clock.setFixedTime(evening);
     await nav('inbox');await nav('overview');
     assert.match(await page.locator('#home-paragraph').textContent(),/^Evening Blair\. \d+ pieces? of work (was|were) agreed today/);
     assert.equal(await page.locator('#home-cards .story-card').count(),1);
@@ -315,9 +315,10 @@ try {
     await page.locator('#home-cards .home-good').click();
     assert.equal(writes.length,before,'reacting to a story never writes or changes permission');
     await page.locator('#home-cards .home-later').click();
-    assert.equal(await page.evaluate(()=>location.hash),'#approvals');
-    assert.match(await page.locator('#notice').textContent(),/private note/);
-    await nav('overview');
+    await page.locator('#review-dialog').waitFor({state:'visible'});
+    assert.match(await page.locator('#notice').textContent(),/without your yes/);
+    assert.equal(writes.length,before,'reopening what was agreed never writes');
+    await page.keyboard.press('Escape');await page.locator('#review-dialog').waitFor({state:'hidden'});
   }else assert.fail('the decisions above should leave nothing pending');
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
