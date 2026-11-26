@@ -18,6 +18,9 @@ const screenshot=async(name)=>{if(!captures)return;await page.evaluate(()=>docum
 const noOverflow=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 try{
  await page.goto(url.href);await page.locator('#password').fill(process.env.HOST_DRAFT_PASSWORD);await page.locator('#login-form button').click();await page.locator('#workspace').waitFor({state:'visible'});
+ const homeCard=page.locator('#home-cards .home-card[data-kind="host-draft"]');await homeCard.waitFor();
+ assert.match(await page.locator('#home-paragraph').textContent(),/A draft from one of your apps, “Fictional host planning draft”, and it needs your decision\./);
+ await homeCard.getByRole('button',{name:'Inspect the draft',exact:true}).click();await page.waitForFunction(()=>location.hash==='#host-drafts');assert.equal(writes.length,0,'Home only reads app drafts');
  await nav();assert.equal(writes.length,0);await noOverflow();await screenshot('host-drafts-desktop.png');
  await inspect();assert.equal(await page.locator('#host-draft-dialog').getAttribute('aria-labelledby'),'host-draft-review-title');
  assert.ok((await page.locator('#host-draft-dialog').textContent()).includes('fictional_fixed_recipient'));

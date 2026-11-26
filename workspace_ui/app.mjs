@@ -1,11 +1,12 @@
 import {operationGate,restoreWhenIdle,inspectionLatch,inspectSavedState,requestIsMutation} from './operations.mjs';
-import {createConversations,inspectMessageOutcome} from './conversations.mjs';
+import {createConversations,inspectMessageOutcome,validateCatalogue} from './conversations.mjs';
 import {money,amountOf,toMicro,ownerCurrency} from './missions.mjs';
 import {homeGreeting,isEvening,budgetSummary,doneToday,doneLine,eveningSummary,shortKey} from './home.mjs';
 import {botFace,ownerPair} from './bots.mjs';
 import {SECTIONS,WORK_VIEWS,WORK_FILTERS,sectionOf,tabOf,receiptsOf,shortDigest,createInspect} from './depth.mjs';
-import {createHostDrafts} from './host_drafts.mjs';
-import {createApprovals} from './approvals.mjs';
+import {createHostDrafts,validateDraftQueue} from './host_drafts.mjs';
+import {createApprovals,validateListing} from './approvals.mjs';
+import {homeQueue,CARD,askerOf,moreLine,closingLine} from './queue.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
@@ -82,7 +83,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setEverything(false);homeOffset=0;storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
+  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -153,7 +154,7 @@ function render() {
   document.body.dataset.screen=currentView;const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
   const section=sectionOf(currentView);document.body.dataset.section=section;
   if(sectionLede[section]){$('page-title').textContent=SECTIONS[section].label;$('page-description').textContent=sectionLede[section];}
-  const waiting=attentionItems(state).length;$('home-count').textContent=waiting;$('home-count').hidden=!waiting;
+  const waiting=homeEntries().length;$('home-count').textContent=waiting;$('home-count').hidden=!waiting;
   renderSectionChrome(section);
   let acceptedFilter=$('accepted-filter');
   if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
@@ -293,30 +294,58 @@ let storyOffset=0;
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
-// A card never decides on its own: agreeing opens the exact review.
-function renderHome(allAttention){
+// The cards are one queue of everything that needs you: proposals from saved state, plus
+// questions, messages and shared drafts (Approvals), conversation invitations and drafts
+// from your apps, each read without writing. A card never decides on its own: its button
+// opens the exact review, or the place where that exact decision is made.
+let homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};
+async function loadHomeExtras(){
+  const epoch=generation,snapshot=state,next={for:snapshot,approvals:null,hostDrafts:null,conversations:null,failed:[]};homeExtras.for=snapshot;
+  const read=(enabled,path,validate,key,label)=>enabled?request(path,{readOnly:true}).then(value=>{next[key]=validate(value);}).catch(()=>{next.failed.push(label);}):null;
+  await Promise.all([read(snapshot.approvals?.enabled===true,'/api/approvals',validateListing,'approvals','Approvals'),
+    read(snapshot.conversations?.enabled===true,'/api/conversations',validateCatalogue,'conversations','Conversations'),
+    read(snapshot.host_drafts?.enabled===true,'/api/host-drafts',validateDraftQueue,'hostDrafts','your apps')].filter(Boolean));
+  if(epoch!==generation||!token||state!==snapshot)return;
+  homeExtras=next;if(currentView==='overview'&&!searchQuery)renderHome();
+}
+function homeEntries(){
+  const extras=homeExtras.for===state?homeExtras:{};
+  return homeQueue({proposals:attentionItems(state),approvals:extras.approvals,hostDrafts:extras.hostDrafts,conversations:extras.conversations});
+}
+function renderHome(){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
   say.replaceChildren();cards.replaceChildren();
+  const queue=homeEntries(),failed=homeExtras.for===state?homeExtras.failed:[];
+  $('home-count').textContent=queue.length;$('home-count').hidden=!queue.length;
   const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined,hour=new Date().getHours(),done=doneToday(state.items);
-  const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting(hour)} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
+  const n=queue.length,first=n?queue[homeOffset%n]:undefined,hour=new Date().getHours(),done=doneToday(state.items);
+  const me=cap(plain(state.identity.owner_id,'there')),mine=plain(state.identity.agent_id,'Your assistant');say.append(text('span',`${homeGreeting(hour)} ${me}. `));
   if(!n&&isEvening(hour)&&done.length)say.append(text('span',eveningSummary(done,peerOf)+' '));
-  if(!n){say.append(text('b','Nothing in your inbox needs you right now.'));if(isEvening(hour)&&done.length)renderStory(done);return;}
-  const peer=peerOf(first),owner=cap(plain(peer?.owner_id,'Someone')),agent=plain(peer?.agent_id,'their assistant');
-  say.append(text('span',`${owner}'s `),ownerPair(owner,agent,'owner-pair inline','look'),text('span',` ${agent} sent `),text('b',plain(first.title,'a proposal')));
-  say.append(text('span',n>1?` and ${n-1} more ${n===2?'waits':'wait'} for your review. `:' and it needs your decision. '));
-  say.append(text('b','Nothing else in your inbox needs you.'));
-  const order=allAttention.slice(homeOffset%n).concat(allAttention.slice(0,homeOffset%n)).slice(0,3);
-  order.forEach((item,index)=>{
-    const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
-    const card=text('article','','home-card depth-'+index);card.dataset.itemId=item.id;
-    const head=text('div','','home-card-head');const who=text('span','','home-card-who');who.append(text('strong',`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
-    head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),who);card.append(head,text('p',plain(item.title,'Untitled proposal'),'home-card-title'));
+  if(!n){say.append(text('b',failed.length?closingLine(failed):'Nothing needs you right now.'));if(isEvening(hour)&&done.length)renderStory(done);return;}
+  const who=entry=>askerOf(entry,{me,mine,peer:entry.item?peerOf(entry.item):undefined});
+  const asker=who(first),owner=cap(plain(asker.owner,'Someone')),agent=plain(asker.agent,'their assistant');
+  const pair=()=>ownerPair(owner,agent,'owner-pair inline','look');
+  if(first.kind==='proposal')say.append(text('span',`${owner}'s `),pair(),text('span',` ${agent} sent `),text('b',first.title));
+  else if(first.kind==='question')say.append(text('span','Your '),pair(),text('span',` ${agent} asked you `),text('b',`“${first.title}”`));
+  else if(first.kind==='message')say.append(text('span','Your '),pair(),text('span',` ${agent} `),text('b','wants to send a message for you'));
+  else if(first.kind==='invite')say.append(text('span',`${owner}'s `),pair(),text('span',` ${agent} `),text('b','invited you to a conversation'));
+  else if(first.kind==='shared-draft')say.append(text('b','A shared draft waits for your agreement'));
+  else say.append(text('span','A draft from one of your apps, '),text('b',`“${first.title}”`),text('span',','));
+  say.append(text('span',moreLine(n)),text('b',closingLine(failed)));
+  const order=queue.slice(homeOffset%n).concat(queue.slice(0,homeOffset%n)).slice(0,3);
+  order.forEach((entry,index)=>{
+    const ask=who(entry),o=cap(plain(ask.owner,'Owner')),a=plain(ask.agent,'Assistant'),copy=CARD[entry.kind];
+    const card=text('article','','home-card depth-'+index);card.dataset.queueKey=entry.key;if(entry.item)card.dataset.itemId=entry.item.id;card.dataset.kind=entry.kind;
+    const head=text('div','','home-card-head'),label=text('span','','home-card-who');label.append(text('strong',ask.yours?`${a}, your assistant`:`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
+    head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),label);card.append(head);
+    if(copy.lead)card.append(text('p',copy.lead.charAt(0)===copy.lead.charAt(0).toUpperCase()?copy.lead:`${a} ${copy.lead}`,'home-card-lead'));
+    card.append(text('p',entry.title,'home-card-title'));
+    const open=()=>entry.kind==='proposal'?openReview(entry.item):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
-      if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome(allAttention);}));
-      actions.append(button('Review and agree','button primary home-agree',()=>openReview(item)));card.append(actions);
-      card.tabIndex=0;card.setAttribute('aria-label',`${a}, ${o}'s assistant: ${plain(item.title,'proposal')}. Right arrow reviews, left arrow shows the next card.`);
-      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();openReview(item);}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();homeOffset++;renderHome(allAttention);$('home-cards').querySelector('.depth-0')?.focus();}});}
+      if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome();}));
+      actions.append(button(copy.action,'button primary home-agree',open));card.append(actions);
+      card.tabIndex=0;card.setAttribute('aria-label',`${ask.yours?a+', your assistant':a+', '+o+"'s assistant"}: ${entry.title}. Right arrow opens it, left arrow shows the next card.`);
+      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();open();}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();homeOffset++;renderHome();$('home-cards').querySelector('.depth-0')?.focus();}});}
     else card.setAttribute('aria-hidden','true');
     cards.append(card);
   });
@@ -381,7 +410,7 @@ function renderMoney(){
   }
 }
 function renderOverview() {
-  renderHome(attentionItems(state));renderDone();
+  renderHome();renderDone();if(homeExtras.for!==state)loadHomeExtras();
   if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
 }
 function renderPeers() {
