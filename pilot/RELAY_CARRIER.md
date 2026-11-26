@@ -33,7 +33,16 @@ python -B -m pilot.relay_cli send   --invite '<their invite>' --recipient <their
 python -B -m pilot.relay_cli fetch  --relay https://<relay> --key mailbox.key --quarantine spool --recipient <your fingerprint>
 ```
 
-Export and import still use `pilot.file_exchange` as before.
+Export and import still use `pilot.file_exchange` as before. For the whole
+two-person walkthrough against the hosted relay, see
+[Two people, one task](../docs/TWO_PEOPLE.md).
+
+To check a deployed relay end to end with two throwaway owners and fictional
+text:
+
+```sh
+python -B -m pilot.relay_live_check https://parlu-relay.vercel.app
+```
 
 ## What the results mean
 

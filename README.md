@@ -52,6 +52,9 @@ python -m venv .venv
 The workspace demo prints a local address and uses fictional people and
 content. The demo password is `Fictional browser test password`.
 
+To pass a real task between two people on different machines through the
+hosted relay, follow [Two people, one task](docs/TWO_PEOPLE.md).
+
 ## What is in this repository
 
 | Folder | What it does |
