@@ -9,7 +9,7 @@ import {createApprovals,validateListing} from './approvals.mjs';
 import {homeQueue,CARD,askerOf,moreLine,closingLine,uncheckedParts} from './queue.mjs';
 import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
 import {holdButton} from './hold.mjs';
-import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor} from './team.mjs';
+import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor,readRules,partText,resultText,accessText,readTeamText,ruleList,approvalsFor,computeFor,teamCompute,checksFor} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
 import {qrMatrix,qrPath} from './qr.mjs';
@@ -393,8 +393,22 @@ const STEP_LABEL={Plan:'Ready to send',Asked:'Waiting for their yes',Building:'B
 function teamPeer(id){return state.peers.find(peer=>peer.peer_id===id);}
 function partAction(part){
   if(part.step==='Plan')return ['Review and send',()=>openReview(part.item)];
-  if(part.step==='Result')return ['Check the result',()=>openReview(part.result)];
+  if(part.step==='Result')return [part.result?.team?'Check and merge':'Check the result',()=>openReview(part.result)];
+  if(part.asking)return ['Check the access ask',()=>openReview(part.asking.item)];
   return null;
+}
+// Rules as chips: ✓ must, ✕ must not.
+function ruleChips(rules,checks=[]){
+  const list=ruleList(rules);if(!list.length)return null;
+  const box=text('ul','','team-rules');
+  list.forEach((entry,index)=>{const check=checks[index];const chip=text('li',`${entry.side==='must'?'✓':'✕'} ${entry.rule}`,'team-rule '+entry.side+(check?check.kept?' kept':' broken':''));
+    chip.title=entry.side==='must'?'Must':'Must not';if(check)chip.title+=check.kept?', kept by the helper\'s report':', not kept by the helper\'s report';box.append(chip);});
+  return box;
+}
+function computeLine(part){
+  const {limit,used,over}=computeFor(part.item,state.items);if(!limit&&!used)return null;
+  const words=used?`${money(used.micro,used.currency)} of ${limit?money(limit.cap_micro,limit.currency):'no limit'} compute, as reported`:`Compute limit ${money(limit.cap_micro,limit.currency)}`;
+  return text('p',words,'team-compute'+(over?' over':''));
 }
 function renderTeams(){
   const root=$('team-view');root.replaceChildren();
@@ -428,7 +442,7 @@ function renderTeams(){
   for(const id of team.people){const peer=teamPeer(id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant');const chip=text('span','','team-chip');chip.append(ownerPair(o,a),text('span',`${o} · ${a}`));members.append(chip);}
   root.append(members);
   const tabs=text('nav','','section-tabs team-tabs');tabs.setAttribute('aria-label','Team mission');
-  for(const [key,label] of [['parts','Parts'],['people','People'],['receipts','Receipts']]){const tab=button(label,'section-tab'+(teamTab===key?' selected':''),()=>{teamTab=key;renderTeams();});tab.dataset.teamTab=key;tab.setAttribute('aria-current',teamTab===key?'page':'false');tabs.append(tab);}
+  for(const [key,label] of [['parts','Parts'],['people','People'],['approvals','Approvals'],['receipts','Receipts']]){const tab=button(label,'section-tab'+(teamTab===key?' selected':''),()=>{teamTab=key;renderTeams();});tab.dataset.teamTab=key;tab.setAttribute('aria-current',teamTab===key?'page':'false');tabs.append(tab);}
   root.append(tabs);
   if(teamTab==='people'){
     const list=text('div','','team-people');
@@ -438,9 +452,30 @@ function renderTeams(){
       card.append(text('p',`${a} decides on each of its parts itself. Nothing it does reaches the others without your review.`,'inspect-note'));list.append(card);}
     root.append(list);return;
   }
+  if(teamTab==='approvals'){
+    // Every merge needs two signatures, and every access grant is one person's consent for one part.
+    const rows=[];
+    for(const part of team.parts){
+      const peer=teamPeer(part.peer_id),a=plain(peer?.agent_id,'Assistant');
+      for(const result of resultsFor(part.item,state.items)){
+        const decided=result.historical_state??result.state,signed=decided==='accepted'?2:1;
+        rows.push({at:Number(result.created_at),open:()=>openReview(result),title:`Merge ${part.title}`,
+          meta:decided==='accepted'?`Merged · 2 of 2 signed (${a} and you)`:decided==='rejected'?'Changes asked · not merged':result.state==='pending'?`Waits for you · ${signed} of 2 signed`:stateLabel(result.state)});
+      }
+      for(const ask of part.access){
+        rows.push({at:Number(ask.item.created_at),open:()=>openReview(ask.item),title:`Access for ${part.title}`,
+          meta:`${ask.what} · ${ask.granted?`granted until ${datetime(ask.until)}`:ask.waiting?'waits for your hold':stateLabel(ask.item.state)}`});
+      }
+    }
+    if(!rows.length){root.append(text('p','No approvals yet. Merges and access asks appear here, each with who signed.','done-empty'));return;}
+    const list=text('div','','mission-rows team-approvals');
+    for(const row of rows.sort((x,y)=>y.at-x.at)){const entry=button('','mission-row',row.open);const main=text('span','','done-main');main.append(text('strong',row.title),text('span',row.meta,'done-meta'));entry.append(main,text('span','›','row-chevron'));list.append(entry);}
+    root.append(list);return;
+  }
   if(teamTab==='receipts'){
-    const ids=new Set(team.parts.flatMap(part=>[part.item.id,...resultsFor(part.item,state.items).map(entry=>entry.id)]));
+    const ids=new Set(team.parts.flatMap(part=>[part.item.id,...resultsFor(part.item,state.items).map(entry=>entry.id),...part.access.map(ask=>ask.item.id)]));
     const receipts=receiptsOf(state).filter(r=>r.item&&ids.has(r.item.id));
+    for(const row of teamCompute(team,state.items))root.append(text('p',`Compute: ${money(row.used,row.currency)} reported of ${money(row.limit,row.currency)} agreed across the parts. Reported by each helper, not checked by ${PRODUCT.short}.`,'team-line team-compute-total'));
     if(!receipts.length){root.append(text('p','No receipts yet. A receipt appears here each time a part or a result is decided.','done-empty'));return;}
     const list=text('div','','mission-rows');
     for(const r of receipts){const row=button('','mission-row',()=>openReceipt(r));const main=text('span','','done-main');main.append(text('strong',plain(r.item.title,'Part')),text('span',`${r.kind==='decision'?'Signed decision':'Result of a run'} · ${shortDigest(r.digest)}`,'done-meta'));row.append(text('span','✓','receipt-mark'),main);list.append(row);}
@@ -455,6 +490,11 @@ function renderTeams(){
     const steps=text('ol','','team-steps');const at=STEPS.indexOf(part.step);
     STEPS.forEach((step,index)=>{const li=text('li',step,index<at?'past':index===at?'now':'');steps.append(li);});
     card.append(steps);
+    const chips=ruleChips(part.rules,checksFor(part.result??resultsFor(part.item,state.items)[0]));if(chips)card.append(chips);
+    const compute=computeLine(part);if(compute)card.append(compute);
+    const granted=part.access.filter(ask=>ask.granted);
+    if(part.asking)card.append(text('p',`${a} asks to ${String(part.asking.what).replace(/^./,c=>c.toLowerCase())}.`,'team-access needs'));
+    else if(granted.length)card.append(text('p',`Access: ${granted[0].what}, until ${datetime(granted[0].until)}`,'team-access'));
     const actions=text('div','','team-part-actions');const action=partAction(part);
     if(action)actions.append(button(action[0],'button primary',action[1]));
     actions.append(button('Details','button secondary',()=>openPartPanel(team,part)));card.append(actions);grid.append(card);
@@ -465,11 +505,22 @@ function openPartPanel(team,part,refresh){
   const peer=teamPeer(part.peer_id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant');
   showPanel('part:'+part.item.id,part.title,`Part of ${team.title} · ${a}`,body=>{
     const action=partAction(part);
-    if(action){const decide=panelSection(body);decide.classList.add('inspect-decide');decide.append(text('strong',part.step==='Plan'?'Ready for you to send':'A result is waiting for your check'),button(action[0],'button primary',action[1]));}
+    if(action){const decide=panelSection(body);decide.classList.add('inspect-decide');decide.append(text('strong',part.step==='Plan'?'Ready for you to send':part.step==='Result'?'A result is waiting for your check':`${a} asks for access`),button(action[0],'button primary',action[1]));}
     const progress=panelSection(body,'Progress');const at=STEPS.indexOf(part.step);
     STEPS.forEach((step,index)=>panelRow(progress,step,index<at?'Done':index===at?'Now':part.step==='Stopped'?'—':'Not yet'));
     if(part.step==='Stopped')progress.append(text('p','This part stopped. Its history stays here.','inspect-note'));
     const who=panelSection(body,'Who');const pair=text('div','','inspect-who');pair.append(ownerPair(o,a),text('span',`${a} decides on this part itself.`,'inspect-note'));who.append(pair);
+    const latest=resultsFor(part.item,state.items)[0];
+    if(part.rules){const rules=panelSection(body,'Rules in force');const chips=ruleChips(part.rules,checksFor(latest));
+      rules.append(chips??text('p','No rules for this part.','inspect-note'),text('p',`${a} agreed to these exact rules. Changing one means a new part, and ${a} agrees again.`,'inspect-note'));}
+    if(latest){const approvals=panelSection(body,'Merge approvals');
+      for(const entry of approvalsFor({result:latest}))panelRow(approvals,entry.who==='helper'?`${a} sent the result`:'Your approval',entry.who==='helper'?'Signed':entry.signed?'Signed':entry.refused?'Changes asked':entry.waiting?'Waiting':'Not given');}
+    if(part.access.length){const access=panelSection(body,'Access');
+      for(const ask of part.access)panelRow(access,ask.what,ask.granted?`Until ${datetime(ask.until)}`:ask.waiting?'Asked, waits for you':stateLabel(ask.item.state));}
+    const cost=computeFor(part.item,state.items);
+    if(cost.limit||cost.used){const box=panelSection(body,'Compute');if(cost.limit)panelRow(box,'Limit',money(cost.limit.cap_micro,cost.limit.currency));
+      if(cost.used)panelRow(box,'Used, as reported',money(cost.used.micro,cost.used.currency));
+      box.append(text('p',cost.over?`Over the limit, by ${a}'s own report.`:`Reported by ${a}. ${PRODUCT.short} does not measure it.`,'inspect-note'));}
     const status=panelSection(body,'Records');panelRow(status,'Proposal',stateLabel(part.item.state));
     const returned=resultsFor(part.item,state.items)[0];
     if(returned)panelRow(status,'Result',stateLabel(returned.state));
@@ -486,8 +537,11 @@ function teamRow(index,first){
   for(const peer of active){const option=text('option',`${plain(peer.agent_id,'Assistant')}, ${cap(plain(peer.owner_id,'Owner'))}'s assistant`);option.value=peer.peer_id;select.append(option);}
   const order=first&&active.some(peer=>peer.peer_id===first)?[first,...active.filter(peer=>peer.peer_id!==first).map(peer=>peer.peer_id)]:active.map(peer=>peer.peer_id);
   if(order.length)select.value=order[index%order.length];who.append(select);
-  const brief=text('label','Brief','full');const area=text('textarea','');area.name='part_text';area.rows=2;area.maxLength=4096;area.value='SYNTHETIC ONLY: ';brief.append(area);
-  row.append(name,who,brief);return row;
+  const brief=text('label','Brief','full');const area=text('textarea','');area.name='part_text';area.rows=2;area.maxLength=3000;area.value='SYNTHETIC ONLY: ';brief.append(area);
+  // The rules travel inside the signed part, so the helper agrees to exactly these.
+  const ruleField=(label,field,placeholder)=>{const box=text('label',label);const input=text('textarea','');input.name=field;input.rows=2;input.maxLength=1700;input.placeholder=placeholder;box.append(input);return box;};
+  const limit=text('label','Compute limit (optional)');const amount=text('input','');amount.name='part_compute';amount.inputMode='decimal';amount.maxLength=14;amount.placeholder='For example, 0.50';limit.append(amount);
+  row.append(name,who,brief,ruleField('Must, one per line','part_must','For example, Tests pass'),ruleField('Must not, one per line','part_must_not','For example, Store card numbers'),limit);return row;
 }
 function openTeamDialog(first){
   if(!state||busy||uncertainty.pending())return;
@@ -502,7 +556,15 @@ $('team-form').addEventListener('submit',async event=>{
   const form=event.currentTarget;
   try{
     if(!form.elements.team_synthetic.checked)throw new Error('Confirm that you may share this fictional work.');
-    const rows=[...$('team-parts').children].map(row=>({title:row.querySelector('[name=part_title]').value,peer_id:row.querySelector('[name=part_peer]').value,text:row.querySelector('[name=part_text]').value.replace(/^SYNTHETIC ONLY:\s*$/,'')}));
+    const currency=form.elements.team_currency.value;
+    const rows=[...$('team-parts').children].map(row=>{
+      const brief=row.querySelector('[name=part_text]').value.replace(/^SYNTHETIC ONLY:\s*$/,''),title=row.querySelector('[name=part_title]').value;
+      if(!brief.trim())return {title,peer_id:row.querySelector('[name=part_peer]').value,text:''};
+      const raw=row.querySelector('[name=part_compute]').value.trim(),cap=raw?toMicro(raw):null;
+      if(raw&&!cap)throw new Error(`Enter a compute limit such as 0.50 for “${title.trim()||'this part'}”.`);
+      const must=readRules(row.querySelector('[name=part_must]').value),mustNot=readRules(row.querySelector('[name=part_must_not]').value);
+      return {title,peer_id:row.querySelector('[name=part_peer]').value,text:partText({brief,must,mustNot,compute:cap?{cap_micro:cap,currency}:null})};
+    });
     const parts=planParts(form.elements.mission.value,rows),context=newContext(),minutes=form.elements.minutes.value;
     const bodies=parts.map(part=>proposalBody({kind:'task',peer_id:part.peer_id,title:part.title,text:part.text,context,task_id:'team-'+crypto.randomUUID(),minutes,synthetic:'on'}));
     let created=0;
@@ -747,6 +809,70 @@ function renderHistory() {
     row.append(text('span','','event-dot'),main,text('time',eventWhen(item),'activity-time'));$('item-list').append(row);
   }
 }
+// A team record reads as words in the review: the brief or summary, then the rules and checks.
+function teamWords(content){
+  const found=readTeamText(content);if(!found)return null;
+  const v=found.value,lines=[];
+  if(found.record==='part'){
+    lines.push(String(v.brief??''));
+    const list=ruleList(v.rules);
+    if(list.length)lines.push('',...list.map(entry=>`${entry.side==='must'?'✓ Must':'✕ Must not'}: ${entry.rule}`));
+    lines.push('',v.compute?`Compute limit for this part: ${money(v.compute.cap_micro,v.compute.currency)}`:'No compute limit for this part.');
+  }else if(found.record==='result'){
+    lines.push(String(v.summary??''));
+    if(Array.isArray(v.checks)&&v.checks.length)lines.push('','Checks, as the helper reports them:',...v.checks.map(entry=>`${entry.kept?'✓ Kept':'✕ Not kept'} · ${entry.side==='must'?'Must':'Must not'}: ${entry.rule}`));
+    lines.push('',v.compute_used?`Compute used, as reported: ${money(v.compute_used.micro,v.compute_used.currency)}`:'No compute reported.');
+  }else{
+    lines.push(`Asks to: ${v.what}`,`Why: ${v.why}`,`For: ${v.hours} ${Number(v.hours)===1?'hour':'hours'}, for one part only`);
+  }
+  return lines.join('\n');
+}
+// The helper's side of a team part: report on every rule and the compute used, or ask for access.
+let teamReply=null;
+function openTeamReply(mode,item){
+  if(busy||uncertainty.pending())return;
+  $('review-dialog').close();selected=null;
+  teamReply={mode,item};const body=$('team-reply-body');body.replaceChildren();
+  $('team-reply-title').textContent=mode==='result'?'Return the result':'Ask for access';
+  $('team-reply-submit').textContent='Prepare for review';
+  body.append(text('p',mode==='result'?`For “${plain(item.title,'this part')}”. Say honestly whether each rule was kept. Nothing is sent until you review and release it.`:`For “${plain(item.title,'this part')}” only. ${peerName(item.peer_id)} decides, and nothing is sent until you review and release it.`,'form-intro full'));
+  const field=(label,node,full=true)=>{const box=text('label',label,full?'full':'');box.append(node);body.append(box);return node;};
+  if(mode==='result'){
+    const area=text('textarea','');area.name='summary';area.rows=3;area.maxLength=2000;area.value='SYNTHETIC ONLY: ';field('What was done',area);
+    const list=ruleList(item.team.rules);
+    if(list.length){const box=text('fieldset','','team-checks full');box.append(text('legend','Tick each rule that was kept'));
+      list.forEach((entry,index)=>{const label=text('label','','check-label');const input=text('input','');input.type='checkbox';input.name='kept';input.dataset.index=String(index);label.append(input,text('span',`${entry.side==='must'?'Must':'Must not'}: ${entry.rule}`));box.append(label);});
+      body.append(box);}
+    if(item.team.compute){const input=text('input','');input.name='compute';input.inputMode='decimal';input.maxLength=14;input.placeholder='For example, 0.12';
+      field(`Compute used (limit ${money(item.team.compute.cap_micro,item.team.compute.currency)})`,input,false);}
+  }else{
+    const what=text('input','');what.name='what';what.maxLength=200;what.placeholder='For example, Read the supper club calendar';field('What this part needs',what);
+    const why=text('textarea','');why.name='why';why.rows=2;why.maxLength=1000;why.value='SYNTHETIC ONLY: ';field('Why',why);
+    const hours=text('select','');hours.name='hours';for(const [value,label] of [[1,'1 hour'],[8,'8 hours'],[24,'1 day'],[72,'3 days'],[168,'7 days']]){const option=text('option',label);option.value=String(value);hours.append(option);}hours.value='24';field('For',hours,false);
+  }
+  body.append(text('p','','form-message full'));body.lastChild.id='team-reply-message';body.lastChild.setAttribute('role','status');
+  openDialog('team-reply-dialog');
+}
+$('team-reply-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||uncertainty.pending()||!teamReply)return;
+  const {mode,item}=teamReply,form=event.currentTarget;
+  try{
+    let body;
+    if(mode==='result'){
+      const kept=ruleList(item.team.rules).map((_,index)=>form.querySelector(`[name=kept][data-index="${index}"]`)?.checked===true);
+      const raw=form.elements.compute?.value.trim()??'',used=raw?toMicro(raw):null;if(raw&&used===null)throw new Error('Enter the compute used, such as 0.12.');
+      const summary=form.elements.summary.value.replace(/^SYNTHETIC ONLY:\s*$/,'');
+      body=proposalBody({kind:'artifact',peer_id:item.peer_id,parent_id:item.id,parent_expires:item.expires,title:`Result: ${plain(item.title,'Part')}`.slice(0,120),
+        text:resultText(summary,item.team,{kept,computeMicro:used}),context:item.context,task_id:item.task_id,minutes:'60',synthetic:'on'});
+    }else{
+      const why=form.elements.why.value.replace(/^SYNTHETIC ONLY:\s*$/,'');
+      body=proposalBody({kind:'task',peer_id:item.peer_id,title:`Access: ${form.elements.what.value.trim()}`.slice(0,120),
+        text:accessText({partTaskId:item.task_id,what:form.elements.what.value,why,hours:Number(form.elements.hours.value)}),context:item.context,task_id:'team-access-'+crypto.randomUUID(),minutes:'60',synthetic:'on'});
+    }
+    await performWrite('/api/proposals',body,{target:'team-reply-message',onSuccess:()=>{teamReply=null;$('team-reply-dialog').close();
+      notice(mode==='result'?'Result prepared. Review and release it from your outbox; the lead decides whether to merge it.':'Access ask prepared. Review and release it; the lead decides.',true);}});
+  }catch(error){$('team-reply-message').textContent=error.message;}
+});
 async function openReview(item) {
   if(busy||uncertainty.pending())return;
   const epoch=generation;const release=operations.acquire();
@@ -759,7 +885,7 @@ async function openReview(item) {
     const permissions=review.source_permissions;
     if(permissions?.return_policy==='origin-only')detail($('review-details'),'Sharing scope','Reviewed artifact return to task originator only');
     const provider=permissions?.provider_disclosure;detail($('review-details'),'Provider permission',provider?`${plain(provider.provider)} · ${plain(provider.model)} · ${Number(provider.max_output_tokens)} output tokens`:'No provider disclosure approved');
-    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
+    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':teamWords(review.content)??review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
     $('review-scope').textContent=item.direction==='outgoing'?'Release shares only this exact proposal with its named recipient. The recipient makes a separate decision.':'Acceptance records this exact proposal. It does not start work or run a model. Any artifact return needs its own review and can go only to the task originator.';
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
@@ -781,6 +907,11 @@ async function openReview(item) {
       }));
     }
     if(canPrepareWorkflow(state,item,review))$('review-actions').append(button('Prepare synthetic run','button secondary',()=>prepareWorkflow(item)));
+    if(item.direction==='incoming'&&item.kind==='task'&&item.team?.record==='part'&&item.state==='accepted'&&isPeerActive(peerOf(item)??{})){
+      const answered=state.items.some(entry=>entry.direction==='outgoing'&&entry.kind==='artifact'&&entry.parent_id===item.id);
+      if(!answered)$('review-actions').append(button('Return the result','button primary',()=>openTeamReply('result',item)));
+      $('review-actions').append(button('Ask for access','button secondary',()=>openTeamReply('access',item)));
+    }
     if(!review.allowed_actions.length)$('review-actions').append(button('Close','button secondary',()=> $('review-dialog').close()));
     $('review-dialog').showModal();
   } catch(error) { if(epoch===generation)handleFailure(error); }
@@ -879,7 +1010,7 @@ function configureKind(){
   $('compose-message').textContent='';
   if(artifact){
     $('proposal-parent').replaceChildren();
-    for(const item of state.items.filter(item=>item.direction==='incoming'&&item.kind==='task'&&item.state==='accepted')){const option=text('option',plain(item.title,item.task_id));option.value=item.id;$('proposal-parent').append(option);}
+    for(const item of state.items.filter(item=>item.direction==='incoming'&&item.kind==='task'&&item.state==='accepted'&&!item.team)){const option=text('option',plain(item.title,item.task_id));option.value=item.id;$('proposal-parent').append(option);}
     if(!$('proposal-parent').options.length)$('compose-message').textContent='Accept an incoming task before preparing an artifact in reply.';
     selectParent();
   }

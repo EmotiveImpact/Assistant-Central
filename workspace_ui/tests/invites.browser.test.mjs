@@ -24,6 +24,17 @@ async function signIn(page){
   await page.locator('#password').fill(password);await page.locator('#login-form button[type=submit]').click();
   await page.locator('#workspace').waitFor({state:'visible'});
 }
+async function goView(page,view){
+  if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();
+  const target=page.locator(`#navigation [data-view="${view}"]`);if(!await target.isVisible())await page.locator('#everything-toggle').click();
+  await target.click();await page.waitForFunction(()=>!document.body.classList.contains('sidebar-open')||innerWidth>700);
+}
+async function openItem(page,title){
+  const row=page.locator('#item-list article').filter({has:page.getByRole('button',{name:'Review '+title,exact:true})});
+  await row.getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});
+}
+async function decide(page,name){await page.locator('#review-actions').getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});}
+async function sync(page,words){await page.locator('#sync').click();if(words)await page.locator('#notice').filter({hasText:words}).waitFor();else await page.waitForTimeout(1500);}
 async function goAssistants(page){
   if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();
   const target=page.locator('#navigation [data-view="peers"]');if(!await target.isVisible())await page.locator('#everything-toggle').click();
@@ -101,6 +112,52 @@ try{
   await maya.locator('#join-message').filter({hasText:'already connected'}).waitFor();
   await maya.locator('#join-dialog .close-dialog').first().click();
   await maya.locator('#item-list .peer-row').filter({hasText:'Juniper'}).filter({hasText:'Connected through the relay'}).waitFor();
+
+  // A team part with rules and a compute limit. Maya agrees, reports on every rule, and Edem merges.
+  const part='parlu/team-part/1\n'+JSON.stringify({brief:'SYNTHETIC ONLY: Take a card deposit when a guest books.',
+    compute:{cap_micro:500000,currency:'GBP'},rules:{must:['Tests pass'],must_not:['Store card numbers']}});
+  await edem.locator('#new-proposal').click();await edem.locator('#compose-dialog').waitFor({state:'visible'});
+  await edem.locator('#compose-form [name="title"]').fill('Supper club app: Card deposits');
+  await edem.locator('#compose-form [name="text"]').fill(part);
+  await edem.locator('#compose-form [name="synthetic"]').check();
+  await edem.getByRole('button',{name:'Create for review',exact:true}).click();await edem.locator('#compose-dialog').waitFor({state:'hidden'});
+  await goView(edem,'outbox');await openItem(edem,'Supper club app: Card deposits');
+  assert.match(await edem.locator('#review-content').textContent(),/✓ Must: Tests pass\n✕ Must not: Store card numbers/);
+  await decide(edem,'Approve & release');await sync(edem);
+  await sync(maya);await goView(maya,'inbox');await openItem(maya,'Supper club app: Card deposits');
+  assert.match(await maya.locator('#review-decide').textContent(),/Up to £0\.50 of compute for this part/);
+  assert.equal(await maya.locator('#review-decide .hold-button').count(),1,'agreeing to spend compute is a hold');
+  await decide(maya,'Accept exact proposal');await sync(maya);
+  await goView(maya,'tasks');await openItem(maya,'Supper club app: Card deposits');
+  await maya.locator('#review-actions').getByRole('button',{name:'Return the result',exact:true}).click();
+  await maya.locator('#team-reply-dialog').waitFor({state:'visible'});
+  await maya.locator('#team-reply-form [name="summary"]').fill('SYNTHETIC ONLY: Deposits are taken when a guest books.');
+  await maya.locator('#team-reply-form [name="kept"]').nth(0).check();await maya.locator('#team-reply-form [name="kept"]').nth(1).check();
+  await maya.locator('#team-reply-form [name="compute"]').fill('0.12');
+  await shot(maya,'team-1-result-phone.png');
+  await maya.locator('#team-reply-submit').click();await maya.locator('#team-reply-dialog').waitFor({state:'hidden'});
+  await goView(maya,'outbox');await openItem(maya,'Result: Supper club app: Card deposits');await decide(maya,'Approve & release');await sync(maya);
+  await sync(edem);await goView(edem,'artifacts');await openItem(edem,'Result: Supper club app: Card deposits');
+  assert.equal(await edem.locator('.decide-question').textContent(),'Merge “Supper club app: Card deposits” from Otto?');
+  assert.match(await edem.locator('#review-decide').textContent(),/Otto reports £0\.12 of compute.*Every rule kept \(2\)/s);
+  await shot(edem,'team-2-merge.png');
+  await decide(edem,'Accept exact proposal');
+
+  // Maya asks for access for that one part; Edem's yes is consent, so it is offered as a hold.
+  await goView(maya,'tasks');await openItem(maya,'Supper club app: Card deposits');
+  await maya.locator('#review-actions').getByRole('button',{name:'Ask for access',exact:true}).click();
+  await maya.locator('#team-reply-dialog').waitFor({state:'visible'});
+  await maya.locator('#team-reply-form [name="what"]').fill('Read the supper club calendar');
+  await maya.locator('#team-reply-form [name="why"]').fill('SYNTHETIC ONLY: Deposits follow the booking dates.');
+  await maya.locator('#team-reply-submit').click();await maya.locator('#team-reply-dialog').waitFor({state:'hidden'});
+  await goView(maya,'outbox');await openItem(maya,'Access: Read the supper club calendar');await decide(maya,'Approve & release');await sync(maya);
+  await sync(edem);await goView(edem,'inbox');await openItem(edem,'Access: Read the supper club calendar');
+  assert.equal(await edem.locator('.decide-question').textContent(),'Let Otto read the supper club calendar?');
+  assert.match(await edem.locator('#review-decide').textContent(),/for one part only.*1 day from when it asked/s);
+  await edem.locator('#review-decide').getByRole('button',{name:'Hold to agree'}).waitFor();
+  await shot(edem,'team-3-access.png');
+  await decide(edem,'Accept exact proposal');
+  await goAssistants(edem);
 
   // Edem removes Otto. It is final, so it is folded away and needs a second, deliberate step.
   await edem.locator('#item-list .peer-row').filter({hasText:'Otto'}).getByRole('button',{name:'Open'}).click();

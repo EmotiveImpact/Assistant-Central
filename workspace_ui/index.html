@@ -145,10 +145,18 @@
         <div id="team-parts" class="team-parts full"></div>
         <button id="team-add-part" class="button secondary team-add" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg> Add a part</button>
         <label>Valid for<select name="minutes"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60" selected>1 hour</option></select></label>
+        <label>Compute limits in<select name="team_currency"><option value="GBP" selected>Pounds (GBP)</option><option value="USD">Dollars (USD)</option><option value="EUR">Euros (EUR)</option></select></label>
         <label class="check-label full"><input name="team_synthetic" type="checkbox" required><span>This contains fictional data that I am authorised to share.</span></label>
         <p id="team-message" class="form-message full" role="status" aria-live="polite"></p>
       </div>
       <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Cancel</button><button class="button primary" type="submit">Create the parts for review</button></footer>
+    </form>
+  </dialog>
+  <dialog id="team-reply-dialog" aria-labelledby="team-reply-title">
+    <form id="team-reply-form" novalidate>
+      <header class="dialog-header"><div><div class="eyebrow">TEAM MISSION</div><h2 id="team-reply-title">Return the result</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close">×</button></header>
+      <div id="team-reply-body" class="dialog-body form-grid"></div>
+      <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Cancel</button><button id="team-reply-submit" class="button primary" type="submit">Prepare for review</button></footer>
     </form>
   </dialog>
 <dialog id="conversation-dialog" aria-label="Exact conversation review"></dialog>
