@@ -2,8 +2,10 @@
 
 `hosted/index.py` puts the real Parlu web app online as a public demo on
 Vercel, with the same fictional workspace as `python -m workspace_ui.demo`
-(Blair and the assistants Atlas, Mira and Orbit). The demo password is shown
-on the sign-in card.
+(Blair and the assistants Atlas, Mira and Orbit). An "Open the demo" button at
+the top of the sign-in screen signs in with one tap (`demo.mjs` fills the
+published demo password into the app's own form). `PAGE_EDITS` in `index.py`
+adds the button to the page; a test fails if the app's page stops matching.
 
 - Each warm instance seeds the workspace in its temporary folder, starts the
   unchanged owner server on a private loopback port and passes requests to it.

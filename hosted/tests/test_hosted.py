@@ -7,7 +7,8 @@ import unittest
 from http.server import ThreadingHTTPServer
 
 os.environ.setdefault('PARLU_DEMO_SCHEME', 'https')
-from hosted.index import PASSWORD, handler, original_target  # noqa: E402
+from hosted.index import PAGE_EDITS, PASSWORD, handler, original_target  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 HOST = 'parlu-demo.example'
 
@@ -52,6 +53,22 @@ class HostedDemoTest(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertIn(PASSWORD.encode(), body)
         self.assertIn("default-src 'self'", headers['Content-Security-Policy'])
+
+    def test_every_page_edit_still_matches_the_app(self):
+        page = (Path(__file__).resolve().parents[2] / 'workspace_ui' / 'index.html').read_bytes()
+        for before, _ in PAGE_EDITS:
+            self.assertEqual(page.count(before), 1, before[:60])
+        status, body, _ = self.request('GET', '/', origin=None)
+        self.assertEqual(status, 200)
+        self.assertEqual(body.count(b'data-demo-enter'), 2)
+        self.assertIn(b'/hosted-demo.mjs', body)
+
+    def test_demo_files_are_served(self):
+        status, body, headers = self.request('GET', '/hosted-demo.mjs', origin=None)
+        self.assertEqual(status, 200)
+        self.assertIn(PASSWORD.encode(), body)
+        self.assertTrue(headers['Content-Type'].startswith('text/javascript'))
+        self.assertEqual(self.request('GET', '/hosted-demo.css', origin=None)[0], 200)
 
     def test_sign_in_and_state(self):
         status, body, _ = self.request('POST', '/api/session', {'password': PASSWORD})

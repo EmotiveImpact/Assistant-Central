@@ -16,6 +16,8 @@ import {qrMatrix,qrPath} from './qr.mjs';
 import {validatePhone,startLink,phoneNote,pairingOutcome,ANSWER_LIMIT} from './phone.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
+// Motion is decoration only; people who ask for less motion get none.
+const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // The product name is a placeholder while naming is decided. Change it here only.
 export const PRODUCT={short:'Parlu',full:'Parlu'};
@@ -100,7 +102,7 @@ function resetSession(message='') {
   for(const id of ['review-title','review-eyebrow','review-state','review-decide','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
   for(const id of ['proposal-peer','proposal-parent','peer-connection'])$(id).replaceChildren();
   for(const id of ['inbox-count','outbox-count','pending-total','accepted-total','peer-total'])$(id).textContent='0';
-  $('review-dialog').querySelector('.commitment-details').open=false;notice('');
+  $('review-dialog').querySelector('.commitment-details').open=false;$('review-more').open=true;$('review-dialog').classList.remove('deciding');notice('');
   $('compose-form').reset();$('peer-form').reset();$('login-message').textContent=message;
   operations.reset();
 }
@@ -157,8 +159,14 @@ function navigate(view,{filter='all'}={}) {
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
   inspect.navigated();setNavigation(false);render();
 }
+// Records that are not a decision open as a full window with everything showing.
+function notDeciding(){$('review-decide').hidden=true;$('review-dialog').classList.remove('deciding');$('review-more').open=true;}
+let lastPlace=null;
 function render() {
   if(!state)return;
+  // A new place slides in, like the mock's pages. A refresh of the same place stays still.
+  const content=document.querySelector('#main .content');
+  if(content&&lastPlace!==currentView){lastPlace=currentView;content.classList.remove('view-in');if(!calm()){void content.offsetWidth;content.classList.add('view-in');}}
   conversations.reset();
   hostDrafts.reset();approvals.reset();
   const owner=state.identity;$('owner-name').textContent=owner.owner_id;$('agent-name').textContent=`${plain(owner.agent_id,'Your assistant')} is ready`;$('owner-avatar').textContent=owner.owner_id.slice(0,2).toUpperCase();$('menu-initials').textContent=owner.owner_id.slice(0,2).toUpperCase();
@@ -626,9 +634,13 @@ function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id)
 // Money needs a deliberate hold; the plain button below stays as the alternative.
 function renderDecide(item,review){
   const box=$('review-decide');box.replaceChildren();
-  const deciding=review.allowed_actions.some(action=>['accept','release'].includes(action));box.hidden=!deciding;if(!deciding)return;
+  const deciding=review.allowed_actions.some(action=>['accept','release'].includes(action));box.hidden=!deciding;
+  // Deciding opens as a short floating sheet: who asks, the question, three rows and the hold.
+  // The exact record stays one tap away under See everything.
+  $('review-dialog').classList.toggle('deciding',deciding);$('review-more').open=!deciding;if(!deciding)return;
   const peer=peerOf(item),names={agent:plain(peer?.agent_id,'their assistant'),owner:cap(plain(peer?.owner_id,'them')),actions:review.allowed_actions};
-  box.append(text('p',decisionQuestion(item,names),'decide-question'));
+  const whoLine=text('div','','decide-who');whoLine.append(ownerPair(names.owner,names.agent,'owner-pair','look'),text('span',item.direction==='outgoing'?`To ${names.agent}, ${names.owner}'s assistant`:`${names.agent}, ${names.owner}'s assistant`));
+  box.append(whoLine,text('p',decisionQuestion(item,names),'decide-question'));
   const rows=text('dl','','decide-rows');
   for(const [key,value] of decisionRows(item,names)){const row=text('div','','decide-row'+(key==='Keeps'?' quiet':''));row.append(text('dt',key),text('dd',value));rows.append(row);}
   box.append(rows);
@@ -658,7 +670,17 @@ function homeEntries(){
   const extras=homeExtras.for===state?homeExtras:{};
   return homeQueue({proposals:attentionItems(state),approvals:extras.approvals,hostDrafts:extras.hostDrafts,conversations:extras.conversations,joiners:joinerCards(state)});
 }
-function renderHome(){
+// Motion follows the approved mock: a card flicks away and the next rises from the deck.
+// It is decoration only. The queue moves on straight after, so nothing waits on an animation.
+let flicking=false;
+function nextCard({focus=false}={}){
+  if(flicking)return;
+  const front=$('home-cards')?.querySelector('.depth-0');
+  const advance=()=>{flicking=false;homeOffset++;renderHome({deck:true});if(focus)$('home-cards').querySelector('.depth-0')?.focus();};
+  if(!front||calm()){advance();return;}
+  flicking=true;front.classList.add('flick-out');setTimeout(advance,180);
+}
+function renderHome({deck=false}={}){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
   say.replaceChildren();cards.replaceChildren();
   const queue=homeEntries(),failed=homeExtras.for===state?homeExtras.failed:[];
@@ -690,11 +712,12 @@ function renderHome(){
     card.append(text('p',entry.title,'home-card-title'));
     const open=()=>entry.kind==='proposal'?openReview(entry.item):entry.kind==='joiner'?openJoinerPanel(entry.joiner):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
-      if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome();}));
+      if(n>1)actions.append(button('Not now','button home-later',()=>nextCard()));
       actions.append(button(copy.action,'button primary home-agree',open));card.append(actions);
       card.tabIndex=0;card.setAttribute('aria-label',`${ask.yours?a+', your assistant':a+', '+o+"'s assistant"}: ${entry.title}. Right arrow opens it, left arrow shows the next card.`);
-      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();open();}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();homeOffset++;renderHome();$('home-cards').querySelector('.depth-0')?.focus();}});}
+      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();open();}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();nextCard({focus:true});}});}
     else card.setAttribute('aria-hidden','true');
+    if(deck)card.classList.add('deck-in');
     cards.append(card);
   });
 }
@@ -795,7 +818,7 @@ function renderPeers() {
 }
 
 function showPublicIdentity(identity,fingerprint) {
-  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
+  notDeciding();$('review-decide').replaceChildren();selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
 function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
@@ -932,7 +955,7 @@ async function prepareWorkflow(item) {
   await performWrite(`/api/items/${encodeURIComponent(item.id)}/workflow`,{}, {target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice('Synthetic run prepared. Inspect its exact request and approve it separately. Nothing has run.',true);}});
 }
 function workflowDetailHeader(item,run,heading) {
-  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
+  notDeciding();$('review-decide').replaceChildren();selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
   $('review-details').replaceChildren();detail($('review-details'),'Task',plain(item.title,item.task_id));detail($('review-details'),'Return recipient',peerName(item.peer_id));detail($('review-details'),'Provider calls','None. Fixed local fixture only.');
   $('review-commitments').replaceChildren();detail($('review-commitments'),'Run ID',run.run_id);detail($('review-commitments'),'Task proposal',item.id);detail($('review-commitments'),'Context',item.context);detail($('review-commitments'),'Provider review',run.review_digest);
   $('review-message').textContent='';$('review-actions').replaceChildren();
@@ -1045,11 +1068,11 @@ document.querySelector('.skip-link').addEventListener('click',event=>{event.prev
 // Both carriers: assistants added by address use the direct exchange, invited ones the relay.
 $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>{if(relayEnabled(state))setTimeout(()=>relaySync(true,{announce:true}));else notice('Exchange checked. Review new items and saved delivery outcomes below.',true);}}));
 $('new-proposal').addEventListener('click',prepareCompose);
-function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
+function setQuickMenu(open){$('quick-menu').hidden=!open;document.body.classList.toggle('quick-open',open);$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
 // The Ask bar drafts a proposal from what you typed. Nothing is sent until you review it.
 $('home-ask')?.addEventListener('submit',event=>{event.preventDefault();const typed=$('home-ask-input').value.trim();prepareCompose();const form=$('compose-form');if(!$('compose-dialog').open)return;if(typed){form.elements.title.value=typed.slice(0,120);form.elements.text.value='SYNTHETIC ONLY: '+typed;}$('home-ask-input').value='';});
-$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='team')openTeamDialog();else if(choice==='mission')navigate('conversations');else if(choice==='invite')openInviteDialog();else if(choice==='join')openJoinDialog();else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
+$('quick-menu').addEventListener('click',event=>{if(event.target===$('quick-menu')){setQuickMenu(false);return;}const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='team')openTeamDialog();else if(choice==='mission')navigate('conversations');else if(choice==='invite')openInviteDialog();else if(choice==='join')openJoinDialog();else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
 document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;selectedTransfer=null;}));
@@ -1156,7 +1179,7 @@ async function openTransfer(selection){
   try{
     const review=validateTransferReview(await request(transferPath(selection)),selection);if(epoch!==generation)return;
     selected=null;selectedWorkflow=null;selectedTransfer={...selection,review};
-    $('review-decide').hidden=true;$('review-decide').replaceChildren();$('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
+    notDeciding();$('review-decide').replaceChildren();$('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
     $('review-details').replaceChildren();detail($('review-details'),'Connection',review.connection.label);detail($('review-details'),'Destination',review.connection.destination);detail($('review-details'),selection.kind==='quarantine'?'Expected sender':'Exact recipient',review.connection.peer_fingerprint);detail($('review-details'),'Packet type',review.packet_kind);detail($('review-details'),'Original expiry',datetime(review.expires));
     if(review.outbox){detail($('review-details'),'Current outbox',review.outbox.state);detail($('review-details'),'Total attempts',String(review.outbox.attempts));}
     $('review-content').textContent=selection.kind==='quarantine'?'This file is untrusted. Import verifies its original signature and current peer/source gates. It does not accept a proposal, start work or send a receipt.':'Only the original retained encrypted packet can be sent. A fixed mailbox acknowledgement proves neither signed receipt nor owner acceptance.';
