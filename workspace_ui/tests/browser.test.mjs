@@ -66,12 +66,13 @@ const checkContrast=async()=>{
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
-const assertAppHeading=async selector=>{
+const HEADINGS={page:{size:'28px',lineHeight:'34px',tracking:'-0.56px'},dialog:{size:'22px',lineHeight:'28px',tracking:'-0.33px'}};
+const assertAppHeading=async(selector,kind='page')=>{
   const style=await page.locator(selector).evaluate(node=>{
     const s=getComputedStyle(node);return {size:s.fontSize,weight:s.fontWeight,lineHeight:s.lineHeight,
       tracking:s.letterSpacing,features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
   });
-  assert.deepEqual(style,{size:'20px',weight:'590',lineHeight:'26.6px',tracking:'-0.24px',
+  assert.deepEqual(style,{size:HEADINGS[kind].size,weight:'700',lineHeight:HEADINGS[kind].lineHeight,tracking:HEADINGS[kind].tracking,
     features:'"cv01", "ss03"',opticalSizing:'auto'});
 };
 
@@ -115,7 +116,7 @@ try {
   });
   assert.ok(navStyle.font.startsWith('"Inter Variable"'));
   assert.deepEqual({size:navStyle.size,weight:navStyle.weight,radius:navStyle.radius,height:navStyle.height,color:navStyle.color},
-    {size:'13px',weight:'510',radius:'8px',height:28,color:'rgb(208, 214, 224)'});
+    {size:'13px',weight:'510',radius:'999px',height:36,color:'rgb(44, 45, 56)'});
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
@@ -174,7 +175,7 @@ try {
   await nav('inbox');
   await openItem('Review the research brief');
   assert.equal(await page.getByRole('dialog',{name:'Review the research brief',exact:true}).count(),1);await checkContrast();
-  await assertAppHeading('#review-title');
+  await assertAppHeading('#review-title','dialog');
   assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
   assert.equal(await page.locator('#review-content *').count(),0);
   assert.match(await page.locator('#review-scope').textContent(),/does not start work/);
