@@ -23,7 +23,7 @@ document.title=PRODUCT.short+' · Your assistant workspace';
 for(const [index,node] of [...document.querySelectorAll('.entrance-avatars .peer-avatar')].entries()){node.textContent='';node.append(botFace(['Beacon','Atlas','Mira','Orbit'][index]??'Parlu'));}
 
 const $ = id => document.getElementById(id);
-const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
+const mobileNavigation=matchMedia('(max-width:700px)'), besidePage=matchMedia('(min-width:1180px)'), sidebar=document.querySelector('.sidebar');
 function setNavigation(open,{restoreFocus=false}={}){
   const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);if(!open)setOwnerMenu(false);
   document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
@@ -236,15 +236,17 @@ function openSettingsPanel(refresh){
   const id=state.identity,active=state.peers.filter(isPeerActive).length;
   showPanel('settings','Settings',`${cap(plain(id.owner_id,'You'))} and ${plain(id.agent_id,'your assistant')}`,body=>{
     const line=(box,label,value,run)=>{const row=button('','inspect-item',run);row.append(text('span',label),text('span',value,'inspect-value'));box.append(row);};
-    // A line that leads to another place takes you there. A panel you pinned on a wide screen
-    // stays beside it. Otherwise the panel closes and the keyboard lands on the page.
-    const go=view=>{const stays=inspect.pinned&&!mobileNavigation.matches;if(!stays)inspect.hide({restoreFocus:false});navigate(view);if(!stays)$('main').focus({preventScroll:true});};
+    // A line that leads to another place takes you there. A pinned panel stays only where it
+    // has a column of its own beside the page. Anywhere narrower it would cover the place you
+    // asked for, so it closes and the keyboard lands on the page.
+    const go=view=>{const stays=inspect.pinned&&besidePage.matches;if(!stays)inspect.hide({restoreFocus:false});navigate(view);if(!stays)$('main').focus({preventScroll:true});};
     const you=panelSection(body,'You');
     line(you,'Your keys and identity',shortDigest(id.fingerprint),()=>openIdentityPanel());
     const people=panelSection(body,'Assistants');
     line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>go('peers'));
     line(people,'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
-    if(state.conversations?.enabled===true)line(people,'Sending modes and private notes','Set inside each conversation',()=>go('conversations'));
+    // Sending modes and private notes are set on a message waiting in Approvals, nowhere else.
+    if(state.approvals?.enabled===true)line(people,'Sending modes and private notes','In Approvals',()=>go('approvals'));
     const device=panelSection(body,'This device');
     line(device,'Workspace status',$('connection-status').textContent||'Not checked yet',()=>openStatusPanel());
     line(device,'Lock and sign out','Clears this browser',()=>$('logout').click());
@@ -289,7 +291,10 @@ function renderReceipts(){
     row.append(text('span','✓','receipt-mark'),main);$('item-list').append(row);
   }
 }
-document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else if(node.dataset.panel==='settings')openSettingsPanel();else openStatusPanel();}));
+// A panel opened from the sidebar gives the keyboard back to its launcher when it closes. On
+// the phone the drawer has closed by then, so the button that opens the drawer takes its place.
+function fromSidebar(launcher){setNavigation(false);(mobileNavigation.matches?$('menu-toggle'):launcher).focus({preventScroll:true});}
+document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;fromSidebar(node);if(node.dataset.panel==='identity')openIdentityPanel();else if(node.dataset.panel==='settings')openSettingsPanel();else openStatusPanel();}));
 // Your menu, on the owner card: the same few places wherever you are.
 function setOwnerMenu(open,{restoreFocus=false}={}){
   const menu=$('owner-menu'),toggle=$('owner-menu-toggle');if(menu.hidden===!open)return;
@@ -301,8 +306,9 @@ $('owner-menu').addEventListener('click',event=>{
   const choice=event.target.closest('[data-owner]')?.dataset.owner;if(!choice||!state||busy)return;
   setOwnerMenu(false);
   if(choice==='lock'){$('logout').click();return;}
-  if(choice==='search'){if(mobileNavigation.matches)setNavigation(true);$('search-input').focus();$('search-input').select();return;}
-  setNavigation(false);
+  // Some places have no search of their own. Search then opens All work, where it does work.
+  if(choice==='search'){if($('search-input').disabled)navigate('tasks');if(mobileNavigation.matches)setNavigation(true);$('search-input').focus();$('search-input').select();return;}
+  fromSidebar($('owner-menu-toggle'));
   if(choice==='identity')openIdentityPanel();else if(choice==='settings')openSettingsPanel();else openStatusPanel();
 });
 $('owner-menu').addEventListener('keydown',event=>{

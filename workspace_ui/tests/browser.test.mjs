@@ -225,6 +225,8 @@ try {
   await settingsLine('Your keys and identity').click();
   assert.equal(await page.locator('#inspect-title').textContent(),'Your identity');
   assert.match(await page.locator('#inspect-body').textContent(),/Fingerprint[0-9a-f]{64}/);
+  await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await ownerToggle.evaluate(node=>node===document.activeElement),true,'closing returns the keyboard to the owner card, even after one record replaced another');
   await page.locator('[data-panel="settings"]').click();
   assert.equal(await page.locator('#inspect-title').textContent(),'Settings','Settings is also listed under Everything');
   await settingsLine('Workspace status').click();
@@ -242,8 +244,17 @@ try {
   await page.keyboard.press('Escape');await page.locator('#peer-dialog').waitFor({state:'hidden'});
   assert.equal(await page.locator('#inspect-title').textContent(),'Settings');
   assert.equal(await page.locator('#inspect').isVisible(),true,'a pinned Settings panel stays beside the place it took you to');
+  // Narrower than that, a pinned panel lies over the page, so it gives way to the place you asked for.
+  await page.setViewportSize({width:1000,height:1000});await nav('activity');
+  await settingsLine('Assistants you work with').click();
+  await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.evaluate(()=>location.hash),'#peers');
+  await page.setViewportSize({width:1440,height:1000});
+  await page.locator('[data-panel="settings"]').click();
+  assert.equal(await page.locator('#inspect-pin').getAttribute('aria-pressed'),'true');
   await page.locator('#inspect-pin').click();await page.locator('#inspect-close').click();
   await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.locator('[data-panel="settings"]').evaluate(node=>node===document.activeElement),true,'a panel opened from Everything returns the keyboard to its line');
   assert.equal(writes.length,0,'the owner menu and Settings never write');
   await nav('overview');
   await page.locator('#home-ask-input').fill('Plan the team offsite');
@@ -561,6 +572,9 @@ try {
   assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),true,'choosing from the menu closes the drawer');
   assert.equal(await page.locator('#inspect-title').textContent(),'Settings');
   await noOverflow();
+  await page.locator('#inspect-back').click();await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#menu-toggle').evaluate(node=>node===document.activeElement),true,'on the phone, closing returns the keyboard to the button that opens the drawer');
+  await page.locator('#menu-toggle').click();await ownerToggle.click();await ownerChoice('Settings').click();
   await settingsLine('Lock and sign out').click();await page.locator('#login-screen').waitFor({state:'visible'});
   for(const id of ['inspect-title','inspect-sub','inspect-body'])assert.equal(await page.locator('#'+id).textContent(),'','locking from Settings clears the panel: '+id);
   await page.setViewportSize({width:1440,height:1000});

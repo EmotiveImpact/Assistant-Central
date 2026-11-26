@@ -83,7 +83,11 @@ export function createInspect(nodes, {onChange = () => {}} = {}) {
       return;
     }
     if (!panel.hidden && current === key && !pinned) { hide(); return; }
-    opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    // A record opened from inside the open panel replaces it, and the line that was pressed is
+    // about to be removed. The first launcher is kept, so closing still returns the keyboard
+    // to where the owner started.
+    const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    if (panel.hidden || !panel.contains(active)) opener = active;
     current = key;
     title.textContent = heading;
     sub.textContent = subtitle || '';
