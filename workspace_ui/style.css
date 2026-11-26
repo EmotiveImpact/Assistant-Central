@@ -882,3 +882,13 @@ body.inspect-open .team-parts-grid{grid-template-columns:minmax(0,1fr)}
   .team-part-row{grid-template-columns:minmax(0,1fr)}
   .team-all{margin-left:0}
 }
+/* Your menu, on the owner card: keys, status, search, settings and lock, wherever you are. */
+.sidebar-bottom{position:relative}
+.owner-button{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer;border-radius:12px}
+.owner-button:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.owner-names{display:flex;flex-direction:column;min-width:0}
+.sidebar .owner-card .avatar{color:#fff;font-size:10px}
+.owner-menu:not([hidden]){position:absolute;left:0;right:0;bottom:calc(100% - 8px);z-index:30;display:grid;gap:2px;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 40px -16px var(--shadow)}
+.owner-menu button{all:unset;box-sizing:border-box;cursor:pointer;padding:9px 10px;border-radius:12px;font-size:13px;font-weight:600;color:var(--text)}
+.owner-menu button:hover,.owner-menu button:focus-visible{background:var(--raised)}
+.owner-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}

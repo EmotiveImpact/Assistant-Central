@@ -87,7 +87,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();panelFor=null;everythingFolded=false;setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};currentTeam=null;teamTab='parts';$('team-view').replaceChildren();$('team-parts').replaceChildren();$('team-form').reset();storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
+  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setOwnerMenu(false);panelFor=null;everythingFolded=false;setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};currentTeam=null;teamTab='parts';$('team-view').replaceChildren();$('team-parts').replaceChildren();$('team-form').reset();storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -144,6 +144,7 @@ async function performWrite(path,body,{target='notice',onSuccess}={}) {
 const DECISION_VIEWS=['approvals','conversations','host-drafts'];
 function leaveForHome(next){if(next==='overview'&&DECISION_VIEWS.includes(currentView))homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};}
 function navigate(view,{filter='all'}={}) {
+  setOwnerMenu(false);
   if(busy||!VIEWS.includes(view))return;
   leaveForHome(view);currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
@@ -229,6 +230,23 @@ function openStatusPanel(refresh){
     const actions=text('div','','inspect-actions');actions.append(button('Refresh saved state','button secondary',()=>$('refresh').click()),button('Sync exchange','button secondary',()=>$('sync').click()));body.append(actions);
   },()=>openStatusPanel(true),refresh);
 }
+// Settings gathers what is already yours to change, in one place. It holds no switch of its
+// own: every line opens the place where that thing really lives.
+function openSettingsPanel(refresh){
+  const id=state.identity,active=state.peers.filter(isPeerActive).length;
+  showPanel('settings','Settings',`${cap(plain(id.owner_id,'You'))} and ${plain(id.agent_id,'your assistant')}`,body=>{
+    const line=(box,label,value,run)=>{const row=button('','inspect-item',run);row.append(text('span',label),text('span',value,'inspect-value'));box.append(row);};
+    const you=panelSection(body,'You');
+    line(you,'Your keys and identity',shortDigest(id.fingerprint),()=>openIdentityPanel());
+    const people=panelSection(body,'Assistants');
+    line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>{inspect.hide({restoreFocus:false});navigate('peers');});
+    line(people,'Add an assistant','Check the fingerprint first',()=>{inspect.hide({restoreFocus:false});navigate('peers');openPeerDialog();});
+    if(state.conversations?.enabled===true)line(people,'Sending modes and private notes','Set inside each conversation',()=>{inspect.hide({restoreFocus:false});navigate('conversations');});
+    const device=panelSection(body,'This device');
+    line(device,'Workspace status',$('connection-status').textContent||'Not checked yet',()=>openStatusPanel());
+    line(device,'Lock and sign out','Clears this browser',()=>$('logout').click());
+  },()=>openSettingsPanel(true),refresh);
+}
 function openAssistantPanel(peer,refresh){
   const o=cap(plain(peer.owner_id,'Owner')),a=plain(peer.agent_id,'Assistant');
   showPanel('peer:'+peer.peer_id,a,`${o}'s assistant`,body=>{
@@ -268,7 +286,30 @@ function renderReceipts(){
     row.append(text('span','✓','receipt-mark'),main);$('item-list').append(row);
   }
 }
-document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else openStatusPanel();}));
+document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else if(node.dataset.panel==='settings')openSettingsPanel();else openStatusPanel();}));
+// Your menu, on the owner card: the same few places wherever you are.
+function setOwnerMenu(open,{restoreFocus=false}={}){
+  const menu=$('owner-menu'),toggle=$('owner-menu-toggle');if(menu.hidden===!open)return;
+  menu.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+  if(open)menu.querySelector('button').focus();else if(restoreFocus)toggle.focus();
+}
+$('owner-menu-toggle').addEventListener('click',()=>{if(!state||busy)return;setOwnerMenu($('owner-menu').hidden,{restoreFocus:true});});
+$('owner-menu').addEventListener('click',event=>{
+  const choice=event.target.closest('[data-owner]')?.dataset.owner;if(!choice||!state||busy)return;
+  setOwnerMenu(false);
+  if(choice==='lock'){$('logout').click();return;}
+  if(choice==='search'){if(mobileNavigation.matches)setNavigation(true);$('search-input').focus();$('search-input').select();return;}
+  setNavigation(false);
+  if(choice==='identity')openIdentityPanel();else if(choice==='settings')openSettingsPanel();else openStatusPanel();
+});
+$('owner-menu').addEventListener('keydown',event=>{
+  const items=[...$('owner-menu').querySelectorAll('button')],at=items.indexOf(document.activeElement);
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setOwnerMenu(false,{restoreFocus:true});}
+  else if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();items[(at+(event.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();}
+  else if(event.key==='Home'||event.key==='End'){event.preventDefault();items.at(event.key==='Home'?0:-1).focus();}
+  else if(event.key==='Tab')setOwnerMenu(false);
+});
+document.addEventListener('click',event=>{if(!$('owner-menu').hidden&&!event.target.closest('#owner-menu,#owner-menu-toggle'))setOwnerMenu(false);});
 // ===== Team missions: your assistant leads; each part is a proposal reviewed on its own =====
 let currentTeam=null,teamTab='parts';
 const STEP_LABEL={Plan:'Ready to send',Asked:'Waiting for their yes',Building:'Building',Result:'Result to check',Done:'Done',Stopped:'Stopped'};
