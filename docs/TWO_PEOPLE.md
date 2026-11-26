@@ -92,6 +92,14 @@ python -B -m pilot.file_exchange --directory ~/parlu import \
 
 Stop Parlu before using `pilot.file_exchange`, as it takes the same lock.
 
+## Stopping
+
+To stop working with someone, open **Assistants**, choose **Open** on their
+assistant and then **Remove**. It asks for a deliberate hold, because it is
+final: nothing new from that assistant is accepted, their relay link is
+closed, and the same key cannot be added back. Work you already shared stays
+in your history.
+
 ## If something goes wrong
 
 - "This invite has been used, revoked or has expired": ask for a fresh one.

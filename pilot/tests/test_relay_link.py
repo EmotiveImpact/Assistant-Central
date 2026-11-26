@@ -13,7 +13,8 @@ from pilot.crypto import canonical, fingerprint
 from pilot.relay_link import (INVITE_PACKETS, LinkDenied, RelayLink, is_envelope, link_code, make_link, read_link,
                               seal_envelope, join_proof)
 from pilot.runtime import PilotRuntime
-from relay.acrelay.client import send_with_invite
+from relay.acrelay.client import RelayClient, send_with_invite
+from relay.acrelay.protocol import RelayError
 from relay.acrelay.local import serve
 from relay.acrelay.service import Relay
 from relay.acrelay.store import SqlStore
@@ -321,6 +322,57 @@ class RelayLinkTests(unittest.TestCase):
         result = self.maya.sync(send=True)
         self.assertEqual((result['sent'], result['waiting_to_send']), (0, 0))
         self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'closed'})
+
+    def test_a_forget_the_relay_missed_is_finished_on_the_next_sync(self):
+        self.connect(self.edem, self.maya)
+        working = self.edem.link.relay_url
+        self.edem.link.relay_url = 'http://127.0.0.1:9'  # Nothing listens here.
+        self.assertEqual(self.edem.link.forget_peer(self.edem.session, self.maya.fingerprint),
+                         {'closed': True, 'relay': 'unreachable'})
+        self.edem.link.relay_url = working
+        self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 1)  # The old token still works on the relay.
+        self.assertEqual(self.edem.sync()['relay'], 'ok')
+        self.assertEqual(self.edem.link.db.execute('SELECT COUNT(*) FROM link_revokes').fetchone()[0], 0)
+        self.propose(self.maya, self.edem, 'A second fictional request')
+        self.assertEqual(self.maya.sync(send=True)['sent'], 0)
+        self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'closed'})
+
+    def test_a_removal_made_without_the_relay_closes_the_send_token_on_the_next_sync(self):
+        self.connect(self.edem, self.maya)
+        self.edem.runtime.revoke_peer(self.edem.session, self.maya.fingerprint)  # Parlu ran with no relay.
+        self.assertEqual(self.edem.sync()['relay'], 'ok')
+        self.assertEqual(self.edem.links(), {})
+        self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 0)
+        self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'closed'})
+
+    def test_work_from_a_removed_assistant_can_still_be_rejected_locally(self):
+        self.connect(self.edem, self.maya)
+        item = self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 1)
+        self.assertEqual(self.edem.sync()['received'], 1)
+        self.edem.runtime.revoke_peer(self.edem.session, self.maya.fingerprint)
+        review = self.edem.runtime.review(self.edem.session, item)
+        self.assertEqual(review['allowed_actions'], ['reject', 'cancel'])
+        decided = self.edem.runtime.decide(self.edem.session, item, review['review_digest'], 'reject')
+        self.assertEqual(decided['state'], 'rejected')
+        self.assertEqual(self.edem.runtime.exchange.pending(), [])  # Nothing is queued for a removed person.
+        with self.assertRaises(ValueError):
+            self.edem.runtime.decide(self.edem.session, item, review['review_digest'], 'accept')
+
+    def test_a_refused_revoke_is_kept_until_the_relay_confirms(self):
+        self.connect(self.edem, self.maya)
+        refusal = RelayError(401, 'bad_signature')
+        with mock.patch.object(RelayClient, 'revoke', side_effect=refusal):
+            self.assertEqual(self.edem.link.forget_peer(self.edem.session, self.maya.fingerprint),
+                             {'closed': True, 'relay': 'refused'})
+            self.assertEqual(self.edem.sync()['relay'], 'refused')
+        self.assertEqual(self.edem.link.db.execute('SELECT COUNT(*) FROM link_revokes').fetchone()[0], 1)
+        self.assertEqual(self.edem.sync()['relay'], 'ok')
+        self.assertEqual(self.edem.link.db.execute('SELECT COUNT(*) FROM link_revokes').fetchone()[0], 0)
+        self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 0)
 
     def test_secrets_are_sealed_at_rest_and_need_the_owner_session(self):
         invite = self.edem.link.create_invite(self.edem.session)

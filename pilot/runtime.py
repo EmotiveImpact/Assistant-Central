@@ -384,12 +384,21 @@ class PilotRuntime:
                 commit_checks.append(lambda:(self._current(row),
                     self._validate_body(body,self.exchange.peer_public(row['peer_id']),self.identity,sending=False)))
                 self._validate_body(body, self.exchange.peer_public(row['peer_id']), self.identity, sending=False)
-            packet = self._packet(session, body, 'decision', decision_body, 'decision-' + decided, self._now() + 3600)
-            self.exchange.queue(packet)
+            message_id = 'decision-' + decided
+            if decision == 'reject' and not self._peer_active(row['peer_id']):
+                # The sender was removed: nothing can reach them, so the rejection stays local.
+                message_id = None
+            else:
+                packet = self._packet(session, body, 'decision', decision_body, message_id, self._now() + 3600)
+                self.exchange.queue(packet)
             self.db.execute('UPDATE runtime_items SET state=?,decision_digest=?,decision_message_id=? WHERE id=?',
-                            ('accepted' if decision == 'accept' else 'rejected', decided, 'decision-' + decided, item_id))
-            self._event('recipient_decided', item_id, decision=decision, decision_digest=decided)
+                            ('accepted' if decision == 'accept' else 'rejected', decided, message_id, item_id))
+            self._event('recipient_decided', item_id, decision=decision, decision_digest=decided,
+                        sent=message_id is not None)
             return self._status(self._row(item_id)[0])
+
+    def _peer_active(self, peer_id):
+        return any(peer['fingerprint'] == peer_id and peer['state'] == 'active' for peer in self.exchange.peers())
 
     def cancel(self, session, item_id, review_digest):
         with self._transaction(session):
