@@ -24,7 +24,7 @@ Every colour in `style.css` is a role token on `:root`. Use the role, never a ra
 
 ## Rules
 
-- **Teal is a person, coral is an assistant.** People are teal circles; assistants are warm rounded squares with a small "AI" mark, always shown with their owner.
+- **Teal is a person, coral is an assistant.** People are teal circles; assistants are two-eyed blobs (a blob is only ever an assistant, so the shape itself says AI, and every label names it, as in "Otto, Tom's assistant"), always shown beside their owner.
 - **Coral marks what needs you:** the count on "Needs your attention" and pending badges. The card itself stays plain white.
 - **Primary actions and the active nav item are ink pills.** Secondary actions are white pills with a line.
 - **Approval screens stay plain.** Lead with the accountable person and what happens, in plain English. Money shows in the mission's own currency.

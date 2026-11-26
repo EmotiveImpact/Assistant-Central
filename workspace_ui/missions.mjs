@@ -136,7 +136,7 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
         else if (!view.current_approval_owners.includes(principal)) controls.push(btn('Review agreement', () => {
           route('review',{proposal_id:pid}, review => {
             const exact = signature(review.proposal);
-            let approving=false;const approveExact=()=>{if(approving)return;approving=true;route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true);};
+            let approving=false;const approveExact=()=>{if(approving||!document.querySelector('#conversation-dialog[open] .hold-control'))return;approving=true;route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true);};
             const details = node('details'), terms = parse(exact);
             details.append(node('summary','Show the exact terms'), node('pre',JSON.stringify(terms,null,2),'artifact-content'));
             section('Approve this revision',...summaryRows(terms),details,

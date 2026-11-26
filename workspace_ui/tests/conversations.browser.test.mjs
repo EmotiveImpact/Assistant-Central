@@ -34,6 +34,12 @@ try{
   await button(alice,'Save revision').click();
   const agreementButton='Approve exact revision';
   await button(alice,'Review agreement').click();
+  // A keyboard hold interrupted by closing the review must never approve.
+  await button(alice,'Hold to approve').focus();await alice.keyboard.down('Space');await alice.waitForTimeout(300);
+  await alice.keyboard.press('Escape');await alice.waitForTimeout(1200);await alice.keyboard.up('Space');
+  assert.equal(await alice.getByText(/1 of 2 owners agreed/).count(),0,'a dismissed hold must not approve');
+  if(!await button(alice,'Review agreement').isVisible()){await button(alice,'Mission agreements').click();await button(alice,'Check the fictional brief · revision 1').click();}
+  await button(alice,'Review agreement').click();
   await button(alice,agreementButton).click();
   await alice.getByText(/1 of 2 owners agreed/).waitFor();
   await screenshot(alice,'central-mission-agreement.png');

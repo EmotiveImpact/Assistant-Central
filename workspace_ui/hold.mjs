@@ -25,13 +25,17 @@ export function holdButton(label, onDone, {duration = HOLD_MS} = {}) {
   const stop = () => { if (done) return; cancelAnimationFrame(frame); start = 0; paint(0); control.classList.remove('holding'); };
   const tick = now => {
     if (!start) return;
+    // A control that was removed (its review closed) or lost focus never completes.
+    if (!control.isConnected) { start = 0; return; }
     const progress = Math.min(1, (now - start) / duration);
     paint(progress);
     if (progress >= 1) { done = true; control.classList.remove('holding'); control.classList.add('held'); control.disabled = true; onDone(); return; }
     frame = requestAnimationFrame(tick);
   };
   const begin = () => { if (done || start) return; start = performance.now(); control.classList.add('holding'); frame = requestAnimationFrame(tick); };
-  control.addEventListener('pointerdown', event => { event.preventDefault(); begin(); });
+  control.addEventListener('pointerdown', event => { if (!event.isPrimary || event.button !== 0) return; event.preventDefault(); begin(); });
+  control.addEventListener('blur', stop);
+  control.addEventListener('keydown', event => { if (event.key === 'Escape') stop(); });
   for (const type of ['pointerup', 'pointerleave', 'pointercancel']) control.addEventListener(type, stop);
   control.addEventListener('keydown', event => { if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) { event.preventDefault(); begin(); } });
   control.addEventListener('keyup', event => { if (event.key === ' ' || event.key === 'Enter') stop(); });

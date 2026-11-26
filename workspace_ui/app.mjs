@@ -77,7 +77,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats'])$(id).replaceChildren();
+  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats','home-when','home-paragraph','home-cards'])$(id).replaceChildren();homeOffset=0;
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -216,7 +216,7 @@ function renderHome(allAttention){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
   say.replaceChildren();cards.replaceChildren();
   const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const n=allAttention.length,first=allAttention[0];
+  const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined;
   const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting()} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
   if(!n){const b=text('b','Nothing in your inbox needs you right now.');say.append(b);return;}
   const peer=peerOf(first),owner=cap(plain(peer?.owner_id,'Someone')),agent=plain(peer?.agent_id,'their assistant');
