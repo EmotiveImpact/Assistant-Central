@@ -21,6 +21,7 @@ from . import mission_budget
 
 ENDPOINT = "https://api.openai.com/v1/responses"
 ANTHROPIC_ENDPOINT = "https://api.anthropic.com/v1/messages"
+ANTHROPIC_BASE_URL = "https://api.anthropic.com"
 ENDPOINTS = {"openai": ENDPOINT, "anthropic": ANTHROPIC_ENDPOINT}
 VERSION = "assistant-central-responses-pilot/1"
 MAX_RESPONSE_BYTES = 65536
@@ -145,7 +146,9 @@ class AnthropicMessagesSDK:
         if self._client_factory is not None:
             return self._client_factory(key, self.timeout)
         import anthropic  # Optional dependency, imported only for a live send.
-        return anthropic.Anthropic(api_key=key, max_retries=0, timeout=self.timeout)
+        # Pin the host: the SDK otherwise follows ANTHROPIC_BASE_URL from the
+        # environment, which could send the owner's key somewhere else.
+        return anthropic.Anthropic(api_key=key, base_url=ANTHROPIC_BASE_URL, max_retries=0, timeout=self.timeout)
 
     def send(self, request_bytes):
         if self.enabled is not True:
