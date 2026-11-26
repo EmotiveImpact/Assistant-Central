@@ -42,3 +42,10 @@ One app whose screens are states, not separate apps. Source: `/mnt/project-files
 - **Desktop speaks the phone's language.** White cards with 24px radii, rows at 16 to 20px, heavy tight headings (800, -0.035em), pill controls and a glass top bar. Home uses the narrated paragraph as its headline, a centre column for decisions and a right rail for numbers, people and activity. Main places first in the sidebar (Home, Inbox, Approvals, Assistants, Recents), everything else quieter under More.
 - **Phone frame.** A floating glass pill bar with Home, Recents and a plus button that opens a short dark menu. The desktop keeps its white sidebar.
 - **Still to come:** the money view (one budget number and who holds which key) and the evening story with "Good" and "Don't do that again".
+
+### Money, Done today, Ask bar and the evening story
+
+- **Money and keys** sits at the top of the right rail. Budgets come from accepted mission terms (the signed spending limit). Where this workspace runs the work, the figure is the amount left; where it cannot see the spending, it shows the amount agreed and says so. One currency at a time, never converted. With no mission budget it says "No budgets yet" and offers to set one up. The Keys tab lists who holds which signing key (short fingerprint) beside each owner and bot.
+- **Done today** lists work someone agreed today, newest first, with a Receipt badge when a signed decision exists. It shows four and links to the rest in All work. The time is the proposal's, which is what is saved.
+- **Ask bar** drafts a proposal from what you typed. Nothing is sent until you review it.
+- **Evening story** (from 18:00, when nothing is waiting) sums up the day; while decisions wait, Home stays on the decisions in one line and shows one finished piece of work at a time. "Good" moves on. "Don't do that again" reopens what was agreed, where it can be cancelled; it does not change a permission by itself, because nothing runs here without the owner's yes. Wiring it to the autonomy dial needs a per-assistant setting and comes next.

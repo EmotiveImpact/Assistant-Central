@@ -129,6 +129,24 @@ try {
   const workIds=await page.locator('#overview-work [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
   assert.equal(workIds.some(id=>attentionIds.includes(id)),false,'overview sections must not repeat the same work');
   assert.equal(await page.locator('#attention-count').textContent(),'3');
+  // Done today, money and keys, and the Ask bar come from saved state and never write.
+  assert.equal(await page.locator('#done-count').textContent(),'3');
+  assert.equal(await page.locator('#done-rows .done-row').count(),3);
+  assert.equal(await page.locator('#done-rows .done-row .person-dot').count(),3,'each done row keeps the owner beside the bot');
+  assert.match(await page.locator('#money-panel').textContent(),/No budgets yet/);
+  assert.equal(await page.locator('#keys-panel').isVisible(),false);
+  await page.locator('[data-money="keys"]').click();
+  assert.equal(await page.locator('#keys-panel .key-row').count(),4);
+  assert.match(await page.locator('#keys-panel .key-row').first().textContent(),/Beacon, your assistant.*Key [0-9a-f]{4} [0-9a-f]{4}.*Yours/);
+  await page.locator('[data-money="money"]').click();
+  assert.equal(await page.locator('#money-panel').isVisible(),true);
+  await page.locator('#home-ask-input').fill('Plan the team offsite');
+  await page.locator('#home-ask-input').press('Enter');
+  await page.locator('#compose-dialog').waitFor({state:'visible'});
+  assert.equal(await page.locator('#compose-form [name="title"]').inputValue(),'Plan the team offsite');
+  assert.equal(await page.locator('#home-ask-input').inputValue(),'');
+  await page.keyboard.press('Escape');await page.locator('#compose-dialog').waitFor({state:'hidden'});
+  assert.equal(writes.length,0,'the Ask bar only drafts: nothing is sent until the owner reviews it');
   assert.equal(await page.locator('.overview-row .badge').first().evaluate(node=>getComputedStyle(node).padding),'0px 11px 0px 7px');
   await page.setViewportSize({width:800,height:1000});
   assert.equal(await page.locator('#new-proposal').evaluate(node=>getComputedStyle(node).fontSize),'13px');
@@ -285,10 +303,28 @@ try {
   assert.equal(await page.locator('.sidebar').evaluate(node=>node.inert),true);
   assert.equal(await page.locator('#menu-toggle').evaluate(node=>node===document.activeElement),true);
   await nav('overview');await screenshot('central-platform-mobile-after-decisions.png',{fullPage:false});
+  // In the evening, with nothing left to decide, a story about the day replaces the stack.
+  const pendingLeft=Number(await page.locator('#attention-count').textContent());
+  if(pendingLeft===0){
+    const evening=new Date();evening.setHours(19,30,0,0);if(evening<Date.now())evening.setTime(Date.now()+60000);await page.clock.setFixedTime(evening);
+    await nav('inbox');await nav('overview');
+    assert.match(await page.locator('#home-paragraph').textContent(),/^Evening Blair\. \d+ pieces? of work (was|were) agreed today/);
+    assert.equal(await page.locator('#home-cards .story-card').count(),1);
+    assert.equal(await page.locator('#home-cards .story-card .person-dot').count(),1);
+    const before=writes.length;
+    await page.locator('#home-cards .home-good').click();
+    assert.equal(writes.length,before,'reacting to a story never writes or changes permission');
+    await page.locator('#home-cards .home-later').click();
+    await page.locator('#review-dialog').waitFor({state:'visible'});
+    assert.match(await page.locator('#notice').textContent(),/without your yes/);
+    assert.equal(writes.length,before,'reopening what was agreed never writes');
+    await page.keyboard.press('Escape');await page.locator('#review-dialog').waitFor({state:'hidden'});
+  }else assert.fail('the decisions above should leave nothing pending');
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
   assert.equal(await page.locator('#overview-stats').textContent(),'');
+  for(const id of ['done-rows','money-panel','keys-panel','home-cards','home-paragraph'])assert.equal(await page.locator('#'+id).textContent(),'','clear home data on sign-out: '+id);
   for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','review-details','review-commitments','owner-name','agent-name','owner-avatar','notice','connection-status'])assert.equal(await page.locator('#'+id).textContent(),'','clear hidden owner data: '+id);
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);
