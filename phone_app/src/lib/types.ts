@@ -57,6 +57,8 @@ export type State = {
   items: Item[];
   peers: Peer[];
   relay?: Relay;
+  /** Present when this Parlu has an approvals desk (conversations are set up). */
+  approvals?: { enabled: boolean };
   [key: string]: unknown;
 };
 
@@ -110,7 +112,7 @@ export interface Backend {
   signIn(password: string): Promise<Identity>;
   signOut(): Promise<void>;
   state(): Promise<State>;
-  /** Null when this Parlu has no approvals desk (conversations are not set up). */
+  /** Questions, messages and shared drafts waiting for you. Only asked for when state says the desk is on. */
   approvals(): Promise<Approvals | null>;
   review(itemId: string): Promise<Review>;
   decide(itemId: string, reviewDigest: string, decision: 'accept' | 'reject'): Promise<unknown>;

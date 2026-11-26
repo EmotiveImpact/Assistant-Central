@@ -124,6 +124,7 @@ export class DemoBackend implements Backend {
       // Saved in the order they were made, as the real owner API returns them.
       items: [...s.items].sort((a, b) => a.created_at - b.created_at).map(i => ({ ...i })),
       relay: { enabled: true, relay_host: 'demo', invites: s.invites.map(i => ({ ...i })), joiners: [], links: [] },
+      approvals: { enabled: true },
       demo: true,
     };
   }

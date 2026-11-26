@@ -53,11 +53,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const load = useCallback(async (target: Backend) => {
     const epoch = generation.current;
-    const [nextState, nextApprovals] = await Promise.all([target.state(), target.approvals()]);
+    const nextState = await target.state();
+    // Ask for the approvals desk only where it is turned on. If it is on but cannot be read,
+    // Home says so instead of claiming nothing else needs you.
+    let nextApprovals: Approvals | null = null, failed = false;
+    if (nextState.approvals?.enabled === true) {
+      try { nextApprovals = await target.approvals(); } catch (error) {
+        if (error instanceof RequestFailure && error.unauthorised) throw error;
+        failed = true;
+      }
+    }
     if (epoch !== generation.current) return;
     setState(nextState);
     setApprovals(nextApprovals);
-    setApprovalsFailed(false);
+    setApprovalsFailed(failed);
   }, []);
 
   const handle = useCallback((error: unknown) => {

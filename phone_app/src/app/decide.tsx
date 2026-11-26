@@ -8,10 +8,10 @@ import Svg, { Circle, ClipPath, Defs, G, Text as SvgText } from 'react-native-sv
 import { useGuard } from '../lib/guard';
 import { cardFor, queueOf, type Entry } from '../lib/home';
 import { sayError, useSession } from '../lib/session';
-import { ANSWER_LIMIT, decisionQuestion, decisionRows, exactMoney, needsHold } from '../shared/web';
+import { ANSWER_LIMIT, decisionQuestion, decisionRows, exactMoney, needsHold, stateLabel } from '../shared/web';
 import type { DraftReview, Item, Review } from '../lib/types';
 import { HoldButton } from '../ui/HoldButton';
-import { Button, Card, Notice, Pair, T } from '../ui/parts';
+import { Button, Card, Chip, Notice, Pair, T } from '../ui/parts';
 import { Sheet } from '../ui/Screen';
 import { colour, font } from '../ui/theme';
 
@@ -51,7 +51,7 @@ function Exact({ text }: { text: string | null }) {
   if (!text) return null;
   return (
     <View style={{ backgroundColor: colour.raised, borderRadius: 16, padding: 14, gap: 6 }}>
-      <T v="label">Exactly what was sent</T>
+      <T v="label">The exact text</T>
       <T v="body" selectable style={{ color: colour.text }}>{text}</T>
     </View>
   );
@@ -90,14 +90,16 @@ function ProposalDecision({ entry, item }: { entry: Entry; item: Item }) {
     try { await act(b => b.release(item.id, review.review_digest)); router.back(); } catch (e) { setError(sayError(e)); setBusy(false); }
   };
 
-  const title = hold && amount && item.mission_cap ? `Hold to pay ${amount} with ${c.owner}` : question;
+  const settled = !!review && !actions.some(a => a === 'accept' || a === 'release' || a === 'reject');
+  const title = settled ? item.title : hold && amount && item.mission_cap ? `Hold to pay ${amount} with ${c.owner}` : question;
   return (
     <Sheet>
       <Pair owner={c.owner} agent={c.agent} size={24} />
       <T v="label">{c.who}</T>
       <T v="title" accessibilityRole="header" style={{ fontSize: 26, lineHeight: 32 }}>{title}</T>
       {c.team ? <T v="small">{c.team}</T> : null}
-      {hold && amount && item.mission_cap ? <Agreement you="You" them={c.owner} amount={amount} /> : null}
+      {settled ? <Chip label={stateLabel(item.state)} tone={item.state === 'accepted' ? 'done' : 'plain'} /> : null}
+      {!settled && hold && amount && item.mission_cap ? <Agreement you="You" them={c.owner} amount={amount} /> : null}
       <Rows rows={rows} />
       <Exact text={review ? review.content : null} />
       <Notice text={error} tone="danger" />
@@ -110,8 +112,8 @@ function ProposalDecision({ entry, item }: { entry: Entry; item: Item }) {
       ) : null}
       {review && actions.includes('release') ? <Button label={`Send to ${c.owner}`} busy={busy} onPress={release} /> : null}
       {review && actions.includes('reject') ? <Button label="Say no" kind="secondary" disabled={busy} onPress={() => decide('reject')} /> : null}
-      {review && !actions.some(a => a === 'accept' || a === 'release' || a === 'reject') ? <Notice text="There is nothing to decide here any more." /> : null}
-      <Button label="Not now" kind="quiet" onPress={() => router.back()} />
+      {settled ? <Notice text="Nothing to decide here. This is the saved record." /> : null}
+      <Button label={settled ? 'Close' : 'Not now'} kind="quiet" onPress={() => router.back()} />
     </Sheet>
   );
 }

@@ -128,14 +128,9 @@ export class CentralClient implements Backend {
   }
 
   async approvals(): Promise<Approvals | null> {
-    try {
-      const value = await this.request<Approvals>('/api/approvals');
-      if (!Array.isArray(value.messages) || !Array.isArray(value.questions) || !Array.isArray(value.drafts)) throw new Error('shape');
-      return value;
-    } catch (error) {
-      if (error instanceof RequestFailure && error.unauthorised) throw error;
-      return null; // This Parlu has no approvals desk turned on.
-    }
+    const value = await this.request<Approvals>('/api/approvals');
+    if (!Array.isArray(value.messages) || !Array.isArray(value.questions) || !Array.isArray(value.drafts)) throw new RequestFailure('Parlu answered in a way the app could not check.');
+    return value;
   }
 
   async review(itemId: string): Promise<Review> {

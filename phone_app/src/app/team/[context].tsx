@@ -70,11 +70,11 @@ export default function Team() {
               </View>
             </View>
             <Chip label={label} tone={tone} />
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }} accessible accessibilityLabel={`Step: ${part.step}`}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }} accessible accessibilityLabel={`Step: ${part.step}`}>
               {STEPS.map((step: string) => {
                 const reached = STEPS.indexOf(step) <= STEPS.indexOf(part.step), current = step === part.step;
-                return <View key={step} style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: current ? colour.accentBg : colour.raised }}>
-                  <T style={{ fontFamily: font.semibold, fontSize: 12.5, color: current ? colour.accentOn : reached ? colour.secondary : colour.faint }}>{reached && !current ? '✓ ' : ''}{step}</T>
+                return <View key={step} style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: current ? colour.accentBg : colour.raised }}>
+                  <T style={{ fontFamily: font.semibold, fontSize: 11.5, color: current ? colour.accentOn : reached ? colour.secondary : colour.faint }}>{reached && !current ? '✓ ' : ''}{step}</T>
                 </View>;
               })}
             </View>
