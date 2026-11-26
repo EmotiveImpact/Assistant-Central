@@ -315,6 +315,12 @@ class OwnerService:
             peer_id = peer.get("peer_id", body["expected_fingerprint"])
             self.mailbox.set_endpoint(peer_id, endpoint)
             return peer
+        revoke = re.fullmatch(r"/api/peers/([0-9a-f]{64})/revoke", path)
+        if revoke and method == "POST":
+            # Final: a revoked pin is never revived, so the same assistant cannot be added again.
+            exact(body, ())
+            self.runtime.revoke_peer(token, revoke[1])
+            return {"revoked": True, "peer_id": revoke[1]}
         transfer = re.fullmatch(r"/api/transfers/(" + CONNECTION_ID + r")/(outbox|receipt|quarantine)/([A-Za-z0-9_.-]{1,128})(?:/(send|import))?", path)
         if transfer:
             connection, kind, identifier, action = transfer.groups()

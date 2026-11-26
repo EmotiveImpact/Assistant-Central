@@ -102,6 +102,15 @@ try{
   await maya.locator('#join-dialog .close-dialog').first().click();
   await maya.locator('#item-list .peer-row').filter({hasText:'Juniper'}).filter({hasText:'Connected through the relay'}).waitFor();
 
+  // Edem removes Otto. It is final, so it is folded away and needs a second, deliberate step.
+  await edem.locator('#item-list .peer-row').filter({hasText:'Otto'}).getByRole('button',{name:'Open'}).click();
+  await edem.locator('#inspect').getByRole('button',{name:'Remove Otto',exact:true}).click();
+  assert.match(await edem.locator('#inspect .remove-facts').textContent(),/cannot be undone/);
+  await shot(edem,'invite-5-remove.png');
+  await edem.locator('#inspect').getByRole('button',{name:'Remove Otto now'}).click();
+  await edem.locator('#notice').filter({hasText:'Otto is removed.'}).waitFor();
+  await edem.locator('#item-list .peer-row').filter({hasText:'Otto'}).filter({hasText:'Revoked'}).waitFor();
+
   assert.deepEqual(errors,[]);
   console.log('Invite link browser test passed.');
 }finally{await browser.close();}

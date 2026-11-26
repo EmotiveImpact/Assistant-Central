@@ -322,6 +322,21 @@ class RelayLinkTests(unittest.TestCase):
         self.assertEqual((result['sent'], result['waiting_to_send']), (0, 0))
         self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'closed'})
 
+    def test_a_forget_the_relay_missed_is_finished_on_the_next_sync(self):
+        self.connect(self.edem, self.maya)
+        working = self.edem.link.relay_url
+        self.edem.link.relay_url = 'http://127.0.0.1:9'  # Nothing listens here.
+        self.assertEqual(self.edem.link.forget_peer(self.edem.session, self.maya.fingerprint),
+                         {'closed': True, 'relay': 'unreachable'})
+        self.edem.link.relay_url = working
+        self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 1)  # The old token still works on the relay.
+        self.assertEqual(self.edem.sync()['relay'], 'ok')
+        self.assertEqual(self.edem.link.db.execute('SELECT COUNT(*) FROM link_revokes').fetchone()[0], 0)
+        self.propose(self.maya, self.edem, 'A second fictional request')
+        self.assertEqual(self.maya.sync(send=True)['sent'], 0)
+        self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'closed'})
+
     def test_secrets_are_sealed_at_rest_and_need_the_owner_session(self):
         invite = self.edem.link.create_invite(self.edem.session)
         target = read_link(invite['link'])

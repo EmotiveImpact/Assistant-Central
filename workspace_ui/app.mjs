@@ -270,8 +270,24 @@ function openAssistantPanel(peer,refresh){
     for(const item of work.slice(0,6)){const row=button('','inspect-item',()=>openReview(item));row.append(text('span',plain(item.title,'Untitled')),badge(item.state));shared.append(row);}
     const mode=panelSection(body,'Sending mode');mode.append(text('p','Every proposal from this assistant waits for your exact decision. Sending modes and private notes for conversations live in Approvals.','inspect-note'));
     if(isPeerActive(peer)){const actions=text('div','','inspect-actions');actions.append(button('Propose work','button primary',()=>prepareCompose(peer.peer_id)));
-      if(state.peers.filter(isPeerActive).length>1)actions.append(button('Start a team mission','button secondary',()=>openTeamDialog(peer.peer_id)));body.append(actions);}
+      if(state.peers.filter(isPeerActive).length>1)actions.append(button('Start a team mission','button secondary',()=>openTeamDialog(peer.peer_id)));body.append(actions);
+      removeSection(body,peer,o,a);}
   },()=>{const next=state.peers.find(entry=>entry.peer_id===peer.peer_id);if(next)openAssistantPanel(next,true);else inspect.hide({restoreFocus:false});},refresh);
+}
+// Removing an assistant is final: its key can never be trusted again here. The section starts
+// folded, and opening it asks for a deliberate hold, with a plain button as the alternative.
+function removeSection(body,peer,owner,agent){
+  const box=panelSection(body,'Remove');box.classList.add('remove-peer');
+  const open=button(`Remove ${agent}`,'button secondary',()=>{
+    open.hidden=true;
+    const confirmBox=text('div','','remove-confirm');
+    const facts=text('ul','','remove-facts');
+    for(const line of [`Nothing new from ${agent} will be accepted, and you cannot send to it.`,'Work you already shared stays in your history.',`This cannot be undone. To work with ${owner} again, they need a new assistant key.`])facts.append(text('li',line));
+    const go=()=>performWrite(`/api/peers/${peer.peer_id}/revoke`,{},{target:'notice',onSuccess:result=>notice(result.relay&&result.relay!=='ok'&&result.relay_closed?`${agent} is removed. The relay could not be reached, so its link closes on the next sync.`:`${agent} is removed.`,true)});
+    confirmBox.append(facts,holdButton('Hold to remove',go),text('p','Or remove with the button below.','hold-alt'),button(`Remove ${agent} now`,'button danger',go),button('Keep','text-button',()=>{confirmBox.remove();open.hidden=false;open.focus();}));
+    box.append(confirmBox);
+  });
+  box.append(text('p',`Stop working with ${owner}'s assistant.`,'inspect-note'),open);
 }
 function openMissionPanel(item,refresh){
   const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');

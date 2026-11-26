@@ -252,6 +252,7 @@ class RelayLink:
                 CREATE TABLE IF NOT EXISTS link_peers(peer TEXT PRIMARY KEY,mailbox TEXT NOT NULL,grant_id TEXT NOT NULL,expires REAL NOT NULL,state TEXT NOT NULL CHECK(state IN ('joining','waiting','connected','closed')),send TEXT NOT NULL,control TEXT,join_digest TEXT,attempts INTEGER NOT NULL DEFAULT 0);
                 CREATE TABLE IF NOT EXISTS link_sent(message_id TEXT PRIMARY KEY,peer TEXT NOT NULL,stored REAL NOT NULL);
                 CREATE TABLE IF NOT EXISTS link_receipts(digest TEXT PRIMARY KEY,peer TEXT NOT NULL,packet TEXT NOT NULL,attempts INTEGER NOT NULL DEFAULT 0);
+                CREATE TABLE IF NOT EXISTS link_revokes(grant_id TEXT PRIMARY KEY);
             ''')
             with self._txn():
                 row = self._meta()
@@ -564,10 +565,25 @@ class RelayLink:
         with self._txn():
             self.db.execute('DELETE FROM link_peers WHERE peer=?', (peer,))
             self.db.execute('DELETE FROM link_receipts WHERE peer=?', (peer,))
+            # Kept until the relay confirms, so an unreachable relay is retried on the next sync.
+            self.db.execute('INSERT OR IGNORE INTO link_revokes VALUES(?)', (row['grant_id'],))
+        return {'closed': True, 'relay': self._finish_revokes(session)}
+
+    def _finish_revokes(self, session):
+        pending = [row['grant_id'] for row in self.db.execute('SELECT grant_id FROM link_revokes').fetchall()]
+        if not pending:
+            return 'ok'
         client, problem = self._mailbox(session)
-        if client is not None:
-            _, problem = self._relay(lambda: client.revoke(row['grant_id']))
-        return {'closed': True, 'relay': problem or 'ok'}
+        if client is None:
+            return problem or 'unreachable'
+        for grant_id in pending:
+            _, problem = self._relay(lambda: client.revoke(grant_id))
+            if problem == 'unreachable':
+                return problem
+            # Done, or the relay no longer knows the grant: either way it cannot be used.
+            with self._txn():
+                self.db.execute('DELETE FROM link_revokes WHERE grant_id=?', (grant_id,))
+        return 'ok'
 
     # Carrying packets --------------------------------------------------------------
 
@@ -711,6 +727,8 @@ class RelayLink:
                     break
         if summary['relay'] == 'ok':
             self._send_receipts(summary)
+        if summary['relay'] == 'ok' and self._finish_revokes(session) != 'ok':
+            summary['relay'] = 'unreachable'
         with self._txn():
             self.db.execute('DELETE FROM link_sent WHERE stored<?', (now - SENT_MEMORY,))
         for status, row in self._unsent():

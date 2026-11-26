@@ -45,23 +45,16 @@ Items 2 and 3 follow in their own pull requests from this same branch name.
 
 ## Status
 
-Implemented in this pull request:
+Merged: invite links with QR pairing (#48).
 
-- `pilot/relay_link.py`: invite links (version 2), join and welcome packets,
-  owner approval on the inviting side, and relay sync for ordinary packets.
-- `workspace_ui/relay_service.py` and `--relay` on `workspace_ui.server`.
-- App: Invite someone (link, QR code, short code), Join with a link, a Home
-  card and panel to check and add, open invites with Show again and Revoke,
-  and the relay link state on each assistant.
-- The relay's invite page hands the link to Parlu on this computer.
-- `docs/TWO_PEOPLE.md` now starts from an invite link.
+In this pull request: revoking an assistant from the app.
 
-Verified: `pilot/tests/test_relay_link.py` (13 tests over a real local relay),
-`workspace_ui/tests/test_relay_service.py`, Node tests for the QR maker
-(matched square for square against python-qrcode) and the invite helpers, and
-`workspace_ui/tests/invites.browser.test.mjs`, which connects two real copies
-of Parlu through one local relay in Chromium on desktop and phone.
+- `POST /api/peers/<fingerprint>/revoke` on the owner server. A revoked pin is
+  final and cannot be added again.
+- With a relay, the same route also closes that person's relay token. If the
+  relay cannot be reached, the close is kept and finished on the next sync.
+- App: a folded Remove section on each assistant's panel, with a hold and a
+  plain button.
 
-Not covered here: the hosted relay itself is unchanged (no schema change, no
-deploy). Revoking an assistant from the app, phone pairing and team mission
-records follow in the next pull requests.
+Next: phone questions in the app, then team mission records (per-part rules,
+merge approvals, access grants and compute spend).

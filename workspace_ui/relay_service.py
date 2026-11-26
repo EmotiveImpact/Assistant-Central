@@ -11,6 +11,7 @@ from pilot.relay_link import LinkDenied, RelayLink
 from pilot.server import RequestDenied, exact
 
 INVITE = re.compile(r'/api/invites/([0-9a-f]{32})(?:/(revoke|joiner))?')
+PEER_REVOKE = re.compile(r'/api/peers/([0-9a-f]{64})/revoke')
 
 
 class RelayService:
@@ -54,6 +55,12 @@ class RelayService:
         if path == '/api/relay/sync' and method == 'POST':
             exact(body, ('send',))
             return link.sync(token, send=body['send'])
+        revoke = PEER_REVOKE.fullmatch(path)
+        if revoke and method == 'POST':
+            # Revoke first; then close their relay token so nothing more reaches the mailbox.
+            result = self.primary.call(method, path, token, body)
+            closed = link.forget_peer(token, revoke[1])
+            return {**result, 'relay_closed': closed['closed'], 'relay': closed['relay']}
         invite = INVITE.fullmatch(path)
         if invite:
             invite_id, action = invite.groups()

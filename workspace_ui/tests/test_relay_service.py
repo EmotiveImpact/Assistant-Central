@@ -7,6 +7,7 @@ import threading
 import unittest
 
 from pilot.auth import LocalOwnerAuth
+from pilot.crypto import fingerprint
 from relay.acrelay.local import serve
 from relay.acrelay.service import Relay
 from relay.acrelay.store import SqlStore
@@ -96,6 +97,36 @@ class RelayRouteTests(unittest.TestCase):
         # Everything else is still the owner's ordinary API.
         self.assertEqual(self.call(server, 'POST', '/api/exchange', {}, token)[0], 200)
 
+    def maya(self, name):
+        auth = LocalOwnerAuth(owner(self.root, name, 'Otto'))
+        try:
+            return auth.public_identity()
+        finally:
+            auth.close()
+
+    def enrol(self, server, token, public):
+        return self.call(server, 'POST', '/api/peers', {'public_identity': public, 'expected_fingerprint': fingerprint(public),
+                                                        'endpoint': 'http://127.0.0.1:9999'}, token)[0]
+
+    def test_revoking_an_assistant_is_final_and_needs_the_owner(self):
+        for relay_url in (None, f'http://127.0.0.1:{self.relay.server_port}'):
+            with self.subTest(relay=bool(relay_url)):
+                server = self.start(owner(self.root, f'edem-{bool(relay_url)}', 'Juniper'), relay_url)
+                token = self.login(server)
+                public = self.maya(f'maya-{bool(relay_url)}')
+                pin = fingerprint(public)
+                self.assertEqual(self.enrol(server, token, public), 200)
+                path = f'/api/peers/{pin}/revoke'
+                self.assertEqual(self.call(server, 'POST', path, {})[0], 401)
+                self.assertEqual(self.call(server, 'POST', path, {'extra': 1}, token)[0], 400)
+                self.assertEqual(self.call(server, 'POST', '/api/peers/' + 'f' * 64 + '/revoke', {}, token)[0], 400)
+                status, result = self.call(server, 'POST', path, {}, token)
+                self.assertEqual((status, result['revoked'], result['peer_id']), (200, True, pin))
+                self.assertEqual('relay' in result, bool(relay_url))
+                peers = self.call(server, 'GET', '/api/state', token=token)[1]['peers']
+                self.assertEqual([(p['peer_id'], p['state']) for p in peers], [(pin, 'revoked')])
+                # A revoked key cannot be added back.
+                self.assertEqual(self.enrol(server, token, public), 400)
 
 if __name__ == '__main__':
     unittest.main()
