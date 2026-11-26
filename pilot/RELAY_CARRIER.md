@@ -21,6 +21,20 @@ returns the original signed receipt explicitly.
 4. The recipient imports the quarantined file with the authenticated
    file-exchange step, and sends the signed receipt back the same way.
 
+## From the command line
+
+`pilot.relay_cli` wraps the same steps. Each person runs `init` once, then
+gives the other an invite:
+
+```sh
+python -B -m pilot.relay_cli init   --relay https://<relay> --key mailbox.key
+python -B -m pilot.relay_cli invite --relay https://<relay> --key mailbox.key --fingerprint <your fingerprint>
+python -B -m pilot.relay_cli send   --invite '<their invite>' --recipient <their fingerprint> --file packet.json
+python -B -m pilot.relay_cli fetch  --relay https://<relay> --key mailbox.key --quarantine spool --recipient <your fingerprint>
+```
+
+Export and import still use `pilot.file_exchange` as before.
+
 ## What the results mean
 
 `send_file` returns `delivery: uncertain`, `owner_acceptance: not_established`
