@@ -11,6 +11,8 @@ import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
 import {holdButton} from './hold.mjs';
 import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
+import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
+import {qrMatrix,qrPath} from './qr.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
@@ -32,6 +34,9 @@ function setNavigation(open,{restoreFocus=false}={}){
   else if(wasOpen&&!open){if(restoreFocus&&mobileNavigation.matches)$('menu-toggle').focus();else if(sidebar.contains(document.activeElement))$('main').focus();}
 }
 mobileNavigation.addEventListener('change',()=>setNavigation(false));
+// The relay's invite page hands an invite over after "#join=". Read it once, then take it out
+// of the address bar and the history, so the secret part does not linger.
+let pendingJoin=joinFromHash(location.hash);if(pendingJoin)history.replaceState(null,'',location.pathname+'#overview');
 let token = null, generation = 0, busy = false, currentView = viewFromHash(location.hash), currentFilter = 'all', currentLayout = 'list', searchQuery = '';
 let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null;
 const uncertainty=inspectionLatch();
@@ -121,7 +126,7 @@ function handleFailure(error,target='notice',source='runtime',operation=null) {
 }
 async function refresh({clearNotice=false}={}) {
   const epoch=generation;
-  const data=await inspectSavedState({latch:uncertainty,session:()=>generation,readState:async()=>validateState(await request('/api/state')),inspectHost:()=>hostDrafts.inspectUncertain(),inspectConversation:operation=>inspectMessageOutcome({request,session:()=>generation,operation})});
+  const data=await inspectSavedState({latch:uncertainty,session:()=>generation,readState:async()=>{const value=validateState(await request('/api/state'));validateRelay(value.relay);return value;},inspectHost:()=>hostDrafts.inspectUncertain(),inspectConversation:operation=>inspectMessageOutcome({request,session:()=>generation,operation})});
   if(epoch!==generation||!token||!data)return;
   state=data;render();$('connection-status').textContent=uncertainty.pending()?'Inspection required':'Saved state checked';$('refresh').setAttribute('aria-label',uncertainty.pending()?'Inspect saved state after an uncertain outcome':'Refresh saved state');
   if(clearNotice)notice(uncertainty.pending()?'An earlier operation is still unconfirmed. A missing or unavailable result is not proof it failed. Read-only inspection is available; writes stay blocked.':'Saved state inspected. Review any pending item before acting.',!uncertainty.pending());
@@ -136,6 +141,7 @@ async function performWrite(path,body,{target='notice',onSuccess}={}) {
     await refresh();
     if(epoch!==generation)return;
     if(onSuccess)onSuccess(result);
+    if(relayEnabled(state)&&OWNER_SENDS.test(path))queueMicrotask(()=>relaySync(true));
   } catch(error) { if(epoch===generation)handleFailure(returned&&!error.unauthorised?new RequestFailure('The operation returned, but its saved state could not be inspected. Refresh before acting again.',{unknown:true}):error,target); }
   finally { release(); }
 }
@@ -244,7 +250,8 @@ function openSettingsPanel(refresh){
     line(you,'Your keys and identity',shortDigest(id.fingerprint),()=>openIdentityPanel());
     const people=panelSection(body,'Assistants');
     line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>go('peers'));
-    line(people,'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
+    if(relayEnabled(state)){line(people,'Invite someone','A link or a QR code',()=>openInviteDialog());line(people,'Join with a link','Paste an invite you were sent',()=>openJoinDialog());}
+    line(people,relayEnabled(state)?'Add an assistant by fingerprint':'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
     // Sending modes and private notes are set on a message waiting in Approvals, nowhere else.
     if(state.approvals?.enabled===true)line(people,'Sending modes and private notes','In Approvals',()=>go('approvals'));
     const device=panelSection(body,'This device');
@@ -526,7 +533,7 @@ async function loadHomeExtras(){
 }
 function homeEntries(){
   const extras=homeExtras.for===state?homeExtras:{};
-  return homeQueue({proposals:attentionItems(state),approvals:extras.approvals,hostDrafts:extras.hostDrafts,conversations:extras.conversations});
+  return homeQueue({proposals:attentionItems(state),approvals:extras.approvals,hostDrafts:extras.hostDrafts,conversations:extras.conversations,joiners:joinerCards(state)});
 }
 function renderHome(){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
@@ -545,6 +552,7 @@ function renderHome(){
   else if(first.kind==='question')say.append(text('span','Your '),pair(),text('span',` ${agent} asked you `),text('b',`“${first.title}”`));
   else if(first.kind==='message')say.append(text('span','Your '),pair(),text('span',` ${agent} `),text('b','wants to send a message for you'));
   else if(first.kind==='invite')say.append(text('span',`${owner}'s `),pair(),text('span',` ${agent} `),text('b','invited you to a conversation'));
+  else if(first.kind==='joiner')say.append(text('span',`${owner} and `),pair(),text('span',` ${agent} `),text('b','used your invite and ask to connect'));
   else if(first.kind==='shared-draft')say.append(text('b','A shared draft waits for your agreement'));
   else say.append(text('span','A draft from one of your apps, '),text('b',`“${first.title}”`),text('span',','));
   say.append(text('span',moreLine(n)),text('b',closingLine(failed)));
@@ -557,7 +565,7 @@ function renderHome(){
     if(copy.lead)card.append(text('p',copy.lead.charAt(0)===copy.lead.charAt(0).toUpperCase()?copy.lead:`${a} ${copy.lead}`,'home-card-lead'));
     const belongs=entry.kind==='proposal'?partLead(partOf(state,entry.item)):'';if(belongs){const lead=text('p',belongs,'home-card-lead');lead.dataset.team='true';card.append(lead);}
     card.append(text('p',entry.title,'home-card-title'));
-    const open=()=>entry.kind==='proposal'?openReview(entry.item):navigate(entry.view);
+    const open=()=>entry.kind==='proposal'?openReview(entry.item):entry.kind==='joiner'?openJoinerPanel(entry.joiner):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
       if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome();}));
       actions.append(button(copy.action,'button primary home-agree',open));card.append(actions);
@@ -646,15 +654,16 @@ function renderOverview() {
   if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
 }
 function renderPeers() {
+  if(relayEnabled(state)&&!searchQuery)renderRelayStrip();
   const own=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(state.identity.agent_id,'Your assistant'),'item-title'),text('div',plain(state.identity.owner_id)+' · Your assistant','item-meta'),text('p',state.identity.fingerprint,'peer-fingerprint'));
   const identity=state.identity.public||Object.fromEntries(Object.entries(state.identity).filter(([key])=>['owner_id','agent_id','signing_key','exchange_key','version'].includes(key)));
   const right=text('div','','row-right');right.append(text('span','Your assistant','badge local'),button('View public identity','button secondary',()=>showPublicIdentity(identity,state.identity.fingerprint)));
   own.append(nameAvatar(state.identity.agent_id,'peer-avatar local'),main,right);
   if(matchesQuery([state.identity.agent_id,state.identity.owner_id,'your assistant'],searchQuery))$('item-list').append(own);
   const peers=state.peers.filter(peer=>matchesQuery([peer.agent_id,peer.owner_id,peer.peer_id,peer.fingerprint,peer.state],searchQuery));
-  if(!state.peers.length&&!searchQuery){empty('⊞','Good work is connected.','Exchange public identities with another owner and verify their full fingerprint.',{label:'Enrol a peer',run:openPeerDialog});return;}
+  if(!state.peers.length&&!searchQuery){if(relayEnabled(state))empty('⊞','Good work is connected.','Invite someone with a link, or join with a link you were sent.',{label:'Invite someone',run:openInviteDialog});else empty('⊞','Good work is connected.','Exchange public identities with another owner and verify their full fingerprint.',{label:'Enrol a peer',run:openPeerDialog});return;}
   for(const peer of peers) {
-    const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',plain(peer.owner_id,'Owner'),'item-meta'),text('p',peer.fingerprint,'peer-fingerprint'));
+    const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',plain(peer.owner_id,'Owner'),'item-meta'));if(linkLabel(state,peer.peer_id))main.append(text('div',linkLabel(state,peer.peer_id),'relay-link-state'));main.append(text('p',peer.fingerprint,'peer-fingerprint'));
     const right=text('div','','row-right');right.append(text('span',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable',isPeerActive(peer)?'badge accepted':'badge revoked'));
     right.append(button('Open','button secondary row-action',()=>openAssistantPanel(peer)));
     row.append(peerAvatar(peer.peer_id),main,right);$('item-list').append(row);
@@ -826,6 +835,7 @@ $('login-form').addEventListener('submit',async event=>{
     if(epoch!==generation)return;
     if(typeof result.token!=='string'||result.token.length<16||!result.identity)throw new Error('Invalid login response');
     token=result.token;epoch=++generation;await refresh();if(epoch!==generation||!token)return;$('login-screen').hidden=true;$('workspace').hidden=false;$('main').focus();
+    if(pendingJoin){const carried=pendingJoin;pendingJoin='';if(relayEnabled(state))queueMicrotask(()=>openJoinDialog(carried));else notice('This copy of Parlu has no relay set up, so it cannot open the invite yet. Start Parlu with --relay first.');}
   } catch(error) { if(epoch===generation)resetSession(error.unauthorised?'The password was not accepted.':error instanceof RequestFailure?error.message:'The session could not be verified.'); }
   finally {release();}
 });
@@ -836,13 +846,14 @@ async function logout(){
 $('logout').addEventListener('click',logout);$('mobile-logout').addEventListener('click',logout);
 $('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;const release=operations.acquire();try{await refresh({clearNotice:true});if(epoch!==generation)return;selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{release();}});
 document.querySelector('.skip-link').addEventListener('click',event=>{event.preventDefault();setNavigation(false);(token?$('main'):$('password')).focus();});
-$('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>notice('Exchange checked. Review new items and saved delivery outcomes below.',true)}));
+// Both carriers: assistants added by address use the direct exchange, invited ones the relay.
+$('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>{if(relayEnabled(state))setTimeout(()=>relaySync(true,{announce:true}));else notice('Exchange checked. Review new items and saved delivery outcomes below.',true);}}));
 $('new-proposal').addEventListener('click',prepareCompose);
 function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
 // The Ask bar drafts a proposal from what you typed. Nothing is sent until you review it.
 $('home-ask')?.addEventListener('submit',event=>{event.preventDefault();const typed=$('home-ask-input').value.trim();prepareCompose();const form=$('compose-form');if(!$('compose-dialog').open)return;if(typed){form.elements.title.value=typed.slice(0,120);form.elements.text.value='SYNTHETIC ONLY: '+typed;}$('home-ask-input').value='';});
-$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='team')openTeamDialog();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
+$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='team')openTeamDialog();else if(choice==='mission')navigate('conversations');else if(choice==='invite')openInviteDialog();else if(choice==='join')openJoinDialog();else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
 document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;selectedTransfer=null;}));
@@ -972,3 +983,150 @@ async function transferAction(action){
   const snapshot=selectedTransfer,body={review_digest:snapshot.review.review_digest};if(action!=='import')body.retry=action==='retry';
   await performWrite(transferPath(snapshot)+(action==='import'?'/import':'/send'),body,{target:'review-message',onSuccess:()=>{selectedTransfer=null;$('review-dialog').close();notice(action==='import'?'Selected packet imported. Review any proposal separately; a cached receipt is not sent automatically.':'One transfer attempt started. Delivery remains uncertain. Refresh saved state to inspect it; no automatic retry will occur.',true);}});
 }
+
+// Invite links ---------------------------------------------------------------------------
+// One person makes a link (or shows its QR code); the other opens it in their own Parlu. Both
+// check the same short code, and the person who made the link adds the other. Joining never
+// agrees to any work, and nothing here needs a model or an AI key.
+const OWNER_SENDS=/^\/api\/items\/[A-Za-z0-9_.-]{1,128}\/(?:release|decision|cancel)$/;
+let joinReview=null,relayBusy=false;
+function joinWho(owner,agent,line){const who=text('div','','join-person');who.append(ownerPair(owner,agent,'owner-pair','look'));const words=text('div','');words.append(text('strong',`${owner} and ${agent}`),text('span',line,'item-meta'));who.append(words);return who;}
+function factList(list,rows){list.replaceChildren();for(const [label,value] of rows)list.append(text('dt',label),text('dd',value));}
+function drawQr(holder,link){
+  holder.replaceChildren();
+  let drawn;try{drawn=qrPath(qrMatrix(link));}catch{holder.append(text('p','The link is too long for a QR code. Copy it instead.','scope-note'));return;}
+  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox',`0 0 ${drawn.size} ${drawn.size}`);svg.setAttribute('shape-rendering','crispEdges');svg.setAttribute('aria-hidden','true');
+  const back=document.createElementNS(ns,'rect');back.setAttribute('width',drawn.size);back.setAttribute('height',drawn.size);back.setAttribute('fill','#fff');
+  const marks=document.createElementNS(ns,'path');marks.setAttribute('d',drawn.path);marks.setAttribute('fill','#1b1a17');svg.append(back,marks);holder.append(svg);
+}
+function openInviteDialog(){
+  if(busy||uncertainty.pending()||!state)return;
+  if(!relayEnabled(state)){notice('This copy of Parlu has no relay set up. Start it with --relay to make invite links.');return;}
+  $('invite-form').reset();$('invite-message').textContent='';$('invite-copied').textContent='';
+  $('invite-make').hidden=false;$('invite-ready').hidden=true;$('invite-submit').hidden=false;$('invite-copy').hidden=true;$('invite-title').textContent='Invite someone';
+  openDialog('invite-dialog');
+}
+function showInviteReady(invite){
+  $('invite-make').hidden=true;$('invite-ready').hidden=false;$('invite-submit').hidden=true;$('invite-copy').hidden=false;
+  $('invite-title').textContent=invite.label?`An invite for ${invite.label}`:'Your invite is ready';
+  drawQr($('invite-qr'),invite.link);$('invite-code').textContent=invite.code;$('invite-link').value=invite.link;$('invite-expires').textContent=expiresIn(invite.join_by);
+  $('invite-copied').textContent='';
+}
+$('invite-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||uncertainty.pending()||!$('invite-ready').hidden)return;
+  const form=event.currentTarget,epoch=generation,release=operations.acquire();$('invite-message').textContent='';
+  try{
+    const made=await request('/api/invites',{method:'POST',body:{label:form.elements.label.value.trim(),hours:Number(form.elements.hours.value)}});
+    if(epoch!==generation)return;
+    if(made.made!==true){$('invite-message').textContent=joinProblem('relay_'+made.relay);return;}
+    if(!inviteFromText(made.link)||typeof made.code!=='string')throw new RequestFailure('The invite could not be checked. Try again.');
+    showInviteReady(made);await refresh();
+  }catch(error){if(epoch===generation)handleFailure(error,'invite-message');}
+  finally{release();}
+});
+$('invite-copy').addEventListener('click',async()=>{
+  const field=$('invite-link');
+  try{await navigator.clipboard.writeText(field.value);$('invite-copied').textContent='Link copied. Send it to them, then check the code together.';}
+  catch{field.focus();field.select();$('invite-copied').textContent='Press Ctrl+C or ⌘C to copy the selected link.';}
+});
+async function showInviteAgain(invite){
+  if(busy||uncertainty.pending())return;const epoch=generation;
+  try{const again=await request(`/api/invites/${invite.id}`);if(epoch!==generation)return;openInviteDialog();if($('invite-dialog').open)showInviteReady(again);}
+  catch(error){if(epoch===generation)handleFailure(error);}
+}
+function openJoinDialog(carried=''){
+  if(busy||uncertainty.pending()||!state)return;
+  if(!relayEnabled(state)){notice('This copy of Parlu has no relay set up. Start it with --relay to join with a link.');return;}
+  joinReview=null;$('join-form').reset();$('join-message').textContent='';$('join-paste').hidden=false;$('join-review').hidden=true;$('join-submit').textContent='Check the link';
+  openDialog('join-dialog');
+  if(carried&&$('join-dialog').open){$('join-link').value=carried;$('join-form').requestSubmit();}
+}
+$('join-link').addEventListener('input',()=>{joinReview=null;$('join-message').textContent='';});
+$('join-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||uncertainty.pending())return;
+  const epoch=generation,release=operations.acquire();$('join-message').textContent='';
+  try{
+    if(!joinReview){
+      const link=inviteFromText($('join-link').value);
+      if(!link){$('join-message').textContent='That does not look like a Parlu invite link. Paste the whole address, including the part after #.';return;}
+      const review=await request('/api/invites/open',{method:'POST',body:{link}});
+      if(epoch!==generation)return;
+      const owner=cap(plain(review.inviter?.owner_id,'Someone')),agent=plain(review.inviter?.agent_id,'their assistant');
+      if(review.ok!==true){$('join-message').textContent=joinProblem(review.reason,owner);return;}
+      joinReview={link,review,owner};
+      $('join-paste').hidden=true;$('join-review').hidden=false;$('join-title').textContent=`Join ${owner}`;
+      $('join-who').replaceChildren(joinWho(owner,agent,review.label?`Invite: ${review.label}`:'invites you to connect'));
+      $('join-code').textContent=review.code;
+      $('join-check').textContent=`Ask ${owner} which code they see. Join only if it is the same.`;
+      factList($('join-facts'),[['Shares',`Your name, ${plain(state.identity.agent_id,'your assistant')}'s name and its public keys, with ${owner} only.`],
+        ['Keeps','Everything else. Joining never agrees to any work: every proposal still needs your own yes.'],
+        ['Through',`The relay at ${review.relay_host}. It carries sealed packets and cannot read them.`],
+        ...(review.known?[['Already',`${owner} is already in your assistants. Joining adds a link through the relay.`]]:[])]);
+      $('join-submit').textContent=`Join ${owner}`;$('join-submit').focus();return;
+    }
+    const {link,review,owner}=joinReview;
+    const joined=await request('/api/invites/accept',{method:'POST',body:{link,review_digest:review.review_digest}});
+    if(epoch!==generation)return;
+    if(joined.joined!==true){$('join-message').textContent=joinProblem(joined.reason,owner);await refresh();return;}
+    joinReview=null;$('join-dialog').close();
+    notice(`Sent. ${owner} adds you when they see your request, and both of you will see the same code.`,true);
+    await refresh();
+  }catch(error){if(epoch===generation)handleFailure(error,'join-message');}
+  finally{release();}
+});
+function openJoinerPanel(joiner){
+  if(!joiner)return;
+  const o=cap(plain(joiner.owner_id,'Someone')),a=plain(joiner.agent_id,'their assistant');
+  showPanel('joiner:'+joiner.invite_id,`${o} wants to connect`,`${a}, ${o}'s assistant`,body=>{
+    body.append(joinWho(o,a,joiner.label?`Used your invite for ${joiner.label}`:'Used your invite'));
+    const check=panelSection(body,'Check the code');check.append(text('div',joiner.code,'pair-code'));
+    check.append(text('p',`Ask ${o} which code they see. Add them only if it is the same.`,'inspect-note'));
+    const keys=panelSection(body,'Keys');panelRow(keys,'Fingerprint',joiner.fingerprint,true);
+    const scope=panelSection(body,'What adding does');
+    panelRow(scope,'Shares',`Your name, your assistant's name and its public keys, with ${o} only.`);
+    panelRow(scope,'Keeps','Everything else. Each proposal from them still needs your own yes.');
+    const actions=text('div','','inspect-actions');
+    actions.append(button(`Add ${o} and ${a}`,'button primary',()=>decideJoiner(joiner,'add')),button('Decline','button secondary',()=>decideJoiner(joiner,'decline')));
+    body.append(actions);
+  },()=>{const next=state?.relay?.joiners?.find(entry=>entry.invite_id===joiner.invite_id);if(next)openJoinerPanel(next);else inspect.hide({restoreFocus:false});});
+}
+function decideJoiner(joiner,decision){
+  const o=cap(plain(joiner.owner_id,'them'));
+  performWrite(`/api/invites/${joiner.invite_id}/joiner`,{decision,review_digest:joiner.review_digest},{onSuccess:result=>{
+    inspect.hide({restoreFocus:false});
+    if(result.decided!==true)notice(joinProblem(result.reason,o));
+    else notice(result.added?`${o} is connected. You can send each other proposals now, and each one still needs a yes.`:`Declined. ${o} was not added.`,true);
+  }});
+}
+function renderRelayStrip(){
+  const relay=state.relay,strip=text('section','','relay-strip');
+  const head=text('div','','relay-head'),words=text('div','');words.append(text('h3','Connect with someone','item-title'),text('p','Invite someone with a link or a QR code, or join with a link you were sent. No keys to copy.','relay-note'));
+  const actions=text('div','','relay-actions');actions.append(button('Invite someone','button primary',openInviteDialog),button('Join with a link','button secondary',()=>openJoinDialog()));
+  head.append(words,actions);strip.append(head);
+  for(const joiner of relay.joiners){
+    const o=cap(plain(joiner.owner_id,'Someone')),a=plain(joiner.agent_id,'Assistant'),row=text('div','','relay-row needs-you');
+    row.append(ownerPair(o,a,'owner-pair','look'),text('span',`${o} and ${a} used ${joiner.label?`your invite for ${joiner.label}`:'your invite'}`),button('Check and add','button primary row-action',()=>openJoinerPanel(joiner)));strip.append(row);
+  }
+  for(const invite of relay.invites.filter(entry=>entry.state==='open')){
+    const row=text('div','','relay-row'),label=text('span','');label.append(text('strong',invite.label||'Invite'),text('span',` · code ${invite.code} · ${expiresIn(invite.join_by)}`,'relay-note'));
+    row.append(label,button('Show again','button secondary row-action',()=>showInviteAgain(invite)),button('Revoke','button secondary row-action',()=>performWrite(`/api/invites/${invite.id}/revoke`,{},{onSuccess:()=>notice('Invite revoked. Nobody can join with it now.',true)})));strip.append(row);
+  }
+  const line=syncLine(relay.last_sync);if(line)strip.append(text('p',line,'relay-sync'));
+  $('item-list').append(strip);
+}
+// Fetching from the relay while you are signed in brings in joins, receipts and new items. It
+// never accepts anything. Sending happens only when you release, decide or press Sync.
+async function relaySync(send,{announce=false}={}){
+  if(!token||!relayEnabled(state)||relayBusy||(send&&(busy||uncertainty.pending())))return;
+  const epoch=generation;relayBusy=true;const release=send?operations.acquire():()=>{};
+  try{
+    const summary=await request('/api/relay/sync',{method:'POST',body:{send}});
+    if(epoch!==generation)return;
+    if(syncChanged(summary)||announce)await refresh();
+    if(announce)notice(syncLine(summary),summary.relay==='ok');
+    else if(summary.relay!=='ok'&&send)notice(syncLine(summary));
+  }catch(error){if(epoch===generation&&(send||error.unauthorised))handleFailure(error);}
+  finally{relayBusy=false;release();}
+}
+setInterval(()=>{if(document.visibilityState==='visible'&&!busy&&!uncertainty.pending())relaySync(false);},15000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!busy&&!uncertainty.pending())relaySync(false);});

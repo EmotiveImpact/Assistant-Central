@@ -27,7 +27,7 @@ jobs:
       - name: Verify alternative server boundaries
         run: python -B -m unittest discover -s workspace_ui/tests -p 'test_*.py' -v
       - name: Verify workspace projections
-        run: node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs workspace_ui/tests/missions.test.mjs workspace_ui/tests/approvals.test.mjs workspace_ui/tests/bots.test.mjs workspace_ui/tests/home.test.mjs workspace_ui/tests/depth.test.mjs workspace_ui/tests/queue.test.mjs workspace_ui/tests/decide.test.mjs workspace_ui/tests/team.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
+        run: node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs workspace_ui/tests/missions.test.mjs workspace_ui/tests/approvals.test.mjs workspace_ui/tests/bots.test.mjs workspace_ui/tests/home.test.mjs workspace_ui/tests/depth.test.mjs workspace_ui/tests/queue.test.mjs workspace_ui/tests/decide.test.mjs workspace_ui/tests/team.test.mjs workspace_ui/tests/qr.test.mjs workspace_ui/tests/invites.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
       - name: Exercise actual owner API in Chromium
         shell: bash
         run: |
@@ -62,6 +62,22 @@ jobs:
             WORKSPACE_PASSWORD='Fictional browser test password' \
             WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/central-workspace-evidence" \
             node workspace_ui/tests/transfers.browser.test.mjs
+      - name: Connect two copies of Parlu from one invite link in Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B -m workspace_ui.invite_fixture --relay-port 8790 --edem-port 8791 --maya-port 8792 > "$RUNNER_TEMP/central-invites.log" 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid" 2>/dev/null || true' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS http://127.0.0.1:8792/ > /dev/null; then break; fi
+            sleep 1
+          done
+          NODE_PATH="$RUNNER_TEMP/central-browser/node_modules" \
+            RELAY_URL=http://127.0.0.1:8790 EDEM_URL=http://127.0.0.1:8791 MAYA_URL=http://127.0.0.1:8792 \
+            WORKSPACE_PASSWORD='Fictional browser test password' \
+            WORKSPACE_SCREENSHOT_DIR="$RUNNER_TEMP/central-workspace-evidence" \
+            node workspace_ui/tests/invites.browser.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

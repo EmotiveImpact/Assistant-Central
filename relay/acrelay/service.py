@@ -4,6 +4,8 @@
 ``Relay.handle(method, target, headers, body)`` returns ``(status, headers, body)``
 so the same code runs under a local HTTP server, a test, or a serverless function.
 """
+import base64
+import hashlib
 import json
 import re
 import secrets
@@ -24,6 +26,15 @@ MAX_GRANT_SECONDS = 365 * 86400
 MAX_GRANT_PACKETS = 100_000
 MAX_FETCH = 100
 GRANT_ID = re.compile(r'[0-9a-f]{32}\Z')
+PARLU_LOCAL = 'http://127.0.0.1:8877/'
+# Parlu runs on a computer. On a phone, loopback would point at the phone itself, so the page
+# offers to copy the link instead of a button that cannot reach Parlu.
+INVITE_SCRIPT = ("var a=document.getElementById('open'),c=document.getElementById('copy');"
+                 "if(location.hash.length>1){if(matchMedia('(pointer:coarse)').matches){c.hidden=false;"
+                 "c.onclick=function(){navigator.clipboard.writeText(location.href).then(function(){"
+                 "c.textContent='Copied. Open it in Parlu on your computer.';});};}else{"
+                 "a.href=a.href+'#join='+encodeURIComponent(location.href);a.hidden=false;}}")
+INVITE_SCRIPT_HASH = 'sha256-' + base64.b64encode(hashlib.sha256(INVITE_SCRIPT.encode()).digest()).decode()
 
 
 def _json(status, value):
@@ -222,16 +233,29 @@ class Relay:
                      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'"}, page.encode()
 
     def _invite_page(self):
+        # The invite itself sits after "#", which browsers never send, so this page never sees
+        # it. A small script hands the whole address to Parlu on this computer, again after "#".
         page = ('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
-                '<title>Assistant Central invite</title>'
-                '<body style="font:16px system-ui;max-width:36rem;margin:3rem auto;padding:0 1rem">'
-                '<h1>You have an Assistant Central invite</h1>'
-                '<p>Open this link in Assistant Central, or copy the whole address into Central under '
-                '<b>Add a person</b>. The part after <code>#</code> stays on your device and was never sent here.</p>'
-                f'<p><a href="{self.source_url}">Relay source code (AGPL-3.0)</a></p>')
+                '<title>Parlu invite</title><style>[hidden]{display:none!important}</style>'
+                '<body style="font:16px system-ui;max-width:36rem;margin:3rem auto;padding:0 1rem;'
+                'background:#fff;color:#1d1d1f">'
+                '<h1>You have a Parlu invite</h1>'
+                '<p>Someone wants their assistant and yours to work together. Joining lets you send each '
+                'other proposals. It never agrees to anything for you.</p>'
+                f'<p><a id="open" href="{PARLU_LOCAL}" hidden '
+                'style="display:inline-block;background:#0f766e;color:#fff;padding:.7rem 1.1rem;'
+                'border-radius:.6rem;text-decoration:none">Open in Parlu on this computer</a>'
+                '<button id="copy" type="button" hidden style="font:inherit;background:#0f766e;color:#fff;'
+                'border:0;padding:.7rem 1.1rem;border-radius:.6rem">Copy this invite</button></p>'
+                '<p>Or open Parlu on your computer, choose <b>Join with a link</b> and paste this whole address. '
+                'The part after '
+                '<code>#</code> stays on your device and was never sent here.</p>'
+                f'<p><a href="{self.source_url}">Relay source code (AGPL-3.0)</a></p>'
+                f'<script>{INVITE_SCRIPT}</script>')
         return 200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store',
-                     'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'"}, page.encode()
-
+                     'Referrer-Policy': 'no-referrer',
+                     'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; "
+                                                f"script-src '{INVITE_SCRIPT_HASH}'"}, page.encode()
 
 def _int(query, name, default):
     values = query.get(name)

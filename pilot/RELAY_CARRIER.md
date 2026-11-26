@@ -57,3 +57,34 @@ imported signed receipt changes delivery state.
 
 The relay client and protocol this module uses are Apache-2.0. Only the relay
 service itself is AGPL-3.0.
+
+## Invite links in Parlu
+
+`pilot/relay_link.py` lets two people connect from one link, inside Parlu,
+with no fingerprints to paste. `workspace_ui/relay_service.py` puts it behind
+the owner's own session when Parlu starts with `--relay <address>`.
+
+1. **Invite.** The inviter's copy makes a mailbox on the relay (once) and a send
+   grant that allows four packets. The link carries the relay and mailbox, the
+   send token, a random join secret and the inviter's public identity. Both
+   people see a short code: a slow hash of everything in the link, so a swapped
+   link shows a different code.
+2. **Join.** The joiner's copy enrols the inviter from the link and posts one
+   sealed `join` packet: its own public identity and mailbox, a fresh send token
+   it made for the inviter, and a proof keyed with the join secret. The packet
+   is encrypted to the inviter and signed, and does not name the sender to the
+   relay.
+3. **Add.** The inviter's copy checks the proof and the signature and shows the
+   person. Nothing is enrolled until the owner adds them. Adding posts one
+   sealed `welcome` packet with a fresh send token, and revokes the invite
+   token. The first valid join wins; later joins under the same link are
+   ignored.
+4. **Carry.** `sync` fetches into the same authenticated receive step every
+   other carrier uses, returns the original receipts, and posts each released
+   packet once. A packet is acknowledged on the relay only after it was kept or
+   refused. Parlu fetches while the owner is signed in; it sends when the owner
+   releases, decides or presses **Sync exchange**.
+
+Tokens and the join secret are sealed to the owner's key at rest
+(`relay-link.sqlite`, mode 0600). A relay answer is only ever "stored" or "not
+stored", never delivery, acceptance or permission. Nothing here calls a model.

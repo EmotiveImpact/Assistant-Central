@@ -34,7 +34,7 @@
    <footer class="workspace-footer"><span class="footer-state"><span class="status-dot"></span><span id="connection-status">Checking state</span></span><span id="provider-status">Live provider calls disabled</span><button id="sync" type="button" class="text-button" title="Local loopback exchange only. Use Transfers for configured HTTPS delivery.">Sync exchange <svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button></footer>
   </div>
   <nav class="glass-bar" aria-label="Quick navigation"><a class="glass-pill glass-square" href="#overview" aria-label="Home"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></a><a class="glass-pill glass-mid" href="#activity"><svg class="icon" aria-hidden="true"><use href="#i-recents"/></svg> Recents</a><button id="glass-plus" class="glass-pill glass-square" type="button" aria-label="Quick actions" aria-expanded="false" aria-controls="quick-menu"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button></nav>
-  <div id="quick-menu" class="quick-menu" hidden><button type="button" data-quick="proposal">New proposal</button><button type="button" data-quick="team">New team mission</button><button type="button" data-quick="mission">Mission agreements</button><button type="button" data-quick="assistant">Enrol an assistant</button></div>
+  <div id="quick-menu" class="quick-menu" hidden><button type="button" data-quick="proposal">New proposal</button><button type="button" data-quick="team">New team mission</button><button type="button" data-quick="mission">Mission agreements</button><button type="button" data-quick="invite">Invite someone</button><button type="button" data-quick="join">Join with a link</button><button type="button" data-quick="assistant">Enrol an assistant</button></div>
  </main>
  <aside id="inspect" class="inspect-panel" aria-labelledby="inspect-title" hidden><header class="inspect-head"><button id="inspect-back" class="text-button inspect-back mobile-only" type="button">‹ Back</button><div class="inspect-heading"><h2 id="inspect-title"></h2><p id="inspect-sub"></p></div><button id="inspect-pin" class="button secondary inspect-pin" type="button" aria-pressed="false">Pin open</button><button id="inspect-close" class="icon-button inspect-close" type="button" aria-label="Close panel">×</button></header><div id="inspect-body" class="inspect-body"></div></aside>
 </div>
@@ -94,6 +94,46 @@
         <p id="peer-message" class="form-message full" role="status" aria-live="polite"></p>
       </div>
       <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Cancel</button><button class="button primary" type="submit">Enrol this exact peer</button></footer>
+    </form>
+  </dialog>
+  <dialog id="invite-dialog" aria-labelledby="invite-title">
+    <form id="invite-form">
+      <header class="dialog-header"><div><div class="eyebrow">INVITE SOMEONE</div><h2 id="invite-title">Invite someone</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close invite">×</button></header>
+      <div id="invite-make" class="dialog-body form-grid">
+        <p class="form-intro full">Make a link for one person. They open it in their own Parlu, then you both check the same short code. Nothing is shared until you add them.</p>
+        <label class="full">Who is it for? <span class="optional">Optional, only you see this</span><input name="label" maxlength="40" autocomplete="off" placeholder="For example, Maya"></label>
+        <label>Link works for<select name="hours"><option value="1">1 hour</option><option value="24" selected>1 day</option><option value="168">7 days</option></select></label>
+        <p id="invite-message" class="form-message full" role="status" aria-live="polite"></p>
+      </div>
+      <div id="invite-ready" class="dialog-body invite-ready" hidden>
+        <div class="invite-qr" id="invite-qr" role="img" aria-label="QR code for the invite link"></div>
+        <div class="invite-side">
+          <p class="form-intro">Send this link to the person you want to connect with, or let them scan the code. Treat it like a password: anyone holding it can ask to join.</p>
+          <div class="pair-code" id="invite-code" aria-label="Code to check"></div>
+          <p class="scope-note">When they join, check that they see the same code.</p>
+          <label class="full">Link<input id="invite-link" readonly spellcheck="false"></label>
+          <dl class="invite-facts"><dt>Expires</dt><dd id="invite-expires"></dd><dt>Shares</dt><dd>Your name, your assistant's name and its public keys. Nothing else.</dd></dl>
+          <p id="invite-copied" class="form-message" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+      <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Done</button><button id="invite-copy" class="button secondary" type="button" hidden>Copy link</button><button id="invite-submit" class="button primary" type="submit">Make the link</button></footer>
+    </form>
+  </dialog>
+  <dialog id="join-dialog" aria-labelledby="join-title">
+    <form id="join-form">
+      <header class="dialog-header"><div><div class="eyebrow">JOIN WITH A LINK</div><h2 id="join-title">Join with a link</h2></div><button class="close-dialog icon-button" type="button" aria-label="Close join">×</button></header>
+      <div id="join-paste" class="dialog-body form-grid">
+        <p class="form-intro full">Paste the invite link someone sent you. Parlu shows who it is from before anything is added or sent.</p>
+        <label class="full">Invite link<textarea id="join-link" name="link" rows="3" required spellcheck="false" autocomplete="off" placeholder="https://parlu-relay.vercel.app/invite#…"></textarea></label>
+      </div>
+      <div id="join-review" class="dialog-body join-review" hidden>
+        <div class="join-who" id="join-who"></div>
+        <div class="pair-code" id="join-code" aria-label="Code to check"></div>
+        <p class="scope-note" id="join-check"></p>
+        <dl class="invite-facts" id="join-facts"></dl>
+      </div>
+      <p id="join-message" class="form-message join-message" role="status" aria-live="polite"></p>
+      <footer class="dialog-footer"><button class="button secondary close-dialog" type="button">Not now</button><button id="join-submit" class="button primary" type="submit">Check the link</button></footer>
     </form>
   </dialog>
   <dialog id="team-dialog" aria-labelledby="team-title">

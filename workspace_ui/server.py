@@ -13,6 +13,7 @@ from pilot.server import PilotHTTPServer, PilotHandler, RequestDenied, WEB
 from pilot.owner_transfer import load_config
 from workspace_ui.host_draft_service import HostDraftService, load_host_draft_config
 from workspace_ui.conversation_service import ConversationService, load_conversation_config
+from workspace_ui.relay_service import RelayService
 
 
 ROOT = Path(__file__).resolve().parent
@@ -35,6 +36,8 @@ STATIC_FILES = {
     "/decide.mjs": (ROOT / "decide.mjs", "text/javascript; charset=utf-8"),
     "/depth.mjs": (ROOT / "depth.mjs", "text/javascript; charset=utf-8"),
     "/team.mjs": (ROOT / "team.mjs", "text/javascript; charset=utf-8"),
+    "/qr.mjs": (ROOT / "qr.mjs", "text/javascript; charset=utf-8"),
+    "/invites.mjs": (ROOT / "invites.mjs", "text/javascript; charset=utf-8"),
     "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
     "/InterVariable.woff2": (ROOT / "InterVariable.woff2", "font/woff2"),
     "/PlusJakartaSansVariable.woff2": (ROOT / "PlusJakartaSansVariable.woff2", "font/woff2"),
@@ -68,9 +71,13 @@ class WorkspaceHandler(PilotHandler):
 
 
 class WorkspaceHTTPServer(PilotHTTPServer):
-    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None, conversation_config=None, host_draft_config=None):
+    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None, conversation_config=None, host_draft_config=None, relay_url=None):
         super().__init__(directory, port, synthetic_workflow=synthetic_workflow, transfer_config=transfer_config)
         try:
+            if relay_url is not None:
+                # Innermost, so the owner's own routes gain invites and relay delivery
+                # whichever optional services are layered on top.
+                self.owner = self.owner_worker.submit(RelayService, self.owner, relay_url).result()
             if conversation_config is not None:
                 self.owner = self.owner_worker.submit(ConversationService, self.owner, conversation_config).result()
         except BaseException:
@@ -98,6 +105,8 @@ def main(argv=None):
     serve.add_argument("--transfer-config", help="Private host-selected HTTPS connection JSON; no automatic transfer")
     serve.add_argument("--conversation-config", help="Private host configuration for existing local owner accounts; disabled by default")
     serve.add_argument("--host-draft-config", help="Private host-selected inert draft review configuration; no automatic action")
+    serve.add_argument("--relay", help="Relay address for invite links and delivery between people, for example "
+                       "https://parlu-relay.vercel.app. Off unless given")
     args = parser.parse_args(argv)
     if args.port != 0 and not 1024 <= args.port <= 65535:
         parser.error("Choose a loopback port from 1024 to 65535, or 0 for an ephemeral port")
@@ -109,8 +118,9 @@ def main(argv=None):
     server = WorkspaceHTTPServer(directory, args.port, synthetic_workflow=args.synthetic_workflow,
                                  transfer_config=load_config(args.transfer_config) if args.transfer_config else None,
                                  conversation_config=load_conversation_config(args.conversation_config) if args.conversation_config else None,
-                                 host_draft_config=load_host_draft_config(args.host_draft_config) if args.host_draft_config else None)
-    print(json.dumps({"url": server.origin, "synthetic_only": True,
+                                 host_draft_config=load_host_draft_config(args.host_draft_config) if args.host_draft_config else None,
+                                 relay_url=args.relay)
+    print(json.dumps({"url": server.origin, "synthetic_only": True, "relay": args.relay,
                       "live_provider_enabled": False,
                       "synthetic_workflow_enabled": args.synthetic_workflow}), flush=True)
     try:
