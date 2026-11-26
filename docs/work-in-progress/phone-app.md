@@ -13,5 +13,7 @@
   in this work.
 - Claimed files: `phone_app/**`, `.github/workflows/phone-app.yml`, this notice, and a
   small opt-in phone address option in `workspace_ui/server.py` with its tests.
-- Verification planned: TypeScript check, Jest tests for the API client and screens'
-  logic, a web and Android bundle export in CI, and screenshots of the running app.
+- Verification: TypeScript check, Jest tests (API client, Home, demo flows), Android,
+  iOS and web bundle exports in CI, the workspace server tests including
+  `test_phone_host.py`, and screenshots of the running app (browser preview).
+- Status: first version implemented in PR #52.

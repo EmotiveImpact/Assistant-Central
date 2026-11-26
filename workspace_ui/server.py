@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import stat
 
 from pilot.server import PilotHTTPServer, PilotHandler, RequestDenied, WEB
@@ -44,9 +45,39 @@ STATIC_FILES = {
     "/PlusJakartaSansVariable.woff2": (ROOT / "PlusJakartaSansVariable.woff2", "font/woff2"),
 }
 MAX_STATIC_BYTES = 2 * 1024 * 1024
+# A private name the owner's phone reaches this loopback server through, such as a
+# Tailscale name served by `tailscale serve`. Letters, digits, dots and hyphens, an
+# optional port. Never an address that would widen what the server listens on.
+PHONE_HOST = re.compile(r'(?=.{4,253}(?::[0-9]{1,5})?$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+(?::[0-9]{1,5})?')
+
+
+def phone_host(value):
+    """The exact Host header the phone app arrives with, or an error."""
+    host = str(value or '').strip().lower()
+    if not PHONE_HOST.fullmatch(host) or host.split(':')[0] in ('localhost',) or re.fullmatch(r'[0-9.]+(?::[0-9]+)?', host):
+        raise ValueError('Give the private name your phone uses, for example my-mac.tail1234.ts.net')
+    return host
 
 
 class WorkspaceHandler(PilotHandler):
+    def _headers(self):
+        # The phone app is a native client: it arrives through the owner's own private
+        # tunnel with that tunnel's name as Host, and sends no Origin. A web page on any
+        # other site would send an Origin and is refused. Only the owner API is reachable
+        # this way: no workspace page and no peer inbox.
+        phone = getattr(self.server, 'phone_host', None)
+        if phone is not None and self.headers.get_all('Host', []) == [phone]:
+            if self.headers.get_all('Origin', []):
+                raise RequestDenied('Invalid request origin')
+            if not self.path.startswith('/api/'):
+                raise RequestDenied('Only the owner API is available to the phone')
+            if self.headers.get('Transfer-Encoding') is not None:
+                raise RequestDenied('Chunked requests are not supported')
+            if '?' in self.path or '#' in self.path or len(self.path) > 256:
+                raise RequestDenied('Unexpected request target')
+            return
+        return super()._headers()
+
     def do_GET(self):
         if self.path.startswith("/api/"):
             return super().do_GET()
@@ -72,8 +103,10 @@ class WorkspaceHandler(PilotHandler):
 
 
 class WorkspaceHTTPServer(PilotHTTPServer):
-    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None, conversation_config=None, host_draft_config=None, relay_url=None):
+    def __init__(self, directory, port=0, *, synthetic_workflow=False, transfer_config=None, conversation_config=None, host_draft_config=None, relay_url=None, phone_host=None):
         super().__init__(directory, port, synthetic_workflow=synthetic_workflow, transfer_config=transfer_config)
+        # Still bound to 127.0.0.1 only. This adds one more exact Host name, nothing else.
+        self.phone_host = phone_host
         try:
             if relay_url is not None:
                 # Innermost, so the owner's own routes gain invites and relay delivery
@@ -108,9 +141,17 @@ def main(argv=None):
     serve.add_argument("--host-draft-config", help="Private host-selected inert draft review configuration; no automatic action")
     serve.add_argument("--relay", help="Relay address for invite links and delivery between people, for example "
                        "https://parlu-relay.vercel.app. Off unless given")
+    serve.add_argument("--phone-host", help="The private name the Parlu phone app reaches this computer by, for example "
+                       "my-mac.tail1234.ts.net with `tailscale serve`. The server still listens on loopback only. Off unless given")
     args = parser.parse_args(argv)
     if args.port != 0 and not 1024 <= args.port <= 65535:
         parser.error("Choose a loopback port from 1024 to 65535, or 0 for an ephemeral port")
+    phone = None
+    if args.phone_host is not None:
+        try:
+            phone = phone_host(args.phone_host)
+        except ValueError as problem:
+            parser.error(str(problem))
     # Require an existing account. Provisioning and password operations remain
     # the pilot's separately reviewed terminal flows.
     directory = Path(args.directory)
@@ -120,8 +161,8 @@ def main(argv=None):
                                  transfer_config=load_config(args.transfer_config) if args.transfer_config else None,
                                  conversation_config=load_conversation_config(args.conversation_config) if args.conversation_config else None,
                                  host_draft_config=load_host_draft_config(args.host_draft_config) if args.host_draft_config else None,
-                                 relay_url=args.relay)
-    print(json.dumps({"url": server.origin, "synthetic_only": True, "relay": args.relay,
+                                 relay_url=args.relay, phone_host=phone)
+    print(json.dumps({"url": server.origin, "synthetic_only": True, "relay": args.relay, "phone_host": phone,
                       "live_provider_enabled": False,
                       "synthetic_workflow_enabled": args.synthetic_workflow}), flush=True)
     try:

@@ -1,0 +1,45 @@
+name: Parlu phone app
+on:
+  push:
+    paths:
+      - 'phone_app/**'
+      - 'workspace_ui/*.mjs'
+      - 'pilot/web/*.mjs'
+      - '.github/workflows/phone-app.yml'
+  pull_request:
+    paths:
+      - 'phone_app/**'
+      - 'workspace_ui/*.mjs'
+      - 'pilot/web/*.mjs'
+      - '.github/workflows/phone-app.yml'
+permissions:
+  contents: read
+jobs:
+  phone-app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: phone_app
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: phone_app/package-lock.json
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Type check
+        run: npx tsc --noEmit
+      - name: Tests, including the desktop's own Home, queue, team and invite logic
+        run: npx jest --ci
+      - name: Bundle for Android, iOS and the browser preview
+        env:
+          EXPO_NO_TELEMETRY: '1'
+        run: |
+          npx expo export --platform android --output-dir "$RUNNER_TEMP/android"
+          npx expo export --platform ios --output-dir "$RUNNER_TEMP/ios"
+          npx expo export --platform web --output-dir "$RUNNER_TEMP/web"
