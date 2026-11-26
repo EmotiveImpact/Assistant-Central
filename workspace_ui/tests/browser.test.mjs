@@ -283,6 +283,58 @@ try {
   assert.equal(await page.evaluate(()=>window.artifactExecuted),undefined);
   await closeReview();
 
+  // Team missions: your assistant leads, and every part is a proposal reviewed on its own.
+  await nav('team');
+  assert.match(await page.locator('#team-view').textContent(),/No team missions yet\./);
+  assert.equal(await page.locator('#navigation [data-view="money"]').getAttribute('class'),'nav-link active','team missions live in Money');
+  const beforeTeam=writes.length;
+  await page.locator('#team-view').getByRole('button',{name:'Start a team mission',exact:true}).click();
+  await page.locator('#team-dialog').waitFor({state:'visible'});
+  assert.equal(await page.locator('#team-parts .team-part-row').count(),2);
+  await page.locator('#team-form [name="mission"]').fill('Supper club app');
+  const teamRows=page.locator('#team-parts .team-part-row');
+  await teamRows.nth(0).locator('[name="part_title"]').fill('Card deposits');
+  await teamRows.nth(0).locator('[name="part_text"]').fill('SYNTHETIC ONLY: Take a card deposit when a guest books.');
+  await teamRows.nth(1).locator('[name="part_title"]').fill('Calendar sync');
+  await teamRows.nth(1).locator('[name="part_text"]').fill('SYNTHETIC ONLY: Keep the supper club calendar in step.');
+  await checkContrast();await screenshot('central-platform-team-new.png');
+  await page.getByRole('button',{name:'Create the parts for review',exact:true}).click();
+  await page.locator('#team-message').filter({hasText:'fictional'}).waitFor();
+  assert.equal(writes.length,beforeTeam,'nothing is created until the content is confirmed as fictional');
+  await page.locator('#team-form [name="team_synthetic"]').check();
+  await page.getByRole('button',{name:'Create the parts for review',exact:true}).click();
+  await page.locator('#team-dialog').waitFor({state:'hidden'});
+  const teamWrites=writes.slice(beforeTeam);
+  assert.deepEqual(teamWrites.map(write=>write.path),['/api/proposals','/api/proposals']);
+  assert.equal(teamWrites[0].body.context,teamWrites[1].body.context,'every part shares one mission context');
+  assert.notEqual(teamWrites[0].body.peer_id,teamWrites[1].body.peer_id,'each part goes to a different assistant');
+  assert.deepEqual(teamWrites.map(write=>write.body.title),['Supper club app: Card deposits','Supper club app: Calendar sync']);
+  await page.locator('#team-view .team-part').nth(1).waitFor();
+  assert.equal(await page.locator('#team-view .team-title').textContent(),'Supper club app');
+  assert.equal(await page.locator('#team-view .team-line').textContent(),'0 of 2 parts are done. 2 parts are ready for you to send.');
+  assert.deepEqual(await page.locator('#team-view .team-part').evaluateAll(nodes=>nodes.map(node=>node.dataset.step)),['Plan','Plan']);
+  assert.equal(await page.locator('#team-view .team-seg').count(),2);
+  await noOverflow();await checkContrast();await screenshot('central-platform-team.png');
+  await page.locator('#team-view .team-part').first().getByRole('button',{name:'Details',exact:true}).click();
+  await page.locator('#inspect').waitFor({state:'visible'});
+  assert.equal(await page.locator('#inspect-title').textContent(),'Card deposits');
+  assert.match(await page.locator('#inspect-sub').textContent(),/^Part of Supper club app/);
+  await screenshot('central-platform-team-part.png');
+  await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
+  await page.locator('[data-team-tab="people"]').click();
+  assert.equal(await page.locator('#team-view .team-person').count(),2);
+  await page.locator('[data-team-tab="parts"]').click();
+  await page.setViewportSize({width:390,height:844});await noOverflow();
+  await screenshot('central-platform-team-mobile.png');
+  await page.setViewportSize({width:1440,height:1000});
+  await page.locator('#team-view .team-part').first().getByRole('button',{name:'Review and send',exact:true}).click();
+  await page.locator('#review-dialog').waitFor({state:'visible'});
+  assert.equal(await page.locator('#review-title').textContent(),'Supper club app: Card deposits');
+  await closeReview();
+  await nav('money');
+  assert.match(await page.locator('#mission-rows .team-row').textContent(),/Supper club app/);
+  assert.equal(writes.length,beforeTeam+2,'browsing a team mission never writes');
+
   // Commit a release but lose its response. A second click must not retry it.
   await nav('outbox');await openItem('Draft the launch announcement');
   let interruptedPath=null,interruptionCount=0;

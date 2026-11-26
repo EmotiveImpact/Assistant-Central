@@ -829,3 +829,55 @@ body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-w
   #review-dialog::before{content:"";display:block;width:38px;height:5px;border-radius:5px;background:#dcdcd9;margin:8px auto 0}
   .decide-question{font-size:18px}
 }
+/* ===== Team missions (Full App mock): one piece of work split across several people's assistants.
+   Your assistant leads; every part is a proposal reviewed on its own, and progress comes from saved states. ===== */
+.team-view{display:grid;gap:14px;align-content:start;max-width:880px}
+.team-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.team-heading{display:grid;gap:4px;min-width:0;flex:1}
+.team-lead{justify-self:start;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--text);color:var(--bg);border-radius:999px;padding:2px 8px}
+.team-title{font-size:26px;letter-spacing:-.03em;line-height:1.1;margin:0;font-weight:700}
+.team-meta{margin:0;font-size:12.5px;color:var(--muted)}
+.team-all{margin-left:auto}
+.team-line{margin:0;font-size:15px;line-height:1.5;color:var(--secondary);max-width:640px}
+.team-progress{display:flex;gap:4px}
+.team-seg{flex:1;height:8px;border-radius:999px;background:var(--line);position:relative;overflow:hidden}
+.team-seg i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:999px}
+.team-seg.stopped i{background:var(--faint)}
+.team-members{display:flex;flex-wrap:wrap;gap:6px}
+.team-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 4px;font-size:11.5px;color:var(--secondary)}
+.team-chip .owner-pair{gap:2px}.team-chip .owner-pair .person-dot{width:20px;height:20px;font-size:10px}.team-chip .owner-pair .bot-avatar{width:22px;height:22px}
+.team-tabs{margin:2px 0 0}
+.team-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.team-part{border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:10px;background:var(--bg);align-content:start}
+.team-part.needs-you{border-color:var(--sun);box-shadow:0 0 0 3px var(--sun-bg)}
+.team-part-head{display:flex;align-items:center;gap:10px;min-width:0}
+.team-part-name{display:grid;gap:1px;min-width:0;flex:1}
+.team-part-name strong{font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-part-who{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-pill{flex:none;font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--line-soft);color:var(--secondary);white-space:nowrap}
+.team-pill.needs{background:var(--sun-bg);color:var(--sun-on)}
+.team-pill.done{background:var(--accent-bg);color:var(--accent-on)}
+.team-steps{display:flex;gap:5px;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.team-steps li{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--raised);color:var(--muted)}
+.team-steps li.past{color:var(--secondary);font-weight:700}
+.team-steps li.past::before{content:'✓ ';color:var(--accent-on)}
+.team-steps li.now{background:var(--accent-bg);color:var(--accent-on)}
+.team-part[data-step=Stopped] .team-steps li{text-decoration:line-through;color:var(--muted);background:var(--raised)}
+.team-part-actions{display:flex;gap:8px;flex-wrap:wrap}
+.team-people{display:grid;gap:10px}
+.team-person .inspect-row>span:first-child{color:var(--text)}
+.team-start{justify-self:start}
+.team-empty .button{margin-top:14px}
+.team-parts{display:grid;gap:10px}
+.team-part-row{border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px;min-width:0}
+.team-part-row legend{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:0 4px}
+.team-part-row label{display:grid;gap:4px;font-size:12.5px;min-width:0}
+.team-part-row label.full{grid-column:1/-1}
+.team-add{grid-column:1/-1;justify-self:start}
+body.inspect-open .team-parts-grid{grid-template-columns:minmax(0,1fr)}
+@media(max-width:700px){
+  .team-title{font-size:22px}
+  .team-parts-grid{grid-template-columns:minmax(0,1fr)}
+  .team-part-row{grid-template-columns:minmax(0,1fr)}
+  .team-all{margin-left:0}
+}

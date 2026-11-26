@@ -10,7 +10,7 @@ export const SECTIONS = Object.freeze({
     tabs: [['activity', 'Activity'], ['receipts', 'Receipts'], ['tasks', 'All work']]},
   assistants: {label: 'Assistants', views: ['peers', 'conversations', 'transfers'],
     tabs: [['peers', 'Network'], ['conversations', 'Conversations'], ['transfers', 'Connections']]},
-  money: {label: 'Money', views: ['money']},
+  money: {label: 'Money', views: ['money', 'team']},
 });
 
 // All work is one tab with filters; each filter is one of the existing screens.

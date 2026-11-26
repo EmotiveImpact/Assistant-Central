@@ -34,6 +34,7 @@ STATIC_FILES = {
     "/queue.mjs": (ROOT / "queue.mjs", "text/javascript; charset=utf-8"),
     "/decide.mjs": (ROOT / "decide.mjs", "text/javascript; charset=utf-8"),
     "/depth.mjs": (ROOT / "depth.mjs", "text/javascript; charset=utf-8"),
+    "/team.mjs": (ROOT / "team.mjs", "text/javascript; charset=utf-8"),
     "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
     "/InterVariable.woff2": (ROOT / "InterVariable.woff2", "font/woff2"),
     "/PlusJakartaSansVariable.woff2": (ROOT / "PlusJakartaSansVariable.woff2", "font/woff2"),
