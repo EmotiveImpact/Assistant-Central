@@ -9,6 +9,7 @@ import {createApprovals,validateListing} from './approvals.mjs';
 import {homeQueue,CARD,askerOf,moreLine,closingLine,uncheckedParts} from './queue.mjs';
 import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
 import {holdButton} from './hold.mjs';
+import {activityLine,activityIsYours} from './activity.mjs';
 import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor,readRules,partText,resultText,accessText,readTeamText,ruleList,fitTitle,approvalsFor,computeFor,teamCompute,checksFor} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
@@ -799,20 +800,22 @@ function renderOverview() {
   renderHome();renderDone();
   if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
 }
+// A short, readable key like the mock's "7F3A 91C2". The full fingerprint is in the tooltip and in Open.
+function keyChip(fingerprint){const chip=text('span',shortKey(fingerprint).toUpperCase(),'key-chip');chip.title=String(fingerprint??'');return chip;}
 function renderPeers() {
   if(relayEnabled(state)&&!searchQuery)renderRelayStrip();
-  const own=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(state.identity.agent_id,'Your assistant'),'item-title'),text('div',plain(state.identity.owner_id)+' · Your assistant','item-meta'),text('p',state.identity.fingerprint,'peer-fingerprint'));
+  const own=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(state.identity.agent_id,'Your assistant'),'item-title'),text('div',`Yours · ${cap(plain(state.identity.owner_id,'You'))}`,'item-meta'),keyChip(state.identity.fingerprint));
   const identity=state.identity.public||Object.fromEntries(Object.entries(state.identity).filter(([key])=>['owner_id','agent_id','signing_key','exchange_key','version'].includes(key)));
   const right=text('div','','row-right');right.append(text('span','Your assistant','badge local'),button('View public identity','button secondary',()=>showPublicIdentity(identity,state.identity.fingerprint)));
-  own.append(nameAvatar(state.identity.agent_id,'peer-avatar local'),main,right);
+  own.append(ownerPair(cap(plain(state.identity.owner_id,'You')),plain(state.identity.agent_id,'Your assistant'),'owner-pair peer-pair'),main,right);
   if(matchesQuery([state.identity.agent_id,state.identity.owner_id,'your assistant'],searchQuery))$('item-list').append(own);
   const peers=state.peers.filter(peer=>matchesQuery([peer.agent_id,peer.owner_id,peer.peer_id,peer.fingerprint,peer.state],searchQuery));
   if(!state.peers.length&&!searchQuery){if(relayEnabled(state))empty('⊞','Good work is connected.','Invite someone with a link, or join with a link you were sent.',{label:'Invite someone',run:openInviteDialog});else empty('⊞','Good work is connected.','Exchange public identities with another owner and verify their full fingerprint.',{label:'Enrol a peer',run:openPeerDialog});return;}
   for(const peer of peers) {
-    const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',plain(peer.owner_id,'Owner'),'item-meta'));if(linkLabel(state,peer.peer_id))main.append(text('div',linkLabel(state,peer.peer_id),'relay-link-state'));main.append(text('p',peer.fingerprint,'peer-fingerprint'));
-    const right=text('div','','row-right');right.append(text('span',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable',isPeerActive(peer)?'badge accepted':'badge revoked'));
+    const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',`${cap(plain(peer.owner_id,'Owner'))}'s assistant`,'item-meta'));if(linkLabel(state,peer.peer_id))main.append(text('div',linkLabel(state,peer.peer_id),'relay-link-state'));main.append(keyChip(peer.fingerprint));
+    const right=text('div','','row-right');right.append(text('span',isPeerActive(peer)?'Connected':peer.state==='revoked'?'Removed':'Status unavailable',isPeerActive(peer)?'badge accepted':'badge revoked'));
     right.append(button('Open','button secondary row-action',()=>openAssistantPanel(peer)));
-    row.append(peerAvatar(peer.peer_id),main,right);$('item-list').append(row);
+    row.append(ownerPair(cap(plain(peer.owner_id,'Owner')),plain(peer.agent_id,'Assistant'),'owner-pair peer-pair'),main,right);$('item-list').append(row);
   }
   if(!$('item-list').childElementCount)empty('⌕','No matching assistants.','Try an assistant name, owner or fingerprint.',{label:'Clear search',run:clearSearch});
 }
@@ -822,14 +825,18 @@ function showPublicIdentity(identity,fingerprint) {
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
 function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
-function eventWhen(item){const when=finiteDate(item.created_at??item.time);return when===null?(Number.isSafeInteger(item.sequence)&&item.sequence>0?`Event #${item.sequence}`:'Event recorded'):datetime(when);}
 function renderHistory() {
-  const events=state.history.filter(item=>matchesQuery([eventLabel(item),item.item_id,item.id],searchQuery)).slice().reverse();
-  if(!events.length){empty('≋',searchQuery?'No matching activity.':'A clear record from the start.',searchQuery?'Try an event name or proposal identifier.':'Saved decisions and exchange events will appear here. An uncertain outcome stays uncertain until saved evidence resolves it.');return;}
+  const words=item=>activityLine(item,state);
+  const events=state.history.filter(item=>matchesQuery([words(item),eventLabel(item),item.item_id,item.id],searchQuery)).slice().reverse();
+  if(!events.length){empty('≋',searchQuery?'No matching activity.':'A clear record from the start.',searchQuery?'Try a name or the title of a piece of work.':'Saved decisions and exchange events will appear here. An uncertain outcome stays uncertain until saved evidence resolves it.');return;}
   for(const item of events) {
-    const row=text('article','','item-row activity-row');const main=text('div','','item-main');main.append(text('h3',eventLabel(item),'item-title'));
-    const id=plain(item.item_id)||plain(item.id);if(id)main.append(text('p',id,'peer-fingerprint'));
-    row.append(text('span','','event-dot'),main,text('time',eventWhen(item),'activity-time'));$('item-list').append(row);
+    // One plain sentence per event. The exact item, digests included, opens in its review.
+    const found=state.items.find(entry=>entry.id===item.item_id);
+    const row=text(found?'button':'article','','item-row activity-row');if(found){row.type='button';row.addEventListener('click',()=>openReview(found));}
+    const main=text('div','','item-main');main.append(text('h3',words(item),'item-title'));
+    const at=['proposal_created','proposal_received'].includes(item.event)?finiteDate(found?.created_at):finiteDate(item.created_at??item.time);
+    const dot=text('span','','event-dot');dot.dataset.side=activityIsYours(item)?'you':'them';
+    row.append(dot,main);if(at!==null)row.append(text('time',datetime(at),'activity-time'));$('item-list').append(row);
   }
 }
 // A team record reads as words in the review: the brief or summary, then the rules and checks.

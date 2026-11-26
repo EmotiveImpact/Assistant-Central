@@ -35,6 +35,7 @@ STATIC_FILES = {
     "/home.mjs": (ROOT / "home.mjs", "text/javascript; charset=utf-8"),
     "/queue.mjs": (ROOT / "queue.mjs", "text/javascript; charset=utf-8"),
     "/decide.mjs": (ROOT / "decide.mjs", "text/javascript; charset=utf-8"),
+    "/activity.mjs": (ROOT / "activity.mjs", "text/javascript; charset=utf-8"),
     "/depth.mjs": (ROOT / "depth.mjs", "text/javascript; charset=utf-8"),
     "/team.mjs": (ROOT / "team.mjs", "text/javascript; charset=utf-8"),
     "/qr.mjs": (ROOT / "qr.mjs", "text/javascript; charset=utf-8"),

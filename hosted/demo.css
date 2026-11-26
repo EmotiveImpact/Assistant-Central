@@ -7,3 +7,17 @@
 .demo-card-button{appearance:none;width:100%;border:0;border-radius:999px;background:#14897a;color:#fff;font:inherit;font-size:15px;font-weight:650;min-height:48px;margin-top:22px;cursor:pointer}
 .demo-or{display:block;text-align:center;font-size:12px;color:#7a766d;margin-top:18px}
 @media(min-width:701px){.demo-entry{flex-direction:row;align-items:center;justify-content:space-between}.demo-entry>div{max-width:640px}}
+
+/* Inside the public demo, match the approved mock: no developer labels, and on desktop a single
+   floating + in the bottom corner instead of the top "New proposal" button. The full app on an
+   owner's own computer keeps its status line and manual exchange. */
+.workspace-plan,.workspace-footer,#new-proposal{display:none!important}
+@media(min-width:701px){
+  .glass-bar{display:flex;position:fixed;right:28px;bottom:28px;left:auto;z-index:20;pointer-events:none}
+  .glass-bar>a{display:none}
+  .glass-bar #glass-plus{pointer-events:auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;padding:0;cursor:pointer;color:var(--text);background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(27,26,23,.08);box-shadow:0 8px 24px -8px rgba(27,26,23,.25)}
+  .glass-bar #glass-plus .icon{width:20px;height:20px}
+  .glass-bar #glass-plus.open{background:var(--sun);border-color:var(--sun)}
+  .quick-menu:not([hidden]){display:grid;position:fixed;right:28px;bottom:92px;z-index:21;gap:8px;justify-items:end}
+  .quick-menu button{border:1px solid var(--secondary);background:var(--text);color:#fff;border-radius:999px;padding:12px 18px;font-weight:600;font-size:14px;line-height:1;font-family:inherit;cursor:pointer}
+}
