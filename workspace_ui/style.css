@@ -871,6 +871,17 @@ body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-w
 .team-empty .button{margin-top:14px}
 .team-parts{display:grid;gap:10px}
 .team-part-row{border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px;min-width:0}
+.team-rules{display:flex;gap:5px;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.team-rule{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--raised);color:var(--secondary);max-width:100%;overflow-wrap:anywhere}
+.team-rule.must::first-letter{color:var(--accent-on)}
+.team-rule.must_not::first-letter{color:var(--danger-fg)}
+.team-rule.broken{background:var(--danger-bg);color:var(--danger-fg)}
+.team-compute,.team-access{margin:0;font-size:12.5px;color:var(--secondary)}
+.team-compute.over{color:var(--danger-fg);font-weight:600}
+.team-access.needs{color:var(--sun-on);font-weight:600}
+.team-checks{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:0;display:grid;gap:6px;min-width:0}
+.team-checks legend{font-size:12.5px;padding:0 4px}
+.team-checks .check-label span{overflow-wrap:anywhere}
 .team-part-row legend{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:0 4px}
 .team-part-row label{display:grid;gap:4px;font-size:12.5px;min-width:0}
 .team-part-row label.full{grid-column:1/-1}

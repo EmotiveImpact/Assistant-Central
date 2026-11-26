@@ -402,6 +402,9 @@ try {
   const teamRows=page.locator('#team-parts .team-part-row');
   await teamRows.nth(0).locator('[name="part_title"]').fill('Card deposits');
   await teamRows.nth(0).locator('[name="part_text"]').fill('SYNTHETIC ONLY: Take a card deposit when a guest books.');
+  await teamRows.nth(0).locator('[name="part_must"]').fill('Tests pass\nUse the design system');
+  await teamRows.nth(0).locator('[name="part_must_not"]').fill('Store card numbers');
+  await teamRows.nth(0).locator('[name="part_compute"]').fill('0.50');
   await teamRows.nth(1).locator('[name="part_title"]').fill('Calendar sync');
   await teamRows.nth(1).locator('[name="part_text"]').fill('SYNTHETIC ONLY: Keep the supper club calendar in step.');
   await checkContrast();await screenshot('central-platform-team-new.png');
@@ -416,16 +419,24 @@ try {
   assert.equal(teamWrites[0].body.context,teamWrites[1].body.context,'every part shares one mission context');
   assert.notEqual(teamWrites[0].body.peer_id,teamWrites[1].body.peer_id,'each part goes to a different assistant');
   assert.deepEqual(teamWrites.map(write=>write.body.title),['Supper club app: Card deposits','Supper club app: Calendar sync']);
+  // Each part's rules and compute limit travel inside the exact text the helper signs.
+  const signedPart=JSON.parse(teamWrites[0].body.text.slice('parlu/team-part/1\n'.length));
+  assert.deepEqual(signedPart,{brief:'SYNTHETIC ONLY: Take a card deposit when a guest books.',compute:{cap_micro:500000,currency:'GBP'},
+    rules:{must:['Tests pass','Use the design system'],must_not:['Store card numbers']}});
+  assert.deepEqual(JSON.parse(teamWrites[1].body.text.slice('parlu/team-part/1\n'.length)).rules,{must:[],must_not:[]});
   await page.locator('#team-view .team-part').nth(1).waitFor();
   assert.equal(await page.locator('#team-view .team-title').textContent(),'Supper club app');
   assert.equal(await page.locator('#team-view .team-line').textContent(),'0 of 2 parts are done. 2 parts are ready for you to send.');
   assert.deepEqual(await page.locator('#team-view .team-part').evaluateAll(nodes=>nodes.map(node=>node.dataset.step)),['Plan','Plan']);
   assert.equal(await page.locator('#team-view .team-seg').count(),2);
+  assert.deepEqual(await page.locator('#team-view .team-part').first().locator('.team-rule').allTextContents(),['✓ Tests pass','✓ Use the design system','✕ Store card numbers']);
+  assert.equal(await page.locator('#team-view .team-part').first().locator('.team-compute').textContent(),'Compute limit £0.50');
   await noOverflow();await checkContrast();await screenshot('central-platform-team.png');
   await page.locator('#team-view .team-part').first().getByRole('button',{name:'Details',exact:true}).click();
   await page.locator('#inspect').waitFor({state:'visible'});
   assert.equal(await page.locator('#inspect-title').textContent(),'Card deposits');
   assert.match(await page.locator('#inspect-sub').textContent(),/^Part of Supper club app/);
+  assert.match(await page.locator('#inspect').textContent(),/Rules in force.*Tests pass/s);
   await screenshot('central-platform-team-part.png');
   await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
   await page.locator('[data-team-tab="people"]').click();
@@ -453,6 +464,9 @@ try {
   await page.locator('#team-view .team-part').first().getByRole('button',{name:'Review and send',exact:true}).click();
   await page.locator('#review-dialog').waitFor({state:'visible'});
   assert.equal(await page.locator('#review-title').textContent(),'Supper club app: Card deposits');
+  // The review reads as words, and agreeing to spend compute on a part is shown before it is sent.
+  assert.match(await page.locator('#review-content').textContent(),/^SYNTHETIC ONLY: Take a card deposit when a guest books\.\n\n✓ Must: Tests pass/);
+  assert.match(await page.locator('#review-decide').textContent(),/Up to £0\.50 of compute for this part/);
   await closeReview();
   assert.equal(writes.length,beforeTeam+2,'browsing a team mission never writes');
   // Sending a part from its open panel redraws the panel from the saved state.

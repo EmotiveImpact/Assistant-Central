@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {STEPS,partStep,resultsFor,sharedName,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead} from '../team.mjs';
+import {STEPS,partStep,resultsFor,sharedName,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,
+  PART,RESULT,ACCESS,readRules,partText,resultText,accessText,readTeamText,fitTitle,RULES_BUDGET,accessFor,approvalsFor,computeFor,teamCompute,checksFor,ruleList} from '../team.mjs';
 
 const task=(id,peer,state,title,extra={})=>({id,kind:'task',direction:'outgoing',peer_id:peer,state,title,context:'c1',created_at:String(100+Number(id.slice(1))),...extra});
 const result=(id,parent,state,at=500)=>({id,kind:'artifact',direction:'incoming',parent_id:parent,state,created_at:String(at)});
@@ -122,4 +123,80 @@ test('an item knows which team mission it belongs to',()=>{
   // Work outside any team mission says nothing.
   assert.equal(partOf(state,items[3]),null);assert.equal(partOf(state,items[4]),null);assert.equal(partOf(state,undefined),null);
   assert.equal(partLead(null),'');
+});
+
+const rules={must:['Tests pass'],must_not:['Store card numbers']},compute={cap_micro:500000,currency:'GBP'};
+
+test('a part carries its rules and compute limit in the exact text both sides sign',()=>{
+  assert.deepEqual(readRules('Tests pass\n\n  Use the design system  \n'),['Tests pass','Use the design system']);
+  assert.throws(()=>readRules(Array.from({length:9},(_,i)=>'Rule '+i).join('\n')),/Up to 8/);
+  const text=partText({brief:' SYNTHETIC ONLY: build deposits ',must:rules.must,mustNot:rules.must_not,compute});
+  assert.ok(text.startsWith(PART));
+  assert.deepEqual(JSON.parse(text.slice(PART.length)),{brief:'SYNTHETIC ONLY: build deposits',compute,rules});
+  assert.throws(()=>partText({brief:'B',must:['A'],mustNot:['A']}),/once/);
+  assert.throws(()=>partText({brief:'B',compute:{cap_micro:0,currency:'GBP'}}),/compute limit/);
+  assert.throws(()=>partText({brief:'  '}),/brief/);
+  assert.deepEqual(readTeamText(text),{record:'part',value:{brief:'SYNTHETIC ONLY: build deposits',compute,rules}});
+  assert.equal(readTeamText('SYNTHETIC ONLY: an ordinary request'),null);
+  assert.equal(readTeamText(PART+'{broken'),null);
+});
+
+test('a result reports on every rule, in order, and compute only in the part\'s currency',()=>{
+  const team={record:'part',rules,compute};
+  const text=resultText('SYNTHETIC ONLY: done',team,{kept:[true,true],computeMicro:12000});
+  assert.deepEqual(JSON.parse(text.slice(RESULT.length)),{checks:[{rule:'Tests pass',side:'must',kept:true},{rule:'Store card numbers',side:'must_not',kept:true}],compute_used:{micro:12000,currency:'GBP'},summary:'SYNTHETIC ONLY: done'});
+  assert.throws(()=>resultText('Done',team,{kept:[true]}),/every rule/);
+  assert.throws(()=>resultText('Done',{rules,compute:null},{kept:[true,true],computeMicro:5}),/no compute limit/);
+  assert.deepEqual(ruleList(rules).map(entry=>entry.side),['must','must_not']);
+});
+
+test('access is asked for one part, for a bounded time',()=>{
+  const text=accessText({partTaskId:'team-1',what:'Read the calendar',why:'Deposits follow bookings',hours:24});
+  assert.deepEqual(JSON.parse(text.slice(ACCESS.length)),{hours:24,part_task_id:'team-1',what:'Read the calendar',why:'Deposits follow bookings'});
+  assert.throws(()=>accessText({partTaskId:'team-1',what:'Read',why:'Because',hours:200}),/7 days/);
+});
+
+test('a team part shows its rules, access asks, merge approvals and reported compute',()=>{
+  const items=[
+    task('t1','p1','accepted','M: Cards',{task_id:'team-1',team:{record:'part',rules,compute}}),
+    task('t2','p2','accepted','M: Calendar',{task_id:'team-2',team:{record:'part',rules:{must:[],must_not:[]},compute:{cap_micro:250000,currency:'GBP'}}}),
+    {...result('r1','t1','pending'),team:{record:'result',checks:[{rule:'Tests pass',side:'must',kept:true},{rule:'Store card numbers',side:'must_not',kept:false}],compute_used:{micro:600000,currency:'GBP'}}},
+    {id:'a1',kind:'task',direction:'incoming',peer_id:'p2',state:'pending',context:'c1',created_at:'1000',team:{record:'access',part_task_id:'team-2',what:'Read the calendar',hours:2}},
+    {id:'a2',kind:'task',direction:'incoming',peer_id:'p1',state:'pending',context:'c1',created_at:'1000',team:{record:'access',part_task_id:'team-2',what:'Not this helper\'s part',hours:2}},
+  ];
+  const [team]=teamsOf({items});
+  const [cards,calendar]=team.parts;
+  assert.deepEqual(cards.rules,rules);
+  assert.equal(calendar.needsYou,true);assert.equal(calendar.asking.item.id,'a1');
+  assert.deepEqual(accessFor(calendar.item,items).map(ask=>[ask.item.id,ask.until,ask.granted]),[['a1',1000+7200,false]]);
+  assert.deepEqual(approvalsFor(cards).map(entry=>[entry.who,entry.signed]),[['helper',true],['you',false]]);
+  assert.deepEqual(checksFor(cards.result).map(entry=>entry.kept),[true,false]);
+  assert.deepEqual(computeFor(cards.item,items),{limit:compute,used:{micro:600000,currency:'GBP'},over:true});
+  assert.deepEqual(teamCompute(team,items),[{currency:'GBP',limit:750000,used:600000}]);
+  assert.match(teamLine(team),/One assistant asks for access\./);
+  assert.equal(partLead(partOf({items},items[3])),'Access for Calendar, part of M');
+});
+
+test('titles made from typed words fit both the form and the saved byte limit', ()=>{
+  const bytes=value=>new TextEncoder().encode(value).length;
+  const part='配達計画: '+'配'.repeat(36);
+  assert.ok(bytes(part)<=128);
+  const title=fitTitle('Result: ',part);
+  assert.ok(title.length<=120&&bytes(title)<=128&&title.endsWith('…')&&title.startsWith('Result: 配達計画'));
+  assert.equal(fitTitle('Access: ','Read the calendar'),'Access: Read the calendar');
+  const emoji=fitTitle('Access: ','😀'.repeat(60));
+  assert.ok(bytes(emoji)<=128&&!/[\uD800-\uDFFF](?![\uDC00-\uDFFF])/.test(emoji.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'')));
+});
+
+test('the largest rule set a part accepts still leaves room for its result', ()=>{
+  // Eight long rules a side, each full of quotes that JSON has to escape.
+  const rule=(side,i)=>`${side}${i} "status" `.padEnd(120,'"');
+  let must=Array.from({length:8},(_,i)=>rule('m',i)),mustNot=Array.from({length:8},(_,i)=>rule('n',i));
+  assert.throws(()=>partText({brief:'Brief',must,mustNot}),/too long together/);
+  while(true){try{partText({brief:'Brief',must,mustNot});break;}catch{must=must.map(r=>r.slice(0,-1));mustNot=mustNot.map(r=>r.slice(0,-1));}}
+  const encoded=[...must,...mustNot].reduce((sum,r)=>sum+new TextEncoder().encode(JSON.stringify(r)).length,0);
+  assert.ok(encoded<=RULES_BUDGET&&encoded>RULES_BUDGET-40);
+  const team={rules:{must,must_not:mustNot},compute:{cap_micro:1_000_000_000,currency:'GBP'}};
+  const text=resultText('S'.repeat(1000),team,{kept:Array(16).fill(false),computeMicro:1_000_000_000});
+  assert.ok(text.length<=4096);
 });

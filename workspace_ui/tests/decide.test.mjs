@@ -39,3 +39,22 @@ test('only money needs a hold', () => {
   assert.equal(needsHold({},'accept'),false);
   assert.equal(needsHold({mission_cap:{cap_micro:1,currency:'GBP'}},'reject'),false);
 });
+
+test('team records get their own question, rows and hold',async()=>{
+  const {decisionQuestion,decisionRows,needsHold}=await import('../decide.mjs');
+  const names={agent:'Otto',owner:'Maya',actions:['accept','reject']};
+  const access={id:'a',kind:'task',direction:'incoming',title:'Access',team:{record:'access',what:'Read the calendar',hours:48}};
+  assert.equal(decisionQuestion(access,names),'Let Otto read the calendar?');
+  assert.deepEqual(decisionRows(access,names).map(([key])=>key),['Shares','For','Keeps']);
+  assert.match(decisionRows(access,names)[1][1],/^2 days/);
+  assert.equal(needsHold(access,'accept'),true);
+  const result={id:'r',kind:'artifact',direction:'incoming',title:'Cards',team:{record:'result',checks:[{rule:'A',side:'must',kept:false}],compute_used:{micro:12000,currency:'GBP'}}};
+  assert.equal(decisionQuestion(result,names),'Merge “Cards” from Otto?');
+  assert.match(decisionRows(result,names)[0][1],/reports £0\.012 of compute/);
+  assert.match(decisionRows(result,names)[1][1],/1 rule not kept/);
+  assert.equal(needsHold(result,'accept'),false);
+  const part={id:'p',kind:'task',direction:'incoming',title:'Cards',team:{record:'part',rules:{must:['A'],must_not:['B']},compute:{cap_micro:500000,currency:'GBP'}}};
+  assert.match(decisionRows(part,names)[1][1],/2 rules/);
+  assert.equal(needsHold(part,'accept'),true);
+  assert.equal(needsHold({...part,team:{...part.team,compute:null}},'accept'),false);
+});

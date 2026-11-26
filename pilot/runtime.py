@@ -16,6 +16,8 @@ import threading
 import time
 
 from .mission import CONTEXT_PREFIX, TASK_PREFIX, PROJECTION, task_details, validate_task
+from . import team
+from .team import TeamDenied
 from .storage import RecordStorage, StoreLease
 from .crypto import canonical, digest, fingerprint, packet_header, seal, token, TransportDenied
 from .transport import PeerExchange
@@ -270,6 +272,40 @@ class PilotRuntime:
         need(permissions == self._permissions(body, provider),
              'Unverified inherited sources or substituted source permissions are forbidden')
         self._parent(body, sending=sending)
+        try:
+            self._team(body, sending=sending)
+        except TeamDenied as error:
+            raise RuntimeDenied(str(error)) from None
+
+    def _team(self, body, *, sending):
+        """Team records are checked against the part they belong to, on both sides."""
+        record = team.kind_of(body['text'])
+        if body['kind'] == 'artifact':
+            _, original = self._row(body['parent_id'])
+            if team.kind_of(original['text']) == team.PART:
+                team.read_result(body['text'], team.read_part(original['text']))
+            else:
+                team.check(record is None, 'A team result answers only a team part')
+            return
+        if record == team.PART:
+            team.read_part(body['text'])
+        elif record == team.ACCESS:
+            access = team.read_access(body['text'])
+            # The helper asks the lead, about a part the lead sent this helper in this same mission.
+            helper, lead = (body['sender'], body['recipient'])
+            direction = 'incoming' if sending else 'outgoing'
+            found = False
+            for row in self.db.execute('SELECT id,body,state,cancelled FROM runtime_items WHERE direction=? AND kind=?', (direction, 'task')):
+                prior = json.loads(self.storage.row('runtime_items', row)['body'])
+                if (prior['task_id'] == access['part_task_id'] and prior['context'] == body['context']
+                        and prior['sender'] == lead and prior['recipient'] == helper
+                        and team.kind_of(prior['text']) == team.PART):
+                    # A withdrawn part keeps its old decision on record, but grants nothing new.
+                    found = not row['cancelled'] and row['state'] in (('accepted',) if sending else ('released', 'accepted'))
+                    break
+            team.check(found, 'Access can be asked only for an agreed part of the same team mission')
+        else:
+            team.check(record is None, 'A team result is returned only as an answer to its part')
 
     def propose(self, session, peer_id, kind, title, text, context, task_id, expires,
                 parent_id=None, provider_disclosure=None, source_permissions=None):
@@ -572,6 +608,9 @@ class PilotRuntime:
             direct['peer_mission'] = 'offer' in value
             if type(limit) is int:
                 direct['mission_cap'] = {'cap_micro': limit, 'currency': unit or 'USD'}
+        record = team.kind_of(body['text'])
+        if record is not None:
+            direct['team'] = self._team_summary(row, body, record)
         return {**direct, 'id':row['id'],'direction':row['direction'],'kind':row['kind'],
                 'state':'cancelled' if row['cancelled'] else ('expired' if not active else row['state']),
                 'historical_state':row['state'],'title':body['title'],'peer_id':row['peer_id'],
@@ -583,6 +622,20 @@ class PilotRuntime:
                 'cancel_packet_receipt_observed':bool(row['cancel_acknowledged']),
                 'peer_cancellation_observed':bool(row['peer_cancelled']),
                 'authorises_execution':False,'synthetic_only':True}
+
+    def _team_summary(self, row, body, record):
+        """The structured part of a team record, for views. Hidden, like content, once a sender is removed."""
+        name = {team.PART: 'part', team.RESULT: 'result', team.ACCESS: 'access'}[record]
+        if row['direction'] == 'incoming' and not self._peer_active(row['peer_id']):
+            return {'record': name}
+        if record == team.PART:
+            value = team.read_part(body['text'])
+            return {'record': name, 'rules': value['rules'], 'compute': value['compute']}
+        if record == team.RESULT:
+            value = json.loads(body['text'][len(team.RESULT):])  # Checked against its part when it was stored.
+            return {'record': name, 'checks': value['checks'], 'compute_used': value['compute_used']}
+        value = team.read_access(body['text'])
+        return {'record': name, 'part_task_id': value['part_task_id'], 'what': value['what'], 'hours': value['hours']}
 
     def status(self, session, item_id):
         with self._transaction(session):

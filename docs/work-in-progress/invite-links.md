@@ -20,41 +20,39 @@ Items 2 and 3 follow in their own pull requests from this same branch name.
 
 ## Boundaries
 
-- Base: `main` at `dff318b` (after #49). Branch: `claude/project-thread-sfa2x7`.
-- Claimed files for this pull request (questions on the owner's phone):
-  new `owner_phone/runner.py`, small changes to `owner_phone/telegram.py` and
-  its README, `workspace_ui/approval_service.py`,
-  `workspace_ui/conversation_service.py`, `workspace_ui/server.py`, new
-  `workspace_ui/phone.mjs`, `app.mjs` and `style.css`, their tests, and the
-  workspace workflow's Node test list.
+- Base: `main` at `9e8c483` (after #50). Branch: `claude/project-thread-sfa2x7`.
+- Claimed files for this pull request (team mission records): new
+  `pilot/team.py` and its tests, the proposal checks in `pilot/runtime.py`,
+  `workspace_ui/team.mjs`, `decide.mjs`, `app.mjs`, `index.html`,
+  `style.css` and their tests.
 - No licence or README changes at the repository root. No new hosted
-  resources: the host brings their own Telegram bot token, and nothing runs
-  unless the host names a phone mode in its private configuration.
-- The phone only answers questions an assistant has already asked. It never
-  agrees to work, releases a packet or reads anything else.
+  resources and no new packet type: team records ride inside ordinary signed
+  proposals, so the relay and the trust rules stay as they are.
+- Parlu runs no AI here. Each person's own assistant writes the part, the
+  result and any access ask; Parlu only checks their shape and shows them.
 
 ## Planned verification
 
-- Python tests over real HTTP with a fictional bot that never reaches the
-  internet: pair from Parlu, the pairing message from the phone, a question
-  sent once to the paired chat, a tap answering it, unpairing, a missing bot
-  token reported plainly, and other local accounts refused.
-- Node tests for the panel's status checks and the Telegram start link.
+- Python tests over real relay packets: a part with rules and a compute cap,
+  a result that must report on every rule, merge approval through the
+  helper's release and the lead's acceptance, an access ask that only counts
+  for an agreed part between the same two people, and forged or mismatched
+  records refused on both sides.
+- Node tests for reading and writing the records, the review rows and
+  questions, and a two-person browser run from part to merge to access.
 
 ## Status
 
-Merged: invite links with QR pairing (#48) and removing an assistant (#49).
+Merged: invite links with QR pairing (#48), removing an assistant (#49) and
+questions on the owner's phone (#50).
 
-In this pull request: questions on the owner's phone.
+In this pull request: team mission records.
 
-- `GET /api/approvals/phone`, `POST /api/approvals/phone/pair` and
-  `POST /api/approvals/phone/unpair` for the person who runs this copy of
-  Parlu.
-- A background runner long-polls Telegram while Parlu is open, sends each new
-  question once and takes answer taps, backing off when Telegram cannot be
-  reached.
-- App: "Questions on your phone" in Settings, with a QR code and an "Open
-  Telegram" link for pairing, and Unpair.
-
-Next: team mission records (per-part rules, merge approvals, access grants and
-compute spend).
+- A team part carries its brief, rules (must and must not) and an optional
+  compute cap.
+- A returned result reports whether each rule was kept and what compute it
+  used. Merging is the helper's signed release plus the lead's acceptance.
+- An access ask names what, why and for how many hours, and is granted when
+  the lead accepts it with a hold.
+- App: rules, merge approvals, access and compute in the team view and the
+  part panel, plus "Return the result" and "Ask for access" on an agreed part.
