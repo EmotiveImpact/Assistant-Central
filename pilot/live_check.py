@@ -46,6 +46,10 @@ def main(argv=None):
         parser.error('refusing to call a real model without --yes-make-one-real-call')
     if not os.environ.get('ANTHROPIC_API_KEY'):
         parser.error('ANTHROPIC_API_KEY is not set')
+    try:
+        import anthropic  # noqa: F401  Checked before approval, so a missing package never burns a run.
+    except ImportError:
+        parser.error('the anthropic package is missing: pip install -r pilot/requirements-live.txt')
     binding = {**BINDING, 'model': args.model}
     owner = _Owner()
     db = sqlite3.connect(':memory:', isolation_level=None)
