@@ -4,9 +4,9 @@ This repository imports three recovered source checkpoints and a rebuilt team
 coordinator. The team implementation is a replacement, not recovery of the
 previous missing local team commit. The components remain separate prototypes.
 
-The original input archive SHA-256 values are retained in `team/BASELINES.json`.
+The original input archive SHA-256 values are retained in `archive/team/BASELINES.json`.
 Original backup ZIPs are not republished: their full source trees are expanded in
-`prototypes/` and `docs/integration-readiness/` instead.
+`archive/prototypes/` and `docs/integration-readiness/` instead.
 
 For public release, private artifact references were removed and machine-specific
 paths in historical evidence were normalized. Runtime Python, JavaScript and UI
@@ -17,7 +17,7 @@ Historical verification files are records of their original checkpoints, not
 fresh claims about this public import. Old inventory manifests can describe the
 pre-normalization evidence; they must not be treated as hashes of every public
 documentation byte. Runtime integrity manifests are preserved unchanged. The
-public `IMPORT_MANIFEST.json` and regenerated `team/MANIFEST.json` describe this
+public `IMPORT_MANIFEST.json` and regenerated `archive/team/MANIFEST.json` describe this
 sanitized import. Run `python -B tools/verify_import.py` to verify them.
 
 The publication review found no actual credentials, private conversation exports

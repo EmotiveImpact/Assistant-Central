@@ -1,6 +1,6 @@
 # Security policy
 
-Assistant Central is about keeping people in control of their information, so
+Parlu is about keeping people in control of their information, so
 we take security reports seriously.
 
 ## Current status

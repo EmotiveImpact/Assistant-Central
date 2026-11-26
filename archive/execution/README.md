@@ -1,7 +1,7 @@
 # Durable local execution boundary
 
 This is an **offline fictional composition** with the rebuilt team coordinator.
-It implements the safe-retry part of [the research plan](../docs/research/orchestration-landscape.md#what-assistant-central-still-needs-to-own):
+It implements the safe-retry part of [the research plan](../../docs/research/orchestration-landscape.md#what-assistant-central-still-needs-to-own):
 a started task is different from a dispatched attempt, an original result, a
 candidate artifact, and the lead's acceptance. It is not a live provider adapter,
 a peer protocol, or proof that two people independently control the system.

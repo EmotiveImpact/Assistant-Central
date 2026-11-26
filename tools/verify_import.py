@@ -26,5 +26,5 @@ def verify(manifest, base):
 
 if __name__ == "__main__":
     total = verify(ROOT / "IMPORT_MANIFEST.json", ROOT)
-    team = verify(ROOT / "team" / "MANIFEST.json", ROOT / "team")
+    team = verify(ROOT / "archive" / "team" / "MANIFEST.json", ROOT / "archive" / "team")
     print(f"Verified {total} imported files and {team} team manifest entries.")

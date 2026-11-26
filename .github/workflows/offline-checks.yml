@@ -29,27 +29,27 @@ jobs:
           "$runtime_dir/node" --version
           printf '%s\n' "$runtime_dir" >> "$GITHUB_PATH"
       - name: Install pinned fixture dependencies
-        run: python -m pip install -r prototypes/consent-v29/requirements-mcp-offline.txt
+        run: python -m pip install -r archive/prototypes/consent-v29/requirements-mcp-offline.txt
       - name: Verify public import
         run: python -B tools/verify_import.py
       - name: Check team coordinator
-        run: python -B team/run_checks.py
+        run: python -B archive/team/run_checks.py
       - name: Check durable synthetic execution boundary
-        run: python -B execution/run_checks.py
+        run: python -B archive/execution/run_checks.py
       - name: Exercise synthetic execution restart and disclosure demo
-        run: python -B execution/demo.py
+        run: python -B archive/execution/demo.py
       - name: Exercise owner-specific provider disclosure rehearsal
-        run: python -B execution/provider_demo.py
+        run: python -B archive/execution/provider_demo.py
       - name: Exercise inherited source-owner disclosure rehearsal
-        run: python -B execution/lineage_demo.py
+        run: python -B archive/execution/lineage_demo.py
       - name: Check exact team-to-proposal mapping
-        run: python -B integration/run_checks.py
+        run: python -B archive/integration/run_checks.py
       - name: Exercise fictional team-to-proposal wire demo
-        run: python -B integration/demo.py
+        run: python -B archive/integration/demo.py
       - name: Exercise synthetic recipient acceptance and restart
-        run: python -B integration/acceptance_demo.py
+        run: python -B archive/integration/acceptance_demo.py
       - name: Check execution result to unsigned proposal composition
-        run: python -B execution/check_composition.py
+        run: python -B archive/execution/check_composition.py
       - name: Check isolated authenticated pilot components
         run: python -B -m unittest discover -s pilot/tests -v
       - name: Exercise two separate assistant processes
@@ -62,9 +62,9 @@ jobs:
           python -B pilot/web/tests/live_contract.py
           python -B pilot/web/tests/workflow_contract.py
       - name: Check consent and protocol prototype
-        run: python -B prototypes/consent-v29/verify_checkpoint.py --full
+        run: python -B archive/prototypes/consent-v29/verify_checkpoint.py --full
       - name: Check targeted synthetic stdio path
-        run: python -I -B "$GITHUB_WORKSPACE/prototypes/synthetic-stdio-r5/run_all_checks.py"
+        run: python -I -B "$GITHUB_WORKSPACE/archive/prototypes/synthetic-stdio-r5/run_all_checks.py"
   pilot-browser:
     runs-on: ubuntu-latest
     timeout-minutes: 12
