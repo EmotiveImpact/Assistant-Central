@@ -109,6 +109,11 @@ to run on Vercel with Postgres, or locally with SQLite.
 - Packets are opaque bytes. The relay holds at most 1,000 packets or 32 MiB per
   mailbox, for at most 14 days, and deletes them when the owner acknowledges.
 
+Inside Parlu, two people connect from one invite link: the link carries a
+join secret the relay never sees, both people check a short code, and the
+person who made the link adds the other
+([invite links](pilot/RELAY_CARRIER.md#invite-links-in-parlu)).
+
 The pilot can deliver packets through the relay
 ([`pilot/relay_carrier.py`](pilot/RELAY_CARRIER.md)), through its explicit HTTPS
 mailbox, or as files. Whichever carrier is used, the recipient still imports

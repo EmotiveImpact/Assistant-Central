@@ -1,7 +1,10 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 """Relay end to end over a real local HTTP server. Fictional owners, opaque test packets."""
 from pathlib import Path
+import base64
+import hashlib
 import json
+import re
 import sqlite3
 import tempfile
 import threading
@@ -134,6 +137,13 @@ class RelayTests(RelayCase):
         self.assertEqual(status, 200)
         self.assertIn("default-src 'none'", headers['Content-Security-Policy'])
         self.assertIn(b'never sent here', page)
+        # Only the one inline script runs, pinned by its hash: it hands the address to local Parlu.
+        script = re.search(rb'<script>(.*?)</script>', page, re.S).group(1)
+        pinned = 'sha256-' + base64.b64encode(hashlib.sha256(script).digest()).decode()
+        self.assertIn(f"script-src '{pinned}'", headers['Content-Security-Policy'])
+        self.assertIn(b"'#join='+encodeURIComponent(location.href)", script)
+        self.assertIn(b'href="http://127.0.0.1:8877/" hidden', page)
+        self.assertEqual(headers['Referrer-Policy'], 'no-referrer')
         status, headers, page = self.relay.handle('GET', '/', {}, b'')
         self.assertEqual(status, 200)
         self.assertIn("default-src 'none'", headers['Content-Security-Policy'])

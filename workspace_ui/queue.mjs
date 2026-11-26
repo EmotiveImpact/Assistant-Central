@@ -3,8 +3,10 @@
 // place where the exact decision is made, and Home only opens it.
 const clip=(value,max=90)=>{const t=String(value??'').replace(/\s+/g,' ').trim();return t.length>max?t.slice(0,max-1)+'…':t;};
 
-export function homeQueue({proposals=[],approvals=null,hostDrafts=null,conversations=null}={}){
+export function homeQueue({proposals=[],approvals=null,hostDrafts=null,conversations=null,joiners=[]}={}){
   const queue=proposals.map(item=>({kind:'proposal',key:'item:'+item.id,item,title:clip(item.title,120)||'Untitled proposal'}));
+  // Someone used one of your invites: nothing is added until you check them and say yes.
+  for(const j of joiners)queue.push({kind:'joiner',key:j.key,joiner:j.joiner,title:clip(j.title),view:'peers',owner:j.owner,agent:j.agent});
   if(approvals){
     for(const q of approvals.questions??[])queue.push({kind:'question',key:'question:'+q.question_id,title:clip(q.question),view:'approvals'});
     for(const m of approvals.messages??[])queue.push({kind:'message',key:'message:'+m.draft_id,title:clip(m.text),view:'approvals'});
@@ -42,6 +44,7 @@ export const CARD=Object.freeze({
   message:{lead:'wants to send a message for you',action:'Check the message'},
   'shared-draft':{lead:'A shared draft waits for your agreement',action:'Read the draft'},
   invite:{lead:'invited you to a conversation',action:'See the invitation'},
+  joiner:{lead:'used your invite and asks to connect',action:'Check and add'},
   'host-draft':{lead:'A draft arrived from one of your apps',action:'Inspect the draft'},
 });
 
@@ -49,7 +52,7 @@ export const CARD=Object.freeze({
 // and an app draft have no single author to name, so the card says what it is instead.
 export function askerOf(entry,{me,mine,peer}={}){
   if(entry.kind==='proposal')return {owner:peer?.owner_id||'Someone',agent:peer?.agent_id||'Their assistant',yours:false};
-  if(entry.kind==='invite')return {owner:entry.owner||'Someone',agent:entry.agent||'Their assistant',yours:false};
+  if(entry.kind==='invite'||entry.kind==='joiner')return {owner:entry.owner||'Someone',agent:entry.agent||'Their assistant',yours:false};
   return {owner:me||'You',agent:mine||'Your assistant',yours:true};
 }
 
