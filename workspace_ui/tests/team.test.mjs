@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {STEPS,partStep,splitTitle,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead} from '../team.mjs';
+import {STEPS,partStep,resultsFor,sharedName,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead} from '../team.mjs';
 
 const task=(id,peer,state,title,extra={})=>({id,kind:'task',direction:'outgoing',peer_id:peer,state,title,context:'c1',created_at:String(100+Number(id.slice(1))),...extra});
 const result=(id,parent,state,at=500)=>({id,kind:'artifact',direction:'incoming',parent_id:parent,state,created_at:String(at)});
@@ -9,23 +9,47 @@ test('a part reads its step only from saved states',()=>{
   assert.equal(partStep(task('t1','p1','draft','M: A')).step,'Plan');
   assert.equal(partStep(task('t1','p1','draft','M: A')).needsYou,true);
   assert.equal(partStep(task('t1','p1','pending','M: A')).step,'Asked');
+  assert.equal(partStep(task('t1','p1','released','M: A')).step,'Asked');
   assert.equal(partStep(task('t1','p1','accepted','M: A')).step,'Building');
   assert.equal(partStep(task('t1','p1','rejected','M: A')).step,'Stopped');
-  assert.equal(partStep(task('t1','p1','pending','M: A',{historical_state:'expired'})).step,'Stopped');
   const item=task('t1','p1','accepted','M: A');
   const waiting=partStep(item,[result('r1','t1','pending')]);
   assert.equal(waiting.step,'Result');assert.equal(waiting.needsYou,true);assert.equal(waiting.result.id,'r1');
   assert.equal(partStep(item,[result('r1','t1','accepted')]).step,'Done');
   assert.equal(partStep(item,[result('r1','t1','rejected')]).step,'Building');
-  // The newest result wins, and results for other parts are ignored.
+  // The newest waiting result is the one to check, and results for other parts are ignored.
   assert.equal(partStep(item,[result('r1','t1','rejected',400),result('r2','t1','pending',600),result('r3','t9','accepted')]).result.id,'r2');
+  assert.deepEqual(resultsFor(item,[result('r1','t1','rejected',400),result('r2','t1','pending',600),result('r3','t9','accepted')]).map(entry=>entry.id),['r2','r1']);
 });
 
-test('titles split into the mission and the part',()=>{
-  assert.deepEqual(splitTitle('Supper club app: Card deposits'),['Supper club app','Card deposits']);
-  assert.deepEqual(splitTitle('Just one title'),['','Just one title']);
-  assert.deepEqual(splitTitle(''),['','Untitled part']);
-  assert.deepEqual(splitTitle('Ratio: 3:1'),['Ratio','3:1']);
+test('what can still be done is read from the state now, not from history',()=>{
+  // The saved pairs the owner API returns: a withdrawn draft and an unanswered request past its time.
+  const withdrawn=partStep(task('t1','p1','cancelled','M: A',{historical_state:'draft'}));
+  assert.equal(withdrawn.step,'Stopped');assert.equal(withdrawn.needsYou,false);
+  assert.equal(partStep(task('t1','p1','expired','M: A',{historical_state:'pending'})).step,'Stopped');
+  // An expired result cannot be accepted any more, so it is not offered.
+  const live=task('t1','p1','accepted','M: A',{historical_state:'accepted'});
+  const stale=partStep(live,[{...result('r1','t1','expired'),historical_state:'pending'}]);
+  assert.equal(stale.step,'Building');assert.equal(stale.result,undefined);
+  // A signed acceptance stays done after everything expires.
+  const old=task('t1','p1','expired','M: A',{historical_state:'accepted'});
+  assert.equal(partStep(old).step,'Stopped');
+  assert.equal(partStep(old,[{...result('r1','t1','expired'),historical_state:'accepted'}]).step,'Done');
+  // A result for a part the owner withdrew is not offered either.
+  assert.equal(partStep(task('t1','p1','cancelled','M: A',{historical_state:'accepted'}),[result('r1','t1','pending')]).step,'Stopped');
+});
+
+test('the mission name is the longest lead every part shares',()=>{
+  assert.equal(sharedName(['Supper club app: Card deposits','Supper club app: Calendar sync']),'Supper club app');
+  // A colon inside the name stays in the name.
+  assert.equal(sharedName(['Launch: November: Card deposits','Launch: November: Calendar sync']),'Launch: November');
+  assert.equal(sharedName(['Supper club app: Card deposits','Supper club app: Card reader']),'Supper club app');
+  assert.equal(sharedName(['One: A','Two: B']),'');
+  assert.equal(sharedName(['No colon here','No colon there']),'');
+  assert.equal(sharedName(['M: A','']),'');assert.equal(sharedName([]),'');
+  const [team]=teamsOf({items:[task('t1','p1','draft','Launch: November: Card deposits'),task('t2','p2','draft','Launch: November: Calendar sync')]});
+  assert.equal(team.title,'Launch: November');
+  assert.deepEqual(team.parts.map(part=>part.title),['Card deposits','Calendar sync']);
 });
 
 test('a team is outgoing tasks sharing one context across two or more assistants',()=>{
@@ -79,6 +103,10 @@ test('planning a team mission checks every part before anything is created',()=>
   assert.throws(()=>planParts('M',[rows[0],{title:'B',peer_id:'p2',text:''}]),/name, an assistant and a brief/);
   assert.throws(()=>planParts('M',Array.from({length:7},(_,i)=>({title:'P'+i,peer_id:'p'+i,text:'t'}))),/six parts/);
   assert.throws(()=>planParts('M',[rows[0],{title:'x'.repeat(120),peer_id:'p2',text:'t'}]),/part name short/);
+  // The saved limits count bytes: 45 Japanese characters fit the form but not the 128 byte title.
+  assert.throws(()=>planParts('Fictional',[rows[0],{title:'あ'.repeat(45),peer_id:'p2',text:'t'}]),/too long with the mission name/);
+  assert.throws(()=>planParts('M',[rows[0],{title:'B',peer_id:'p2',text:'あ'.repeat(3000)}]),/brief for “B” is too long/);
+  assert.equal(planParts('M',[rows[0],{title:'あ'.repeat(30),peer_id:'p2',text:'あ'.repeat(2000)}]).length,2);
 });
 
 test('an item knows which team mission it belongs to',()=>{

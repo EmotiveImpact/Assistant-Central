@@ -23,6 +23,17 @@ test('rows are always Spends, Shares and Keeps, and spending appears only with a
   assert.match(outgoing[1][1],/^This exact result with Orbit, Drew's assistant\. Nobody else\.$/);
 });
 
+test('a limit is shown exactly, never rounded', () => {
+  const row=cap=>decisionRows({...task,mission_cap:cap},{...names,actions:['accept']})[0][1];
+  // 14,999 millionths of a pound is not "£0.01".
+  assert.match(row({cap_micro:14999,currency:'GBP'}),/^Up to £0\.014999 from this mission's limit\./);
+  assert.match(row({cap_micro:500000,currency:'GBP'}),/^Up to £0\.50 from /);
+  assert.match(row({cap_micro:276,currency:'USD'}),/^Up to US\$0\.000276 from /);
+  assert.match(row({cap_micro:12345678,currency:'EUR'}),/^Up to €12\.345678 from /);
+  const outgoing=decisionRows({...task,direction:'outgoing',mission_cap:{cap_micro:1999999,currency:'GBP'}},{...names,actions:['release']})[0][1];
+  assert.match(outgoing,/^Up to £1\.999999 from this mission's limit if Orbit agrees\./);
+});
+
 test('only money needs a hold', () => {
   assert.equal(needsHold({mission_cap:{cap_micro:1,currency:'GBP'}},'accept'),true);
   assert.equal(needsHold({},'accept'),false);

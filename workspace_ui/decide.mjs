@@ -1,7 +1,7 @@
 // Decide: the exact review opens with three plain rows, Spends, Shares and Keeps, worked out
 // from the proposal and its verified review only. Nothing here invents a figure: spending
 // appears only when a signed mission limit exists, and every amount is simulated.
-import {money} from './missions.mjs';
+import {exactMoney} from './missions.mjs';
 
 const quote=value=>`“${String(value||'Untitled').trim()}”`;
 
@@ -14,7 +14,7 @@ export function decisionQuestion(item,{agent='their assistant',owner='them'}={})
 
 // Three rows. The last one is always what stays yours.
 export function decisionRows(item,{agent='their assistant',owner='them',actions=[]}={}){
-  const cap=item.mission_cap&&Number.isFinite(Number(item.mission_cap.cap_micro))?money(item.mission_cap.cap_micro,item.mission_cap.currency):null;
+  const cap=item.mission_cap&&Number.isFinite(Number(item.mission_cap.cap_micro))?exactMoney(item.mission_cap.cap_micro,item.mission_cap.currency):null;
   if(item.direction==='outgoing'){
     return [
       ['Spends',cap?`Up to ${cap} from this mission's limit if ${agent} agrees. Simulated, no real payment.`:'Nothing. This proposal has no spending limit.'],

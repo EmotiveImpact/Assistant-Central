@@ -34,6 +34,19 @@ test('receipts list only digests that exist in saved state, newest first', () =>
   assert.deepEqual(receiptsOf({}),[]);
 });
 
+test('a decision signed today sits above older receipts, whenever its proposal was made', () => {
+  // The old proposal "a" was decided last, so its receipt is the newest record.
+  const state={items:[{id:'a',title:'Old proposal',created_at:100,decision_digest:'d'.repeat(64)},
+    {id:'b',title:'New proposal',created_at:900,decision_digest:'e'.repeat(64)}],
+    history:[{sequence:1,event:'proposal_received',item_id:'a'},{sequence:2,event:'proposal_received',item_id:'b'},
+      {sequence:3,event:'recipient_decided',item_id:'b'},{sequence:4,event:'peer_decision_observed',item_id:'a'}],
+    workflow:{runs:[{item_id:'b',run_id:'r1',result_digest:'f'.repeat(64)}]}};
+  assert.deepEqual(receiptsOf(state).map(r=>[r.kind,r.item.id]),[['decision','a'],['decision','b'],['result','b']]);
+  // A run event moves that result to the top.
+  state.history.push({sequence:5,event:'workflow_result_staged',item_id:'b',data:{run_id:'r1'}});
+  assert.deepEqual(receiptsOf(state).map(r=>[r.kind,r.item.id]),[['result','b'],['decision','a'],['decision','b']]);
+});
+
 test('short digests keep both ends', () => {
   assert.equal(shortDigest('0123456789abcdef'),'0123…cdef');
   assert.equal(shortDigest('short'),'short');

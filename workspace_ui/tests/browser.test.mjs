@@ -212,11 +212,20 @@ try {
     if(view==='receipts')assert.ok(await page.locator('#item-list .receipt-row').count()>0,'signed decisions appear as receipts');
   }
   assert.equal(writes.length,0,'navigation must never mutate owner state');
+  // See all lists exactly what the line counted, and each row opens its exact review.
   await page.locator('#done-line .done-all').click();
-  assert.equal(await page.locator('#accepted-filter').isVisible(),true);
-  assert.ok(await page.locator('#item-list article').count()>0);
-  assert.equal(await page.locator('#item-list article').count(),await page.locator('#item-list article .badge.accepted').count());
-  assert.equal(await page.locator('#item-list .item-icon.artifact').count(),0);
+  await page.locator('#inspect').waitFor({state:'visible'});
+  assert.equal(await page.locator('#inspect-title').textContent(),'Done today');
+  assert.equal(await page.locator('#inspect-body .inspect-item').count(),3);
+  await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#inspect-title').textContent()+await page.locator('#inspect-sub').textContent(),'','a closed panel keeps nothing of the record it showed');
+  // Browser Back closes an unpinned panel, the same as moving with the sidebar.
+  await nav('money');await nav('peers');
+  await page.locator('.peer-row').filter({hasText:'Orbit'}).getByRole('button',{name:'Open',exact:true}).click();
+  await page.locator('#inspect').waitFor({state:'visible'});
+  await page.goBack();await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.evaluate(()=>location.hash),'#money');
+  assert.equal(writes.length,0);
   await nav('tasks');
   await page.keyboard.press('Control+k');assert.equal(await page.locator('#search-input').evaluate(node=>node===document.activeElement),true);
   await page.locator('#search-input').fill('Map the onboarding');
@@ -335,16 +344,49 @@ try {
   await page.locator('[data-team-tab="people"]').click();
   assert.equal(await page.locator('#team-view .team-person').count(),2);
   await page.locator('[data-team-tab="parts"]').click();
+  // A search from Team missions looks across all work, then gives the page back.
+  await page.locator('#search-input').fill('Calendar sync');
+  assert.equal(await page.locator('#item-list article').count(),1);
+  await page.locator('#search-clear').click();
+  await page.locator('#team-view .team-part').nth(1).waitFor();
   await page.setViewportSize({width:390,height:844});await noOverflow();
   await screenshot('central-platform-team-mobile.png');
+  // On the phone the panel covers the page, so the page underneath takes no focus.
+  await page.locator('#team-view .team-part').first().getByRole('button',{name:'Details',exact:true}).click();
+  await page.locator('#inspect').waitFor({state:'visible'});
+  assert.equal(await page.locator('#main').evaluate(node=>node.inert),true);
+  await page.locator('#inspect-back').click();await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(await page.locator('#main').evaluate(node=>node.inert),false);
+  // The search shortcut opens the drawer that holds the search box.
+  await page.keyboard.press('Control+k');
+  assert.equal(await page.locator('#search-input').evaluate(node=>node===document.activeElement),true);
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(()=>!document.body.classList.contains('sidebar-open'));
   await page.setViewportSize({width:1440,height:1000});
   await page.locator('#team-view .team-part').first().getByRole('button',{name:'Review and send',exact:true}).click();
   await page.locator('#review-dialog').waitFor({state:'visible'});
   assert.equal(await page.locator('#review-title').textContent(),'Supper club app: Card deposits');
   await closeReview();
+  assert.equal(writes.length,beforeTeam+2,'browsing a team mission never writes');
+  // Sending a part from its open panel redraws the panel from the saved state.
+  await page.locator('#team-view .team-part').nth(1).getByRole('button',{name:'Details',exact:true}).click();
+  await page.locator('#inspect').waitFor({state:'visible'});
+  await page.locator('#inspect').getByRole('button',{name:'Review and send',exact:true}).click();
+  await page.locator('#review-dialog').waitFor({state:'visible'});await action('Approve & release');
+  await page.locator('#team-view .team-part[data-step="Asked"]').waitFor();
+  assert.equal(await page.locator('#inspect').isVisible(),true);
+  assert.equal(await page.locator('#inspect-title').textContent(),'Calendar sync');
+  assert.match(await page.locator('#inspect-body').textContent(),/AskedNow/);
+  assert.equal(await page.locator('#inspect').getByRole('button',{name:'Review and send',exact:true}).count(),0,'a sent part no longer offers to send');
+  assert.equal(await page.locator('#team-view .team-line').textContent(),'0 of 2 parts are done. One part is ready for you to send. One assistant is still deciding.');
+  await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
   await nav('money');
   assert.match(await page.locator('#mission-rows .team-row').textContent(),/Supper club app/);
-  assert.equal(writes.length,beforeTeam+2,'browsing a team mission never writes');
+  // A search from Money finds matching work instead of an empty page.
+  await page.locator('#search-input').fill('Card deposits');
+  assert.equal(await page.locator('#item-list article').count(),1);
+  await page.locator('#search-clear').click();
+  await page.locator('#mission-rows .team-row').waitFor();
 
   // Commit a release but lose its response. A second click must not retry it.
   await nav('outbox');await openItem('Draft the launch announcement');
@@ -426,7 +468,7 @@ try {
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
-  for(const id of ['done-line','money-panel','mission-rows','home-cards','home-paragraph','section-tabs','section-filters','inspect-body'])assert.equal(await page.locator('#'+id).textContent(),'','clear home data on sign-out: '+id);
+  for(const id of ['done-line','money-panel','mission-rows','home-cards','home-paragraph','section-tabs','section-filters','inspect-body','inspect-title','inspect-sub','team-view'])assert.equal(await page.locator('#'+id).textContent(),'','clear home data on sign-out: '+id);
   for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','review-details','review-commitments','owner-name','agent-name','owner-avatar','notice','connection-status'])assert.equal(await page.locator('#'+id).textContent(),'','clear hidden owner data: '+id);
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);

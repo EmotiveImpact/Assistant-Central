@@ -12,6 +12,11 @@ export function money(micro, currency = 'USD') {
   return new Intl.NumberFormat('en-GB', {style: 'currency', currency, minimumFractionDigits: 2,
     maximumFractionDigits: digits}).format(value);
 }
+// A limit you are about to agree is shown exactly, never rounded: every stored millionth appears.
+export function exactMoney(micro, currency = 'USD') {
+  return new Intl.NumberFormat('en-GB', {style: 'currency', currency, minimumFractionDigits: 2,
+    maximumFractionDigits: 6}).format(Number(micro) / 1e6);
+}
 export function dollars(microusd) { return money(microusd, 'USD'); }
 
 // [amount, currency] for terms in either shape.
