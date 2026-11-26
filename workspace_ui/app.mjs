@@ -30,7 +30,7 @@ let token = null, generation = 0, busy = false, currentView = viewFromHash(locat
 let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null;
 const uncertainty=inspectionLatch();
 const viewCopy = {
-  overview:['Overview','WORKSPACE OVERVIEW','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
+  overview:['Home','HOME','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
   inbox:['Inbox','INCOMING WORK','Inbox','Review the requests and artifacts shared with your assistant.','All incoming','Every proposal has its own decision'],
   tasks:['Work','SHARED WORK','All work','Follow every task from its first proposal to the exact result.','All tasks','Incoming and outgoing task requests'],
   artifacts:['Artifacts','SHARED ARTIFACTS','Artifacts','Find the exact artifacts prepared and shared across your network.','All artifacts','Drafts, received artifacts and saved decisions'],
@@ -145,7 +145,7 @@ function render() {
   $('outbox-count').textContent=state.items.filter(item=>item.direction==='outgoing'&&!isTerminal(item)).length;
   $('pending-total').textContent=totals.pending;
   $('accepted-total').textContent=state.items.filter(item=>item.state==='accepted').length;$('peer-total').textContent=totals.peers;
-  const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
+  document.body.dataset.screen=currentView;const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
   let acceptedFilter=$('accepted-filter');
   if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
   if(acceptedFilter)acceptedFilter.hidden=currentFilter!=='accepted';
@@ -207,7 +207,7 @@ function overviewItem(item) {
   row.append(main,badge(item.state),text('span','↗','overview-arrow'));return row;
 }
 let homeOffset=0;
-function homeGreeting(hour=new Date().getHours()){return hour<12?'Morning':hour<18?'Afternoon':'Evening';}
+function homeGreeting(hour=new Date().getHours()){return hour<5?'Evening':hour<12?'Morning':hour<18?'Afternoon':'Evening';}
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
@@ -215,6 +215,7 @@ function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id)
 function renderHome(allAttention){
   const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
   say.replaceChildren();cards.replaceChildren();
+  const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
   const n=allAttention.length,first=allAttention[0];
   const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting()} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
   if(!n){const b=text('b','Nothing in your inbox needs you right now.');say.append(b);return;}
@@ -230,7 +231,9 @@ function renderHome(allAttention){
     head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),who);card.append(head,text('p',plain(item.title,'Untitled proposal'),'home-card-title'));
     if(index===0){const actions=text('div','','home-card-actions');
       if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome(allAttention);}));
-      actions.append(button('Review and agree','button primary home-agree',()=>openReview(item)));card.append(actions);}
+      actions.append(button('Review and agree','button primary home-agree',()=>openReview(item)));card.append(actions);
+      card.tabIndex=0;card.setAttribute('aria-label',`${a}, ${o}'s assistant: ${plain(item.title,'proposal')}. Right arrow reviews, left arrow shows the next card.`);
+      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();openReview(item);}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();homeOffset++;renderHome(allAttention);$('home-cards').querySelector('.depth-0')?.focus();}});}
     else card.setAttribute('aria-hidden','true');
     cards.append(card);
   });
