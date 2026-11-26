@@ -15,6 +15,7 @@ from .crypto import (TransportDenied, _need, _timestamp, canonical, digest, fing
 VERSION = 'assistant-central-pilot-exchange/1'
 MAX_HISTORY = 1024
 MAX_ATTEMPTS = 5
+MAX_PEERS = 16
 
 
 class PeerExchange:
@@ -77,7 +78,7 @@ class PeerExchange:
                 _need(old[0] == pin and old[1] == canonical(public).decode() and old[2] == 'active',
                       'Peer pin cannot be replaced or revived')
             else:
-                _need(self.db.execute('SELECT COUNT(*) FROM peer_enrolment').fetchone()[0] < 16,
+                _need(self.db.execute('SELECT COUNT(*) FROM peer_enrolment').fetchone()[0] < MAX_PEERS,
                       'Pilot peer capacity reached')
                 self.db.execute('INSERT INTO peer_enrolment VALUES(?,?,?,?,\'active\')',
                                 (pin, public['owner_id'], public['agent_id'], canonical(public).decode()))

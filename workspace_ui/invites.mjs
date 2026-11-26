@@ -64,6 +64,7 @@ export function joinProblem(reason,inviter='them'){
     revoked_before:`You removed ${inviter} before. Parlu does not add them back from a link.`,
     cannot_add:`Parlu could not add ${inviter}. Their assistant may already be listed under another key.`,
     invite_closed:'This invite has been used, revoked or has expired. Ask for a fresh one.',
+    already_linked:`You are already connected with ${inviter} through the relay. Nothing was changed.`,
     relay_refused:'The relay refused the request. Nothing was sent.',
     relay_closed:'The relay refused the request. Nothing was sent.',
     relay_unreachable:'The relay could not be reached. Nothing was sent. Try again in a moment.',

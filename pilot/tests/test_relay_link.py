@@ -5,6 +5,7 @@ import tempfile
 import threading
 import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 from pilot.auth import AuthError, LocalOwnerAuth
@@ -261,6 +262,44 @@ class RelayLinkTests(unittest.TestCase):
         self.assertEqual(self.edem.link.snapshot(self.edem.session)['invites'], [])
         with self.assertRaises(LinkDenied):
             self.edem.link.show_invite(self.edem.session, invite['id'])
+
+    def test_a_join_stored_in_time_counts_when_the_inviter_signs_in_late(self):
+        invite = self.edem.link.create_invite(self.edem.session, hours=1)
+        review = self.maya.link.open_invite(self.maya.session, invite['link'])
+        joined = self.maya.link.accept_invite(self.maya.session, invite['link'], review['review_digest'])
+        self.assertTrue(joined['joined'])
+        self.offset = 6 * 3600  # Edem only signs in hours after the invite ran out.
+        self.assertEqual(self.edem.sync()['joined'], 1)
+        waiting = self.edem.link.snapshot(self.edem.session)['joiners']
+        added = self.edem.link.decide_joiner(self.edem.session, invite['id'], waiting[0]['review_digest'], 'add')
+        self.assertTrue(added['added'])
+        self.assertEqual(self.maya.sync()['connected'], 1)
+
+    def test_the_invite_label_stays_with_its_maker(self):
+        invite = self.edem.link.create_invite(self.edem.session, 'Fictional private note')
+        self.assertEqual(invite['label'], 'Fictional private note')
+        self.assertEqual(read_link(invite['link'])['label'], '')
+        self.assertNotIn('private', self.maya.link.open_invite(self.maya.session, invite['link'])['label'])
+        self.assertEqual(self.edem.link.show_invite(self.edem.session, invite['id'])['link'], invite['link'])
+
+    def test_another_invite_never_disturbs_a_working_link(self):
+        invite = self.connect(self.edem, self.maya)
+        for link in (invite['link'], self.edem.link.create_invite(self.edem.session)['link']):
+            self.assertEqual(self.maya.link.open_invite(self.maya.session, link)['reason'], 'already_linked')
+        self.assertEqual(self.maya.links(), {self.edem.fingerprint: 'connected'})
+        self.propose(self.maya, self.edem)
+        self.assertEqual(self.maya.sync(send=True)['sent'], 1)
+        self.assertEqual(self.edem.sync()['received'], 1)
+
+    def test_a_full_peer_list_sends_no_join(self):
+        invite = self.edem.link.create_invite(self.edem.session)
+        review = self.maya.link.open_invite(self.maya.session, invite['link'])
+        full = [{'fingerprint': f'{n:064x}', 'public': {'owner_id': f'fictional{n}', 'agent_id': 'Bot'}, 'state': 'active'}
+                for n in range(1, 17)]
+        with mock.patch.object(self.maya.runtime.exchange, 'peers', return_value=full):
+            joined = self.maya.link.accept_invite(self.maya.session, invite['link'], review['review_digest'])
+        self.assertEqual(joined, {'joined': False, 'reason': 'cannot_add'})
+        self.assertEqual(self.edem.sync()['joined'], 0)
 
     def test_unreachable_relay_changes_nothing_and_is_reported(self):
         self.connect(self.edem, self.maya)

@@ -143,6 +143,9 @@ class RelayTests(RelayCase):
         self.assertIn(f"script-src '{pinned}'", headers['Content-Security-Policy'])
         self.assertIn(b"'#join='+encodeURIComponent(location.href)", script)
         self.assertIn(b'href="http://127.0.0.1:8877/" hidden', page)
+        # On a phone the page offers to copy the link, since loopback there is the phone.
+        self.assertIn(b"matchMedia('(pointer:coarse)')", script)
+        self.assertIn(b'id="copy" type="button" hidden', page)
         self.assertEqual(headers['Referrer-Policy'], 'no-referrer')
         status, headers, page = self.relay.handle('GET', '/', {}, b'')
         self.assertEqual(status, 200)

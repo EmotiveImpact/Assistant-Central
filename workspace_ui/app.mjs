@@ -846,7 +846,8 @@ async function logout(){
 $('logout').addEventListener('click',logout);$('mobile-logout').addEventListener('click',logout);
 $('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;const release=operations.acquire();try{await refresh({clearNotice:true});if(epoch!==generation)return;selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{release();}});
 document.querySelector('.skip-link').addEventListener('click',event=>{event.preventDefault();setNavigation(false);(token?$('main'):$('password')).focus();});
-$('sync').addEventListener('click',()=>{if(relayEnabled(state))return relaySync(true,{announce:true});performWrite('/api/exchange',{}, {onSuccess:()=>notice('Exchange checked. Review new items and saved delivery outcomes below.',true)});});
+// Both carriers: assistants added by address use the direct exchange, invited ones the relay.
+$('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>{if(relayEnabled(state))setTimeout(()=>relaySync(true,{announce:true}));else notice('Exchange checked. Review new items and saved delivery outcomes below.',true);}}));
 $('new-proposal').addEventListener('click',prepareCompose);
 function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));

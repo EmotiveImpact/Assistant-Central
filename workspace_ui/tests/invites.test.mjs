@@ -46,7 +46,7 @@ test('expiry reads in plain words',()=>{
 });
 
 test('every refusal has one sentence the owner can act on',()=>{
-  for(const reason of ['own_invite','other_relay','revoked_before','cannot_add','invite_closed','relay_refused','relay_closed','relay_unreachable'])
+  for(const reason of ['own_invite','other_relay','revoked_before','cannot_add','invite_closed','already_linked','relay_refused','relay_closed','relay_unreachable'])
     assert.notEqual(joinProblem(reason,'Maya'),'This invite could not be used.',reason);
   assert.match(joinProblem('revoked_before','Maya'),/Maya/);
   assert.equal(joinProblem('anything else'),'This invite could not be used.');

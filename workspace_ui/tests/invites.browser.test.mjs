@@ -49,12 +49,18 @@ try{
   await edem.locator('#invite-dialog .dialog-footer .close-dialog').click();
   await edem.locator('.relay-row').filter({hasText:`code ${code}`}).waitFor();
 
-  // Maya opens the link: the relay's page hands it to her own Parlu after "#join=".
-  const maya=await open(mayaURL,{phone:true});
-  await maya.goto(link);
-  const handoff=await maya.locator('#open').getAttribute('href');
+  // On a computer the relay's page hands the link to local Parlu after "#join=".
+  const desk=await open(mayaURL);
+  await desk.goto(link);
+  const handoff=await desk.locator('#open').getAttribute('href');
   assert.ok(handoff.startsWith('http://127.0.0.1:8877/#join='),'the relay page hands over to local Parlu');
   assert.equal(decodeURIComponent(handoff.split('#join=')[1]),link);
+  assert.equal(await desk.locator('#copy').isVisible(),false);
+  // On a phone, loopback is the phone itself, so the page offers to copy the link instead.
+  const maya=await open(mayaURL,{phone:true});
+  await maya.goto(link);
+  await maya.locator('#copy').waitFor({state:'visible'});
+  assert.equal(await maya.locator('#open').isVisible(),false,'no button that cannot reach Parlu');
   await maya.goto(mayaURL.origin+'/#join='+encodeURIComponent(link));
   assert.ok(!maya.url().includes('join='),'the invite is taken out of the address bar straight away');
   await signIn(maya);
@@ -89,12 +95,12 @@ try{
   assert.equal(await maya.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'no sideways scroll on a phone');
   await shot(maya,'invite-4-connected-phone.png');
 
-  // The used link cannot be joined again by someone else.
+  // Opening the link again is refused before anything is sent, and the working link stays.
   await maya.locator('.relay-strip').getByRole('button',{name:'Join with a link'}).click();
   await maya.locator('#join-link').fill(link);await maya.locator('#join-submit').click();
-  await maya.locator('#join-review').waitFor({state:'visible'});
-  await maya.locator('#join-submit').click();
-  await maya.locator('#join-message').filter({hasText:'used, revoked or has expired'}).waitFor();
+  await maya.locator('#join-message').filter({hasText:'already connected'}).waitFor();
+  await maya.locator('#join-dialog .close-dialog').first().click();
+  await maya.locator('#item-list .peer-row').filter({hasText:'Juniper'}).filter({hasText:'Connected through the relay'}).waitFor();
 
   assert.deepEqual(errors,[]);
   console.log('Invite link browser test passed.');

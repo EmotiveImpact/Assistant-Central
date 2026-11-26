@@ -40,6 +40,7 @@ from relay.acrelay.protocol import MailboxKey, RelayError, new_send_token
 from .auth import AuthError, _create_private_file, _private_path
 from .crypto import MAX_PACKET, TransportDenied, b64, canonical, digest, fingerprint, packet_header, unb64, validate_public
 from .storage import RecordStorage
+from .transport import MAX_PEERS
 
 VERSION = 'parlu-relay-link/1'
 LINK_VERSION = 2
@@ -54,9 +55,10 @@ MAX_ATTEMPTS = 5
 MAX_FETCH_ROUNDS = 20
 INVITE_PACKETS = 4
 MAX_INVITE_HOURS = 7 * 24
-PEER_SECONDS = 365 * 86400
+PEER_SECONDS = 364 * 86400  # Below the relay's one-year cap, leaving room for clock skew.
 PEER_PACKETS = 50_000
 WELCOME_WINDOW = 14 * 86400
+JOIN_KEPT = 14 * 86400  # How long the relay keeps a stored packet.
 SENT_MEMORY = 2 * 3600
 SEALED = {'link_meta': ('key',), 'link_invites': ('secret', 'joiner'), 'link_peers': ('send',)}
 
@@ -347,7 +349,7 @@ class RelayLink:
         if with_link:
             secret = self._open('link_invites', row['id'], 'secret', row['secret'])
             view['link'] = make_link(self.relay_url, self._meta()['mailbox'], secret['token'], secret['secret'],
-                                     self.identity, row['label'])
+                                     self.identity)
         return view
 
     def create_invite(self, session, label='', *, hours=24):
@@ -367,7 +369,8 @@ class RelayLink:
             return {'made': False, 'relay': problem}
         invite_id = grant['grant_id']
         need(type(invite_id) is str and GRANT_ID.fullmatch(invite_id) is not None)
-        code = read_link(make_link(self.relay_url, client.mailbox, token, secret, self.identity, label))['code']
+        # The label is a private note for the person who made the invite: it never goes in the link.
+        code = read_link(make_link(self.relay_url, client.mailbox, token, secret, self.identity))['code']
         with self._txn():
             self.db.execute("INSERT INTO link_invites VALUES(?,?,?,?,?,'open',?,NULL)",
                             (invite_id, label, code, now, now + hours * 3600,
@@ -413,6 +416,10 @@ class RelayLink:
         known = self._peer_state(target['fingerprint'])
         if known == 'revoked':
             return {**base, 'ok': False, 'reason': 'revoked_before'}
+        linked = self.db.execute('SELECT state FROM link_peers WHERE peer=?', (target['fingerprint'],)).fetchone()
+        if linked is not None and linked['state'] != 'closed':
+            # Trying another invite must never disturb a link that works or is waiting.
+            return {**base, 'ok': False, 'reason': 'already_linked'}
         return {**base, 'ok': True, 'code': target['code'], 'known': known == 'active',
                 'review_digest': digest(['parlu-link-accept/1', self.fingerprint, target['fingerprint'],
                                          target['mailbox'], target['code']])}
@@ -473,7 +480,7 @@ class RelayLink:
             same = (entry['public']['owner_id'], entry['public']['agent_id']) == (public['owner_id'], public['agent_id'])
             if entry['fingerprint'] == pin or same:
                 return entry['fingerprint'] == pin and entry['state'] == 'active'
-        return pin != self.fingerprint
+        return pin != self.fingerprint and len(self.runtime.exchange.peers()) < MAX_PEERS
 
     def _flush_control(self, peer):
         """Post a waiting join or welcome packet once. The try is recorded before bytes leave."""
@@ -568,9 +575,11 @@ class RelayLink:
         need(type(grant_id) is str and GRANT_ID.fullmatch(grant_id) is not None)
         row = self.db.execute('SELECT * FROM link_invites WHERE id=?', (grant_id,)).fetchone()
         # One invite, one person: the first valid join wins and later ones are ignored.
-        need(row is not None and row['state'] == 'open' and now < row['join_by'] + 300)
+        # The relay stops taking packets under the invite grant at its expiry, so a join found
+        # here was stored in time, even if the inviter only signs in to fetch it days later.
+        need(row is not None and row['state'] == 'open' and now < row['join_by'] + JOIN_KEPT)
         header, body = open_envelope(self.auth, session, envelope, 'join')
-        need(row['created'] - 300 <= header['created'] <= now + 300)
+        need(row['created'] - 300 <= header['created'] <= min(now, row['join_by']) + 300)
         need(set(body) == {'public', 'relay_url', 'mailbox', 'token', 'proof'})
         try:
             public = validate_public(body['public'])
