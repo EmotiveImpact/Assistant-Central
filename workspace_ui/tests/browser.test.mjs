@@ -233,6 +233,11 @@ try {
   assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
   assert.equal(await page.locator('#review-content *').count(),0);
   assert.match(await page.locator('#review-scope').textContent(),/does not start work/);
+  // Decide: Spends, Shares and Keeps sit above the exact content. No money, so no hold.
+  assert.match(await page.locator('#review-decide .decide-question').textContent(),/^Agree to “Review the research brief” for \S+\?$/);
+  assert.deepEqual(await page.locator('#review-decide dt').allTextContents(),['Spends','Shares','Keeps']);
+  assert.match(await page.locator('#review-decide dd').first().textContent(),/^Nothing\./);
+  assert.equal(await page.locator('#review-decide .hold-control').count(),0,'no money, no hold');
   await action('Accept exact proposal');
   await article('Review the research brief').locator('.badge.accepted').waitFor();
   await openItem('Explore the visual direction');await action('Reject proposal');
@@ -301,6 +306,7 @@ try {
   assert.equal(await page.getByRole('dialog',{name:'Enrol a trusted peer',exact:true}).count(),1);await checkContrast();
   await page.keyboard.press('Escape');await page.locator('#peer-dialog').waitFor({state:'hidden'});
   await page.getByRole('button',{name:'View public identity'}).click();
+  assert.equal(await page.locator('#review-decide').isVisible(),false,'showing an identity is not a decision');
   const publicIdentity=JSON.parse(await page.locator('#review-content').textContent());
   assert.deepEqual(Object.keys(publicIdentity).sort(),['agent_id','exchange_key','owner_id','signing_key']);await closeReview();
   await nav('outbox');
@@ -314,6 +320,8 @@ try {
   await page.getByRole('button',{name:'Create for review',exact:true}).click();
   await article('Fictional studio brief').getByRole('button',{name:'Review Fictional studio brief',exact:true}).click();
   await page.getByRole('dialog',{name:'Fictional studio brief',exact:true}).waitFor();
+  assert.match(await page.locator('#review-decide .decide-question').textContent(),/^Send “Fictional studio brief” to /);
+  assert.match(await page.locator('#review-decide dd').first().textContent(),/^Up to .+ from this mission's limit if \S+ agrees\. Simulated, no real payment\.$/,'a mission shows its signed limit');
   const offerText = await page.locator('#review-content').textContent();
   assert.match(offerText,/Fictional studio brief/);
   assert.match(offerText,/Prepare one fictional studio note/);

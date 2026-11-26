@@ -27,7 +27,7 @@ jobs:
       - name: Verify alternative server boundaries
         run: python -B -m unittest discover -s workspace_ui/tests -p 'test_*.py' -v
       - name: Verify workspace projections
-        run: node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs workspace_ui/tests/missions.test.mjs workspace_ui/tests/approvals.test.mjs workspace_ui/tests/bots.test.mjs workspace_ui/tests/home.test.mjs workspace_ui/tests/depth.test.mjs workspace_ui/tests/queue.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
+        run: node --test workspace_ui/tests/host_drafts.test.mjs workspace_ui/tests/projections.test.mjs workspace_ui/tests/missions.test.mjs workspace_ui/tests/approvals.test.mjs workspace_ui/tests/bots.test.mjs workspace_ui/tests/home.test.mjs workspace_ui/tests/depth.test.mjs workspace_ui/tests/queue.test.mjs workspace_ui/tests/decide.test.mjs pilot/web/tests/model.test.mjs pilot/web/tests/transfers.test.mjs
       - name: Exercise actual owner API in Chromium
         shell: bash
         run: |

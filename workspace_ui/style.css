@@ -813,3 +813,19 @@ body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-w
 @media(max-width:700px){body[data-screen=overview] #new-proposal{display:none}}
 /* A card's one line of context above its title (questions, messages, drafts, invitations). */
 .home-card-lead{margin:0;font-size:12.5px;color:#c9c9c5;font-weight:600}
+
+/* ===== Decide (Full App mock): the exact review opens with Spends, Shares and Keeps.
+   A dialog on desktop, a sheet on the phone. Money needs a hold. ===== */
+.decide-block{display:grid;gap:12px;margin:0 0 18px}
+.decide-question{margin:0;font-size:20px;line-height:1.2;font-weight:800;letter-spacing:-.03em;color:var(--text);overflow-wrap:anywhere}
+.decide-rows{margin:0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.decide-row{display:flex;gap:12px;padding:10px 14px;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.45}
+.decide-row:first-child{border-top:0}
+.decide-row dt{flex:none;width:68px;margin:0;padding-top:2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.decide-row dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+.decide-row.quiet dd{color:var(--muted)}
+.decide-block .hold-control{margin:22px 0 4px}
+@media(max-width:700px){
+  #review-dialog::before{content:"";display:block;width:38px;height:5px;border-radius:5px;background:#dcdcd9;margin:8px auto 0}
+  .decide-question{font-size:18px}
+}

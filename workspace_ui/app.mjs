@@ -7,6 +7,8 @@ import {SECTIONS,WORK_VIEWS,WORK_FILTERS,sectionOf,tabOf,receiptsOf,shortDigest,
 import {createHostDrafts,validateDraftQueue} from './host_drafts.mjs';
 import {createApprovals,validateListing} from './approvals.mjs';
 import {homeQueue,CARD,askerOf,moreLine,closingLine} from './queue.mjs';
+import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
+import {holdButton} from './hold.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
@@ -87,7 +89,7 @@ function resetSession(message='') {
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
-  for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
+  for(const id of ['review-title','review-eyebrow','review-state','review-decide','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
   for(const id of ['proposal-peer','proposal-parent','peer-connection'])$(id).replaceChildren();
   for(const id of ['inbox-count','outbox-count','pending-total','accepted-total','peer-total'])$(id).textContent='0';
   $('review-dialog').querySelector('.commitment-details').open=false;notice('');
@@ -293,6 +295,21 @@ let homeOffset=0;
 let storyOffset=0;
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
+// Decide: what this exact decision spends, shares and keeps, above the exact content.
+// Money needs a deliberate hold; the plain button below stays as the alternative.
+function renderDecide(item,review){
+  const box=$('review-decide');box.replaceChildren();
+  const deciding=review.allowed_actions.some(action=>['accept','release'].includes(action));box.hidden=!deciding;if(!deciding)return;
+  const peer=peerOf(item),names={agent:plain(peer?.agent_id,'their assistant'),owner:cap(plain(peer?.owner_id,'them')),actions:review.allowed_actions};
+  box.append(text('p',decisionQuestion(item,names),'decide-question'));
+  const rows=text('dl','','decide-rows');
+  for(const [key,value] of decisionRows(item,names)){const row=text('div','','decide-row'+(key==='Keeps'?' quiet':''));row.append(text('dt',key),text('dd',value));rows.append(row);}
+  box.append(rows);
+  if(review.allowed_actions.includes('accept')&&needsHold(item,'accept')){
+    const current=selected;
+    box.append(holdButton('Hold to agree',()=>{if(selected===current&&$('review-dialog').open)decideSelected('accept');}),text('p','Or agree with the button below.','hold-alt'));
+  }
+}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
 // The cards are one queue of everything that needs you: proposals from saved state, plus
 // questions, messages and shared drafts (Approvals), conversation invitations and drafts
@@ -431,7 +448,7 @@ function renderPeers() {
 }
 
 function showPublicIdentity(identity,fingerprint) {
-  selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
+  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
 function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
@@ -462,6 +479,7 @@ async function openReview(item) {
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
+    renderDecide(item,review);
     const parent=state.items.find(candidate=>candidate.id===item.parent_id);
     if(item.kind==='artifact' && item.direction==='incoming' && ['pending','accepted'].includes(item.state) && parent?.peer_mission===true) {
       const current=selected;
@@ -494,7 +512,7 @@ async function prepareWorkflow(item) {
   await performWrite(`/api/items/${encodeURIComponent(item.id)}/workflow`,{}, {target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice('Synthetic run prepared. Inspect its exact request and approve it separately. Nothing has run.',true);}});
 }
 function workflowDetailHeader(item,run,heading) {
-  selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
+  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
   $('review-details').replaceChildren();detail($('review-details'),'Task',plain(item.title,item.task_id));detail($('review-details'),'Return recipient',peerName(item.peer_id));detail($('review-details'),'Provider calls','None. Fixed local fixture only.');
   $('review-commitments').replaceChildren();detail($('review-commitments'),'Run ID',run.run_id);detail($('review-commitments'),'Task proposal',item.id);detail($('review-commitments'),'Context',item.context);detail($('review-commitments'),'Provider review',run.review_digest);
   $('review-message').textContent='';$('review-actions').replaceChildren();
@@ -714,7 +732,7 @@ async function openTransfer(selection){
   try{
     const review=validateTransferReview(await request(transferPath(selection)),selection);if(epoch!==generation)return;
     selected=null;selectedWorkflow=null;selectedTransfer={...selection,review};
-    $('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
+    $('review-decide').hidden=true;$('review-decide').replaceChildren();$('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
     $('review-details').replaceChildren();detail($('review-details'),'Connection',review.connection.label);detail($('review-details'),'Destination',review.connection.destination);detail($('review-details'),selection.kind==='quarantine'?'Expected sender':'Exact recipient',review.connection.peer_fingerprint);detail($('review-details'),'Packet type',review.packet_kind);detail($('review-details'),'Original expiry',datetime(review.expires));
     if(review.outbox){detail($('review-details'),'Current outbox',review.outbox.state);detail($('review-details'),'Total attempts',String(review.outbox.attempts));}
     $('review-content').textContent=selection.kind==='quarantine'?'This file is untrusted. Import verifies its original signature and current peer/source gates. It does not accept a proposal, start work or send a receipt.':'Only the original retained encrypted packet can be sent. A fixed mailbox acknowledgement proves neither signed receipt nor owner acceptance.';
