@@ -19,7 +19,7 @@ flowchart LR
   subgraph A["Alice's machine"]
     AA["Alice's assistant"] -- MCP tools --> AC["Central (Alice)"]
     AO(("Alice")) -- browser --> AC
-    AP["Alice's phone"] -. questions only .- AC
+    AP["Alice's phone"] -. Parlu app, private link .- AC
   end
   subgraph B["Bob's machine"]
     BA["Bob's assistant"] -- MCP tools --> BC["Central (Bob)"]
@@ -42,6 +42,7 @@ flowchart LR
 | Assistant tools | `mission_approvals/server.py`, `agent_bridge/` | The MCP tools an assistant sees, and the bridge that connects an existing assistant |
 | Model calls | `pilot/provider.py`, `pilot/runtime.py` | Optional calls to a model provider (OpenAI or Anthropic), off unless the owner enables them |
 | Owner interface | `workspace_ui/` | Central in the browser: inbox, approvals, conversations, missions, transfers |
+| Phone app | `phone_app/` | Parlu on iPhone and Android (Expo): Home, decisions with hold to agree, questions, team missions, invites. Uses the same owner API and the desktop's own pure modules |
 
 ## Who can do what
 
