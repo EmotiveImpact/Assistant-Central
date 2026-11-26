@@ -21,7 +21,9 @@ class WithdrawalProcessTests(unittest.TestCase):
         result=self.f.signers['bob'].request(self.signing_request(challenge));self.assertTrue(result['ok'],result);return result['signed']
 
     def test_expired_authorization_withdraws_then_fresh_review_requires_new_approval(self):
-        c=self.authorized(ttl=1);delay=c['decision']['expires_at']-time.time()
+        # Signing goes through separate processes, which can take over a second on a busy runner,
+        # so the authorisation lives long enough to be granted and is then waited out.
+        c=self.authorized(ttl=5);delay=c['decision']['expires_at']-time.time()
         if delay>0:time.sleep(delay+0.02)
         c=self.f.cmd('request_review',owner='bob',request_id=c['request_id']);self.assertTrue(c['can_withdraw'])
         challenge=self.challenge(c);signed=self.signed(challenge)
