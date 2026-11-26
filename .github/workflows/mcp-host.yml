@@ -19,5 +19,7 @@ jobs:
         run: python -m pip install -r pilot/requirements.txt -r mission_approvals/requirements.txt
       - name: Mission approvals and assistant conversation tools through the official MCP client
         run: python -B -m unittest discover -s mission_approvals/tests -v
+      - name: Parlu SDK on its own (no app code)
+        run: cd sdk/python && python -B -m unittest discover -s tests -t . -v
       - name: Owner questions and the Telegram adapter (fake Bot API, no network)
         run: python -B -m unittest discover -s owner_phone/tests -t . -v

@@ -13,8 +13,13 @@ from typing import Any
 from pydantic import BaseModel
 
 from mcp.server.apps import Apps, ResourceCsp
+from mcp.types import ToolAnnotations
 
 from .tools import CardBook
+
+# Explicit hints for every tool, as assistant directories require. Nothing here reaches the
+# open internet: tools act only inside the owner's own Parlu.
+READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False, open_world_hint=False)
 
 APP_URI = 'ui://assistant-central/mission-card.html'
 APP_HTML = (Path(__file__).with_name('card_app.html')).read_text(encoding='utf-8')
@@ -32,7 +37,7 @@ class CardView(BaseModel):
 def card_app(book: CardBook, owner_id: str) -> Apps:
     apps = Apps()
 
-    @apps.tool(resource_uri=APP_URI, name='show_mission_card',
+    @apps.tool(annotations=READ_ONLY, resource_uri=APP_URI, name='show_mission_card',
                description='Show a mission card visually: goal, every owner\'s constraints, status and what is '
                            'waiting on you. Constraint text is written by the people on the mission.')
     def show_mission_card(mission_id: str) -> CardView:
