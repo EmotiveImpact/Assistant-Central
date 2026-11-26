@@ -60,7 +60,7 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
   function listing() {
     route('list', {}, ({missions}) => {
       const rows = missions.map(m => btn(m.goal + ' · revision ' + m.revision, () => inspect(m.id)));
-      section('Mission agreements', ...rows, btn('Create mission agreement', () => edit()));
+      section('Mission agreements', ...rows, btn('Create mission agreement', () => edit(), 'primary'));
     });
   }
   function edit(previous) {
@@ -90,7 +90,7 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
     const message=node('p'); message.setAttribute('role','status');
     section(previous?'Revise mission':'Create mission agreement',field('Goal',goal),field('Deliverable',deliverable),field('Executing owner',executor),
       field('Spending limit in US dollars (simulated)',amount),list,btn('Add check',()=>{if(list.childElementCount<12)add();}),
-      node('p','Valid for 30 minutes. Work pauses for owner decisions and stops at the usage limit or expiry.'),message,btn('Save revision',submit));
+      node('p','Valid for 30 minutes. Work pauses for owner decisions and stops at the usage limit or expiry.'),message,btn('Save revision',submit,'primary'));
   }
   function inspect(pid) {
     route('inspect', {proposal_id:pid}, view => {
@@ -108,9 +108,9 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
               node('p','Owners: '+exact.audience.map(a=>name(a.principal)).join(', ')),
               node('p','Revision '+exact.revision+' · expires '+new Date(exact.expires_at*1000).toLocaleString()),
               node('p','Agreement only. Task release, provider use and accepting a return each require a separate decision.'),
-              btn('Approve exact revision',()=>route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true)));
+              btn('Approve exact revision',()=>route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true),'primary'));
           });
-        }));
+        }, 'primary'));
         else controls.push(btn('Withdraw my agreement',()=>route('withdraw',{proposal_id:pid,proposal_digest:view.mission_digest},()=>inspect(pid),true)));
         if (s.author===principal) controls.push(btn('Prepare revised terms',()=>edit(s)));
       }
