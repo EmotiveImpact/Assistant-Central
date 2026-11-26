@@ -1,4 +1,5 @@
 import {ownerPair} from './bots.mjs';
+import {holdButton} from './hold.mjs';
 // A mission operates inside the current conversation's session and operation gate.
 
 // Budgets are stored exactly, in millionths of one currency unit, and signed with
@@ -135,13 +136,16 @@ export function openMissions({dialog, room, principal, name, call, close, node, 
         else if (!view.current_approval_owners.includes(principal)) controls.push(btn('Review agreement', () => {
           route('review',{proposal_id:pid}, review => {
             const exact = signature(review.proposal);
+            let approving=false;const approveExact=()=>{if(approving||!document.querySelector('#conversation-dialog[open] .hold-control'))return;approving=true;route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true);};
             const details = node('details'), terms = parse(exact);
             details.append(node('summary','Show the exact terms'), node('pre',JSON.stringify(terms,null,2),'artifact-content'));
             section('Approve this revision',...summaryRows(terms),details,
               node('p','Owners: '+exact.audience.map(a=>name(a.principal)).join(', ')),
               node('p','Revision '+exact.revision+' · expires '+new Date(exact.expires_at*1000).toLocaleString()),
               node('p','Agreement only. Task release, provider use and accepting a return each require a separate decision.'),
-              btn('Approve exact revision',()=>route('approve',{proposal_id:pid,review_digest:review.review_digest},()=>inspect(pid),true),'primary'));
+              holdButton('Hold to approve',approveExact),
+              node('p','Or approve with a button:','hold-alt'),
+              btn('Approve exact revision',approveExact));
           });
         }, 'primary'));
         else controls.push(btn('Withdraw my agreement',()=>route('withdraw',{proposal_id:pid,proposal_digest:view.mission_digest},()=>inspect(pid),true)));

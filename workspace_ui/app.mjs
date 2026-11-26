@@ -1,7 +1,7 @@
 import {operationGate,restoreWhenIdle,inspectionLatch,inspectSavedState,requestIsMutation} from './operations.mjs';
 import {createConversations,inspectMessageOutcome} from './conversations.mjs';
 import {money,amountOf,toMicro,ownerCurrency} from './missions.mjs';
-import {botFace} from './bots.mjs';
+import {botFace,ownerPair} from './bots.mjs';
 import {createHostDrafts} from './host_drafts.mjs';
 import {createApprovals} from './approvals.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
@@ -30,7 +30,7 @@ let token = null, generation = 0, busy = false, currentView = viewFromHash(locat
 let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null;
 const uncertainty=inspectionLatch();
 const viewCopy = {
-  overview:['Overview','WORKSPACE OVERVIEW','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
+  overview:['Home','HOME','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
   inbox:['Inbox','INCOMING WORK','Inbox','Review the requests and artifacts shared with your assistant.','All incoming','Every proposal has its own decision'],
   tasks:['Work','SHARED WORK','All work','Follow every task from its first proposal to the exact result.','All tasks','Incoming and outgoing task requests'],
   artifacts:['Artifacts','SHARED ARTIFACTS','Artifacts','Find the exact artifacts prepared and shared across your network.','All artifacts','Drafts, received artifacts and saved decisions'],
@@ -77,7 +77,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats'])$(id).replaceChildren();
+  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats','home-when','home-paragraph','home-cards'])$(id).replaceChildren();homeOffset=0;
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -145,7 +145,7 @@ function render() {
   $('outbox-count').textContent=state.items.filter(item=>item.direction==='outgoing'&&!isTerminal(item)).length;
   $('pending-total').textContent=totals.pending;
   $('accepted-total').textContent=state.items.filter(item=>item.state==='accepted').length;$('peer-total').textContent=totals.peers;
-  const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
+  document.body.dataset.screen=currentView;const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
   let acceptedFilter=$('accepted-filter');
   if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
   if(acceptedFilter)acceptedFilter.hidden=currentFilter!=='accepted';
@@ -206,12 +206,45 @@ function overviewItem(item) {
   const main=text('span','','overview-row-main');main.append(text('strong',plain(item.title,'Untitled proposal')),text('span',peerName(item.peer_id)+' · '+plain(item.task_id).slice(0,28),'overview-row-meta'));
   row.append(main,badge(item.state),text('span','↗','overview-arrow'));return row;
 }
+let homeOffset=0;
+function homeGreeting(hour=new Date().getHours()){return hour<5?'Evening':hour<12?'Morning':hour<18?'Afternoon':'Evening';}
+function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
+function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
+// Home is a short honest paragraph (at most three sentences) and one decision per card.
+// A card never decides on its own: agreeing opens the exact review.
+function renderHome(allAttention){
+  const say=$('home-paragraph'),cards=$('home-cards');if(!say||!cards)return;
+  say.replaceChildren();cards.replaceChildren();
+  const when=$('home-when');if(when)when.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const n=allAttention.length,first=n?allAttention[homeOffset%n]:undefined;
+  const me=plain(state.identity.owner_id,'there');say.append(text('span',`${homeGreeting()} ${me.charAt(0).toUpperCase()+me.slice(1)}. `));
+  if(!n){const b=text('b','Nothing in your inbox needs you right now.');say.append(b);return;}
+  const peer=peerOf(first),owner=cap(plain(peer?.owner_id,'Someone')),agent=plain(peer?.agent_id,'their assistant');
+  say.append(text('span',`${owner}'s `),ownerPair(owner,agent,'owner-pair inline','look'),text('span',` ${agent} sent `),text('b',plain(first.title,'a proposal')));
+  say.append(text('span',n>1?` and ${n-1} more ${n===2?'waits':'wait'} for your review. `:' and it needs your decision. '));
+  say.append(text('b','Nothing else in your inbox needs you.'));
+  const order=allAttention.slice(homeOffset%n).concat(allAttention.slice(0,homeOffset%n)).slice(0,3);
+  order.forEach((item,index)=>{
+    const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
+    const card=text('article','','home-card depth-'+index);card.dataset.itemId=item.id;
+    const head=text('div','','home-card-head');const who=text('span','','home-card-who');who.append(text('strong',`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
+    head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),who);card.append(head,text('p',plain(item.title,'Untitled proposal'),'home-card-title'));
+    if(index===0){const actions=text('div','','home-card-actions');
+      if(n>1)actions.append(button('Not now','button home-later',()=>{homeOffset++;renderHome(allAttention);}));
+      actions.append(button('Review and agree','button primary home-agree',()=>openReview(item)));card.append(actions);
+      card.tabIndex=0;card.setAttribute('aria-label',`${a}, ${o}'s assistant: ${plain(item.title,'proposal')}. Right arrow reviews, left arrow shows the next card.`);
+      card.addEventListener('keydown',event=>{if(event.target!==card)return;if(event.key==='ArrowRight'){event.preventDefault();openReview(item);}else if(event.key==='ArrowLeft'&&n>1){event.preventDefault();homeOffset++;renderHome(allAttention);$('home-cards').querySelector('.depth-0')?.focus();}});}
+    else card.setAttribute('aria-hidden','true');
+    cards.append(card);
+  });
+}
 function renderOverview(totals) {
   for(const id of ['overview-stats','overview-attention','overview-work','overview-network','overview-events'])$(id).replaceChildren();
   const stats=[['Needs your review',totals.pending,'Incoming proposals','inbox','pending'],['Accepted tasks',totals.acceptedTasks,'Work agreed by its recipient','tasks','accepted'],['Artifacts',totals.artifacts,'Drafts and received work','artifacts','all'],['Trusted assistants',totals.peers,'Individually enrolled','peers','all']];
   const metricSymbols={inbox:'i-inbox',tasks:'i-tasks',artifacts:'i-artifacts',peers:'i-peers'};
   for(const [label,value,note,view,filter] of stats){const tile=button('','overview-metric',()=>navigate(view,{filter}));tile.append(symbolIcon(metricSymbols[view],'metric-icon'),text('span',label,'metric-label'),text('strong',value,'metric-value'),text('span',note,'metric-note'));$('overview-stats').append(tile);}
   const allAttention=attentionItems(state),attention=allAttention.slice(0,3);
+  renderHome(allAttention);
   if($('attention-count'))$('attention-count').textContent=allAttention.length;
   if(attention.length)for(const item of attention)$('overview-attention').append(overviewItem(item));
   else empty('✓','You’re all caught up.','New requests will appear here after you sync the exchange.',undefined,$('overview-attention'));
@@ -418,7 +451,10 @@ $('logout').addEventListener('click',logout);$('mobile-logout').addEventListener
 $('refresh').addEventListener('click',async()=>{if(busy)return;const epoch=generation;const release=operations.acquire();try{await refresh({clearNotice:true});if(epoch!==generation)return;selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-dialog').close();}catch(error){if(epoch===generation)handleFailure(error);}finally{release();}});
 document.querySelector('.skip-link').addEventListener('click',event=>{event.preventDefault();setNavigation(false);(token?$('main'):$('password')).focus();});
 $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSuccess:()=>notice('Exchange checked. Review new items and saved delivery outcomes below.',true)}));
-$('new-proposal').addEventListener('click',prepareCompose);$('add-peer').addEventListener('click',openPeerDialog);
+$('new-proposal').addEventListener('click',prepareCompose);
+function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
+$('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
+$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
 document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;selectedTransfer=null;}));

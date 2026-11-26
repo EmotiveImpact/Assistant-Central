@@ -66,13 +66,13 @@ const checkContrast=async()=>{
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
-const HEADINGS={page:{size:'36px',lineHeight:'42px',tracking:'-1.08px'},dialog:{size:'22px',lineHeight:'28px',tracking:'-0.33px'}};
+const HEADINGS={page:{size:'36px',lineHeight:'42px',tracking:'-1.26px'},dialog:{size:'22px',lineHeight:'28px',tracking:'-0.33px'}};
 const assertAppHeading=async(selector,kind='page')=>{
   const style=await page.locator(selector).evaluate(node=>{
     const s=getComputedStyle(node);return {size:s.fontSize,weight:s.fontWeight,lineHeight:s.lineHeight,
       tracking:s.letterSpacing,features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
   });
-  assert.deepEqual(style,{size:HEADINGS[kind].size,weight:'700',lineHeight:HEADINGS[kind].lineHeight,tracking:HEADINGS[kind].tracking,
+  assert.deepEqual(style,{size:HEADINGS[kind].size,weight:'800',lineHeight:HEADINGS[kind].lineHeight,tracking:HEADINGS[kind].tracking,
     features:'"cv01", "ss03"',opticalSizing:'auto'});
 };
 

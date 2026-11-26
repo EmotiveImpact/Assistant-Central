@@ -34,6 +34,12 @@ try{
   await button(alice,'Save revision').click();
   const agreementButton='Approve exact revision';
   await button(alice,'Review agreement').click();
+  // A keyboard hold interrupted by closing the review must never approve.
+  await button(alice,'Hold to approve').focus();await alice.keyboard.down('Space');await alice.waitForTimeout(300);
+  await alice.keyboard.press('Escape');await alice.waitForTimeout(1200);await alice.keyboard.up('Space');
+  assert.equal(await alice.getByText(/1 of 2 owners agreed/).count(),0,'a dismissed hold must not approve');
+  if(!await button(alice,'Review agreement').isVisible()){await button(alice,'Mission agreements').click();await button(alice,'Check the fictional brief · revision 1').click();}
+  await button(alice,'Review agreement').click();
   await button(alice,agreementButton).click();
   await alice.getByText(/1 of 2 owners agreed/).waitFor();
   await screenshot(alice,'central-mission-agreement.png');
@@ -41,7 +47,13 @@ try{
   await bob.bringToFront();await open(bob);
   await button(bob,'Mission agreements').click();
   await button(bob,'Check the fictional brief · revision 1').click();
-  await button(bob,'Review agreement').click();await button(bob,agreementButton).click();
+  await button(bob,'Review agreement').click();
+  // Hold to agree: letting go early does nothing, a full hold of about a second approves.
+  const hold=button(bob,'Hold to approve');await hold.waitFor();
+  const box=await hold.boundingBox();await bob.mouse.move(box.x+box.width/2,box.y+box.height/2);
+  await bob.mouse.down();await bob.waitForTimeout(300);await bob.mouse.up();await bob.waitForTimeout(900);
+  assert.equal(await bob.getByText(/2 of 2 owners agreed/).count(),0,'an early release must not approve');
+  await bob.mouse.down();await bob.waitForTimeout(1300);await bob.mouse.up();
   await bob.getByText(/2 of 2 owners agreed/).waitFor();
   await button(bob,'Withdraw my agreement').click();
   await bob.getByText(/1 of 2 owners agreed/).waitFor();
