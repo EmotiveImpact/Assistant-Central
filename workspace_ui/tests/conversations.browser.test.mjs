@@ -53,6 +53,17 @@ try{
   const box=await hold.boundingBox();await bob.mouse.move(box.x+box.width/2,box.y+box.height/2);
   await bob.mouse.down();await bob.waitForTimeout(300);await bob.mouse.up();await bob.waitForTimeout(900);
   assert.equal(await bob.getByText(/2 of 2 owners agreed/).count(),0,'an early release must not approve');
+  // Touch keeps the pointer captured, so a finger that slides off the button gets no leave event.
+  // It must still cancel: a hold only counts while the finger stays on the button.
+  const touch=await bob.context().newCDPSession(bob),finger=(x,y)=>[{x:Math.round(x),y:Math.round(y),id:1}];
+  await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:finger(box.x+box.width/2,box.y+box.height/2)});
+  await bob.waitForTimeout(200);
+  await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:finger(box.x+box.width/2+160,box.y+box.height/2)});
+  await bob.waitForTimeout(1300);
+  await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  await bob.waitForTimeout(400);
+  assert.equal(await bob.getByText(/2 of 2 owners agreed/).count(),0,'sliding a finger off the hold must not approve');
+  await touch.detach();
   await bob.mouse.down();await bob.waitForTimeout(1300);await bob.mouse.up();
   await bob.getByText(/2 of 2 owners agreed/).waitFor();
   await button(bob,'Withdraw my agreement').click();

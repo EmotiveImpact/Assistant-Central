@@ -455,7 +455,7 @@ dialog::backdrop{background:var(--backdrop);backdrop-filter:blur(6px)}
 body,.workspace{background:var(--raised)}
 .main{background:var(--bg);border-color:var(--line);box-shadow:0 1px 2px rgba(27,26,23,.06)}
 .brand-mark{display:block;width:32px;height:32px;flex:none}
-.wordmark>span[data-product]{text-transform:lowercase;font-weight:700;letter-spacing:-.045em}
+.wordmark>span[data-product]{font-weight:700;letter-spacing:-.045em}
 .brand.wordmark>span[data-product]{font-size:24px}
 .login-top .wordmark>span[data-product]{font-size:26px}
 .workspace-plan{background:var(--sun-bg);color:var(--sun-on)}
@@ -519,7 +519,8 @@ body,.workspace{background:var(--raised)}
 .home-say{display:grid;gap:22px;margin:0 0 28px;max-width:760px}
 .home-say .say{margin:0;font-size:24px;line-height:1.38;font-weight:600;letter-spacing:-.02em;color:var(--faint)}
 .home-say .say b{color:var(--text);font-weight:700}
-.owner-pair.inline{vertical-align:-6px;margin:0 2px}
+/* A pair inside a line of text sits centred on the line, never dropped below it. */
+.owner-pair.inline{vertical-align:middle;position:relative;top:-.09em;margin:0 2px}
 .owner-pair.inline .person-dot{width:24px;height:24px;font-size:10px}
 .owner-pair.inline .bot-avatar{width:24px;height:24px}
 .card-stack{display:grid;padding-top:22px}
@@ -808,8 +809,76 @@ body[data-screen=overview] .overview-primary{width:100%;max-width:680px;margin:0
 body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-width:none}
 @media(min-width:701px){body[data-screen=overview] .home-say{margin-top:8px}}
 .done-line{display:block;line-height:1.7}
-.done-line .owner-pair{margin-right:8px;vertical-align:-6px}
+.done-line .owner-pair{margin-right:8px;vertical-align:middle;position:relative;top:-.09em}
 @media(max-width:700px){.inspect-close{display:none}}
 @media(max-width:700px){body[data-screen=overview] #new-proposal{display:none}}
 /* A card's one line of context above its title (questions, messages, drafts, invitations). */
 .home-card-lead{margin:0;font-size:12.5px;color:#c9c9c5;font-weight:600}
+
+/* ===== Decide (Full App mock): the exact review opens with Spends, Shares and Keeps.
+   A dialog on desktop, a sheet on the phone. Money needs a hold. ===== */
+.decide-block{display:grid;gap:12px;margin:0 0 18px}
+.decide-question{margin:0;font-size:20px;line-height:1.2;font-weight:800;letter-spacing:-.03em;color:var(--text);overflow-wrap:anywhere}
+.decide-rows{margin:0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.decide-row{display:flex;gap:12px;padding:10px 14px;border-top:1px solid var(--line-soft);font-size:13px;line-height:1.45}
+.decide-row:first-child{border-top:0}
+.decide-row dt{flex:none;width:68px;margin:0;padding-top:2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+.decide-row dd{margin:0;color:var(--text);overflow-wrap:anywhere}
+.decide-row.quiet dd{color:var(--muted)}
+.decide-block .hold-control{margin:22px 0 4px}
+@media(max-width:700px){
+  #review-dialog::before{content:"";display:block;width:38px;height:5px;border-radius:5px;background:var(--line-strong);margin:8px auto 0}
+  .decide-question{font-size:18px}
+}
+/* ===== Team missions (Full App mock): one piece of work split across several people's assistants.
+   Your assistant leads; every part is a proposal reviewed on its own, and progress comes from saved states. ===== */
+.team-view{display:grid;gap:14px;align-content:start;max-width:880px}
+.team-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.team-heading{display:grid;gap:4px;min-width:0;flex:1}
+.team-lead{justify-self:start;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--text);color:var(--bg);border-radius:999px;padding:2px 8px}
+.team-title{font-size:26px;letter-spacing:-.03em;line-height:1.1;margin:0;font-weight:700}
+.team-meta{margin:0;font-size:12.5px;color:var(--muted)}
+.team-all{margin-left:auto}
+.team-line{margin:0;font-size:15px;line-height:1.5;color:var(--secondary);max-width:640px}
+.team-progress{display:flex;gap:4px}
+.team-seg{flex:1;height:8px;border-radius:999px;background:var(--line);position:relative;overflow:hidden}
+.team-seg i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:999px}
+.team-seg.stopped i{background:var(--faint)}
+.team-members{display:flex;flex-wrap:wrap;gap:6px}
+.team-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 4px;font-size:11.5px;color:var(--secondary)}
+.team-chip .owner-pair{gap:2px}.team-chip .owner-pair .person-dot{width:20px;height:20px;font-size:10px}.team-chip .owner-pair .bot-avatar{width:22px;height:22px}
+.team-tabs{margin:2px 0 0}
+.team-parts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.team-part{border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;gap:10px;background:var(--bg);align-content:start}
+.team-part.needs-you{border-color:var(--sun);box-shadow:0 0 0 3px var(--sun-bg)}
+.team-part-head{display:flex;align-items:center;gap:10px;min-width:0}
+.team-part-name{display:grid;gap:1px;min-width:0;flex:1}
+.team-part-name strong{font-size:14px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-part-who{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team-pill{flex:none;font-size:11px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--line-soft);color:var(--secondary);white-space:nowrap}
+.team-pill.needs{background:var(--sun-bg);color:var(--sun-on)}
+.team-pill.done{background:var(--accent-bg);color:var(--accent-on)}
+.team-steps{display:flex;gap:5px;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+.team-steps li{font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--raised);color:var(--muted)}
+.team-steps li.past{color:var(--secondary);font-weight:700}
+.team-steps li.past::before{content:'✓ ';color:var(--accent-on)}
+.team-steps li.now{background:var(--accent-bg);color:var(--accent-on)}
+.team-part[data-step=Stopped] .team-steps li{text-decoration:line-through;color:var(--muted);background:var(--raised)}
+.team-part-actions{display:flex;gap:8px;flex-wrap:wrap}
+.team-people{display:grid;gap:10px}
+.team-person .inspect-row>span:first-child{color:var(--text)}
+.team-start{justify-self:start}
+.team-empty .button{margin-top:14px}
+.team-parts{display:grid;gap:10px}
+.team-part-row{border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 10px;min-width:0}
+.team-part-row legend{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:0 4px}
+.team-part-row label{display:grid;gap:4px;font-size:12.5px;min-width:0}
+.team-part-row label.full{grid-column:1/-1}
+.team-add{grid-column:1/-1;justify-self:start}
+body.inspect-open .team-parts-grid{grid-template-columns:minmax(0,1fr)}
+@media(max-width:700px){
+  .team-title{font-size:22px}
+  .team-parts-grid{grid-template-columns:minmax(0,1fr)}
+  .team-part-row{grid-template-columns:minmax(0,1fr)}
+  .team-all{margin-left:0}
+}

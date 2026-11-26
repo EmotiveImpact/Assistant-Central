@@ -33,7 +33,12 @@ export function holdButton(label, onDone, {duration = HOLD_MS} = {}) {
     frame = requestAnimationFrame(tick);
   };
   const begin = () => { if (done || start) return; start = performance.now(); control.classList.add('holding'); frame = requestAnimationFrame(tick); };
-  control.addEventListener('pointerdown', event => { if (!event.isPrimary || event.button !== 0) return; event.preventDefault(); begin(); });
+  let pointer = null;
+  control.addEventListener('pointerdown', event => { if (!event.isPrimary || event.button !== 0) return; event.preventDefault(); pointer = event.pointerId; begin(); });
+  // Touch captures the pointer, so a finger that slides off the button sends no leave event.
+  // The hold only counts while the pointer is still on the button.
+  const inside = event => { const box = control.getBoundingClientRect(); return event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom; };
+  control.addEventListener('pointermove', event => { if (start && event.pointerId === pointer && !inside(event)) stop(); });
   control.addEventListener('blur', stop);
   control.addEventListener('keydown', event => { if (event.key === 'Escape') stop(); });
   for (const type of ['pointerup', 'pointerleave', 'pointercancel']) control.addEventListener(type, stop);

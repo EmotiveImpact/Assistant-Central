@@ -25,6 +25,16 @@ export function homeQueue({proposals=[],approvals=null,hostDrafts=null,conversat
   return queue;
 }
 
+// A listing can answer and still say that part of it could not be checked: shared drafts the
+// host has not opened yet, or an app whose connection has lapsed. Those parts are named, so
+// Home never reads them as an empty queue.
+export function uncheckedParts({approvals=null,hostDrafts=null}={}){
+  const parts=[];
+  if(approvals&&approvals.drafts_available===false)parts.push('shared drafts');
+  if((hostDrafts?.connections??[]).some(connection=>connection.available===false))parts.push('one of your apps');
+  return parts;
+}
+
 // The words on a card: what is being asked, and the one button that opens the decision.
 export const CARD=Object.freeze({
   proposal:{lead:'',action:'Review and agree'},

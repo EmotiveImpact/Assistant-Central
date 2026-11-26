@@ -5,7 +5,8 @@ The workspace follows the Parlu brand sketch Edem chose on 26 November 2026: two
 ## Brand
 
 - **Mark:** two overlapping circles (teal `#14897a`, coral `#ee7b5b`) with an ink lens (`#1b1a17`) where they meet. Inline SVG in `index.html`.
-- **Wordmark:** lowercase "parlu", Plus Jakarta Sans 700, tracking -0.045em. The name itself stays a placeholder in `PRODUCT` in `app.mjs`.
+- **Wordmark:** "Parlu" with a capital P, Plus Jakarta Sans 700, tracking -0.045em. The name itself stays a placeholder in `PRODUCT` in `app.mjs`.
+- **Pairs in text:** a person and assistant pair inside a sentence sits centred on the line (`vertical-align:middle` with a .09em lift), never dropped low like a subscript.
 - **Type:** Plus Jakarta Sans (self-hosted variable font, Latin subset, SIL OFL). Page titles 36/42 bold (28/34 on phones), dialog titles 22/28 bold, section titles 17 semibold.
 
 ## Tokens

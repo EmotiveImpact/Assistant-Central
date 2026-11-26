@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {homeQueue,CARD,askerOf,moreLine,closingLine} from '../queue.mjs';
+import {homeQueue,CARD,askerOf,moreLine,closingLine,uncheckedParts} from '../queue.mjs';
 
 const principal='a'.repeat(64),other='b'.repeat(64);
 const approvals={note:'',count:3,drafts_available:true,
@@ -41,4 +41,14 @@ test('who is asking, and the honest closing line', () => {
   assert.equal(closingLine([]),'Nothing else needs you.');
   assert.equal(closingLine(['Approvals']),'I couldn’t check Approvals just now.');
   assert.equal(closingLine(['Approvals','Conversations','your apps']),'I couldn’t check Approvals, Conversations and your apps just now.');
+});
+
+test('a listing that could not check part of itself is not an empty queue',()=>{
+  assert.deepEqual(uncheckedParts({}),[]);
+  assert.deepEqual(uncheckedParts({approvals:{drafts_available:true,drafts:[]},hostDrafts:{connections:[{id:'a',available:true,items:[]}]}}),[]);
+  // Shared drafts the host has not opened, and an app whose connection lapsed.
+  assert.deepEqual(uncheckedParts({approvals:{drafts_available:false,drafts:[]}}),['shared drafts']);
+  assert.deepEqual(uncheckedParts({hostDrafts:{connections:[{id:'a',available:true,items:[]},{id:'b',available:false,items:[]}]}}),['one of your apps']);
+  const both=uncheckedParts({approvals:{drafts_available:false},hostDrafts:{connections:[{id:'b',available:false,items:[]}]}});
+  assert.equal(closingLine(both),'I couldn’t check shared drafts and one of your apps just now.');
 });

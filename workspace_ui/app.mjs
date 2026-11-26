@@ -6,7 +6,10 @@ import {botFace,ownerPair} from './bots.mjs';
 import {SECTIONS,WORK_VIEWS,WORK_FILTERS,sectionOf,tabOf,receiptsOf,shortDigest,createInspect} from './depth.mjs';
 import {createHostDrafts,validateDraftQueue} from './host_drafts.mjs';
 import {createApprovals,validateListing} from './approvals.mjs';
-import {homeQueue,CARD,askerOf,moreLine,closingLine} from './queue.mjs';
+import {homeQueue,CARD,askerOf,moreLine,closingLine,uncheckedParts} from './queue.mjs';
+import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
+import {holdButton} from './hold.mjs';
+import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
@@ -25,7 +28,7 @@ function setNavigation(open,{restoreFocus=false}={}){
   const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);
   document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
   sidebar.setAttribute('aria-hidden',String(sidebar.inert));$('menu-toggle').setAttribute('aria-expanded',String(open));$('menu-toggle').setAttribute('aria-label',open?'Close navigation':'Open navigation');
-  if(open&&!wasOpen){$('everything-toggle').setAttribute('aria-expanded','true');$('everything-list').hidden=false;sidebar.querySelector('[data-view]')?.focus();}
+  if(open&&!wasOpen){if(!everythingFolded){$('everything-toggle').setAttribute('aria-expanded','true');$('everything-list').hidden=false;}sidebar.querySelector('[data-view]')?.focus();}
   else if(wasOpen&&!open){if(restoreFocus&&mobileNavigation.matches)$('menu-toggle').focus();else if(sidebar.contains(document.activeElement))$('main').focus();}
 }
 mobileNavigation.addEventListener('change',()=>setNavigation(false));
@@ -45,7 +48,8 @@ const viewCopy = {
   transfers:['Transfers','EXPLICIT DELIVERY','Every handoff, deliberate.','Review an exact packet before each send or import.','Connections & transfers','No automatic delivery or retries'],
   'host-drafts':['Host drafts','INERT LOCAL DRAFTS','Inspect before anything moves.','Review exact drafts from a configured supported host.','Host task drafts','Inspection and dismissal only'],
   money:['Money','MONEY','Money','What your assistants may spend, and what they have.','Money','Budgets and missions'],
-  receipts:['Receipts','SIGNED RECORDS','Recents','Everything that happened, every receipt and all work.','Receipts','Signed decisions and results'],
+  team:['Team missions','MONEY','Team missions','One piece of work, split across several people’s assistants.','Team missions','Every part is reviewed on its own'],
+  receipts:['Receipts','RECORDS','Recents','Everything that happened, every receipt and all work.','Receipts','Signed decisions and result hashes'],
   activity:['Activity','WORKSPACE ACTIVITY','Activity','The saved history of work moving through your workspace.','Recent activity','Recorded events from this assistant']
 };
 class RequestFailure extends Error { constructor(message,{unknown=false,unauthorised=false}={}) { super(message); this.unknown=unknown;this.unauthorised=unauthorised; } }
@@ -83,11 +87,11 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
+  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();panelFor=null;everythingFolded=false;setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};currentTeam=null;teamTab='parts';$('team-view').replaceChildren();$('team-parts').replaceChildren();$('team-form').reset();storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
-  for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
+  for(const id of ['review-title','review-eyebrow','review-state','review-decide','review-scope','review-message','compose-message','peer-message','peer-connection-note','owner-name','agent-name','owner-avatar','connection-status','provider-status'])$(id).replaceChildren();
   for(const id of ['proposal-peer','proposal-parent','peer-connection'])$(id).replaceChildren();
   for(const id of ['inbox-count','outbox-count','pending-total','accepted-total','peer-total'])$(id).textContent='0';
   $('review-dialog').querySelector('.commitment-details').open=false;notice('');
@@ -135,9 +139,13 @@ async function performWrite(path,body,{target='notice',onSuccess}={}) {
   } catch(error) { if(epoch===generation)handleFailure(returned&&!error.unauthorised?new RequestFailure('The operation returned, but its saved state could not be inspected. Refresh before acting again.',{unknown:true}):error,target); }
   finally { release(); }
 }
+// A decision made in Approvals, Conversations or From your apps changes what Home should show,
+// so coming back to Home from one of them reads those lists again instead of reusing old cards.
+const DECISION_VIEWS=['approvals','conversations','host-drafts'];
+function leaveForHome(next){if(next==='overview'&&DECISION_VIEWS.includes(currentView))homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};}
 function navigate(view,{filter='all'}={}) {
   if(busy||!VIEWS.includes(view))return;
-  currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
+  leaveForHome(view);currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
   inspect.navigated();setNavigation(false);render();
 }
@@ -153,34 +161,45 @@ function render() {
   $('accepted-total').textContent=state.items.filter(item=>item.state==='accepted').length;$('peer-total').textContent=totals.peers;
   document.body.dataset.screen=currentView;const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
   const section=sectionOf(currentView);document.body.dataset.section=section;
-  if(sectionLede[section]){$('page-title').textContent=SECTIONS[section].label;$('page-description').textContent=sectionLede[section];}
+  if(sectionLede[section]&&currentView!=='team'){$('page-title').textContent=SECTIONS[section].label;$('page-description').textContent=sectionLede[section];}
   const waiting=homeEntries().length;$('home-count').textContent=waiting;$('home-count').hidden=!waiting;
   renderSectionChrome(section);
-  let acceptedFilter=$('accepted-filter');
-  if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
-  if(acceptedFilter)acceptedFilter.hidden=currentFilter!=='accepted';
-  if(currentFilter==='accepted')$('list-title').textContent=currentView==='tasks'?'Accepted tasks':'Accepted proposals';
   document.querySelectorAll('[data-view]').forEach(node=>{const here=node.dataset.view===currentView,lit=here||node.dataset.section===section;node.classList.toggle('active',lit);node.setAttribute('aria-current',here?'page':'false');});
   if(document.querySelector(`#everything-list [data-view="${currentView}"]`))setEverything(true);
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
-  const overview=currentView==='overview'&&!searchQuery, moneyView=currentView==='money'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals','receipts'].includes(currentView);
-  $('overview-panel').hidden=!overview;$('money-panel-view').hidden=!moneyView;$('work-panel').hidden=overview||moneyView;
+  const overview=currentView==='overview'&&!searchQuery, moneyView=currentView==='money'&&!searchQuery, teamView=currentView==='team'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals','receipts'].includes(currentView);
+  $('overview-panel').hidden=!overview;$('money-panel-view').hidden=!moneyView;$('team-view').hidden=!teamView;$('work-panel').hidden=overview||moneyView||teamView;
   $('summary').hidden=true;$('filters').hidden=structural||overview;$('view-toggle').hidden=structural||overview;$('add-peer').hidden=currentView!=='peers';
   $('search-clear').hidden=!searchQuery;
   $('search-input').disabled=['transfers','conversations','host-drafts','approvals'].includes(currentView);
-  $('new-proposal').hidden=['conversations','host-drafts','approvals'].includes(currentView);
+  $('new-proposal').hidden=['conversations','host-drafts','approvals','team'].includes(currentView);
   $('search-input').setAttribute('placeholder',currentView==='transfers'?'Exact transfer selection below':currentView==='peers'?'Search assistants…':currentView==='activity'?'Search activity…':'Search work…');
   const provider=state.provider;
   $('provider-status').textContent=workflowEnabled(state)?'Synthetic workspace · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();$('item-list').classList.toggle('board',currentLayout==='board'&&!structural);$('item-list').classList.toggle('peers-grid',currentView==='peers');
-  if(overview)renderOverview(totals);else if(moneyView)renderMoney();else if(currentView==='receipts')renderReceipts();else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
+  if(overview)renderOverview(totals);else if(moneyView)renderMoney();else if(teamView)renderTeams();else if(currentView==='receipts')renderReceipts();else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
   const date=$('overview-date');if(date)date.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  // The Home count covers the whole queue wherever you are. The decision places read their own
+  // lists, so Home reads them again when you come back from one.
+  if(homeExtras.for!==state&&!DECISION_VIEWS.includes(currentView))loadHomeExtras();
+  if(inspect.current&&panelAgain&&panelFor!==state)panelAgain();
 }
 // ===== Depth shell: section tabs, the Everything list and the Inspect panel =====
-const inspect=createInspect({panel:$('inspect'),title:$('inspect-title'),sub:$('inspect-sub'),body:$('inspect-body'),pin:$('inspect-pin'),close:$('inspect-close'),back:$('inspect-back')});
+// A panel shows a saved record, so it is redrawn from the latest saved state after every refresh.
+// `panelAgain` knows how to find that record again; it is dropped as soon as the panel closes.
+let panelAgain=null,panelFor=null;
+// On the phone the panel covers the page, so the page underneath takes no focus or presses.
+function coverPage(){$('main').inert=!$('inspect').hidden&&mobileNavigation.matches;}
+const inspect=createInspect({panel:$('inspect'),title:$('inspect-title'),sub:$('inspect-sub'),body:$('inspect-body'),pin:$('inspect-pin'),close:$('inspect-close'),back:$('inspect-back')},
+  {onChange:open=>{if(!open)panelAgain=null;coverPage();}});
+mobileNavigation.addEventListener('change',coverPage);
+function showPanel(key,heading,subtitle,draw,again,refresh){panelAgain=again;panelFor=state;inspect.open(key,heading,subtitle,draw,{refresh:refresh===true});}
+document.querySelectorAll('dialog').forEach(dialog=>dialog.addEventListener('close',()=>queueMicrotask(()=>{if(inspect.current&&document.activeElement===document.body)$('inspect-title').focus({preventScroll:true});})));
 function setEverything(open){$('everything-toggle').setAttribute('aria-expanded',String(open));$('everything-list').hidden=!open;}
-$('everything-toggle').addEventListener('click',()=>setEverything($('everything-list').hidden));
+// Folding the list yourself is remembered until you sign out, so the phone drawer does not reopen it.
+let everythingFolded=false;
+$('everything-toggle').addEventListener('click',()=>{const open=$('everything-list').hidden;everythingFolded=!open;setEverything(open);});
 $('everything-count').textContent=document.querySelectorAll('#everything-list .nav-link').length;
 function renderSectionChrome(section){
   const tabs=$('section-tabs'),filters=$('section-filters');tabs.replaceChildren();filters.replaceChildren();
@@ -191,28 +210,28 @@ function renderSectionChrome(section){
 }
 function panelSection(body,heading){const box=text('section','','inspect-card');if(heading)box.append(text('h3',heading,'inspect-label'));body.append(box);return box;}
 function panelRow(box,label,value,mono=false){const row=text('div','','inspect-row');row.append(text('span',label),text(mono?'code':'span',value,mono?'inspect-mono':'inspect-value'));box.append(row);return row;}
-function openIdentityPanel(){
+function openIdentityPanel(refresh){
   const id=state.identity;
-  inspect.open('identity','Your identity',`${plain(id.agent_id,'Your assistant')}, ${cap(plain(id.owner_id,'you'))}'s assistant`,body=>{
+  showPanel('identity','Your identity',`${plain(id.agent_id,'Your assistant')}, ${cap(plain(id.owner_id,'you'))}'s assistant`,body=>{
     const keys=panelSection(body,'Keys');panelRow(keys,'Fingerprint',id.fingerprint,true);
     keys.append(text('p','Another owner compares this full fingerprint with you before enrolling your assistant.','inspect-note'));
     const publicIdentity=id.public||Object.fromEntries(Object.entries(id).filter(([key])=>['owner_id','agent_id','signing_key','exchange_key','version'].includes(key)));
     body.append(button('Show the public identity to share','button secondary',()=>showPublicIdentity(publicIdentity,id.fingerprint)));
-  });
+  },()=>openIdentityPanel(true),refresh);
 }
-function openStatusPanel(){
-  inspect.open('status','Workspace status','What this workspace can do right now',body=>{
+function openStatusPanel(refresh){
+  showPanel('status','Workspace status','What this workspace can do right now',body=>{
     const box=panelSection(body,'Status');
     panelRow(box,'Saved state',$('connection-status').textContent||'Not checked yet');
     panelRow(box,'Model calls',$('provider-status').textContent||'Disabled');
     panelRow(box,'Content',state.synthetic_only?'Synthetic, fictional work only':'Owner content');
     panelRow(box,'Exchange',state.pilot?.loopback_only?'Local loopback only':'Configured delivery');
     const actions=text('div','','inspect-actions');actions.append(button('Refresh saved state','button secondary',()=>$('refresh').click()),button('Sync exchange','button secondary',()=>$('sync').click()));body.append(actions);
-  });
+  },()=>openStatusPanel(true),refresh);
 }
-function openAssistantPanel(peer){
+function openAssistantPanel(peer,refresh){
   const o=cap(plain(peer.owner_id,'Owner')),a=plain(peer.agent_id,'Assistant');
-  inspect.open('peer:'+peer.peer_id,a,`${o}'s assistant`,body=>{
+  showPanel('peer:'+peer.peer_id,a,`${o}'s assistant`,body=>{
     const who=text('div','','inspect-who');who.append(ownerPair(o,a,'owner-pair','idle'),text('span',isPeerActive(peer)?'Trusted. Each proposal still needs your decision.':peer.state==='revoked'?'Revoked. Nothing new is accepted from this assistant.':'Status unavailable.','inspect-note'));body.append(who);
     const keys=panelSection(body,'Keys');panelRow(keys,'Fingerprint',peer.fingerprint,true);panelRow(keys,'Status',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Unverified');
     const work=state.items.filter(item=>item.peer_id===peer.peer_id);
@@ -220,32 +239,161 @@ function openAssistantPanel(peer){
     if(!work.length)shared.append(text('p','No shared work yet.','inspect-note'));
     for(const item of work.slice(0,6)){const row=button('','inspect-item',()=>openReview(item));row.append(text('span',plain(item.title,'Untitled')),badge(item.state));shared.append(row);}
     const mode=panelSection(body,'Sending mode');mode.append(text('p','Every proposal from this assistant waits for your exact decision. Sending modes and private notes for conversations live in Approvals.','inspect-note'));
-  });
+    if(isPeerActive(peer)){const actions=text('div','','inspect-actions');actions.append(button('Propose work','button primary',()=>prepareCompose(peer.peer_id)));
+      if(state.peers.filter(isPeerActive).length>1)actions.append(button('Start a team mission','button secondary',()=>openTeamDialog(peer.peer_id)));body.append(actions);}
+  },()=>{const next=state.peers.find(entry=>entry.peer_id===peer.peer_id);if(next)openAssistantPanel(next,true);else inspect.hide({restoreFocus:false});},refresh);
 }
-function openMissionPanel(item){
+function openMissionPanel(item,refresh){
   const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
-  inspect.open('mission:'+item.id,plain(item.title,'Mission'),`Mission with ${o} · ${money(item.mission_cap.cap_micro,item.mission_cap.currency)} limit`,body=>{
+  showPanel('mission:'+item.id,plain(item.title,'Mission'),`Mission with ${o} · ${money(item.mission_cap.cap_micro,item.mission_cap.currency)} limit`,body=>{
     const decide=panelSection(body);decide.classList.add('inspect-decide');decide.append(text('strong',plain(item.title,'Mission')),button(isTerminal(item)?'Inspect the exact agreement':'Review the exact agreement','button primary',()=>openReview(item)));
     const budget=panelSection(body,'Budget');
     const run=(state.workflow?.runs??[]).find(entry=>entry.item_id===item.id&&entry.mission_balance);
     if(run){const [left,cur]=amountOf(run.mission_balance,'available');budget.append(text('strong',money(left,cur),'money-figure small'),text('p',`left of ${money(...amountOf(run.mission_balance,'cap'))}`,'inspect-note'));}
-    else{budget.append(text('strong',money(item.mission_cap.cap_micro,item.mission_cap.currency),'money-figure small'),text('p','Agreed limit. Spending shows here once the work runs on this workspace.','inspect-note'));}
+    else{budget.append(text('strong',money(item.mission_cap.cap_micro,item.mission_cap.currency),'money-figure small'),text('p',(item.historical_state??item.state)==='accepted'?'Agreed limit. Spending shows here once the work runs on this workspace.':'Proposed limit. Nothing is agreed until both of you accept the exact agreement.','inspect-note'));}
     const keys=panelSection(body,'Who');const who=text('div','','inspect-who');who.append(ownerPair(o,a),text('span',`${a} ${item.direction==='outgoing'?'does the work':'asked for it'}`,'inspect-note'));keys.append(who);
     const status=panelSection(body,'Status');panelRow(status,'Agreement',stateLabel(item.historical_state??item.state));if(item.decision_digest)panelRow(status,'Receipt',shortDigest(item.decision_digest),true);
-  });
+  },()=>{const next=state.items.find(entry=>entry.id===item.id&&entry.mission_cap);if(next)openMissionPanel(next,true);else inspect.hide({restoreFocus:false});},refresh);
 }
-// Receipts: every signed decision and finished run in saved state.
+// Receipts: every signed decision, and the content hash of every finished run, in saved state.
+// A decision receipt opens the exact proposal. A result receipt opens the run that kept the result.
+function openReceipt(r){if(!r.item)return;if(r.kind==='result'&&r.run?.run_id)openWorkflow(r.item,r.run.run_id);else openReview(r.item);}
 function renderReceipts(){
   const receipts=receiptsOf(state).filter(r=>matchesQuery([r.item?.title,r.digest,r.kind],searchQuery));
-  if(!receipts.length){empty('✓','No receipts yet.','A signed receipt appears here each time a decision or result is saved.');return;}
+  if(!receipts.length){empty('✓','No receipts yet.','A receipt appears here each time a decision is signed or a run returns a result.');return;}
   for(const r of receipts){
     const row=text('article','','item-row receipt-row');const main=text('div','','item-main');
-    const open=button(plain(r.item?.title,'Untitled'),'item-title item-open',()=>r.item&&openReview(r.item));open.setAttribute('aria-label','Review '+plain(r.item?.title,'receipt'));
-    const h=text('h3','','item-heading');h.append(open);main.append(h,text('div',`${r.kind==='decision'?stateLabel(r.item.historical_state??r.item.state)+' · signed decision':'Result of a run'} · ${peerName(r.item?.peer_id)}`,'item-meta'),text('p',r.digest,'peer-fingerprint'));
+    const open=button(plain(r.item?.title,'Untitled'),'item-title item-open',()=>openReceipt(r));open.setAttribute('aria-label','Review '+plain(r.item?.title,'receipt'));
+    const h=text('h3','','item-heading');h.append(open);main.append(h,text('div',`${r.kind==='decision'?stateLabel(r.item.historical_state??r.item.state)+' · signed decision':'Result of a run · content hash'} · ${peerName(r.item?.peer_id)}`,'item-meta'),text('p',r.digest,'peer-fingerprint'));
     row.append(text('span','✓','receipt-mark'),main);$('item-list').append(row);
   }
 }
 document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else openStatusPanel();}));
+// ===== Team missions: your assistant leads; each part is a proposal reviewed on its own =====
+let currentTeam=null,teamTab='parts';
+const STEP_LABEL={Plan:'Ready to send',Asked:'Waiting for their yes',Building:'Building',Result:'Result to check',Done:'Done',Stopped:'Stopped'};
+function teamPeer(id){return state.peers.find(peer=>peer.peer_id===id);}
+function partAction(part){
+  if(part.step==='Plan')return ['Review and send',()=>openReview(part.item)];
+  if(part.step==='Result')return ['Check the result',()=>openReview(part.result)];
+  return null;
+}
+function renderTeams(){
+  const root=$('team-view');root.replaceChildren();
+  const teams=teamsOf(state);
+  if(!teams.length){
+    const box=text('div','','empty-state team-empty');box.append(text('div','◎','empty-symbol'),text('h3','No team missions yet.'),
+      text('p','Split one piece of work across two or more assistants. Each part is a proposal you review and send, and each assistant decides on its own.'),
+      button('Start a team mission','button primary',openTeamDialog));
+    root.append(box);return;
+  }
+  const team=teams.find(entry=>entry.context===currentTeam)??(teams.length===1?teams[0]:null);
+  if(!team){
+    const list=text('div','','mission-rows');
+    for(const entry of teams){const row=button('','mission-row team-row',()=>{currentTeam=entry.context;teamTab='parts';renderTeams();});row.dataset.team=entry.context;
+      const main=text('span','','done-main');main.append(text('strong',entry.title),text('span',`${entry.parts.length} parts · ${teamLine(entry)}`,'done-meta'));
+      row.append(main,text('span','›','row-chevron'));list.append(row);}
+    root.append(list,button('Start a team mission','button secondary team-start',openTeamDialog));return;
+  }
+  currentTeam=team.context;
+  const me=cap(plain(state.identity.owner_id,'You')),mine=plain(state.identity.agent_id,'Your assistant');
+  const head=text('header','','team-head');const words=text('div','','team-heading');
+  words.append(text('span',`${mine} leads`,'team-lead'),text('h2',team.title,'team-title'),text('p',`${team.parts.length} parts · ${team.people.length} assistants`,'team-meta'));
+  head.append(ownerPair(me,mine,'owner-pair team-pair','look'),words);
+  if(teams.length>1)head.append(button('All team missions','text-button team-all',()=>{currentTeam=null;renderTeams();}));
+  root.append(head,text('p',teamLine(team),'team-line'));
+  const bar=text('div','','team-progress');bar.setAttribute('role','img');
+  const counts=teamCounts(team);bar.setAttribute('aria-label',`${counts.Done} of ${team.parts.length} parts done`);
+  for(const part of team.parts){const seg=text('span','','team-seg'+(part.step==='Stopped'?' stopped':''));const fill=text('i','');fill.style.width=`${Math.round(stepShare(part.step)*100)}%`;seg.append(fill);bar.append(seg);}
+  root.append(bar);
+  const members=text('div','','team-members');
+  for(const id of team.people){const peer=teamPeer(id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant');const chip=text('span','','team-chip');chip.append(ownerPair(o,a),text('span',`${o} · ${a}`));members.append(chip);}
+  root.append(members);
+  const tabs=text('nav','','section-tabs team-tabs');tabs.setAttribute('aria-label','Team mission');
+  for(const [key,label] of [['parts','Parts'],['people','People'],['receipts','Receipts']]){const tab=button(label,'section-tab'+(teamTab===key?' selected':''),()=>{teamTab=key;renderTeams();});tab.dataset.teamTab=key;tab.setAttribute('aria-current',teamTab===key?'page':'false');tabs.append(tab);}
+  root.append(tabs);
+  if(teamTab==='people'){
+    const list=text('div','','team-people');
+    for(const id of team.people){const peer=teamPeer(id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant'),mineParts=team.parts.filter(part=>part.peer_id===id);
+      const card=text('article','','inspect-card team-person');const who=text('div','','inspect-who');who.append(ownerPair(o,a),text('strong',`${a}, ${o}'s assistant`));card.append(who);
+      for(const part of mineParts){const row=text('div','','inspect-row');row.append(text('span',part.title),text('span',STEP_LABEL[part.step],'inspect-value'));card.append(row);}
+      card.append(text('p',`${a} decides on each of its parts itself. Nothing it does reaches the others without your review.`,'inspect-note'));list.append(card);}
+    root.append(list);return;
+  }
+  if(teamTab==='receipts'){
+    const ids=new Set(team.parts.flatMap(part=>[part.item.id,...resultsFor(part.item,state.items).map(entry=>entry.id)]));
+    const receipts=receiptsOf(state).filter(r=>r.item&&ids.has(r.item.id));
+    if(!receipts.length){root.append(text('p','No receipts yet. A receipt appears here each time a part or a result is decided.','done-empty'));return;}
+    const list=text('div','','mission-rows');
+    for(const r of receipts){const row=button('','mission-row',()=>openReceipt(r));const main=text('span','','done-main');main.append(text('strong',plain(r.item.title,'Part')),text('span',`${r.kind==='decision'?'Signed decision':'Result of a run'} · ${shortDigest(r.digest)}`,'done-meta'));row.append(text('span','✓','receipt-mark'),main);list.append(row);}
+    root.append(list);return;
+  }
+  const grid=text('div','','team-parts-grid');
+  for(const part of team.parts){
+    const peer=teamPeer(part.peer_id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant');
+    const card=text('article','','team-part'+(part.needsYou?' needs-you':''));card.dataset.itemId=part.item.id;card.dataset.step=part.step;
+    const top=text('div','','team-part-head');const name=text('div','','team-part-name');name.append(text('strong',part.title),text('span',`${a}, ${o}'s assistant`,'team-part-who'));
+    top.append(ownerPair(o,a),name,text('span',STEP_LABEL[part.step],'team-pill'+(part.needsYou?' needs':part.step==='Done'?' done':'')));card.append(top);
+    const steps=text('ol','','team-steps');const at=STEPS.indexOf(part.step);
+    STEPS.forEach((step,index)=>{const li=text('li',step,index<at?'past':index===at?'now':'');steps.append(li);});
+    card.append(steps);
+    const actions=text('div','','team-part-actions');const action=partAction(part);
+    if(action)actions.append(button(action[0],'button primary',action[1]));
+    actions.append(button('Details','button secondary',()=>openPartPanel(team,part)));card.append(actions);grid.append(card);
+  }
+  root.append(grid,button('Start another team mission','button secondary team-start',openTeamDialog));
+}
+function openPartPanel(team,part,refresh){
+  const peer=teamPeer(part.peer_id),o=cap(plain(peer?.owner_id,'Owner')),a=plain(peer?.agent_id,'Assistant');
+  showPanel('part:'+part.item.id,part.title,`Part of ${team.title} · ${a}`,body=>{
+    const action=partAction(part);
+    if(action){const decide=panelSection(body);decide.classList.add('inspect-decide');decide.append(text('strong',part.step==='Plan'?'Ready for you to send':'A result is waiting for your check'),button(action[0],'button primary',action[1]));}
+    const progress=panelSection(body,'Progress');const at=STEPS.indexOf(part.step);
+    STEPS.forEach((step,index)=>panelRow(progress,step,index<at?'Done':index===at?'Now':part.step==='Stopped'?'—':'Not yet'));
+    if(part.step==='Stopped')progress.append(text('p','This part stopped. Its history stays here.','inspect-note'));
+    const who=panelSection(body,'Who');const pair=text('div','','inspect-who');pair.append(ownerPair(o,a),text('span',`${a} decides on this part itself.`,'inspect-note'));who.append(pair);
+    const status=panelSection(body,'Records');panelRow(status,'Proposal',stateLabel(part.item.state));
+    const returned=resultsFor(part.item,state.items)[0];
+    if(returned)panelRow(status,'Result',stateLabel(returned.state));
+    if(part.item.decision_digest)panelRow(status,'Receipt',shortDigest(part.item.decision_digest),true);
+    body.append(button('Open the exact proposal','button secondary',()=>openReview(part.item)));
+  },()=>{const nextTeam=teamsOf(state).find(entry=>entry.context===team.context),nextPart=nextTeam?.parts.find(entry=>entry.item.id===part.item.id);
+    if(nextPart)openPartPanel(nextTeam,nextPart,true);else inspect.hide({restoreFocus:false});},refresh);
+}
+function teamRow(index,first){
+  const row=text('fieldset','','team-part-row');row.append(text('legend',`Part ${index+1}`));
+  const name=text('label','Part name');const nameInput=text('input','');nameInput.name='part_title';nameInput.maxLength=50;nameInput.placeholder='For example, Card deposits';name.append(nameInput);
+  const who=text('label','Assistant');const select=text('select','');select.name='part_peer';
+  const active=state.peers.filter(isPeerActive);
+  for(const peer of active){const option=text('option',`${plain(peer.agent_id,'Assistant')}, ${cap(plain(peer.owner_id,'Owner'))}'s assistant`);option.value=peer.peer_id;select.append(option);}
+  const order=first&&active.some(peer=>peer.peer_id===first)?[first,...active.filter(peer=>peer.peer_id!==first).map(peer=>peer.peer_id)]:active.map(peer=>peer.peer_id);
+  if(order.length)select.value=order[index%order.length];who.append(select);
+  const brief=text('label','Brief','full');const area=text('textarea','');area.name='part_text';area.rows=2;area.maxLength=4096;area.value='SYNTHETIC ONLY: ';brief.append(area);
+  row.append(name,who,brief);return row;
+}
+function openTeamDialog(first){
+  if(!state||busy||uncertainty.pending())return;
+  if(state.peers.filter(isPeerActive).length<2){navigate('peers');notice('A team mission needs at least two enrolled assistants. Enrol another trusted peer first.');return;}
+  const form=$('team-form');form.reset();$('team-message').textContent='';const lead=typeof first==='string'?first:undefined;$('team-form').dataset.first=lead??'';$('team-parts').replaceChildren(teamRow(0,lead),teamRow(1,lead));
+  $('team-intro').textContent=`${plain(state.identity.agent_id,'Your assistant')} leads. Each part becomes a proposal you review and send on its own, and each assistant decides for itself. Nothing is sent yet.`;
+  $('team-add-part').hidden=false;openDialog('team-dialog');
+}
+$('team-add-part').addEventListener('click',()=>{const parts=$('team-parts');if(parts.children.length>=6)return;parts.append(teamRow(parts.children.length,$('team-form').dataset.first||undefined));$('team-add-part').hidden=parts.children.length>=6;});
+$('team-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||uncertainty.pending())return;
+  const form=event.currentTarget;
+  try{
+    if(!form.elements.team_synthetic.checked)throw new Error('Confirm that you may share this fictional work.');
+    const rows=[...$('team-parts').children].map(row=>({title:row.querySelector('[name=part_title]').value,peer_id:row.querySelector('[name=part_peer]').value,text:row.querySelector('[name=part_text]').value.replace(/^SYNTHETIC ONLY:\s*$/,'')}));
+    const parts=planParts(form.elements.mission.value,rows),context=newContext(),minutes=form.elements.minutes.value;
+    const bodies=parts.map(part=>proposalBody({kind:'task',peer_id:part.peer_id,title:part.title,text:part.text,context,task_id:'team-'+crypto.randomUUID(),minutes,synthetic:'on'}));
+    let created=0;
+    for(const body of bodies){const before=created;await performWrite('/api/proposals',body,{target:'team-message',onSuccess:()=>{created++;}});if(created===before)break;}
+    if(created===bodies.length){$('team-dialog').close();currentTeam=context;teamTab='parts';navigate('team');notice(`${bodies.length} parts prepared. Review and send each one; every assistant decides on its own.`,true);}
+    else if(!$('team-message').textContent)$('team-message').textContent=`Prepared ${created} of ${bodies.length} parts. The rest were not created, and nothing has been sent.`;
+    else $('team-message').textContent=`Prepared ${created} of ${bodies.length} parts, and nothing has been sent. `+$('team-message').textContent;
+  }catch(error){$('team-message').textContent=error.message;}
+});
 document.querySelectorAll('[data-jump]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.jump)));
 document.querySelector('[data-action=lock]')?.addEventListener('click',()=>$('logout').click());
 $('money-start').addEventListener('click',()=>{if(!state)return;if(state.peers.some(isPeerActive)){prepareCompose();const kind=$('compose-form').elements.kind;kind.value='mission';configureKind();}else navigate('peers');});
@@ -268,7 +416,8 @@ function itemRow(item) {
   row.append(symbol,main,right);return row;
 }
 function renderItems() {
-  const items=projectItems(state,currentView,currentFilter,searchQuery);
+  // Money and Team missions have no list of their own, so a search from them looks across all work.
+  const items=projectItems(state,['money','team'].includes(currentView)?'overview':currentView,currentFilter,searchQuery);
   if(searchQuery)$('list-description').textContent=`${items.length} ${items.length===1?'result':'results'} for “${searchQuery}”`;
   else $('list-description').textContent=`${items.length} ${currentView==='artifacts'?'artifacts':currentView==='tasks'?'tasks':'proposals'} · ${viewCopy[currentView][5]}`;
   if(!items.length){empty('⌕',searchQuery?'No matching work.':currentFilter!=='all'?'No matching proposals.':currentView==='artifacts'?'Your artifacts will live here.':'A little room for what comes next.',searchQuery?'Try a title, task reference, assistant or status.':'Create a proposal, or sync the exchange to inspect incoming work.',searchQuery?{label:'Clear search',run:clearSearch}:undefined);return;}
@@ -293,6 +442,21 @@ let homeOffset=0;
 let storyOffset=0;
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
+// Decide: what this exact decision spends, shares and keeps, above the exact content.
+// Money needs a deliberate hold; the plain button below stays as the alternative.
+function renderDecide(item,review){
+  const box=$('review-decide');box.replaceChildren();
+  const deciding=review.allowed_actions.some(action=>['accept','release'].includes(action));box.hidden=!deciding;if(!deciding)return;
+  const peer=peerOf(item),names={agent:plain(peer?.agent_id,'their assistant'),owner:cap(plain(peer?.owner_id,'them')),actions:review.allowed_actions};
+  box.append(text('p',decisionQuestion(item,names),'decide-question'));
+  const rows=text('dl','','decide-rows');
+  for(const [key,value] of decisionRows(item,names)){const row=text('div','','decide-row'+(key==='Keeps'?' quiet':''));row.append(text('dt',key),text('dd',value));rows.append(row);}
+  box.append(rows);
+  if(review.allowed_actions.includes('accept')&&needsHold(item,'accept')){
+    const current=selected;
+    box.append(holdButton('Hold to agree',()=>{if(selected===current&&$('review-dialog').open)decideSelected('accept');}),text('p','Or agree with the button below.','hold-alt'));
+  }
+}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
 // The cards are one queue of everything that needs you: proposals from saved state, plus
 // questions, messages and shared drafts (Approvals), conversation invitations and drafts
@@ -306,7 +470,9 @@ async function loadHomeExtras(){
     read(snapshot.conversations?.enabled===true,'/api/conversations',validateCatalogue,'conversations','Conversations'),
     read(snapshot.host_drafts?.enabled===true,'/api/host-drafts',validateDraftQueue,'hostDrafts','your apps')].filter(Boolean));
   if(epoch!==generation||!token||state!==snapshot)return;
-  homeExtras=next;if(currentView==='overview'&&!searchQuery)renderHome();
+  // A valid answer can still say that part of it could not be checked. That is not an empty queue.
+  next.failed.push(...uncheckedParts(next));homeExtras=next;
+  if(currentView==='overview'&&!searchQuery)renderHome();else{const waiting=homeEntries().length;$('home-count').textContent=waiting;$('home-count').hidden=!waiting;}
 }
 function homeEntries(){
   const extras=homeExtras.for===state?homeExtras:{};
@@ -339,6 +505,7 @@ function renderHome(){
     const head=text('div','','home-card-head'),label=text('span','','home-card-who');label.append(text('strong',ask.yours?`${a}, your assistant`:`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
     head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),label);card.append(head);
     if(copy.lead)card.append(text('p',copy.lead.charAt(0)===copy.lead.charAt(0).toUpperCase()?copy.lead:`${a} ${copy.lead}`,'home-card-lead'));
+    const belongs=entry.kind==='proposal'?partLead(partOf(state,entry.item)):'';if(belongs){const lead=text('p',belongs,'home-card-lead');lead.dataset.team='true';card.append(lead);}
     card.append(text('p',entry.title,'home-card-title'));
     const open=()=>entry.kind==='proposal'?openReview(entry.item):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
@@ -372,7 +539,17 @@ function renderDone(){
   const first=done[0],p=peerOf(first);
   const names=done.slice(0,2).map(item=>`“${plain(item.title,'Untitled')}”`),rest=done.length-names.length;
   line.append(ownerPair(cap(plain(p?.owner_id,state.identity.owner_id)),plain(p?.agent_id,state.identity.agent_id),'owner-pair','done'),
-    text('span',`Done today: ${names.join(rest?', ':' and ')}${rest?` and ${rest} more`:''}. `),button('See all','text-button done-all',()=>navigate('tasks',{filter:'accepted'})));
+    text('span',`Done today: ${names.join(rest?', ':' and ')}${rest?` and ${rest} more`:''}. `),button('See all','text-button done-all',()=>openDonePanel()));
+}
+// See all shows exactly what the line counted: everything agreed today, results included.
+function openDonePanel(refresh){
+  const done=doneToday(state.items);
+  if(!done.length){if(refresh===true)inspect.hide({restoreFocus:false});return;}
+  showPanel('done','Done today',`${done.length} agreed today`,body=>{
+    const list=panelSection(body,'Agreed today');
+    for(const item of done){const row=button('','inspect-item',()=>openReview(item));row.append(text('span',plain(item.title,'Untitled')),badge(item.historical_state??item.state));list.append(row);}
+    body.append(button('Open receipts','button secondary',()=>navigate('receipts')));
+  },()=>openDonePanel(true),refresh);
 }
 // Money: real mission budgets only, and every mission agreement with its spending limit.
 function missionsOf(){
@@ -400,8 +577,13 @@ function renderMoney(){
     for(const other of totals.slice(1))panel.append(text('p',other.unknown?`Also ${money(other.cap,other.currency)} agreed in ${other.currency}`:`Also ${money(other.available,other.currency)} left in ${other.currency}`,'money-note'));
     panel.append(text('p','Simulated spending. No real payment is made.','money-note muted'));
   }
+  for(const team of teamsOf(state)){
+    const row=button('','mission-row team-row',()=>{currentTeam=team.context;teamTab='parts';navigate('team');});row.dataset.team=team.context;
+    const main=text('span','','done-main');main.append(text('strong',team.title),text('span',`Team mission · ${team.parts.length} parts · ${teamLine(team).split('. ')[0].replace(/\.$/,'')}`,'done-meta'));
+    row.append(ownerPair(cap(plain(state.identity.owner_id,'You')),plain(state.identity.agent_id,'Your assistant')),main,text('span','›','row-chevron'));rows.append(row);
+  }
   const missions=missionsOf();
-  if(!missions.length)rows.append(text('p','No missions yet. A mission is a piece of work with a spending limit and checks that both owners agree.','done-empty'));
+  if(!missions.length&&!teamsOf(state).length)rows.append(text('p','No missions yet. A mission is a piece of work with a spending limit and checks that both owners agree.','done-empty'));
   for(const item of missions){
     const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
     const row=button('','mission-row',()=>openMissionPanel(item));row.dataset.itemId=item.id;
@@ -410,7 +592,7 @@ function renderMoney(){
   }
 }
 function renderOverview() {
-  renderHome();renderDone();if(homeExtras.for!==state)loadHomeExtras();
+  renderHome();renderDone();
   if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
 }
 function renderPeers() {
@@ -431,7 +613,7 @@ function renderPeers() {
 }
 
 function showPublicIdentity(identity,fingerprint) {
-  selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
+  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedWorkflow=null;selectedTransfer=null;$('review-title').textContent='Your public identity';$('review-eyebrow').textContent='SHARE AND VERIFY';$('review-state').replaceChildren();$('review-details').replaceChildren();detail($('review-details'),'Fingerprint',fingerprint);
   $('review-content').textContent=JSON.stringify(identity,null,2);$('review-commitments').replaceChildren();$('review-message').textContent='';$('review-scope').textContent='Only public identity fields are shown. The other owner must verify the full fingerprint before enrolment.';$('review-actions').replaceChildren(button('Close','button secondary',()=> $('review-dialog').close()));openDialog('review-dialog');
 }
 function eventLabel(item){const label=plain(item.label)||plain(item.event).replaceAll('_',' ')||'Saved event';return label.charAt(0).toUpperCase()+label.slice(1);}
@@ -462,6 +644,7 @@ async function openReview(item) {
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
+    renderDecide(item,review);
     const parent=state.items.find(candidate=>candidate.id===item.parent_id);
     if(item.kind==='artifact' && item.direction==='incoming' && ['pending','accepted'].includes(item.state) && parent?.peer_mission===true) {
       const current=selected;
@@ -494,7 +677,7 @@ async function prepareWorkflow(item) {
   await performWrite(`/api/items/${encodeURIComponent(item.id)}/workflow`,{}, {target:'review-message',onSuccess:()=>{selected=null;$('review-dialog').close();notice('Synthetic run prepared. Inspect its exact request and approve it separately. Nothing has run.',true);}});
 }
 function workflowDetailHeader(item,run,heading) {
-  selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
+  $('review-decide').hidden=true;$('review-decide').replaceChildren();selected=null;selectedTransfer=null;$('review-title').textContent=heading;$('review-eyebrow').textContent='LOCAL SYNTHETIC REHEARSAL';$('review-state').replaceChildren(text('span',workflowStateLabel(run.state),'badge '+statusClass(run.state)));
   $('review-details').replaceChildren();detail($('review-details'),'Task',plain(item.title,item.task_id));detail($('review-details'),'Return recipient',peerName(item.peer_id));detail($('review-details'),'Provider calls','None. Fixed local fixture only.');
   $('review-commitments').replaceChildren();detail($('review-commitments'),'Run ID',run.run_id);detail($('review-commitments'),'Task proposal',item.id);detail($('review-commitments'),'Context',item.context);detail($('review-commitments'),'Provider review',run.review_digest);
   $('review-message').textContent='';$('review-actions').replaceChildren();
@@ -555,12 +738,13 @@ async function workflowAction(action) {
 }
 function openDialog(id) { if(busy||uncertainty.pending())return;$(id).showModal(); }
 function newContext(){return Array.from(crypto.getRandomValues(new Uint8Array(32)),byte=>byte.toString(16).padStart(2,'0')).join('');}
-function prepareCompose(){
+function prepareCompose(peerId){
   if(busy||uncertainty.pending())return;
   if(!state.peers.some(isPeerActive)){navigate('peers');notice('Enrol an active trusted peer before preparing a proposal.');return;}
   $('compose-form').reset();$('compose-message').textContent='';$('proposal-peer').replaceChildren();
   for(const peer of state.peers.filter(isPeerActive)){const option=text('option',`${plain(peer.agent_id,'Assistant')} · ${plain(peer.owner_id,'Owner')}`);option.value=peer.peer_id;$('proposal-peer').append(option);}
   const form=$('compose-form');form.elements.context.value=newContext();form.elements.task_id.value='task-'+crypto.randomUUID();form.elements.text.value='SYNTHETIC ONLY: ';
+  if(typeof peerId==='string'&&[...$('proposal-peer').options].some(option=>option.value===peerId))$('proposal-peer').value=peerId;
   $('compose-form').elements.mission_currency.value=ownerCurrency();configureKind();openDialog('compose-dialog');
 }
 function configureKind(){
@@ -608,7 +792,7 @@ function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttr
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
 // The Ask bar drafts a proposal from what you typed. Nothing is sent until you review it.
 $('home-ask')?.addEventListener('submit',event=>{event.preventDefault();const typed=$('home-ask-input').value.trim();prepareCompose();const form=$('compose-form');if(!$('compose-dialog').open)return;if(typed){form.elements.title.value=typed.slice(0,120);form.elements.text.value='SYNTHETIC ONLY: '+typed;}$('home-ask-input').value='';});
-$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
+$('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='team')openTeamDialog();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);
 document.querySelectorAll('[data-view]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.view)));
 document.querySelectorAll('[data-filter]').forEach(node=>node.addEventListener('click',()=>{if(busy)return;currentFilter=node.dataset.filter;render();}));
 document.querySelectorAll('.close-dialog').forEach(node=>node.addEventListener('click',()=>{if(busy)return;node.closest('dialog').close();selected=null;selectedWorkflow=null;selectedTransfer=null;}));
@@ -643,8 +827,9 @@ document.querySelectorAll('[data-layout]').forEach(node=>node.addEventListener('
 $('menu-toggle').addEventListener('click',()=>setNavigation(!document.body.classList.contains('sidebar-open'),{restoreFocus:true}));
 $('sidebar-scrim')?.addEventListener('click',()=>setNavigation(false,{restoreFocus:true}));
 function restoreLocation(){
-  currentView=viewFromHash(location.hash);currentFilter='all';searchQuery='';$('search-input').value='';
-  setNavigation(false);render();
+  const next=viewFromHash(location.hash);leaveForHome(next);
+  currentView=next;currentFilter='all';searchQuery='';$('search-input').value='';
+  inspect.navigated();setNavigation(false);render();
 }
 window.addEventListener('popstate',restoreLocation);
 window.addEventListener('hashchange',restoreLocation);
@@ -661,7 +846,7 @@ document.addEventListener('keydown',event=>{
   }
   if(!token||busy||document.body.classList.contains('sidebar-open')||document.querySelector('dialog[open]'))return;
   const editing=event.target.closest('input,textarea,select,[contenteditable="true"]');
-  if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();$('search-input').focus();$('search-input').select();}
+  if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();if(mobileNavigation.matches)setNavigation(true);$('search-input').focus();$('search-input').select();}
   else if(!editing&&!event.metaKey&&!event.ctrlKey&&!event.altKey&&event.key.toLowerCase()==='n'){event.preventDefault();prepareCompose();}
 });
 
@@ -714,7 +899,7 @@ async function openTransfer(selection){
   try{
     const review=validateTransferReview(await request(transferPath(selection)),selection);if(epoch!==generation)return;
     selected=null;selectedWorkflow=null;selectedTransfer={...selection,review};
-    $('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
+    $('review-decide').hidden=true;$('review-decide').replaceChildren();$('review-title').textContent=selection.kind==='quarantine'?'Inspect selected import':'Inspect exact transfer';$('review-eyebrow').textContent='TRANSPORT ONLY';$('review-state').replaceChildren(text('span',selection.kind==='quarantine'?'Untrusted quarantine':review.outbox?.state==='received'?'Signed receipt observed':'No owner acceptance implied','badge uncertain'));
     $('review-details').replaceChildren();detail($('review-details'),'Connection',review.connection.label);detail($('review-details'),'Destination',review.connection.destination);detail($('review-details'),selection.kind==='quarantine'?'Expected sender':'Exact recipient',review.connection.peer_fingerprint);detail($('review-details'),'Packet type',review.packet_kind);detail($('review-details'),'Original expiry',datetime(review.expires));
     if(review.outbox){detail($('review-details'),'Current outbox',review.outbox.state);detail($('review-details'),'Total attempts',String(review.outbox.attempts));}
     $('review-content').textContent=selection.kind==='quarantine'?'This file is untrusted. Import verifies its original signature and current peer/source gates. It does not accept a proposal, start work or send a receipt.':'Only the original retained encrypted packet can be sent. A fixed mailbox acknowledgement proves neither signed receipt nor owner acceptance.';

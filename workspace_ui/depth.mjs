@@ -10,7 +10,7 @@ export const SECTIONS = Object.freeze({
     tabs: [['activity', 'Activity'], ['receipts', 'Receipts'], ['tasks', 'All work']]},
   assistants: {label: 'Assistants', views: ['peers', 'conversations', 'transfers'],
     tabs: [['peers', 'Network'], ['conversations', 'Conversations'], ['transfers', 'Connections']]},
-  money: {label: 'Money', views: ['money']},
+  money: {label: 'Money', views: ['money', 'team']},
 });
 
 // All work is one tab with filters; each filter is one of the existing screens.
@@ -26,19 +26,25 @@ export function sectionOf(view) {
 // The tab that stays lit for a view: every work filter belongs to All work.
 export function tabOf(view) { return WORK_VIEWS.includes(view) ? 'tasks' : view; }
 
-// Signed records, newest first: owner decisions, accepted results and finished runs.
-// Only digests that exist in saved state are listed.
+// Records, newest first: signed owner decisions, and the content hash of each finished run.
+// Only digests that exist in saved state are listed. Saved state keeps no time for a decision,
+// so the order comes from the saved event sequence: the latest decision or run event for the
+// item. Without one, the proposal's own time is used.
 export function receiptsOf(state) {
-  const receipts = [];
+  const receipts = [], history = state?.history ?? [];
+  const latest = (itemId, match) => history.reduce((top, event) =>
+    event?.item_id === itemId && Number.isSafeInteger(event.sequence) && match(event) ? Math.max(top, event.sequence) : top, 0);
   for (const item of state?.items ?? []) {
-    if (item.decision_digest) receipts.push({kind: 'decision', item, digest: item.decision_digest, at: Number(item.created_at) || 0});
+    if (item.decision_digest) receipts.push({kind: 'decision', item, digest: item.decision_digest, at: Number(item.created_at) || 0,
+      order: latest(item.id, event => /decid|decision/.test(String(event.event)))});
   }
   for (const run of state?.workflow?.runs ?? []) {
     if (!run?.result_digest) continue;
     const item = (state.items ?? []).find(entry => entry.id === run.item_id);
-    receipts.push({kind: 'result', item, run, digest: run.result_digest, at: Number(item?.created_at) || 0});
+    receipts.push({kind: 'result', item, run, digest: run.result_digest, at: Number(item?.created_at) || 0,
+      order: latest(run.item_id, event => String(event.event).startsWith('workflow') || event.data?.run_id === run.run_id)});
   }
-  return receipts.sort((a, b) => b.at - a.at);
+  return receipts.sort((a, b) => b.order - a.order || b.at - a.at);
 }
 
 export function shortDigest(value) {
@@ -58,7 +64,24 @@ export function createInspect(nodes, {onChange = () => {}} = {}) {
     document.body.classList.toggle('inspect-pinned', pinned && !panel.hidden);
     onChange(!panel.hidden);
   }
-  function open(key, heading, subtitle, render) {
+  function open(key, heading, subtitle, render, {refresh = false} = {}) {
+    // A refresh redraws the record that is already open from newer saved state. It never
+    // opens or closes the panel, and it leaves the pin alone. Focus stays on the same control
+    // when the redraw still has it; otherwise it moves to the panel's title, so the keyboard
+    // is never left outside the panel.
+    if (refresh) {
+      if (panel.hidden || current !== key) return;
+      const top = body.scrollTop, held = body.contains(document.activeElement) ? document.activeElement : null;
+      title.textContent = heading; sub.textContent = subtitle || '';
+      body.replaceChildren(); render(body); body.scrollTop = top;
+      if (held) {
+        const same = [...body.querySelectorAll('button,a[href],input,select,textarea')]
+          .find(node => node.tagName === held.tagName && node.textContent === held.textContent);
+        title.tabIndex = -1;
+        (same ?? title).focus({preventScroll: true});
+      }
+      return;
+    }
     if (!panel.hidden && current === key && !pinned) { hide(); return; }
     opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     current = key;
@@ -75,7 +98,8 @@ export function createInspect(nodes, {onChange = () => {}} = {}) {
     if (panel.hidden) return;
     panel.hidden = true;
     current = null;
-    body.replaceChildren();
+    // Nothing from the closed record stays in the page, so a locked workspace keeps no trace of it.
+    body.replaceChildren(); title.textContent = ''; sub.textContent = '';
     sync();
     if (restoreFocus && opener?.isConnected) opener.focus({preventScroll: true});
     opener = null;
