@@ -19,11 +19,11 @@ and the [decision record](docs/DECISIONS.md) for choices and alternatives.
 
 ## What the building blocks establish
 
-- The [team](team/README.md), [execution ledger](execution/README.md) and
-  [offline binding](integration/README.md) exercise bounded work, retained result
+- The [team](archive/team/README.md), [execution ledger](archive/execution/README.md) and
+  [offline binding](archive/integration/README.md) exercise bounded work, retained result
   correlation and separate release/recipient decisions. Their scripted fictional
   approvals are not real owners' consent. The
-  [provider-disclosure rehearsal](execution/PROVIDER_DISCLOSURE.md) is synthetic.
+  [provider-disclosure rehearsal](archive/execution/PROVIDER_DISCLOSURE.md) is synthetic.
 - The [pilot](pilot/README.md) has real local password sessions, private identity
   vaults, pinned signed/encrypted packets and separate runtime stores. A password
   identifies a local account, not a verified human. Its

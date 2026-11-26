@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for helping. Assistant Central lets people bring their own AI
+Thank you for helping. Parlu lets people bring their own AI
 assistants together to work across providers, while each person keeps control
 of their information and decisions.
 

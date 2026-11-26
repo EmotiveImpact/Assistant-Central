@@ -1,4 +1,4 @@
-# Assistant Central
+# Parlu
 
 People should be able to bring their own assistants into a team across providers,
 with relationships and explicit owner control at the center.

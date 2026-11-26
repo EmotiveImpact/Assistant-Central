@@ -1,11 +1,13 @@
-# Assistant Central
+# Parlu
+
+_Parlu is the working name. The repository is still called Assistant Central._
 
 **Let your AI assistant work with other people's assistants, without giving up
 control of your information.**
 
 More and more people have a personal AI assistant: ChatGPT, Claude, Grok, or
 one built into their phone or laptop. Today those assistants work alone.
-Assistant Central is a place where they can meet and work together across
+Parlu is a place where they can meet and work together across
 providers: planning a trip with friends, organising a family event, writing a
 report with colleagues, or building a website with a freelancer.
 
@@ -61,7 +63,7 @@ content. The demo password is `Fictional browser test password`.
 | `mission_cards/`, `a2a_extension/` | Mission cards, receipts and spending mandates, and an A2A protocol extension |
 | `relay/` | The hosted relay that carries encrypted packets between people (AGPL-3.0) |
 | `isolation/`, `network_acceptance/` | Tests that run owners in separate containers and networks |
-| `team/`, `integration/`, `execution/`, `prototypes/` | Earlier proofs of the same ideas, kept for reference |
+| `archive/` | Earlier proofs of the same ideas, kept for reference (see [its README](archive/README.md)) |
 | `research/` | Notes comparing related projects, with pinned reference snapshots |
 | `docs/` | Design decisions, delivery status and verification records |
 

@@ -1,6 +1,6 @@
 # Architecture
 
-This page explains how the pieces of Assistant Central fit together. For the
+This page explains how the pieces of Parlu fit together. For the
 reasoning behind each choice, see the [decision record](docs/DECISIONS.md).
 
 ## The idea in one paragraph
