@@ -66,17 +66,18 @@ const checkContrast=async()=>{
 const closeReview=async()=>{await page.getByRole('button',{name:'Close review',exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
 const openItem=async title=>{await article(title).getByRole('button',{name:/^(Review exact item|Inspect)$/}).click();await page.locator('#review-dialog').waitFor({state:'visible'});};
 const action=async name=>{await page.getByRole('button',{name,exact:true}).click();await page.locator('#review-dialog').waitFor({state:'hidden'});};
-const assertAppHeading=async selector=>{
+const HEADINGS={page:{size:'36px',lineHeight:'42px',tracking:'-1.08px'},dialog:{size:'22px',lineHeight:'28px',tracking:'-0.33px'}};
+const assertAppHeading=async(selector,kind='page')=>{
   const style=await page.locator(selector).evaluate(node=>{
     const s=getComputedStyle(node);return {size:s.fontSize,weight:s.fontWeight,lineHeight:s.lineHeight,
       tracking:s.letterSpacing,features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
   });
-  assert.deepEqual(style,{size:'20px',weight:'590',lineHeight:'26.6px',tracking:'-0.24px',
+  assert.deepEqual(style,{size:HEADINGS[kind].size,weight:'700',lineHeight:HEADINGS[kind].lineHeight,tracking:HEADINGS[kind].tracking,
     features:'"cv01", "ss03"',opticalSizing:'auto'});
 };
 
 try {
-  const fontResponsePromise=page.waitForResponse(response=>new URL(response.url()).pathname==='/InterVariable.woff2');
+  const fontResponsePromise=page.waitForResponse(response=>new URL(response.url()).pathname==='/PlusJakartaSansVariable.woff2');
   await page.goto(url.origin);
   await checkContrast();
   const fontResponse=await fontResponsePromise;
@@ -85,14 +86,14 @@ try {
   const fontBytes=await fontResponse.body();
   assert.equal(fontBytes.subarray(0,4).toString(),'wOF2');
   assert.equal(createHash('sha256').update(fontBytes).digest('hex'),
-    '693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3');
+    '1262bff0591c36094d058ab102b84ce34eb1e547e8ff00557bf8d55449e58e40');
   await page.evaluate(()=>document.fonts.ready.then(()=>undefined));
   const fontEvidence=await page.evaluate(()=>({
     family:getComputedStyle(document.body).fontFamily,
-    ready:document.fonts.check('510 13px "Inter Variable"'),
-    loaded:[...document.fonts].some(face=>face.family.replaceAll('"','').replaceAll("'",'')==='Inter Variable'&&face.status==='loaded'),
+    ready:document.fonts.check('510 13px "Plus Jakarta Sans"'),
+    loaded:[...document.fonts].some(face=>face.family.replaceAll('"','').replaceAll("'",'')==='Plus Jakarta Sans'&&face.status==='loaded'),
   }));
-  assert.ok(fontEvidence.family.startsWith('"Inter Variable"'),fontEvidence.family);
+  assert.ok(fontEvidence.family.startsWith('"Plus Jakarta Sans"'),fontEvidence.family);
   assert.equal(fontEvidence.ready,true);
   assert.equal(fontEvidence.loaded,true,'a declared family alone does not prove a loaded webfont');
   await noOverflow();await screenshot('central-platform-login.png');
@@ -113,12 +114,17 @@ try {
       radius:s.borderRadius,height:node.getBoundingClientRect().height,color:s.color,
       features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
   });
-  assert.ok(navStyle.font.startsWith('"Inter Variable"'));
+  assert.ok(navStyle.font.startsWith('"Plus Jakarta Sans"'));
   assert.deepEqual({size:navStyle.size,weight:navStyle.weight,radius:navStyle.radius,height:navStyle.height,color:navStyle.color},
-    {size:'13px',weight:'510',radius:'8px',height:28,color:'rgb(208, 214, 224)'});
+    {size:'13px',weight:'510',radius:'999px',height:36,color:'rgb(62, 59, 53)'});
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
+  await page.setViewportSize({width:1366,height:768});
+  await page.locator('#logout').scrollIntoViewIfNeeded();
+  const logoutBox=await page.locator('#logout').boundingBox();
+  assert.ok(logoutBox&&logoutBox.y+logoutBox.height<=768,'sign out must stay reachable on a short desktop screen');
+  await page.setViewportSize({width:1440,height:1000});
   const attentionIds=await page.locator('#overview-attention [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
   const workIds=await page.locator('#overview-work [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
   assert.equal(workIds.some(id=>attentionIds.includes(id)),false,'overview sections must not repeat the same work');
@@ -174,7 +180,7 @@ try {
   await nav('inbox');
   await openItem('Review the research brief');
   assert.equal(await page.getByRole('dialog',{name:'Review the research brief',exact:true}).count(),1);await checkContrast();
-  await assertAppHeading('#review-title');
+  await assertAppHeading('#review-title','dialog');
   assert.match(await page.locator('#review-content').textContent(),/SYNTHETIC/);
   assert.equal(await page.locator('#review-content *').count(),0);
   assert.match(await page.locator('#review-scope').textContent(),/does not start work/);
@@ -288,7 +294,7 @@ try {
   assert.equal(await page.locator('#workspace').isVisible(),false);
   assert.deepEqual(errors,[]);
   assert.deepEqual(externalRequests,[],'the font and all workspace assets must stay same-origin');
-  console.log('PASS workspace browser: exact local Inter Variable bytes and loaded face, measured Linear nav and heading typography, no external asset requests, every state-backed view, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
+  console.log('PASS workspace browser: exact local Plus Jakarta Sans bytes and loaded face, measured Linear nav and heading typography, no external asset requests, every state-backed view, search and layouts without writes, keyboard navigation, exact accept/reject, separately approved synthetic work and artifact release, committed-but-lost response without duplicate retry, public-only identity, desktop/tablet/mobile layouts and session cleanup.');
 } catch(error) {
   if(screenshots)await page.screenshot({path:path.join(screenshots,'central-platform-failure.png'),fullPage:true}).catch(()=>{});
   throw error;

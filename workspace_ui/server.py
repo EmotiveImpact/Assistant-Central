@@ -28,8 +28,10 @@ STATIC_FILES = {
     "/missions.mjs": (ROOT / "missions.mjs", "text/javascript; charset=utf-8"),
     "/approvals.mjs": (ROOT / "approvals.mjs", "text/javascript; charset=utf-8"),
     "/conversations.mjs": (ROOT / "conversations.mjs", "text/javascript; charset=utf-8"),
+    "/bots.mjs": (ROOT / "bots.mjs", "text/javascript; charset=utf-8"),
     "/transfers.mjs": (WEB / "transfers.mjs", "text/javascript; charset=utf-8"),
     "/InterVariable.woff2": (ROOT / "InterVariable.woff2", "font/woff2"),
+    "/PlusJakartaSansVariable.woff2": (ROOT / "PlusJakartaSansVariable.woff2", "font/woff2"),
 }
 MAX_STATIC_BYTES = 2 * 1024 * 1024
 

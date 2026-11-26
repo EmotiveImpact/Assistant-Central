@@ -1,3 +1,4 @@
+import {ownerPair} from './bots.mjs';
 import {openMissions} from './missions.mjs';
 import {operationGate} from './operations.mjs';
 export {operationGate} from './operations.mjs';
@@ -105,6 +106,7 @@ export function createConversations({request,items=()=>[],busy,uncertain=()=>fal
   dialog.addEventListener('cancel',e=>{if(busy())e.preventDefault();else clearDialog();});
   function reset({sessionEnded=false}={}){epoch++;if(sessionEnded)gate.reset();clearTimeout(timer);timer=null;composer=null;catalogue=null;room=null;messages=[];query='';after=null;clearDialog();if(root)root.replaceChildren();root=null;}
   function name(p){const a=catalogue?.actors.find(a=>a.principal===p);return a?`${a.owner_id} · ${a.agent_id}`:p;}
+  function who(p){const a=catalogue?.actors.find(a=>a.principal===p);return ownerPair(a?.owner_id??'?',a?.agent_id??p);}
   function binding(){return {member_epoch:room.binding.member_epoch,policy_generation:room.binding.policy_generation};}
   const route=(suffix='')=>`/api/conversations/${room.id}${suffix}`;
   async function run(action,{write=false,operation=null}={}){
@@ -169,11 +171,11 @@ export function createConversations({request,items=()=>[],busy,uncertain=()=>fal
         }});
     }));
     const participants=node('ul','','conversation-participants');
-    for(const p of room.participants){const row=node('li',name(p.principal));if(p.principal!==room.admin&&(room.admin===catalogue.principal||p.principal===catalogue.principal))row.append(btn(p.principal===catalogue.principal?'Leave conversation':'Remove member',()=>mutate(route('/remove'),{binding:binding(),recipient:p.principal}),'danger'));participants.append(row);}panel.append(participants);
+    for(const p of room.participants){const row=node('li','');row.append(who(p.principal),node('span',name(p.principal),'participant-name'));if(p.principal!==room.admin&&(room.admin===catalogue.principal||p.principal===catalogue.principal))row.append(btn(p.principal===catalogue.principal?'Leave conversation':'Remove member',()=>mutate(route('/remove'),{binding:binding(),recipient:p.principal}),'danger'));participants.append(row);}panel.append(participants);
     if(room.admin===catalogue.principal){const choices=catalogue.actors.filter(a=>!room.participants.some(p=>p.principal===a.principal));if(choices.length){const form=node('form','','conversation-inline'),recipient=select(choices.map(a=>[a.principal,name(a.principal)]));form.append(field('Invite an existing local owner',recipient),btn('Invite future messages only',()=>mutate(route('/invite'),{binding:binding(),recipient:recipient.value})));form.addEventListener('submit',e=>e.preventDefault());panel.append(form);}}
     const search=node('form','','conversation-inline'),input=node('input');input.type='search';input.maxLength=256;input.value=query;search.append(field('Search only visible history',input),btn('Search history',()=>run(async current=>{query=input.value.trim();after=null;await loadRoom(room.id);if(current())render();})));search.addEventListener('submit',e=>{e.preventDefault();search.querySelector('button').click();});panel.append(search);
     const history=node('div','','conversation-history');history.setAttribute('aria-label','Visible messages');const chosen=new Set();
-    for(const m of messages){const item=node('article','','conversation-message');item.dataset.eventId=m.id;const check=node('input');check.type='checkbox';check.setAttribute('aria-label','Select message '+m.id);check.addEventListener('change',()=>check.checked?chosen.add(m.id):chosen.delete(m.id));item.append(field(name(m.author),check),node('p',m.text,'conversation-text'),node('small',m.id,'peer-fingerprint'));history.append(item);}
+    for(const m of messages){const item=node('article','','conversation-message');item.dataset.eventId=m.id;const check=node('input');check.type='checkbox';check.setAttribute('aria-label','Select message '+m.id);check.addEventListener('change',()=>check.checked?chosen.add(m.id):chosen.delete(m.id));item.append(who(m.author),field(name(m.author),check),node('p',m.text,'conversation-text'),node('small',m.id,'peer-fingerprint'));history.append(item);}
     if(!messages.length)history.append(node('p',query?'No visible messages match.':'No visible messages on this page. Earlier history is not shared automatically.'));panel.append(history);
     const paging=node('div','','conversation-toolbar');paging.append(btn('First page',()=>run(async current=>{after=null;await loadRoom(room.id);if(current())render();})));
     if(messages.length===25)paging.append(btn('Next visible page',()=>run(async current=>{after=messages.at(-1).id;await loadRoom(room.id);if(current())render();})));panel.append(paging);

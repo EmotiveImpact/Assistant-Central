@@ -13,6 +13,12 @@ PROJECTION = 'mission-brief-only/1'
 TARIFF = 'fictional-usd-v1'
 BASE_MICROUSD = 20
 OUTPUT_MICROUSD = 2
+# Budgets are whole millionths of one currency unit. Legacy terms carry
+# cap_microusd and mean US dollars; newer terms carry cap_micro plus an explicit
+# currency, which is signed into the agreement, task envelope and context.
+CURRENCIES = ('GBP', 'USD', 'EUR')
+LEGACY_KEYS = frozenset({'goal', 'deliverable', 'executor', 'criteria', 'cap_microusd'})
+CURRENCY_KEYS = frozenset({'goal', 'deliverable', 'executor', 'criteria', 'cap_micro', 'currency'})
 
 
 def check(condition):
@@ -30,12 +36,28 @@ def cap(value):
     return value
 
 
+def currency(value):
+    check(value in CURRENCIES)
+    return value
+
+
+def budget(value):
+    """(limit, currency) for valid terms; currency is None for legacy US dollar terms."""
+    if 'cap_microusd' in value:
+        return value['cap_microusd'], None
+    return value['cap_micro'], value['currency']
+
+
 def terms(value):
-    check(type(value) is dict and set(value) == {'goal', 'deliverable', 'executor', 'criteria', 'cap_microusd'})
+    check(type(value) is dict and set(value) in (LEGACY_KEYS, CURRENCY_KEYS))
     bounded(value['goal'], 512)
     bounded(value['deliverable'], 512)
     check(type(value['executor']) is str and re.fullmatch('[a-f0-9]{64}', value['executor']))
-    cap(value['cap_microusd'])
+    if 'currency' in value:
+        currency(value['currency'])
+        cap(value['cap_micro'])
+    else:
+        cap(value['cap_microusd'])
     checks = value['criteria']
     check(type(checks) is list and 1 <= len(checks) <= 12)
     for criterion in checks:
@@ -64,15 +86,30 @@ def read_agreement(statement):
     return value['terms']
 
 
-def mission_context(commitment, limit):
+def mission_context(commitment, limit, unit=None):
     check(type(commitment) is str and re.fullmatch('[0-9a-f]{64}', commitment))
-    return CONTEXT_PREFIX + digest([AGREEMENT, commitment, cap(limit)])[len(CONTEXT_PREFIX):]
+    bound = [AGREEMENT, commitment, cap(limit)] if unit is None else [AGREEMENT, commitment, cap(limit), currency(unit)]
+    return CONTEXT_PREFIX + digest(bound)[len(CONTEXT_PREFIX):]
 
 
-def task_text(brief, limit, commitment):
-    mission_context(commitment, limit)
-    return TASK_PREFIX + canonical({'brief': bounded(brief, 4096), 'cap_microusd': limit,
-                                    'agreement_digest': commitment}).decode()
+def terms_context(commitment, agreed):
+    return mission_context(commitment, *budget(agreed))
+
+
+def task_text(brief, limit, commitment, unit=None):
+    mission_context(commitment, limit, unit)
+    value = ({'brief': bounded(brief, 4096), 'cap_microusd': limit, 'agreement_digest': commitment} if unit is None else
+             {'brief': bounded(brief, 4096), 'cap_micro': limit, 'currency': unit, 'agreement_digest': commitment})
+    return TASK_PREFIX + canonical(value).decode()
+
+
+def money_keys(unit):
+    """Key suffix for amounts: legacy US dollar missions keep their original field names."""
+    return '_microusd' if unit is None else '_micro'
+
+
+def amount(record, name):
+    return record[name + '_micro'] if name + '_micro' in record else record[name + '_microusd']
 
 
 def direct_offer(requester, task_id, expires, agreed):
@@ -92,13 +129,13 @@ def task_details(text, context):
         offer = value['offer']
         check(type(offer) is dict and set(offer) == {'domain','requester','task_id','expires','terms'})
         check(offer == direct_offer(offer['requester'], offer['task_id'], offer['expires'], offer['terms']))
-        limit, commitment = offer['terms']['cap_microusd'], digest(offer)
+        (limit, unit), commitment = budget(offer['terms']), digest(offer)
         check(direct_task_text(value['brief'], offer) == text)
     else:
-        limit, commitment = value['cap_microusd'], value['agreement_digest']
-        check(task_text(value['brief'], limit, commitment) == text)
-    check(mission_context(commitment, limit) == context)
-    return value, limit
+        limit, unit, commitment = value.get('cap_micro', value.get('cap_microusd')), value.get('currency'), value['agreement_digest']
+        check(task_text(value['brief'], limit, commitment, unit) == text)
+    check(mission_context(commitment, limit, unit) == context)
+    return value, (limit, unit)
 
 
 def validate_task(body):
@@ -111,24 +148,30 @@ def validate_task(body):
 
 def fixture_request(request, context):
     check(context.startswith(CONTEXT_PREFIX))
-    value, limit = task_details(request['input'], context)
+    value, (limit, unit) = task_details(request['input'], context)
     check(request['model'] == 'synthetic-research-v1' and request['max_output_tokens'] == 128)
     wire_request = {**request, 'input': value['brief']}
-    return wire_request, {'tariff': TARIFF, 'cap_microusd': limit,
-            'reserve_microusd': BASE_MICROUSD + OUTPUT_MICROUSD * request['max_output_tokens'],
-            'base_microusd': BASE_MICROUSD, 'per_output_token_microusd': OUTPUT_MICROUSD,
+    if unit is None:
+        return wire_request, {'tariff': TARIFF, 'cap_microusd': limit,
+                'reserve_microusd': BASE_MICROUSD + OUTPUT_MICROUSD * request['max_output_tokens'],
+                'base_microusd': BASE_MICROUSD, 'per_output_token_microusd': OUTPUT_MICROUSD,
+                'simulated': True}
+    # A fictional flat tariff per currency. It is not a converted provider price.
+    return wire_request, {'tariff': 'fictional-' + unit.lower() + '-v1', 'currency': unit, 'cap_micro': limit,
+            'reserve_micro': BASE_MICROUSD + OUTPUT_MICROUSD * request['max_output_tokens'],
+            'base_micro': BASE_MICROUSD, 'per_output_token_micro': OUTPUT_MICROUSD,
             'simulated': True}
 
 
 def evaluate(statement, artifact_id, artifact):
     """Pure local checks. Caller supplies a currently authorised original return."""
     agreed = read_agreement(statement)
-    check(digest(artifact) == artifact_id and artifact['context'] == mission_context(digest(statement), agreed['cap_microusd']))
+    check(digest(artifact) == artifact_id and artifact['context'] == terms_context(digest(statement), agreed))
     return evidence(agreed, statement['id'], statement['revision'], digest(statement), artifact_id, artifact)
 
 
 def evidence(agreed, proposal_id, revision, commitment, artifact_id, artifact):
-    check(digest(artifact) == artifact_id and artifact['context'] == mission_context(commitment, agreed['cap_microusd']))
+    check(digest(artifact) == artifact_id and artifact['context'] == terms_context(commitment, agreed))
     content = artifact['text']
     encoded = content.encode('utf-8')
     findings = []
