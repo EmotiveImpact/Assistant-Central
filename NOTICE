@@ -1,7 +1,11 @@
 Assistant Central
 Copyright 2026 The Assistant Central Authors
 
-This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+This product is licensed under the Apache License, Version 2.0 (see LICENSE),
+except the relay/ folder, which is licensed under the GNU Affero General
+Public License v3 only (see relay/LICENSE). Within that folder, the relay
+client and wire protocol (relay/acrelay/client.py and relay/acrelay/protocol.py)
+are licensed under the Apache License, Version 2.0.
 
 It includes third-party material under its own licences:
 

@@ -180,6 +180,20 @@ class InboxStore:
             finally:
                 self._commit_or_rollback(error)
 
+    def check_lease(self, session, lease):
+        """Confirm a lease is current for its owner's live session; returns its epoch."""
+        with self._lock:
+            self._authenticate(self._key(lease)[0], session)
+            error = None
+            self._write()
+            try:
+                return self._live(lease)['epoch']
+            except BaseException as exc:
+                error = exc
+                raise
+            finally:
+                self._commit_or_rollback(error)
+
     def revoke(self, session, lease):
         """Terminal for this generation. Retained cursor and deliveries remain."""
         with self._lock:
@@ -318,16 +332,27 @@ class InboxAccess:
     assistant identity, the conversation or the session.
     """
 
-    def __init__(self, store, lease, session_provider):
+    def __init__(self, store, lease, session_provider, timeline=None):
         need(type(store) is InboxStore and type(lease) is AssistantLease and callable(session_provider))
         self._store, self._lease, self._session = store, lease, session_provider
+        self._timeline = timeline
 
     @property
     def conversation_id(self):
         return self._lease.conversation_id
 
     def pending(self, limit=20):
-        return self._store.pending(self._session(), self._lease, limit=limit)
+        batch = self._store.pending(self._session(), self._lease, limit=limit)
+        if self._timeline is not None:
+            from .timeline import record_safely
+            for message in batch['messages']:
+                own = message['author'] == self._lease.principal
+                role = ('your_assistant' if message['kind'] == 'assistant' else 'you') if own else 'someone_else'
+                record_safely(self._timeline, 'message_received', self._lease.conversation_id, role=role,
+                              ref='msg:' + message['id'],
+                              detail={'message_id': message['id'], 'author': message['author'],
+                                      'kind': message['kind'], 'assistant_id': self._lease.assistant_id})
+        return batch
 
     def acknowledge(self, through_event_id):
         return self._store.acknowledge(self._session(), self._lease, through_event_id)

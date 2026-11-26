@@ -1,6 +1,7 @@
 import {operationGate,restoreWhenIdle,inspectionLatch,inspectSavedState,requestIsMutation} from './operations.mjs';
 import {createConversations,inspectMessageOutcome} from './conversations.mjs';
 import {createHostDrafts} from './host_drafts.mjs';
+import {createApprovals} from './approvals.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
@@ -25,6 +26,7 @@ const viewCopy = {
   artifacts:['Artifacts','SHARED ARTIFACTS','Artifacts','Find the exact artifacts prepared and shared across your network.','All artifacts','Drafts, received artifacts and saved decisions'],
   outbox:['Outbox','OUTGOING WORK','Outbox','Prepare the exact content. Review it before you release it.','All outgoing','Prepared and released proposals'],
   peers:['Assistants','YOUR NETWORK','Your assistants','A network of people and the assistants they choose to trust.','Assistant network','Enrolment is separate from approval'],
+  approvals:['Approvals','WAITING FOR YOU','Your decisions, in one place.','Messages, questions and shared drafts your assistant has brought to you.','Approvals','Nothing moves until you choose'],
   conversations:['Conversations','SCOPED LOCAL HISTORY','Room for a conversation.','Persistent conversations with explicit membership and exact history consent.','Your conversations','Local coordinating host only'],
   transfers:['Transfers','EXPLICIT DELIVERY','Every handoff, deliberate.','Review an exact packet before each send or import.','Connections & transfers','No automatic delivery or retries'],
   'host-drafts':['Host drafts','INERT LOCAL DRAFTS','Inspect before anything moves.','Review exact drafts from a configured supported host.','Host task drafts','Inspection and dismissal only'],
@@ -54,13 +56,14 @@ function peerName(peerId) { const peer=state?.peers.find(peer=>peer.peer_id===pe
 function identityText(identity) { if(typeof identity==='string')return identity;return `${plain(identity?.agent_id,'Assistant')} · ${plain(identity?.owner_id,'Owner')}`; }
 function notice(message,success=false) { $('notice').textContent=message;$('notice').hidden=!message;$('notice').classList.toggle('success',success); }
 function setBusy(value) { busy=value; document.querySelectorAll('button').forEach(node=>{ if(!node.classList.contains('close-dialog'))node.disabled=value; });if(!value)restorePanel(); }
-const restorePanel=restoreWhenIdle({session:()=>generation,eligible:()=>Boolean(token&&state&&!busy&&!document.hidden&&['conversations','host-drafts'].includes(currentView)&&!$('item-list').childElementCount),restore:()=>render()});
+const restorePanel=restoreWhenIdle({session:()=>generation,eligible:()=>Boolean(token&&state&&!busy&&!document.hidden&&['conversations','host-drafts','approvals'].includes(currentView)&&!$('item-list').childElementCount),restore:()=>render()});
 const operations=operationGate(setBusy);
 const conversations=createConversations({request,items:()=>state?.items??[],gate:operations.scope(),session:()=>generation,restore:()=>{if(token&&currentView==='conversations')render();},unknownFailure:message=>new RequestFailure(message,{unknown:true}),busy:()=>busy,uncertain:()=>uncertainty.pending(),failed:(error,operation)=>handleFailure(error,'notice','conversations',operation),active:()=>Boolean(token&&currentView==='conversations'&&!document.hidden)});
+const approvals=createApprovals({request,gate:operations.scope(),restore:()=>{if(token&&currentView==='approvals')render();},session:()=>generation,busy:()=>busy,failed:error=>handleFailure(error,'notice','approvals'),active:()=>Boolean(token&&currentView==='approvals'&&!document.hidden)});
 const hostDrafts=createHostDrafts({request,gate:operations.scope(),restore:()=>{if(token&&currentView==='host-drafts')render();},session:()=>generation,owner:()=>state?.identity.fingerprint,unknownFailure:message=>new RequestFailure(message,{unknown:true}),busy:()=>busy,uncertain:()=>uncertainty.pending(),failed:(error,operation)=>handleFailure(error,'notice','host-drafts',operation),active:()=>Boolean(token&&currentView==='host-drafts'&&!document.hidden)});
 function resetSession(message='') {
   conversations.reset({sessionEnded:true});
-  hostDrafts.reset({sessionEnded:true});
+  hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
   for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats'])$(id).replaceChildren();
@@ -124,7 +127,7 @@ function navigate(view,{filter='all'}={}) {
 function render() {
   if(!state)return;
   conversations.reset();
-  hostDrafts.reset();
+  hostDrafts.reset();approvals.reset();
   const owner=state.identity;$('owner-name').textContent=owner.owner_id;$('agent-name').textContent=owner.agent_id;$('owner-avatar').textContent=owner.owner_id.slice(0,2).toUpperCase();
   const totals=workspaceTotals(state);
   $('inbox-count').textContent=totals.pending;
@@ -139,17 +142,17 @@ function render() {
   document.querySelectorAll('[data-view]').forEach(node=>{node.classList.toggle('active',node.dataset.view===currentView);node.setAttribute('aria-current',node.dataset.view===currentView?'page':'false');});
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
-  const overview=currentView==='overview'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts'].includes(currentView);
+  const overview=currentView==='overview'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals'].includes(currentView);
   $('overview-panel').hidden=!overview;$('work-panel').hidden=overview;
   $('summary').hidden=true;$('filters').hidden=structural||overview;$('view-toggle').hidden=structural||overview;$('add-peer').hidden=currentView!=='peers';
   $('search-clear').hidden=!searchQuery;
-  $('search-input').disabled=['transfers','conversations','host-drafts'].includes(currentView);
-  $('new-proposal').hidden=['conversations','host-drafts'].includes(currentView);
+  $('search-input').disabled=['transfers','conversations','host-drafts','approvals'].includes(currentView);
+  $('new-proposal').hidden=['conversations','host-drafts','approvals'].includes(currentView);
   $('search-input').setAttribute('placeholder',currentView==='transfers'?'Exact transfer selection below':currentView==='peers'?'Search assistants…':currentView==='activity'?'Search activity…':'Search work…');
   const provider=state.provider;
   $('provider-status').textContent=workflowEnabled(state)?'Synthetic workspace · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();$('item-list').classList.toggle('board',currentLayout==='board'&&!structural);$('item-list').classList.toggle('peers-grid',currentView==='peers');
-  if(overview)renderOverview(totals);else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else renderItems();
+  if(overview)renderOverview(totals);else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
   const date=$('overview-date');if(date)date.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 }
 function empty(symbol,title,description,action,target=$('item-list')) {
@@ -443,8 +446,8 @@ function restoreLocation(){
 }
 window.addEventListener('popstate',restoreLocation);
 window.addEventListener('hashchange',restoreLocation);
-window.addEventListener('focus',()=>{if(token&&['conversations','host-drafts'].includes(currentView)&&!document.hidden&&!busy)render();});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&['conversations','host-drafts'].includes(currentView)&&!busy)render();});
+window.addEventListener('focus',()=>{if(token&&['conversations','host-drafts','approvals'].includes(currentView)&&!document.hidden&&!busy)render();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token&&['conversations','host-drafts','approvals'].includes(currentView)&&!busy)render();});
 document.addEventListener('keydown',event=>{
   if(event.key==='Escape'){setNavigation(false,{restoreFocus:true});return;}
   if(event.key==='Tab'&&document.body.classList.contains('sidebar-open')){

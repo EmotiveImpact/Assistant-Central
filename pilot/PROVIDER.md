@@ -1,4 +1,36 @@
-# OpenAI Responses adapter
+# Model adapter (Anthropic Messages or OpenAI Responses)
+
+## Anthropic route
+
+The same adapter, with the same owner gate, can also send one request to the
+Anthropic Messages API (`https://api.anthropic.com/v1/messages`). Use a binding
+with `"provider": "anthropic"` and a model such as `"claude-opus-5-5"`, and the
+`AnthropicMessagesSDK` transport:
+
+```python
+transport = AnthropicMessagesSDK(lambda: os.environ["ANTHROPIC_API_KEY"], enabled=True)
+adapter = ResponsesAdapter(..., transport=transport, allow_live=True)
+```
+
+- It uses the official `anthropic` SDK (`pilot/requirements-live.txt`) with its
+  automatic retries switched off, so an approved run makes at most one attempt.
+- The request has a fixed system prompt, the accepted task text as the only
+  user message, `max_tokens` from the binding and low effort. It declares no
+  tools, so no tool can be called.
+- A refusal, a truncated answer (`max_tokens`), any tool request or an
+  over-budget token count is not a result: the run stays `uncertain` and is
+  never retried. Thinking blocks are discarded, never shown or replayed.
+- The sender's signed disclosure must name `anthropic` as the provider. Mission
+  pricing fixtures remain OpenAI-route only.
+
+To make one real call with fictional text through the full gate:
+
+```sh
+pip install -r pilot/requirements.txt -r pilot/requirements-live.txt
+ANTHROPIC_API_KEY=... python -B -m pilot.live_check --yes-make-one-real-call
+```
+
+## OpenAI Responses route
 
 `provider.py` implements a bounded, text-only adapter for
 `https://api.openai.com/v1/responses`. It is **disabled by default**. This change

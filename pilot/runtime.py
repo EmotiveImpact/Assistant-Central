@@ -202,7 +202,8 @@ class PilotRuntime:
             fields.add('projection')
             need(value['projection'] == PROJECTION)
         need(set(value) == fields, 'Provider disclosure must name its exact bounded route')
-        need(value['provider'] == 'openai', 'Unsupported provider disclosure route')
+        need(value['provider'] in ('openai', 'anthropic'), 'Unsupported provider disclosure route')
+        need(value['provider'] == 'openai' or 'projection' not in value, 'Mission projection is OpenAI-route only')
         text(value['model'], 128)
         need(type(value['max_output_tokens']) is int and 1 <= value['max_output_tokens'] <= 2048,
              'Provider output token bound is invalid')

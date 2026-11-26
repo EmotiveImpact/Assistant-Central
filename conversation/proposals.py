@@ -262,6 +262,35 @@ class LocalProposals:
             checks.append(lambda: self._check_view(principal, binding, signed, result))
             return result
 
+    def latest(self, principal, session, binding, *, limit=20):
+        """The newest revision of each proposal series this owner can read, newest first.
+
+        Each entry is a full ``inspect`` view. Series the caller is not in the
+        audience of, or cannot read every source of, are skipped silently.
+        """
+        need(type(limit) is int and 1 <= limit <= 50)
+        checks = []
+        with self._transaction(principal, session, checks):
+            self.ledger._check_binding(principal, binding)
+            rows = self.db.execute(
+                'SELECT p.id FROM conversation_proposals p JOIN (SELECT series_id,MAX(revision) AS revision '
+                'FROM conversation_proposals WHERE conversation_id=? GROUP BY series_id) l '
+                'ON p.series_id=l.series_id AND p.revision=l.revision ORDER BY p.rowid DESC',
+                (binding.conversation_id,)).fetchall()
+            results = []
+            for row in rows:
+                signed = self._proposal(row['id'])
+                try:
+                    self._readable(principal, binding, signed['statement'])
+                except ConversationDenied:
+                    continue
+                result = self._view(principal, binding, signed)
+                checks.append(lambda signed=signed, result=result: self._check_view(principal, binding, signed, result))
+                results.append(result)
+                if len(results) == limit:
+                    break
+            return results
+
     def inspect_request(self, principal, session, binding, request_id):
         """Reconcile a lost create response without repeating an external effect."""
         identifier(request_id)

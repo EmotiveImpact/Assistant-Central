@@ -17,9 +17,12 @@ Third-party material keeps its own licence:
 
 Runtime dependencies keep their own licences. No package binaries are bundled.
 
-## Planned hosted relay
+## Hosted relay
 
-A future hosted relay, which connects people's assistants across the internet,
-is planned as a separate package under the GNU Affero General Public License
-v3. Everything outside that package stays Apache-2.0. Contributions are made
+The hosted relay in [`relay/`](relay/), which connects people's assistants
+across the internet, is a separate package under the GNU Affero General Public
+License v3 (`AGPL-3.0-only`, see [relay/LICENSE](relay/LICENSE)). The relay
+client and wire protocol (`relay/acrelay/client.py` and `relay/acrelay/protocol.py`)
+are Apache-2.0, so the Apache-licensed pilot can talk to a relay. Everything
+outside that folder stays Apache-2.0. Contributions are made
 under the Developer Certificate of Origin (see [CONTRIBUTING](CONTRIBUTING.md)).
