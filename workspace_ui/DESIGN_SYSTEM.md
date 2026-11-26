@@ -31,3 +31,13 @@ Every colour in `style.css` is a role token on `:root`. Use the role, never a ra
 - **Shape:** cards 20 to 24px radius, dialogs 28px (a bottom sheet on phones), controls are pills.
 
 - **People and assistants sit side by side, never overlapping.** The owner's teal circle and the assistant's bot keep a small gap; only the logo mark overlaps.
+
+## The Parlu direction (chosen by Edem, 26 November 2026)
+
+One app whose screens are states, not separate apps. Source: `/mnt/project-files/design-system/direction/` in the project files.
+
+- **Home is a paragraph.** At most three sentences with people and bots inline, ending with a true line about whether anything else needs you. Under it, one decision per card. A card never decides on its own: "Review and agree" opens the exact review.
+- **Every assistant has a face.** A two-eyed blob from `bots.mjs` (six shapes, six warm colours, five expressions that carry state), always beside its owner's teal circle with a 4px gap. Nothing overlaps or merges.
+- **Money and consent need a hold.** `hold.mjs` fills a coral ring over about a second; letting go early does nothing. The plain button stays as the alternative.
+- **Phone frame.** A floating glass pill bar with Home, Recents and a plus button that opens a short dark menu. The desktop keeps its white sidebar.
+- **Still to come:** the money view (one budget number and who holds which key) and the evening story with "Good" and "Don't do that again".
