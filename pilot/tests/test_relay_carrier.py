@@ -101,6 +101,31 @@ class RelayCarrierTests(unittest.TestCase):
         self.assertEqual(len(list(spool.glob('*.json'))), 1)
         self.assertEqual(self.bob_box.fetch()['packets'], [])
 
+    def test_command_line_round_trip(self):
+        import contextlib, io, json
+        from pilot import relay_cli
+        url = f'http://127.0.0.1:{self.server.server_port}'
+        def run(*argv):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                code = relay_cli.main(list(argv))
+            return code, out.getvalue()
+        key = str(self.root / 'bob.key')
+        self.assertEqual(run('init', '--relay', url, '--key', key)[0], 0)
+        self.assertEqual((self.root / 'bob.key').stat().st_mode & 0o777, 0o600)
+        self.assertEqual(run('init', '--relay', url, '--key', key)[0], 0)  # Repeatable.
+        code, out = run('invite', '--relay', url, '--key', key, '--fingerprint', self.b[2].fingerprint)
+        link = json.loads(out)['invite']
+        code, out = run('send', '--invite', link, '--recipient', self.b[2].fingerprint, '--file', str(self.packet))
+        self.assertEqual((code, json.loads(out)['delivery']), (0, 'uncertain'))
+        spool = self.root / 'cli-spool'
+        code, out = run('fetch', '--relay', url, '--key', key, '--quarantine', str(spool),
+                        '--recipient', self.b[2].fingerprint)
+        self.assertEqual(len(json.loads(out)['stored']), 1)
+        self.b[3].receive(self.b[1], spool / json.loads(out)['stored'][0], self.receipt)
+        self.assertEqual(run('send', '--invite', link, '--recipient', self.a[2].fingerprint,
+                             '--file', str(self.packet))[0], 1)
+
 
 if __name__ == '__main__':
     unittest.main()
