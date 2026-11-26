@@ -11,6 +11,8 @@ Third-party material keeps its own licence:
   public vector licence text.
 - `workspace_ui/InterVariable.woff2`: SIL Open Font Licence 1.1
   (`workspace_ui/INTER-LICENSE.txt`).
+- `workspace_ui/PlusJakartaSansVariable.woff2` (Latin subset, via Fontsource 5.1.1): SIL Open Font Licence 1.1
+  (`workspace_ui/PLUS-JAKARTA-SANS-LICENSE.txt`).
 - `research/sources/`: reference snapshots of other projects, each under its
   own MIT or Apache-2.0 licence. They are not part of the software and will be
   removed once the research phase ends.

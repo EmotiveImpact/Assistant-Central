@@ -1,35 +1,31 @@
 # Parlu workspace design notes
 
-The workspace follows the "Combined" direction chosen on 26 November 2026: a tonal base, a calm approval sheet and a white working card on a soft lilac-grey surface. The fuller design system (tokens, components, previews) lives with the project's design files; this note records how the app's `style.css` maps onto it.
+The workspace follows the Parlu brand sketch Edem chose on 26 November 2026: two overlapping circles, teal for the person, coral for the assistant and dark ink for the shared space where they agree, on warm cream grounds. This note records how `style.css` maps onto it.
+
+## Brand
+
+- **Mark:** two overlapping circles (teal `#14897a`, coral `#ee7b5b`) with an ink lens (`#1b1a17`) where they meet. Inline SVG in `index.html`.
+- **Wordmark:** lowercase "parlu", Plus Jakarta Sans 700, tracking -0.045em. The name itself stays a placeholder in `PRODUCT` in `app.mjs`.
+- **Type:** Plus Jakarta Sans (self-hosted variable font, Latin subset, SIL OFL). Page titles 36/42 bold (28/34 on phones), dialog titles 22/28 bold, section titles 17 semibold.
 
 ## Tokens
 
-Every colour in `style.css` is a role token on `:root` (the Parlu token block). Use the role, never a raw hex.
+Every colour in `style.css` is a role token on `:root`. Use the role, never a raw hex.
 
 | Role | Token | Value |
 | --- | --- | --- |
-| Page surface | `--bg` | `#fcfbfe` |
-| Card | `--surface` | `#ffffff` |
-| Sidebar and tonal fills | `--raised` | `#f3f2f8` |
-| Lines | `--line`, `--line-strong` | `#e2e0ea`, `#d4d1df` |
-| Text | `--text`, `--secondary`, `--muted` | `#1a1a22`, `#2c2d38`, `#5e6070` |
-| Signed-in owner | `--accent`, `--accent-bg`, `--accent-on` | lilac `#6a4fd6`, `#ebe4ff`, `#25156e` |
-| Other owners | `--teal*`, coral `#b04a20` | |
-| Your turn | `--sun`, `--sun-bg` | `#ffd56b`, `#fff3cc` |
-| Positive, warning, negative | `--ok-*`, `--warn-*`, `--danger-*` | |
+| Page ground and sidebar | `--raised` | `#f3f1ec` |
+| Working card | `--bg` | `#fbfaf7` |
+| Inner cards | `--surface` | `#ffffff` |
+| Lines | `--line`, `--line-strong` | `#e4e0d8`, `#d6d1c7` |
+| Text | `--text`, `--secondary`, `--muted` | `#1b1a17`, `#3e3b35`, `#5c5850` |
+| Person (teal) | `--accent`, `--accent-bg`, `--accent-on` | `#14897a`, `#e3f2ef`, `#0b5a50` |
+| Assistant and "needs you" (coral) | `--sun`, `--sun-bg`, `--sun-on` | `#ee7b5b`, `#fce9e2`, `#8a3a22` |
 
 ## Rules
 
-- **Colour means owner.** Lilac is the signed-in person. Other owners take teal, then coral.
-- **Yellow means your turn.** Only the "Needs your attention" block and counts that wait on the viewer use `--sun`.
-- **People are circles, assistants are rounded squares** with a small "AI" mark (`data-kind="person"` or `data-kind="assistant"`). An assistant is always shown with its owner.
-- **Primary actions are ink** (dark pill). Secondary actions are white pills with a line. Destructive actions are a soft red pill.
-- **Approval screens stay plain.** Lead with the accountable person and what happens, in plain English. Money should read in pounds once the backend stores a currency; until then it is labelled honestly as US dollars.
-- **Type:** Inter Variable (self-hosted, CSP-safe). Page titles 28/34 bold, dialog titles 22/28 bold, section titles 17 semibold, body 14.
-- **Shape:** cards 18 to 24px radius, dialogs 28px (a bottom sheet on phones), controls are pills.
-
-## Known gaps
-
-- Assistant avatar tone is still chosen by a name hash, not by owner. Owner-based colour needs the owner passed into `nameAvatar`.
-- Some mission and conversation buttons still use the secondary style where they should be the primary action.
-- Dark theme tokens exist in the design system but the app ships light only for now.
+- **Teal is a person, coral is an assistant.** People are teal circles; assistants are warm rounded squares with a small "AI" mark, always shown with their owner.
+- **Coral marks what needs you:** the count on "Needs your attention" and pending badges. The card itself stays plain white.
+- **Primary actions and the active nav item are ink pills.** Secondary actions are cream pills with a line.
+- **Approval screens stay plain.** Lead with the accountable person and what happens, in plain English. Money shows in the mission's own currency.
+- **Shape:** cards 20 to 24px radius, dialogs 28px (a bottom sheet on phones), controls are pills.
