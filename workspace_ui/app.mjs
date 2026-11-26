@@ -13,7 +13,7 @@ import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,re
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
 import {qrMatrix,qrPath} from './qr.mjs';
-import {validatePhone,startLink,phoneNote,ANSWER_LIMIT} from './phone.mjs';
+import {validatePhone,startLink,phoneNote,pairingOutcome,ANSWER_LIMIT} from './phone.mjs';
 import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 
@@ -272,7 +272,8 @@ async function openPhonePanel(refresh){
     if(!status.available)return;
     const actions=text('div','','inspect-actions');
     actions.append(button(status.paired?'Pair a different phone':'Pair your phone',status.paired?'button secondary':'button primary',()=>pairPhone(body)));
-    if(status.paired)actions.append(button('Unpair','button secondary',()=>performWrite('/api/approvals/phone/unpair',{},{onSuccess:()=>{notice('Your phone is unpaired. Questions now wait only in Approvals.',true);openPhonePanel(true);}})));
+    // The write still holds the gate when it succeeds, so the panel is redrawn just after.
+    if(status.paired)actions.append(button('Unpair','button secondary',()=>performWrite('/api/approvals/phone/unpair',{},{onSuccess:()=>{notice('Your phone is unpaired. Questions now wait only in Approvals.',true);setTimeout(()=>openPhonePanel(true));}})));
     body.append(actions);
   },()=>openPhonePanel(true),refresh);
 }
@@ -294,7 +295,11 @@ async function pairPhone(body){
   const until=made.expires_at*1000;
   const check=async()=>{
     if(!box.isConnected||Date.now()>until||epoch!==generation)return;
-    try{const status=validatePhone(await request('/api/approvals/phone'));if(status.paired){notice('Your phone is paired. New questions reach it as they arrive.',true);openPhonePanel(true);return;}}catch{}
+    try{
+      const status=validatePhone(await request('/api/approvals/phone')),outcome=pairingOutcome(status,made);
+      if(outcome==='paired'){notice('Your phone is paired. New questions reach it as they arrive.',true);openPhonePanel(true);return;}
+      if(outcome==='ended'){box.append(text('p','This code can no longer be used. Make a new one to pair.','inspect-note'));return;}
+    }catch{}
     setTimeout(check,3000);
   };
   setTimeout(check,3000);

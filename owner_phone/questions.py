@@ -67,9 +67,12 @@ class OwnerQuestions:
             ''')
             with self._lock:
                 self.db.execute('BEGIN IMMEDIATE')
+                # When the current chat was paired, so a replacement attempt can tell it worked.
+                if 'paired_at' not in {column[1] for column in self.db.execute('PRAGMA table_info(question_meta)')}:
+                    self.db.execute('ALTER TABLE question_meta ADD COLUMN paired_at REAL')
                 row = self.db.execute('SELECT * FROM question_meta WHERE singleton=1').fetchone()
                 if row is None:
-                    self.db.execute('INSERT INTO question_meta VALUES(1,?,?,?,0,NULL,NULL,NULL)',
+                    self.db.execute('INSERT INTO question_meta(singleton,version,owner,tag_key,observed) VALUES(1,?,?,?,0)',
                                     (VERSION, principal, secrets.token_hex(32)))
                 else:
                     need(row['version'] == VERSION and row['owner'] == principal)
@@ -213,19 +216,22 @@ class OwnerQuestions:
                 now = self._now()
                 self.db.execute('UPDATE question_meta SET pairing_digest=?,pairing_expires=? WHERE singleton=1',
                                 (hashlib.sha256(code.encode()).hexdigest(), now + PAIRING_SECONDS))
-            return {'code': code, 'expires_at': now + PAIRING_SECONDS}
+            return {'code': code, 'started_at': now, 'expires_at': now + PAIRING_SECONDS}
 
     def unpair(self, session):
         with self._lock:
             self._owner(session)
             with self._txn():
                 self._now()
-                self.db.execute('UPDATE question_meta SET chat_id=NULL,pairing_digest=NULL,pairing_expires=NULL WHERE singleton=1')
+                self.db.execute('UPDATE question_meta SET chat_id=NULL,paired_at=NULL,pairing_digest=NULL,pairing_expires=NULL WHERE singleton=1')
 
     def phone_status(self, session):
         with self._lock:
             self._owner(session)
-            return {'paired': self._meta()['chat_id'] is not None}
+            meta = self._meta()
+            # No secret here: whether a chat is paired, since when, and whether a code is still open.
+            return {'paired': meta['chat_id'] is not None, 'paired_at': meta['paired_at'],
+                    'pairing_open': meta['pairing_digest'] is not None and self.clock() < meta['pairing_expires']}
 
     # Channel side (called by a phone adapter, never by a model) --------------
 
@@ -236,8 +242,8 @@ class OwnerQuestions:
             meta = self._meta()
             need(meta['pairing_digest'] is not None and now < meta['pairing_expires'])
             need(hmac.compare_digest(meta['pairing_digest'], hashlib.sha256(code.encode()).hexdigest()))
-            self.db.execute('UPDATE question_meta SET chat_id=?,pairing_digest=NULL,pairing_expires=NULL WHERE singleton=1',
-                            (chat_id,))
+            self.db.execute('UPDATE question_meta SET chat_id=?,paired_at=?,pairing_digest=NULL,pairing_expires=NULL WHERE singleton=1',
+                            (chat_id, now))
 
     def paired_chat(self):
         with self._lock:
@@ -261,7 +267,20 @@ class OwnerQuestions:
             paired = self._meta()['chat_id']
             need(paired is not None and type(chat_id) is str and hmac.compare_digest(paired, chat_id))
             need(type(tag) is str and type(option) is int and hmac.compare_digest(self.tag(question_id, option), tag))
-            return self._record(question_id, option, 'phone')
+            # Recorded by its number alone, so a tap still counts while Parlu is locked: the
+            # question text stays sealed, and the paired chat and keyed tag prove the tap is the owner's.
+            with self._txn():
+                now = self._now()
+                row = self._row(question_id)
+                need(0 <= option < row['options'])
+                if row['answer'] is not None:
+                    need(row['answer'] == option)
+                    return {'saved': True, 'option': option}
+                need(now < row['expires'])
+                self.db.execute("UPDATE owner_questions SET answer=?,answered_via='phone' WHERE id=?", (option, question_id))
+            record_safely(self.timeline, 'question_answered', row['conversation_id'], role='you',
+                          ref='question:' + question_id, detail={'question_id': question_id, 'via': 'phone'})
+            return {'saved': True, 'option': option}
 
 
 class _Txn:

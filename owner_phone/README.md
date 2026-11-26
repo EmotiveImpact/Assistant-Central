@@ -37,6 +37,13 @@ Reminders about waiting reviews (`nudge`) never include any content.
    Start. The one-time code lasts ten minutes, and only that chat is accepted
    from then on. Unpair at any time from the same panel.
 
+Pairing only connects the phone. An assistant asks its owner through the
+`ask_my_owner` tool, which the host gives it from the same question store
+(see `mission_approvals/server.py`); questions it asks there reach the phone.
+
+A tap is saved even while nobody is signed in to Parlu: it is recorded by its
+answer number, so the question's words stay sealed until the owner signs in.
+
 Hosts that run their own loop can still call `TelegramPhone.poll_once()` and
 `send_waiting()` directly; `owner_phone/runner.py` is that loop.
 

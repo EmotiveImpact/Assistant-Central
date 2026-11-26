@@ -40,6 +40,10 @@ class FictionalBot:
         with self.lock:
             return [payload for method, payload in self.calls if method == 'sendMessage']
 
+    def answered(self):
+        with self.lock:
+            return [payload for method, payload in self.calls if method == 'answerCallbackQuery']
+
 
 def until(check, seconds=5):
     deadline = time.monotonic() + seconds
@@ -60,11 +64,13 @@ class PhoneTests(Base):
         self.addCleanup(patch.stop)
         super().setUp()
 
+    mode = 'notice'
+
     def start(self):
         self.config = ConversationConfig({'version': VERSION, 'directory': str(self.config.directory),
                                           'actors': [{'directory': str(a['directory']), 'fingerprint': a['fingerprint']}
                                                      for a in self.config.actors],
-                                          'phone': {'telegram': 'notice'}})
+                                          'phone': {'telegram': self.mode}})
         super().start()
 
     def ask_alice(self):
@@ -94,6 +100,31 @@ class PhoneTests(Base):
         self.assertFalse(any('train' in m['text'].lower() for m in self.bot.sent()))
         self.assertEqual(self.call('alice', '/api/approvals/phone/unpair', {}), {'paired': False})
         self.assertFalse(self.call('alice', '/api/approvals/phone')['paired'])
+
+    def test_full_mode_taps_answer_even_after_signing_out(self):
+        self.stop()
+        self.mode = 'full'
+        self.start()
+        self.tokens = {n: self.login(n) for n in self.keys}
+        until(lambda: self.call('alice', '/api/approvals/phone')['bot'])
+        made = self.call('alice', '/api/approvals/phone/pair', {})
+        with self.bot.lock:
+            self.bot.updates.append({'update_id': 1, 'message': {'chat': {'id': 777, 'type': 'private'},
+                                                                 'text': '/start ' + made['code']}})
+        until(lambda: self.call('alice', '/api/approvals/phone')['paired'])
+        self.create()
+        self.server.owner_worker.submit(self.ask_alice()).result()
+        message = until(lambda: next((m for m in self.bot.sent() if 'train' in m['text'].lower()), None))
+        coach = message['reply_markup']['inline_keyboard'][1][0]
+        self.assertTrue(any(q['question'] == 'Fictional: train or coach?' for q in self.call('alice', '/api/approvals')['questions']))
+        # Alice signs out; Parlu stays open and the bot keeps listening.
+        self.call('alice', '/api/session', {}, method='DELETE')
+        with self.bot.lock:
+            self.bot.updates.append({'update_id': 2, 'callback_query': {'id': 'cb1', 'data': coach['callback_data'],
+                                                                        'message': {'chat': {'id': 777}, 'reply_markup': message['reply_markup']}}})
+        until(lambda: any(m.get('text') == 'Answered: Coach' for m in self.bot.answered()))
+        self.tokens['alice'] = self.login('alice')
+        self.assertFalse(any(q['question'] == 'Fictional: train or coach?' for q in self.call('alice', '/api/approvals')['questions']))
 
     def test_only_the_person_running_parlu_gets_the_bot(self):
         status = self.call('bob', '/api/approvals/phone')

@@ -39,11 +39,25 @@ class PhoneRunner:
         return {'available': True, 'mode': self.mode, 'bot': self.bot, 'reachable': self.reachable}
 
     def step(self):
-        """One round: learn the bot's name once, send new questions, then wait for taps."""
-        if self.bot is None:
-            self.bot = self.phone.bot_name()
-        self.phone.send_waiting()
-        self.phone.poll_once(timeout=POLL_SECONDS)
+        """One round: learn the bot's name once, send new questions, then wait for taps.
+
+        Sending and listening fail separately. A chat that refuses a message, or a question
+        that cannot be read while Parlu is locked, never stops the bot hearing a new
+        pairing or an answer tap. The first problem is raised after the round.
+        """
+        problem = None
+        try:
+            if self.bot is None:
+                self.bot = self.phone.bot_name()
+            self.phone.send_waiting()
+        except Exception as error:
+            problem = error
+        try:
+            self.phone.poll_once(timeout=POLL_SECONDS)
+        except Exception as error:
+            problem = problem or error
+        if problem is not None:
+            raise problem
 
     def _run(self):
         delay = FIRST_DELAY

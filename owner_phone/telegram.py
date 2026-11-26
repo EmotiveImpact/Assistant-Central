@@ -64,11 +64,14 @@ class TelegramPhone:
 
     def send_waiting(self):
         """Send each new question once to the paired chat. Returns how many were sent."""
-        chat = self.questions.paired_chat()
-        if chat is None:
+        if self.questions.paired_chat() is None:
             return 0
         sent = 0
         for question in self.questions.unsent_for_phone():
+            # Read the pairing again for every message: an Unpair or a new phone takes effect at once.
+            chat = self.questions.paired_chat()
+            if chat is None:
+                break
             self._call('sendMessage', self._question_message(chat, question))
             self.questions.mark_sent_to_phone(question['question_id'])
             sent += 1
@@ -135,8 +138,12 @@ class TelegramPhone:
         prefix, question_id, option, tag = query['data'].split(':')
         need(prefix == 'a' and option.isdigit())
         try:
-            result = self.questions.answer_from_phone(chat, question_id, int(option), tag)
-            note = f"Answered: {result['answer']}"
+            self.questions.answer_from_phone(chat, question_id, int(option), tag)
+            # Echo the words of the button that was tapped; the saved answer itself is only its number.
+            buttons = query.get('message', {}).get('reply_markup', {}).get('inline_keyboard', [])
+            words = next((b.get('text') for row in buttons if type(row) is list for b in row
+                          if type(b) is dict and b.get('callback_data') == query['data']), None)
+            note = f'Answered: {words}' if type(words) is str else 'Answer saved.'
         except ConversationDenied:
             note = 'That question can no longer be answered here.'
         self._call('answerCallbackQuery', {'callback_query_id': query['id'], 'text': note[:200]})

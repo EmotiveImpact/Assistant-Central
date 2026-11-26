@@ -31,4 +31,12 @@ export function phoneNote(status){
   return mode+reach;
 }
 
+// Where one pairing attempt stands. An older pairing is not this one: only a chat paired at
+// or after this code was made counts, so "Pair a different phone" waits for the new phone.
+export function pairingOutcome(status,made){
+  const started=Number(made?.started_at),at=status?.paired_at;
+  if(status?.paired===true&&typeof at==='number'&&Number.isFinite(started)&&at>=started)return 'paired';
+  return status?.pairing_open===true?'waiting':'ended';
+}
+
 export const ANSWER_LIMIT='An answer is information for your assistant. It never approves sending, sharing, running or paying for anything.';
