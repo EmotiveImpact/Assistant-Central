@@ -113,6 +113,16 @@ class AnthropicRouteTests(_Base):
         client = AnthropicMessagesSDK(lambda: 'k' * 20, enabled=True)._client('k' * 20)
         self.assertEqual(client.max_retries, 0)
 
+    def test_real_client_ignores_base_url_from_environment(self):
+        try:
+            import anthropic  # noqa: F401
+        except ImportError:
+            self.skipTest('optional anthropic package not installed')
+        from unittest import mock
+        with mock.patch.dict('os.environ', {'ANTHROPIC_BASE_URL': 'https://elsewhere.invalid'}):
+            client = AnthropicMessagesSDK(lambda: 'k' * 20, enabled=True)._client('k' * 20)
+        self.assertEqual(str(client.base_url).rstrip('/'), 'https://api.anthropic.com')
+
 
 # Only run the Anthropic-specific tests here; the OpenAI suite runs from its own module.
 for _name in [n for n in vars(_Base) if n.startswith('test_')]:
