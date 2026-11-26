@@ -8,7 +8,7 @@
    Sunshine yellow is reserved for "your turn". */
 :root{
   --bg:#fbfaf7;--surface:#ffffff;--raised:#f3f1ec;--hover-solid:#eceae5;--sidebar:#f3f1ec;
-  --line:#e4e0d8;--line-strong:#d6d1c7;--line-alpha:rgba(27,26,23,.08);--panel-edge:#e4e0d8;
+  --line:#e4e0d8;--line-strong:#d6d1c7;--line-soft:#ece9e2;--line-alpha:rgba(27,26,23,.08);--panel-edge:#e4e0d8;
   --hover:rgba(27,26,23,.03);--hover-strong:rgba(27,26,23,.06);
   --text:#1b1a17;--secondary:#3e3b35;--muted:#5c5850;--quiet:#5c5850;--metadata:#5c5850;--faint:#8e897f;
   --accent:#14897a;--accent-fg:#0f6e61;--accent-bg:#e3f2ef;--accent-on:#0b5a50;--accent-tint:rgba(20,137,122,.14);
@@ -506,3 +506,7 @@ body,.workspace{background:var(--raised)}
 .conversation-message>:not(.owner-pair){grid-column:2}
 .participant-name{margin-right:auto}
 .mission-summary dd.with-pair{display:flex;align-items:center;gap:10px}
+.pilot-note .status-dot,.workspace-note .status-dot{background:var(--accent)}
+.workspace-plan{background:var(--hover-solid);color:var(--secondary)}
+/* The desktop sidebar scrolls on its own so Sign out stays reachable on short screens. */
+@media(min-width:701px){.sidebar{overflow-y:auto;overscroll-behavior:contain}}

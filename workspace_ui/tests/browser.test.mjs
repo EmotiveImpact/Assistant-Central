@@ -120,6 +120,11 @@ try {
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
+  await page.setViewportSize({width:1366,height:768});
+  await page.locator('#logout').scrollIntoViewIfNeeded();
+  const logoutBox=await page.locator('#logout').boundingBox();
+  assert.ok(logoutBox&&logoutBox.y+logoutBox.height<=768,'sign out must stay reachable on a short desktop screen');
+  await page.setViewportSize({width:1440,height:1000});
   const attentionIds=await page.locator('#overview-attention [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
   const workIds=await page.locator('#overview-work [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
   assert.equal(workIds.some(id=>attentionIds.includes(id)),false,'overview sections must not repeat the same work');
