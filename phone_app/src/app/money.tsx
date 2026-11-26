@@ -1,12 +1,10 @@
-// Money and assistants: one big number per currency from the signed budgets, then everyone
-// you are connected to, each assistant beside its owner. Nothing is converted or guessed.
+// Money: one big number per currency from the signed budgets. Nothing is converted or
+// guessed. The people you work with have their own page, Assistants.
 import React from 'react';
-import { View } from 'react-native';
 import { useGuard } from '../lib/guard';
-import { queueOf } from '../lib/home';
 import { useSession } from '../lib/session';
-import { budgetSummary, money, shortKey } from '../shared/web';
-import { Bot, Card, Pair, T } from '../ui/parts';
+import { budgetSummary, money } from '../shared/web';
+import { Card, T } from '../ui/parts';
 import { Screen } from '../ui/Screen';
 import { colour, font } from '../ui/theme';
 
@@ -23,14 +21,12 @@ function Big({ amount }: { amount: string }) {
 
 export default function Money() {
   const guard = useGuard();
-  const { state, approvals } = useSession();
+  const { state } = useSession();
   if (guard || !state) return guard;
   const runs = ((state.workflow as { runs?: unknown[] } | undefined)?.runs ?? []) as unknown[];
   const totals = budgetSummary(runs, state.items) as Total[];
-  const waiting = new Set(queueOf(state, approvals).map(e => e.item?.peer_id).filter(Boolean));
-  const peers = state.peers.filter(p => p.state === 'active');
   return (
-    <Screen title="Money and assistants">
+    <Screen title="Money">
       {totals.length ? totals.map(total => {
         const known = total.budgets - total.unknown;
         return (
@@ -46,28 +42,6 @@ export default function Money() {
           <T v="small">No shared budgets yet. When you agree to spend, the limit appears here in its own currency.</T>
         </Card>
       )}
-      <Card style={{ gap: 12, marginTop: 6 }}>
-        <View>
-          <T v="section">Assistants</T>
-          <T v="small">{peers.length} connected{waiting.size ? ` · ${waiting.size} need${waiting.size === 1 ? 's' : ''} you` : ''}</T>
-        </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          {peers.map(p => <Bot key={p.peer_id} name={p.agent_id} size={48} e={waiting.has(p.peer_id) ? 'look' : 'idle'} />)}
-        </View>
-      </Card>
-      <View style={{ marginTop: 14, gap: 8 }}>
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }}>
-          <Pair owner={state.identity.owner_id} agent={state.identity.agent_id} size={24} />
-          <T v="bodyBold" style={{ flex: 1 }}>{state.identity.agent_id}, yours</T>
-        </Card>
-        {peers.map(p => (
-          <Card key={p.peer_id} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 }}>
-            <Pair owner={p.owner_id} agent={p.agent_id} size={24} e={waiting.has(p.peer_id) ? 'look' : 'idle'} />
-            <T v="bodyBold" style={{ flex: 1 }}>{p.agent_id} · {p.owner_id}’s</T>
-            <T v="mono" accessibilityLabel={`Key ${shortKey(p.fingerprint ?? p.peer_id)}`}>{shortKey(p.fingerprint ?? p.peer_id)}</T>
-          </Card>
-        ))}
-      </View>
     </Screen>
   );
 }
