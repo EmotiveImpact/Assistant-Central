@@ -1011,3 +1011,19 @@ dialog[open]::backdrop{animation:pm-fade .25s ease-out}
 @media(max-width:700px){.content{padding-bottom:104px}}
 @media(prefers-reduced-motion:reduce){.quick-menu:not([hidden])::before{animation:none}}
 .quick-open .glass-bar{z-index:22}
+/* Recents › Activity: one plain sentence per event, like the mock. A row that has an item opens it. */
+button.activity-row{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;appearance:none}
+button.activity-row:hover .item-title{color:var(--accent-fg)}
+.activity-row .event-dot[data-side="them"]{background:#14897a}
+.activity-row .event-dot[data-side="you"]{background:#ee7b5b}
+.activity-row .item-title{font-weight:560;text-transform:none}
+/* Assistants: big cards, with each person beside their assistant and a short key, as in the mock. */
+.peer-pair .person-dot{width:36px;height:36px;font-size:14px}
+.peer-pair .bot-avatar{width:40px;height:40px}
+.key-chip{display:inline-block;margin-top:8px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;letter-spacing:.06em;color:var(--muted);background:var(--line);border:1px solid var(--line-strong);border-radius:6px;padding:2px 7px}
+.peers-grid .item-meta,.peer-row .item-meta{text-transform:none}
+.peer-pair .person-dot{flex:none;min-width:36px;min-height:36px;aspect-ratio:1}
+.peer-pair{flex:none}.peer-pair .bot-avatar{flex:none;min-width:40px}
+.peers-grid .peer-row:has(.peer-pair){grid-template-columns:auto minmax(0,1fr)}
+.peers-grid .peer-row:has(.peer-pair):has(.badge.local){grid-template-columns:auto minmax(0,1fr) auto}
+@media(max-width:700px){.peers-grid .peer-row:has(.peer-pair):has(.badge.local){grid-template-columns:auto minmax(0,1fr)}}

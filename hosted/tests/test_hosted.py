@@ -88,6 +88,27 @@ class HostedDemoTest(unittest.TestCase):
     def test_peer_mailbox_is_not_public(self):
         self.assertEqual(self.request('POST', '/peer/inbox', {'packet': {}})[0], 404)
 
+    def test_demo_has_the_story_money_and_a_team_mission(self):
+        token = json.loads(self.request('POST', '/api/session', {'password': PASSWORD})[1])['token']
+        items = json.loads(self.request('GET', '/api/state', token=token, origin=None)[1])['items']
+        caps = [item['mission_cap'] for item in items if item.get('mission_cap')]
+        self.assertIn({'cap_micro': 400_000_000, 'currency': 'GBP'}, caps)
+        parts = [item for item in items if item['title'].startswith('Launch website: ') and item['kind'] == 'task']
+        self.assertEqual(len({item['peer_id'] for item in parts}), 3)
+        self.assertEqual(len({item['context'] for item in parts}), 1)
+
+    def test_a_long_warm_instance_starts_a_fresh_workspace(self):
+        import hosted.index as hosted
+        first = hosted._owner_server()
+        saved = hosted._seeded_at
+        try:
+            hosted._seeded_at = saved - hosted.MAX_AGE - 1
+            second = hosted._owner_server()
+            self.assertIsNot(first, second)
+            self.assertIs(hosted._owner_server(), second)
+        finally:
+            hosted._seeded_at = max(hosted._seeded_at, saved)
+
 
 if __name__ == '__main__':
     unittest.main()

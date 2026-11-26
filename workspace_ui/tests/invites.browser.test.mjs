@@ -167,7 +167,7 @@ try{
   await shot(edem,'invite-5-remove.png');
   await edem.locator('#inspect').getByRole('button',{name:'Remove Otto now'}).click();
   await edem.locator('#notice').filter({hasText:'Otto is removed.'}).waitFor();
-  await edem.locator('#item-list .peer-row').filter({hasText:'Otto'}).filter({hasText:'Revoked'}).waitFor();
+  await edem.locator('#item-list .peer-row').filter({hasText:'Otto'}).filter({hasText:'Removed'}).waitFor();
 
   assert.deepEqual(errors,[]);
   console.log('Invite link browser test passed.');

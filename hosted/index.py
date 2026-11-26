@@ -15,6 +15,7 @@ import os
 import sys
 import tempfile
 import threading
+import time
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import unquote
 
@@ -58,18 +59,25 @@ PAGE_EDITS = (
 
 _lock = threading.Lock()
 _server = None
+_seeded_at = 0.0
+# Signed proposals live at most an hour, so a long-warm instance would slowly empty Home.
+# Seed a fresh workspace before that happens; anyone signed in simply taps "Open the demo" again.
+MAX_AGE = 45 * 60
 
 
 def _owner_server():
-    global _server
+    global _server, _seeded_at
     with _lock:
+        if _server is not None and time.time() - _seeded_at > MAX_AGE:
+            old, _server = _server, None
+            threading.Thread(target=lambda: (old.shutdown(), old.server_close()), daemon=True).start()
         if _server is None:
             directory = tempfile.mkdtemp(prefix='parlu-demo-')
-            owner = seed_workspace(directory)
+            owner = seed_workspace(directory, story=True)
             server = WorkspaceHTTPServer(owner, 0, synthetic_workflow=True,
                                          relay_url=os.environ.get('PARLU_RELAY_URL') or None)
             threading.Thread(target=server.serve_forever, daemon=True).start()
-            _server = server
+            _server, _seeded_at = server, time.time()
         return _server
 
 
