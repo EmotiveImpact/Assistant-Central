@@ -3,8 +3,17 @@
     {
       "src": "hosted/index.py",
       "use": "@vercel/python",
-      "config": { "excludeFiles": "{.git,archive,research,docs,sdk,node_modules}/**" }
-    }
+      "config": { "excludeFiles": "{.git,archive,research,docs,sdk,node_modules,films}/**" }
+    },
+    { "src": "films/**", "use": "@vercel/static" }
   ],
-  "routes": [{ "src": "/(.*)", "dest": "/hosted/index.py?parlu_path=$1" }]
+  "routes": [
+    { "src": "/films/?", "dest": "/films/index.html" },
+    {
+      "src": "/films/(media|posters)/([a-z0-9-]+\\.(?:mp4|jpg))",
+      "dest": "/films/$1/$2",
+      "headers": { "Cache-Control": "public, max-age=86400" }
+    },
+    { "src": "/(.*)", "dest": "/hosted/index.py?parlu_path=$1" }
+  ]
 }
