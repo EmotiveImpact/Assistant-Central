@@ -1,7 +1,10 @@
 // The frame for a full screen: white ground, safe areas, an optional back row and title.
+// Content slides in from the right as in the mock, and leaves room for the glass bar.
 import React from 'react';
 import { Pressable, RefreshControl, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated from 'react-native-reanimated';
+import { slideIn } from './motion';
 import { router } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { colour, font } from './theme';
@@ -30,26 +33,16 @@ export function Screen({ children, title, lead, back = true, scroll = true, refr
       {lead ? <T v="body" style={{ fontSize: 16, lineHeight: 23, color: colour.muted }}>{lead}</T> : null}
     </View>
   );
-  const pad = { paddingTop: inset.top + 12, paddingHorizontal: 20, paddingBottom: inset.bottom + (footer ? 110 : 32) };
+  const pad = { paddingTop: inset.top + 12, paddingHorizontal: 20, paddingBottom: inset.bottom + 110 };
   return (
     <View style={{ flex: 1, backgroundColor: colour.bg }}>
       {scroll ? (
         <ScrollView contentContainerStyle={[pad, style]} keyboardShouldPersistTaps="handled"
           refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colour.accent} /> : undefined}>
-          {head}{children}
+          <Animated.View entering={slideIn}>{head}{children}</Animated.View>
         </ScrollView>
-      ) : <View style={[{ flex: 1 }, pad, style]}>{head}{children}</View>}
+      ) : <Animated.View entering={slideIn} style={[{ flex: 1 }, pad, style]}>{head}{children}</Animated.View>}
       {footer}
     </View>
-  );
-}
-
-/** Content for a sheet: no back row, the grabber is the way out. */
-export function Sheet({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
-  const inset = useSafeAreaInsets();
-  return (
-    <ScrollView style={{ backgroundColor: colour.bg }} contentContainerStyle={[{ padding: 22, paddingTop: 30, paddingBottom: inset.bottom + 28, gap: 16 }, style]} keyboardShouldPersistTaps="handled">
-      {children}
-    </ScrollView>
   );
 }

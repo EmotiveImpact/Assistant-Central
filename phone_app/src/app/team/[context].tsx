@@ -2,7 +2,7 @@
 // keeps its own exact review and receipt; sending a part or merging a result opens Decide.
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useGuard } from '../../lib/guard';
 import { peerOf } from '../../lib/home';
 import { useSession } from '../../lib/session';
@@ -10,6 +10,7 @@ import { STEPS, exactMoney, teamLine, teamsOf } from '../../shared/web';
 import { Button, Card, Chip, Pair, T } from '../../ui/parts';
 import { Progress } from '../../ui/Progress';
 import { Screen } from '../../ui/Screen';
+import { useOverlay } from '../../ui/overlay';
 import { colour, font, radius } from '../../ui/theme';
 
 type Tab = 'Parts' | 'People' | 'Receipts';
@@ -35,12 +36,13 @@ export default function Team() {
   const guard = useGuard();
   const { context } = useLocalSearchParams<{ context: string }>();
   const { state } = useSession();
+  const { decide } = useOverlay();
   const [tab, setTab] = useState<Tab>('Parts');
   if (guard || !state) return guard;
   const team = (teamsOf(state) as any[]).find(t => t.context === context);
   if (!team) return <Screen title="Team mission"><T v="body">This team mission is no longer here.</T></Screen>;
   const me = state.identity;
-  const open = (id: string) => router.push({ pathname: '/decide', params: { key: 'item:' + id } });
+  const open = (id: string) => decide('item:' + id);
   return (
     <Screen>
       <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
