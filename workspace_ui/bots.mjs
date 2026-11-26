@@ -61,7 +61,7 @@ export function botFace(name) {
   return svg;
 }
 
-// A person (teal circle with their initial, drawn by CSS) overlapping their bot.
+// A person (teal circle with their initial, drawn by CSS) beside their bot, never overlapping.
 // The initial comes from a data attribute, so the pair adds no text to the page.
 export function ownerPair(owner, agent, className = 'owner-pair') {
   const pair = document.createElement('span');
