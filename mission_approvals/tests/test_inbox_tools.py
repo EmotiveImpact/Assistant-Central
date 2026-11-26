@@ -10,7 +10,7 @@ from mcp import Client
 from conversation import ConversationLedger
 from conversation.inbox import InboxAccess, InboxStore
 from mission_approvals.inbox import OfferInbox
-from mission_approvals.server import build_server
+from mission_approvals.server import INBOX_URI, build_server, watch_inbox
 from pilot.auth import LocalOwnerAuth
 from pilot.crypto import fingerprint
 
@@ -71,6 +71,44 @@ class InboxToolTests(unittest.TestCase):
             async with Client(bare, mode='2026-07-28') as client:
                 return sorted(t.name for t in (await client.list_tools()).tools)
         self.assertEqual(anyio.run(run), ['list_mission_offers', 'review_mission_offer'])
+
+    def test_listening_assistant_wakes_on_arrival_without_content(self):
+        async def run():
+            async with Client(self.server, mode='2026-07-28') as client:
+                read = await client.read_resource(INBOX_URI)
+                self.assertEqual(json.loads(read.contents[0].text), {'pending': False})
+                async with client.listen(resource_subscriptions=[INBOX_URI]) as sub:
+                    ticks = []
+                    async def tick(_):
+                        ticks.append(1)
+                        if len(ticks) == 1:
+                            self.post('Fictional: lunch on Thursday?', 'w1')
+                        await anyio.sleep(0)
+                    async with anyio.create_task_group() as group:
+                        group.start_soon(lambda: watch_inbox(self.server, self.access, rounds=3, sleep=tick))
+                        with anyio.fail_after(5):
+                            event = await sub.__anext__()
+                    self.assertEqual(event.uri, INBOX_URI)
+                    self.assertNotIn('lunch', repr(event))
+                read = await client.read_resource(INBOX_URI)
+                self.assertEqual(json.loads(read.contents[0].text), {'pending': True})
+                batch = await client.call_tool('check_inbox', {})
+                self.assertIn('lunch', json.dumps(payload(batch)))
+        anyio.run(run)
+
+    def test_watcher_stays_quiet_when_nothing_changes(self):
+        published = []
+        class Bus:
+            async def publish(self, event):
+                published.append(event)
+        self.server.parlu_events = Bus()
+        async def nap(_):
+            pass
+        anyio.run(lambda: watch_inbox(self.server, self.access, rounds=3, sleep=nap))
+        self.assertEqual(published, [])
+        self.post('Fictional: one message', 'q1')
+        anyio.run(lambda: watch_inbox(self.server, self.access, rounds=3, sleep=nap))
+        self.assertEqual(len(published), 1)
 
     def test_check_acknowledge_and_status_round_trip(self):
         self.assertFalse(payload(self.call('inbox_status'))['pending'])
