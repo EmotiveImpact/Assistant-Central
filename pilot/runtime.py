@@ -295,12 +295,13 @@ class PilotRuntime:
             helper, lead = (body['sender'], body['recipient'])
             direction = 'incoming' if sending else 'outgoing'
             found = False
-            for row in self.db.execute('SELECT id,body,state FROM runtime_items WHERE direction=? AND kind=?', (direction, 'task')):
+            for row in self.db.execute('SELECT id,body,state,cancelled FROM runtime_items WHERE direction=? AND kind=?', (direction, 'task')):
                 prior = json.loads(self.storage.row('runtime_items', row)['body'])
                 if (prior['task_id'] == access['part_task_id'] and prior['context'] == body['context']
                         and prior['sender'] == lead and prior['recipient'] == helper
                         and team.kind_of(prior['text']) == team.PART):
-                    found = row['state'] in (('accepted',) if sending else ('released', 'accepted'))
+                    # A withdrawn part keeps its old decision on record, but grants nothing new.
+                    found = not row['cancelled'] and row['state'] in (('accepted',) if sending else ('released', 'accepted'))
                     break
             team.check(found, 'Access can be asked only for an agreed part of the same team mission')
         else:

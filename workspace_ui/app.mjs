@@ -9,7 +9,7 @@ import {createApprovals,validateListing} from './approvals.mjs';
 import {homeQueue,CARD,askerOf,moreLine,closingLine,uncheckedParts} from './queue.mjs';
 import {decisionQuestion,decisionRows,needsHold} from './decide.mjs';
 import {holdButton} from './hold.mjs';
-import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor,readRules,partText,resultText,accessText,readTeamText,ruleList,approvalsFor,computeFor,teamCompute,checksFor} from './team.mjs';
+import {STEPS,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,resultsFor,readRules,partText,resultText,accessText,readTeamText,ruleList,fitTitle,approvalsFor,computeFor,teamCompute,checksFor} from './team.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
 import {qrMatrix,qrPath} from './qr.mjs';
@@ -460,7 +460,7 @@ function renderTeams(){
       for(const result of resultsFor(part.item,state.items)){
         const decided=result.historical_state??result.state,signed=decided==='accepted'?2:1;
         rows.push({at:Number(result.created_at),open:()=>openReview(result),title:`Merge ${part.title}`,
-          meta:decided==='accepted'?`Merged · 2 of 2 signed (${a} and you)`:decided==='rejected'?'Changes asked · not merged':result.state==='pending'?`Waits for you · ${signed} of 2 signed`:stateLabel(result.state)});
+          meta:decided==='accepted'?`Merged · 2 of 2 signed (${a} and you)`:decided==='rejected'?'Declined · not merged':result.state==='pending'?`Waits for you · ${signed} of 2 signed`:stateLabel(result.state)});
       }
       for(const ask of part.access){
         rows.push({at:Number(ask.item.created_at),open:()=>openReview(ask.item),title:`Access for ${part.title}`,
@@ -514,7 +514,7 @@ function openPartPanel(team,part,refresh){
     if(part.rules){const rules=panelSection(body,'Rules in force');const chips=ruleChips(part.rules,checksFor(latest));
       rules.append(chips??text('p','No rules for this part.','inspect-note'),text('p',`${a} agreed to these exact rules. Changing one means a new part, and ${a} agrees again.`,'inspect-note'));}
     if(latest){const approvals=panelSection(body,'Merge approvals');
-      for(const entry of approvalsFor({result:latest}))panelRow(approvals,entry.who==='helper'?`${a} sent the result`:'Your approval',entry.who==='helper'?'Signed':entry.signed?'Signed':entry.refused?'Changes asked':entry.waiting?'Waiting':'Not given');}
+      for(const entry of approvalsFor({result:latest}))panelRow(approvals,entry.who==='helper'?`${a} sent the result`:'Your approval',entry.who==='helper'?'Signed':entry.signed?'Signed':entry.refused?'Declined':entry.waiting?'Waiting':'Not given');}
     if(part.access.length){const access=panelSection(body,'Access');
       for(const ask of part.access)panelRow(access,ask.what,ask.granted?`Until ${datetime(ask.until)}`:ask.waiting?'Asked, waits for you':stateLabel(ask.item.state));}
     const cost=computeFor(part.item,state.items);
@@ -810,7 +810,7 @@ function renderHistory() {
   }
 }
 // A team record reads as words in the review: the brief or summary, then the rules and checks.
-function teamWords(content){
+function teamWords(content,item){
   const found=readTeamText(content);if(!found)return null;
   const v=found.value,lines=[];
   if(found.record==='part'){
@@ -823,7 +823,11 @@ function teamWords(content){
     if(Array.isArray(v.checks)&&v.checks.length)lines.push('','Checks, as the helper reports them:',...v.checks.map(entry=>`${entry.kept?'✓ Kept':'✕ Not kept'} · ${entry.side==='must'?'Must':'Must not'}: ${entry.rule}`));
     lines.push('',v.compute_used?`Compute used, as reported: ${money(v.compute_used.micro,v.compute_used.currency)}`:'No compute reported.');
   }else{
-    lines.push(`Asks to: ${v.what}`,`Why: ${v.why}`,`For: ${v.hours} ${Number(v.hours)===1?'hour':'hours'}, for one part only`);
+    // Name the part this covers, found by its signed reference in the same mission with the same person.
+    const part=state.items.find(entry=>entry.kind==='task'&&entry.team?.record==='part'&&entry.task_id===v.part_task_id
+      &&entry.context===item?.context&&entry.peer_id===item?.peer_id);
+    lines.push(`For the part: ${part?plain(part.title,'Part'):'unknown here'} (reference ${plain(v.part_task_id)})`,
+      `Asks to: ${v.what}`,`Why: ${v.why}`,`For: ${v.hours} ${Number(v.hours)===1?'hour':'hours'}, for this part only`);
   }
   return lines.join('\n');
 }
@@ -862,11 +866,11 @@ $('team-reply-form').addEventListener('submit',async event=>{
       const kept=ruleList(item.team.rules).map((_,index)=>form.querySelector(`[name=kept][data-index="${index}"]`)?.checked===true);
       const raw=form.elements.compute?.value.trim()??'',used=raw?toMicro(raw):null;if(raw&&used===null)throw new Error('Enter the compute used, such as 0.12.');
       const summary=form.elements.summary.value.replace(/^SYNTHETIC ONLY:\s*$/,'');
-      body=proposalBody({kind:'artifact',peer_id:item.peer_id,parent_id:item.id,parent_expires:item.expires,title:`Result: ${plain(item.title,'Part')}`.slice(0,120),
+      body=proposalBody({kind:'artifact',peer_id:item.peer_id,parent_id:item.id,parent_expires:item.expires,title:fitTitle('Result: ',plain(item.title,'Part')),
         text:resultText(summary,item.team,{kept,computeMicro:used}),context:item.context,task_id:item.task_id,minutes:'60',synthetic:'on'});
     }else{
       const why=form.elements.why.value.replace(/^SYNTHETIC ONLY:\s*$/,'');
-      body=proposalBody({kind:'task',peer_id:item.peer_id,title:`Access: ${form.elements.what.value.trim()}`.slice(0,120),
+      body=proposalBody({kind:'task',peer_id:item.peer_id,title:fitTitle('Access: ',form.elements.what.value),
         text:accessText({partTaskId:item.task_id,what:form.elements.what.value,why,hours:Number(form.elements.hours.value)}),context:item.context,task_id:'team-access-'+crypto.randomUUID(),minutes:'60',synthetic:'on'});
     }
     await performWrite('/api/proposals',body,{target:'team-reply-message',onSuccess:()=>{teamReply=null;$('team-reply-dialog').close();
@@ -885,7 +889,7 @@ async function openReview(item) {
     const permissions=review.source_permissions;
     if(permissions?.return_policy==='origin-only')detail($('review-details'),'Sharing scope','Reviewed artifact return to task originator only');
     const provider=permissions?.provider_disclosure;detail($('review-details'),'Provider permission',provider?`${plain(provider.provider)} · ${plain(provider.model)} · ${Number(provider.max_output_tokens)} output tokens`:'No provider disclosure approved');
-    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':teamWords(review.content)??review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
+    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':teamWords(review.content,item)??review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
     $('review-scope').textContent=item.direction==='outgoing'?'Release shares only this exact proposal with its named recipient. The recipient makes a separate decision.':'Acceptance records this exact proposal. It does not start work or run a model. Any artifact return needs its own review and can go only to the task originator.';
     $('review-message').textContent='';$('review-actions').replaceChildren();
     const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};

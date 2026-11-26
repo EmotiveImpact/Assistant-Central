@@ -27,6 +27,9 @@ CURRENCIES = ('GBP', 'USD', 'EUR')
 MAX_RULES = 8
 MAX_COMPUTE = 1_000_000_000  # Whole millionths of one currency unit.
 MAX_HOURS = 168
+# Each rule is repeated in the result with its side and outcome, so all the rules of a part,
+# as encoded, stay within this many bytes. That always leaves room for the checks and a summary.
+RULES_BUDGET = 2048
 
 
 class TeamDenied(ValueError):
@@ -52,6 +55,8 @@ def _rules(value):
             _text(rule, 200)
             check(rule not in seen, 'Each rule appears once')
             seen.add(rule)
+    check(sum(len(json.dumps(rule, ensure_ascii=False).encode('utf-8')) for rule in seen) <= RULES_BUDGET,
+          'The rules are too long together')
     return value
 
 

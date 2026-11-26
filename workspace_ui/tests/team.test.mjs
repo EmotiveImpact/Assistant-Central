@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {STEPS,partStep,resultsFor,sharedName,teamsOf,teamCounts,teamLine,stepShare,planParts,partOf,partLead,
-  PART,RESULT,ACCESS,readRules,partText,resultText,accessText,readTeamText,accessFor,approvalsFor,computeFor,teamCompute,checksFor,ruleList} from '../team.mjs';
+  PART,RESULT,ACCESS,readRules,partText,resultText,accessText,readTeamText,fitTitle,RULES_BUDGET,accessFor,approvalsFor,computeFor,teamCompute,checksFor,ruleList} from '../team.mjs';
 
 const task=(id,peer,state,title,extra={})=>({id,kind:'task',direction:'outgoing',peer_id:peer,state,title,context:'c1',created_at:String(100+Number(id.slice(1))),...extra});
 const result=(id,parent,state,at=500)=>({id,kind:'artifact',direction:'incoming',parent_id:parent,state,created_at:String(at)});
@@ -175,4 +175,28 @@ test('a team part shows its rules, access asks, merge approvals and reported com
   assert.deepEqual(teamCompute(team,items),[{currency:'GBP',limit:750000,used:600000}]);
   assert.match(teamLine(team),/One assistant asks for access\./);
   assert.equal(partLead(partOf({items},items[3])),'Access for Calendar, part of M');
+});
+
+test('titles made from typed words fit both the form and the saved byte limit', ()=>{
+  const bytes=value=>new TextEncoder().encode(value).length;
+  const part='配達計画: '+'配'.repeat(36);
+  assert.ok(bytes(part)<=128);
+  const title=fitTitle('Result: ',part);
+  assert.ok(title.length<=120&&bytes(title)<=128&&title.endsWith('…')&&title.startsWith('Result: 配達計画'));
+  assert.equal(fitTitle('Access: ','Read the calendar'),'Access: Read the calendar');
+  const emoji=fitTitle('Access: ','😀'.repeat(60));
+  assert.ok(bytes(emoji)<=128&&!/[\uD800-\uDFFF](?![\uDC00-\uDFFF])/.test(emoji.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g,'')));
+});
+
+test('the largest rule set a part accepts still leaves room for its result', ()=>{
+  // Eight long rules a side, each full of quotes that JSON has to escape.
+  const rule=(side,i)=>`${side}${i} "status" `.padEnd(120,'"');
+  let must=Array.from({length:8},(_,i)=>rule('m',i)),mustNot=Array.from({length:8},(_,i)=>rule('n',i));
+  assert.throws(()=>partText({brief:'Brief',must,mustNot}),/too long together/);
+  while(true){try{partText({brief:'Brief',must,mustNot});break;}catch{must=must.map(r=>r.slice(0,-1));mustNot=mustNot.map(r=>r.slice(0,-1));}}
+  const encoded=[...must,...mustNot].reduce((sum,r)=>sum+new TextEncoder().encode(JSON.stringify(r)).length,0);
+  assert.ok(encoded<=RULES_BUDGET&&encoded>RULES_BUDGET-40);
+  const team={rules:{must,must_not:mustNot},compute:{cap_micro:1_000_000_000,currency:'GBP'}};
+  const text=resultText('S'.repeat(1000),team,{kept:Array(16).fill(false),computeMicro:1_000_000_000});
+  assert.ok(text.length<=4096);
 });

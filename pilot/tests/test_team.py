@@ -36,9 +36,9 @@ class TeamRecordTests(RelayLinkTests):
         review = owner.runtime.review(owner.session, item_id)
         return owner.runtime.decide(owner.session, item_id, review['review_digest'], decision)
 
-    def agreed_part(self, compute={'cap_micro': 500_000, 'currency': 'GBP'}):
+    def agreed_part(self, compute={'cap_micro': 500_000, 'currency': 'GBP'}, task_id='team-cards'):
         text = team.part_text(BRIEF, ['Tests pass'], ['Store card numbers'], compute)
-        item = self.send(self.edem, self.maya, 'task', 'Supper club app: Card deposits', text, 'team-cards')
+        item = self.send(self.edem, self.maya, 'task', 'Supper club app: Card deposits', text, task_id)
         self.assertEqual(self.maya.runtime.review(self.maya.session, item)['content'], text)
         self.decide(self.maya, item)
         self.maya.sync(send=True)
@@ -93,6 +93,70 @@ class TeamRecordTests(RelayLinkTests):
                 self.maya.runtime.propose(self.maya.session, self.edem.fingerprint, 'task', 'Access',
                                           team.ACCESS + json.dumps(unknown), self.context, 'team-access-2',
                                           time.time() + 3000)
+
+    def test_a_withdrawn_part_grants_no_new_access(self):
+        item, _ = self.agreed_part()
+        ask = {'part_task_id': 'team-cards', 'what': 'Read the fictional supper club calendar',
+               'why': 'SYNTHETIC ONLY: deposits follow the booking dates.', 'hours': 24}
+        request = self.send(self.maya, self.edem, 'task', 'Access: supper club calendar',
+                            team.ACCESS + json.dumps(ask), 'team-access-1')
+        review = self.edem.runtime.review(self.edem.session, item)
+        self.edem.runtime.cancel(self.edem.session, item, review['review_digest'])
+        with self.assertRaises(ValueError):
+            self.decide(self.edem, request)
+        self.assertEqual(self.edem.runtime.status(self.edem.session, request)['state'], 'pending')
+        # Once the withdrawal reaches the helper, a new ask for that part is refused there too.
+        self.edem.sync(send=True)
+        self.maya.sync(send=False)
+        with self.assertRaises(ValueError):
+            self.maya.runtime.propose(self.maya.session, self.edem.fingerprint, 'task', 'Access',
+                                      team.ACCESS + json.dumps(ask), self.context, 'team-access-2', time.time() + 3000)
+
+    def test_the_receiver_refuses_records_the_sender_should_not_have_sent(self):
+        def short(part):
+            value = json.loads(result_text(part)[len(team.RESULT):])
+            value['checks'] = value['checks'][:1]
+            return team.RESULT + json.dumps(value)
+
+        def dollars(part):
+            value = json.loads(result_text(part)[len(team.RESULT):])
+            value['compute_used']['currency'] = 'USD'
+            return team.RESULT + json.dumps(value)
+
+        stranger = {'part_task_id': 'team-unknown', 'what': 'Read everything', 'why': 'SYNTHETIC ONLY.', 'hours': 1}
+        cases = [('skips a rule', short), ('wrong currency', dollars), ('unknown part', None)]
+        for index, (name, make) in enumerate(cases):
+            with self.subTest(name):
+                if make:  # One artifact per part is allowed, so each forged result answers its own part.
+                    item, part = self.agreed_part(task_id=f'team-forged-{index}')
+                    kind, text, task_id, parent = 'artifact', make(part), f'team-forged-{index}', item
+                else:
+                    kind, text, task_id, parent = 'task', team.ACCESS + json.dumps(stranger), 'team-access-9', None
+                # A sender that skips its own checks still cannot get the record past the receiver.
+                real = self.maya.runtime._team
+                self.maya.runtime._team = lambda body, sending: None
+                try:
+                    sent = self.maya.runtime.propose(self.maya.session, self.edem.fingerprint, kind, 'Forged', text,
+                                                     self.context, task_id, time.time() + 2000, parent_id=parent)
+                    review = self.maya.runtime.review(self.maya.session, sent['id'])
+                    self.maya.runtime.release(self.maya.session, sent['id'], review['review_digest'])
+                    self.assertEqual(self.maya.sync(send=True)['sent'], 1)
+                finally:
+                    self.maya.runtime._team = real
+                summary = self.edem.sync(send=False)
+                self.assertEqual((summary['received'], summary['rejected']), (0, 1))
+
+    def test_all_the_rules_of_a_part_fit_within_one_budget(self):
+        rule = lambda side, i: f'{side}{i} "status" '.ljust(120, '"')
+        too_long = team.PART + json.dumps({'brief': BRIEF, 'compute': None,
+                                           'rules': {'must': [rule('m', i) for i in range(8)],
+                                                     'must_not': [rule('n', i) for i in range(8)]}})
+        with self.assertRaises(team.TeamDenied):
+            team.read_part(too_long)
+        fits = team.part_text(BRIEF, [rule('m', i)[:60] for i in range(8)], [rule('n', i)[:60] for i in range(8)],
+                              {'cap_micro': 1_000_000_000, 'currency': 'GBP'})
+        part = team.read_part(fits)
+        team.read_result(result_text(part, kept=False, compute=1_000_000_000, summary='S' * 4000), part)
 
     def test_malformed_parts_and_stray_results_are_refused(self):
         bad = [team.PART + json.dumps({'brief': BRIEF, 'rules': {'must': ['A', 'A'], 'must_not': []}, 'compute': None}),

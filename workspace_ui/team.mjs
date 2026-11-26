@@ -134,6 +134,20 @@ export function planParts(mission,rows){
 export const PART='parlu/team-part/1\n',RESULT='parlu/team-result/1\n',ACCESS='parlu/team-access/1\n';
 export const CURRENCIES=Object.freeze(['GBP','USD','EUR']);
 const MAX_RULES=8,MAX_COMPUTE=1_000_000_000;
+// Every rule comes back in the result with its side and outcome, so the rules together must leave
+// room for that and a summary. pilot/team.py holds the same budget on the encoded rules.
+export const RULES_BUDGET=2048;
+const ruleBytes=rules=>rules.reduce((sum,rule)=>sum+bytes(JSON.stringify(rule)),0);
+
+// A title made from words someone typed: cut on whole characters to fit both the form's 120
+// characters and the saved 128 bytes, and say so with an ellipsis.
+export function fitTitle(prefix,words){
+  const full=`${prefix}${String(words??'').trim()}`;
+  if(full.length<=120&&bytes(full)<=TITLE_BYTES)return full;
+  const chars=[...full];
+  while(chars.length&&(chars.join('').length+1>120||bytes(chars.join('')+'…')>TITLE_BYTES))chars.pop();
+  return chars.join('').trimEnd()+'…';
+}
 
 // Rules are typed one per line. Blank lines go; a repeated rule is an error, not a quiet merge.
 export function readRules(text){
@@ -147,6 +161,7 @@ export function partText({brief,must=[],mustNot=[],compute=null}){
   const clean=String(brief??'').trim();
   if(!clean||bytes(clean)>4096)throw new Error('Each part needs a brief.');
   const seen=new Set([...must,...mustNot]);if(seen.size!==must.length+mustNot.length)throw new Error('Each rule appears once.');
+  if(ruleBytes([...must,...mustNot])>RULES_BUDGET)throw new Error('The rules are too long together. Shorten or combine some.');
   if(compute!==null&&!(Number.isInteger(compute.cap_micro)&&compute.cap_micro>0&&compute.cap_micro<=MAX_COMPUTE&&CURRENCIES.includes(compute.currency)))throw new Error('Enter a compute limit such as 0.50.');
   const text=PART+JSON.stringify({brief:clean,compute,rules:{must,must_not:mustNot}});
   if(text.length>4096||bytes(text)>8192)throw new Error('This part is too long. Shorten the brief or the rules.');

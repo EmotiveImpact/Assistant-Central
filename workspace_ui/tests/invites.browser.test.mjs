@@ -154,6 +154,7 @@ try{
   await sync(edem);await goView(edem,'inbox');await openItem(edem,'Access: Read the supper club calendar');
   assert.equal(await edem.locator('.decide-question').textContent(),'Let Otto read the supper club calendar?');
   assert.match(await edem.locator('#review-decide').textContent(),/for one part only.*1 day from when it asked/s);
+  assert.match(await edem.locator('#review-content').textContent(),/^For the part: Supper club app: Card deposits \(reference /);
   await edem.locator('#review-decide').getByRole('button',{name:'Hold to agree'}).waitFor();
   await shot(edem,'team-3-access.png');
   await decide(edem,'Accept exact proposal');
