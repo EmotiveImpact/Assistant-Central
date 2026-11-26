@@ -24,7 +24,35 @@ try{
   }
   const {alice,bob,carol}=pages;
   const button=(page,label)=>page.getByRole('button',{name:label,exact:true});
-  await alice.bringToFront();await open(alice);
+  await alice.bringToFront();
+  // Conversations has no search of its own, so Search from the owner menu opens All work.
+  assert.equal(await alice.locator('#search-input').isDisabled(),true);
+  await alice.locator('#owner-menu-toggle').click();await alice.locator('#owner-menu').getByRole('menuitem',{name:'Search',exact:true}).click();
+  await alice.waitForFunction(()=>location.hash==='#tasks');
+  assert.equal(await alice.locator('#search-input').evaluate(node=>node===document.activeElement&&!node.disabled),true,'Search from the owner menu always lands where you can type');
+  // Settings points at where sending modes really live: on a message waiting in Approvals. One
+  // waiting message, shaped as the assistant would propose it, shows the controls it promises.
+  await alice.route('**/api/approvals',async route=>{
+    if(route.request().method()!=='GET')return route.continue();
+    const response=await route.fetch(),listing=await response.json();
+    listing.messages.push({draft_id:'draft_fixture_1',assistant_id:'alice_assistant',conversation_id:'thread_1',text:'Fictional waiting message.',digest:'a'.repeat(64)});listing.count+=1;
+    await route.fulfill({response,json:listing});
+  });
+  await alice.locator('#owner-menu-toggle').click();await alice.locator('#owner-menu').getByRole('menuitem',{name:'Settings',exact:true}).click();
+  const beforeSettings=writes.length;
+  const sendingLine=alice.locator('#inspect-body .inspect-item').filter({hasText:'Sending modes and private notes'});
+  assert.equal(await sendingLine.locator('.inspect-value').textContent(),'In Approvals');
+  await sendingLine.click();
+  await alice.waitForFunction(()=>location.hash==='#approvals');
+  const waiting=alice.locator('.approval-card[data-kind="message"]');await waiting.waitFor();
+  assert.equal(await alice.locator('#inspect').isVisible(),false);
+  await waiting.locator('summary').click();
+  assert.equal(await waiting.getByLabel('Sending mode',{exact:true}).isVisible(),true,'the Settings line leads to the sending mode itself');
+  assert.equal(await waiting.getByLabel('Private guidance',{exact:true}).isVisible(),true,'and to the private note beside it');
+  assert.deepEqual(writes.slice(beforeSettings).filter(w=>w.path!=='/api/approvals/timeline'),[],'Settings only leads to the real place and never writes');
+  await alice.unroute('**/api/approvals');
+  await nav(alice);
+  await open(alice);
   await button(alice,'Mission agreements').click();
   await button(alice,'Create mission agreement').click();
   const editor=alice.locator('#conversation-dialog[open]');

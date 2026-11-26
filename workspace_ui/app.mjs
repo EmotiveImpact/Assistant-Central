@@ -23,9 +23,9 @@ document.title=PRODUCT.short+' · Your assistant workspace';
 for(const [index,node] of [...document.querySelectorAll('.entrance-avatars .peer-avatar')].entries()){node.textContent='';node.append(botFace(['Beacon','Atlas','Mira','Orbit'][index]??'Parlu'));}
 
 const $ = id => document.getElementById(id);
-const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
+const mobileNavigation=matchMedia('(max-width:700px)'), besidePage=matchMedia('(min-width:1180px)'), sidebar=document.querySelector('.sidebar');
 function setNavigation(open,{restoreFocus=false}={}){
-  const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);
+  const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);if(!open)setOwnerMenu(false);
   document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
   sidebar.setAttribute('aria-hidden',String(sidebar.inert));$('menu-toggle').setAttribute('aria-expanded',String(open));$('menu-toggle').setAttribute('aria-label',open?'Close navigation':'Open navigation');
   if(open&&!wasOpen){if(!everythingFolded){$('everything-toggle').setAttribute('aria-expanded','true');$('everything-list').hidden=false;}sidebar.querySelector('[data-view]')?.focus();}
@@ -87,7 +87,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();panelFor=null;everythingFolded=false;setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};currentTeam=null;teamTab='parts';$('team-view').replaceChildren();$('team-parts').replaceChildren();$('team-form').reset();storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
+  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setOwnerMenu(false);panelFor=null;everythingFolded=false;setEverything(false);homeOffset=0;homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};currentTeam=null;teamTab='parts';$('team-view').replaceChildren();$('team-parts').replaceChildren();$('team-form').reset();storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -144,6 +144,7 @@ async function performWrite(path,body,{target='notice',onSuccess}={}) {
 const DECISION_VIEWS=['approvals','conversations','host-drafts'];
 function leaveForHome(next){if(next==='overview'&&DECISION_VIEWS.includes(currentView))homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};}
 function navigate(view,{filter='all'}={}) {
+  setOwnerMenu(false);
   if(busy||!VIEWS.includes(view))return;
   leaveForHome(view);currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
@@ -229,6 +230,28 @@ function openStatusPanel(refresh){
     const actions=text('div','','inspect-actions');actions.append(button('Refresh saved state','button secondary',()=>$('refresh').click()),button('Sync exchange','button secondary',()=>$('sync').click()));body.append(actions);
   },()=>openStatusPanel(true),refresh);
 }
+// Settings gathers what is already yours to change, in one place. It holds no switch of its
+// own: every line opens the place where that thing really lives.
+function openSettingsPanel(refresh){
+  const id=state.identity,active=state.peers.filter(isPeerActive).length;
+  showPanel('settings','Settings',`${cap(plain(id.owner_id,'You'))} and ${plain(id.agent_id,'your assistant')}`,body=>{
+    const line=(box,label,value,run)=>{const row=button('','inspect-item',run);row.append(text('span',label),text('span',value,'inspect-value'));box.append(row);};
+    // A line that leads to another place takes you there. A pinned panel stays only where it
+    // has a column of its own beside the page. Anywhere narrower it would cover the place you
+    // asked for, so it closes and the keyboard lands on the page.
+    const go=view=>{const stays=inspect.pinned&&besidePage.matches;if(!stays)inspect.hide({restoreFocus:false});navigate(view);if(!stays)$('main').focus({preventScroll:true});};
+    const you=panelSection(body,'You');
+    line(you,'Your keys and identity',shortDigest(id.fingerprint),()=>openIdentityPanel());
+    const people=panelSection(body,'Assistants');
+    line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>go('peers'));
+    line(people,'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
+    // Sending modes and private notes are set on a message waiting in Approvals, nowhere else.
+    if(state.approvals?.enabled===true)line(people,'Sending modes and private notes','In Approvals',()=>go('approvals'));
+    const device=panelSection(body,'This device');
+    line(device,'Workspace status',$('connection-status').textContent||'Not checked yet',()=>openStatusPanel());
+    line(device,'Lock and sign out','Clears this browser',()=>$('logout').click());
+  },()=>openSettingsPanel(true),refresh);
+}
 function openAssistantPanel(peer,refresh){
   const o=cap(plain(peer.owner_id,'Owner')),a=plain(peer.agent_id,'Assistant');
   showPanel('peer:'+peer.peer_id,a,`${o}'s assistant`,body=>{
@@ -268,7 +291,34 @@ function renderReceipts(){
     row.append(text('span','✓','receipt-mark'),main);$('item-list').append(row);
   }
 }
-document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else openStatusPanel();}));
+// A panel opened from the sidebar gives the keyboard back to its launcher when it closes. On
+// the phone the drawer has closed by then, so the button that opens the drawer takes its place.
+function fromSidebar(launcher){setNavigation(false);(mobileNavigation.matches?$('menu-toggle'):launcher).focus({preventScroll:true});}
+document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;fromSidebar(node);if(node.dataset.panel==='identity')openIdentityPanel();else if(node.dataset.panel==='settings')openSettingsPanel();else openStatusPanel();}));
+// Your menu, on the owner card: the same few places wherever you are.
+function setOwnerMenu(open,{restoreFocus=false}={}){
+  const menu=$('owner-menu'),toggle=$('owner-menu-toggle');if(menu.hidden===!open)return;
+  menu.hidden=!open;toggle.setAttribute('aria-expanded',String(open));
+  if(open)menu.querySelector('button').focus();else if(restoreFocus)toggle.focus();
+}
+$('owner-menu-toggle').addEventListener('click',()=>{if(!state||busy)return;setOwnerMenu($('owner-menu').hidden,{restoreFocus:true});});
+$('owner-menu').addEventListener('click',event=>{
+  const choice=event.target.closest('[data-owner]')?.dataset.owner;if(!choice||!state||busy)return;
+  setOwnerMenu(false);
+  if(choice==='lock'){$('logout').click();return;}
+  // Some places have no search of their own. Search then opens All work, where it does work.
+  if(choice==='search'){if($('search-input').disabled)navigate('tasks');if(mobileNavigation.matches)setNavigation(true);$('search-input').focus();$('search-input').select();return;}
+  fromSidebar($('owner-menu-toggle'));
+  if(choice==='identity')openIdentityPanel();else if(choice==='settings')openSettingsPanel();else openStatusPanel();
+});
+$('owner-menu').addEventListener('keydown',event=>{
+  const items=[...$('owner-menu').querySelectorAll('button')],at=items.indexOf(document.activeElement);
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setOwnerMenu(false,{restoreFocus:true});}
+  else if(event.key==='ArrowDown'||event.key==='ArrowUp'){event.preventDefault();items[(at+(event.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();}
+  else if(event.key==='Home'||event.key==='End'){event.preventDefault();items.at(event.key==='Home'?0:-1).focus();}
+  else if(event.key==='Tab')setOwnerMenu(false);
+});
+document.addEventListener('click',event=>{if(!$('owner-menu').hidden&&!event.target.closest('#owner-menu,#owner-menu-toggle'))setOwnerMenu(false);});
 // ===== Team missions: your assistant leads; each part is a proposal reviewed on its own =====
 let currentTeam=null,teamTab='parts';
 const STEP_LABEL={Plan:'Ready to send',Asked:'Waiting for their yes',Building:'Building',Result:'Result to check',Done:'Done',Stopped:'Stopped'};
