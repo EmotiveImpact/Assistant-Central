@@ -811,3 +811,5 @@ body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-w
 .done-line .owner-pair{margin-right:8px;vertical-align:-6px}
 @media(max-width:700px){.inspect-close{display:none}}
 @media(max-width:700px){body[data-screen=overview] #new-proposal{display:none}}
+/* A card's one line of context above its title (questions, messages, drafts, invitations). */
+.home-card-lead{margin:0;font-size:12.5px;color:#c9c9c5;font-weight:600}
