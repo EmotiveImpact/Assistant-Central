@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parlu"
+version = "0.1.0"
+description = "Let any agent or app take part in Parlu: inbox, wake-ups, owner approvals and the relay."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = ["cryptography==50.0.0"]
+
+[project.optional-dependencies]
+mcp = ["mcp==2.3.0"]
+
+[tool.setuptools.packages.find]
+include = ["parlu*"]
