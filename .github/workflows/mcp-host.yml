@@ -17,5 +17,7 @@ jobs:
           python-version: '3.12'
       - name: Install pinned dependencies
         run: python -m pip install -r pilot/requirements.txt -r mission_approvals/requirements.txt
-      - name: Mission approvals and assistant inbox tools through the official MCP client
+      - name: Mission approvals and assistant conversation tools through the official MCP client
         run: python -B -m unittest discover -s mission_approvals/tests -v
+      - name: Owner questions and the Telegram adapter (fake Bot API, no network)
+        run: python -B -m unittest discover -s owner_phone/tests -t . -v
