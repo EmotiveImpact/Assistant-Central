@@ -24,7 +24,14 @@ try{
   }
   const {alice,bob,carol}=pages;
   const button=(page,label)=>page.getByRole('button',{name:label,exact:true});
-  await alice.bringToFront();await open(alice);
+  // Settings points at where sending modes really live, and only in a workspace that has conversations.
+  await alice.bringToFront();await alice.locator('[data-view=overview]').click();
+  await alice.locator('#owner-menu-toggle').click();await alice.locator('#owner-menu').getByRole('menuitem',{name:'Settings',exact:true}).click();
+  const beforeSettings=writes.length;
+  await alice.locator('#inspect-body .inspect-item').filter({hasText:'Sending modes and private notes'}).click();
+  await alice.waitForFunction(()=>location.hash==='#conversations');await button(alice,'New conversation').waitFor();
+  assert.equal(await alice.locator('#inspect').isVisible(),false);assert.equal(writes.length,beforeSettings,'Settings only leads to the real place and never writes');
+  await open(alice);
   await button(alice,'Mission agreements').click();
   await button(alice,'Create mission agreement').click();
   const editor=alice.locator('#conversation-dialog[open]');

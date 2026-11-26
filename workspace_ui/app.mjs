@@ -25,7 +25,7 @@ for(const [index,node] of [...document.querySelectorAll('.entrance-avatars .peer
 const $ = id => document.getElementById(id);
 const mobileNavigation=matchMedia('(max-width:700px)'), sidebar=document.querySelector('.sidebar');
 function setNavigation(open,{restoreFocus=false}={}){
-  const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);
+  const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);if(!open)setOwnerMenu(false);
   document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
   sidebar.setAttribute('aria-hidden',String(sidebar.inert));$('menu-toggle').setAttribute('aria-expanded',String(open));$('menu-toggle').setAttribute('aria-label',open?'Close navigation':'Open navigation');
   if(open&&!wasOpen){if(!everythingFolded){$('everything-toggle').setAttribute('aria-expanded','true');$('everything-list').hidden=false;}sidebar.querySelector('[data-view]')?.focus();}
@@ -236,12 +236,15 @@ function openSettingsPanel(refresh){
   const id=state.identity,active=state.peers.filter(isPeerActive).length;
   showPanel('settings','Settings',`${cap(plain(id.owner_id,'You'))} and ${plain(id.agent_id,'your assistant')}`,body=>{
     const line=(box,label,value,run)=>{const row=button('','inspect-item',run);row.append(text('span',label),text('span',value,'inspect-value'));box.append(row);};
+    // A line that leads to another place takes you there. A panel you pinned on a wide screen
+    // stays beside it. Otherwise the panel closes and the keyboard lands on the page.
+    const go=view=>{const stays=inspect.pinned&&!mobileNavigation.matches;if(!stays)inspect.hide({restoreFocus:false});navigate(view);if(!stays)$('main').focus({preventScroll:true});};
     const you=panelSection(body,'You');
     line(you,'Your keys and identity',shortDigest(id.fingerprint),()=>openIdentityPanel());
     const people=panelSection(body,'Assistants');
-    line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>{inspect.hide({restoreFocus:false});navigate('peers');});
-    line(people,'Add an assistant','Check the fingerprint first',()=>{inspect.hide({restoreFocus:false});navigate('peers');openPeerDialog();});
-    if(state.conversations?.enabled===true)line(people,'Sending modes and private notes','Set inside each conversation',()=>{inspect.hide({restoreFocus:false});navigate('conversations');});
+    line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>go('peers'));
+    line(people,'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
+    if(state.conversations?.enabled===true)line(people,'Sending modes and private notes','Set inside each conversation',()=>go('conversations'));
     const device=panelSection(body,'This device');
     line(device,'Workspace status',$('connection-status').textContent||'Not checked yet',()=>openStatusPanel());
     line(device,'Lock and sign out','Clears this browser',()=>$('logout').click());
