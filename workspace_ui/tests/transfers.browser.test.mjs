@@ -22,7 +22,7 @@ const api=async(route,body)=>{
  return {status:response.status(),value:await response.json()};
 };
 const snapshot=async()=>{const result=await api('/api/state');assert.equal(result.status,200);return result.value;};
-const nav=async view=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();await page.locator(`#navigation [data-view=${view}]`).click();};
+const nav=async view=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();if(!await page.locator(`#navigation [data-view=${view}]`).isVisible())await page.locator('#everything-toggle').click();await page.locator(`#navigation [data-view=${view}]`).click();};
 const refresh=async()=>{await page.locator('#refresh').click();await page.waitForFunction(()=>!document.getElementById('refresh').disabled);await page.locator('#notice').filter({hasText:'Saved state inspected'}).waitFor();};
 const idle=async()=>{for(let n=0;n<80;n++){const state=await snapshot();if(state.transfers.dispatch?.state!=='in_flight')return state;await page.waitForTimeout(100);}throw new Error('Disposable dispatch did not finish');};
 const row=id=>page.locator('.transfer-row').filter({hasText:id});

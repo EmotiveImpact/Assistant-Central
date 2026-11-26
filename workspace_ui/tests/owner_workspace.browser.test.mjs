@@ -10,7 +10,7 @@ assert.equal(url.protocol,'http:');assert.equal(url.hostname,'127.0.0.1');assert
 const captures=process.env.WORKSPACE_SCREENSHOT_DIR;if(captures)await mkdir(captures,{recursive:true});
 const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
 const pages={},tokens={},errors=[],writes=[];
-const nav=async(page,view)=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();await page.locator(`[data-view="${view}"]`).click();};
+const nav=async(page,view)=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();if(!await page.locator(`[data-view="${view}"]`).isVisible())await page.locator('#everything-toggle').click();await page.locator(`[data-view="${view}"]`).click();};
 const showRoom=async page=>{await page.locator('.conversation-rooms button').first().click();await page.getByLabel('Message to the members shown above').waitFor();};
 const capture=async(page,name)=>{assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));if(captures){await page.evaluate(()=>document.fonts.ready.then(()=>undefined));await page.screenshot({path:path.join(captures,name),fullPage:true});}};
 async function api(name,route,body){const response=await pages[name].request.fetch(new URL(route,url).href,{method:body===undefined?'GET':'POST',headers:{Authorization:'Bearer '+tokens[name]},...(body===undefined?{}:{data:body})});assert.equal(response.status(),200);return response.json();}

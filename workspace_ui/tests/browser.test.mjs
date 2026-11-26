@@ -26,7 +26,9 @@ page.on('request',request=>{
 const article=title=>page.locator('#item-list article').filter({has:page.getByRole('button',{name:'Review '+title,exact:true})});
 const nav=async view=>{
   if(await page.locator('#menu-toggle').isVisible()&&!await page.locator('body').evaluate(node=>node.classList.contains('sidebar-open')))await page.locator('#menu-toggle').click();
-  await page.locator(`#navigation [data-view="${view}"]`).click();
+  const target=page.locator(`#navigation [data-view="${view}"]`);
+  if(!await target.isVisible())await page.locator('#everything-toggle').click();
+  await target.click();
   await page.waitForFunction(value=>document.querySelector(`#navigation [data-view="${value}"]`)?.getAttribute('aria-current')==='page',view);
 };
 const noOverflow=async()=>{
@@ -109,14 +111,16 @@ try {
   assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
   assert.match(await page.locator('#owner-name').textContent(),/blair/i);
   await page.locator('#overview-panel').waitFor({state:'visible'});
-  const navStyle=await page.locator('#navigation [data-view="inbox"]').evaluate(node=>{
+  assert.equal(await page.locator('#everything-list').isVisible(),false,'Everything starts folded away');
+  assert.deepEqual(await page.locator('.nav-primary .nav-link').evaluateAll(nodes=>nodes.map(node=>node.textContent.replace(/\d+$/,'').trim())),['Home','Recents','Assistants','Money']);
+  const navStyle=await page.locator('#navigation [data-view="activity"]').evaluate(node=>{
     const s=getComputedStyle(node);return {font:s.fontFamily,size:s.fontSize,weight:s.fontWeight,
       radius:s.borderRadius,height:node.getBoundingClientRect().height,color:s.color,
       features:s.fontFeatureSettings,opticalSizing:s.fontOpticalSizing};
   });
   assert.ok(navStyle.font.startsWith('"Plus Jakarta Sans"'));
   assert.deepEqual({size:navStyle.size,weight:navStyle.weight,radius:navStyle.radius,height:navStyle.height,color:navStyle.color},
-    {size:'13px',weight:'510',radius:'999px',height:36,color:'rgb(62, 59, 53)'});
+    {size:'13.5px',weight:'600',radius:'999px',height:40,color:'rgb(62, 59, 53)'});
   assert.equal(navStyle.features,'normal');
   assert.equal(navStyle.opticalSizing,'auto');
   await assertAppHeading('#page-title');
@@ -125,21 +129,36 @@ try {
   const logoutBox=await page.locator('#logout').boundingBox();
   assert.ok(logoutBox&&logoutBox.y+logoutBox.height<=768,'sign out must stay reachable on a short desktop screen');
   await page.setViewportSize({width:1440,height:1000});
-  const attentionIds=await page.locator('#overview-attention [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
-  const workIds=await page.locator('#overview-work [data-item-id]').evaluateAll(nodes=>nodes.map(node=>node.dataset.itemId));
-  assert.equal(workIds.some(id=>attentionIds.includes(id)),false,'overview sections must not repeat the same work');
-  assert.equal(await page.locator('#attention-count').textContent(),'3');
-  // Done today, money and keys, and the Ask bar come from saved state and never write.
-  assert.equal(await page.locator('#done-count').textContent(),'3');
-  assert.equal(await page.locator('#done-rows .done-row').count(),3);
-  assert.equal(await page.locator('#done-rows .done-row .person-dot').count(),3,'each done row keeps the owner beside the bot');
+  // Home is calm: the paragraph, one card at a time, the Ask bar and one Done today line.
+  assert.equal(await page.locator('#home-count').textContent(),'3');
+  assert.equal(await page.locator('#home-cards .home-card').count(),3,'three decisions wait, shown one at a time');
+  assert.match(await page.locator('#done-line').textContent(),/^Done today: “[^”]+”, “[^”]+” and 1 more\. See all$/);
+  assert.equal(await page.locator('#done-line .person-dot').count(),1,'the done line keeps the owner beside the bot');
+  // Money and keys moved to their own place and to the Inspect panel.
+  await nav('money');
   assert.match(await page.locator('#money-panel').textContent(),/No budgets yet/);
-  assert.equal(await page.locator('#keys-panel').isVisible(),false);
-  await page.locator('[data-money="keys"]').click();
-  assert.equal(await page.locator('#keys-panel .key-row').count(),4);
-  assert.match(await page.locator('#keys-panel .key-row').first().textContent(),/Beacon, your assistant.*Key [0-9a-f]{4} [0-9a-f]{4}.*Yours/);
-  await page.locator('[data-money="money"]').click();
-  assert.equal(await page.locator('#money-panel').isVisible(),true);
+  assert.match(await page.locator('#mission-rows').textContent(),/No missions yet/);
+  await nav('peers');
+  await page.locator('.peer-row').filter({hasText:'Orbit'}).getByRole('button',{name:'Open',exact:true}).click();
+  await page.locator('#inspect').waitFor({state:'visible'});
+  assert.equal(await page.locator('#inspect-title').textContent(),'Orbit');
+  assert.match(await page.locator('#inspect-body').textContent(),/Fingerprint[0-9a-f]{64}/);
+  assert.equal(await page.locator('#inspect-title').evaluate(node=>node===document.activeElement),true,'opening the panel moves focus to its heading');
+  await page.locator('#inspect-pin').click();
+  assert.equal(await page.locator('#inspect-pin').getAttribute('aria-pressed'),'true');
+  await nav('money');
+  assert.equal(await page.locator('#inspect').isVisible(),true,'a pinned panel stays open between places');
+  const panelBox=await page.locator('#inspect').boundingBox(),mainBox=await page.locator('#main').boundingBox();
+  assert.ok(panelBox.x>=mainBox.x+mainBox.width,'on a wide screen the pinned panel sits beside the page, not over it');
+  await page.locator('#inspect-pin').click();await nav('activity');
+  assert.equal(await page.locator('#inspect').isVisible(),false,'an unpinned panel closes when you move');
+  await page.locator('#everything-toggle').click();
+  assert.equal(await page.locator('#everything-toggle').getAttribute('aria-expanded'),'true');
+  await page.locator('[data-panel="identity"]').click();
+  assert.equal(await page.locator('#inspect-title').textContent(),'Your identity');
+  await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
+  assert.equal(writes.length,0,'inspecting never writes');
+  await nav('overview');
   await page.locator('#home-ask-input').fill('Plan the team offsite');
   await page.locator('#home-ask-input').press('Enter');
   await page.locator('#compose-dialog').waitFor({state:'visible'});
@@ -147,20 +166,20 @@ try {
   assert.equal(await page.locator('#home-ask-input').inputValue(),'');
   await page.keyboard.press('Escape');await page.locator('#compose-dialog').waitFor({state:'hidden'});
   assert.equal(writes.length,0,'the Ask bar only drafts: nothing is sent until the owner reviews it');
-  assert.equal(await page.locator('.overview-row .badge').first().evaluate(node=>getComputedStyle(node).padding),'0px 11px 0px 7px');
   await page.setViewportSize({width:800,height:1000});
   assert.equal(await page.locator('#new-proposal').evaluate(node=>getComputedStyle(node).fontSize),'13px');
   await noOverflow();
   await page.setViewportSize({width:1440,height:1000});
   await noOverflow();await screenshot('central-platform-overview.png');
   await page.setViewportSize({width:390,height:844});await noOverflow();
-  assert.deepEqual(await page.locator('.overview-metric').evaluateAll(nodes=>nodes.map(node=>getComputedStyle(node).paddingLeft)),['14px','14px','14px','14px']);
+  assert.equal(await page.locator('.glass-bar').isVisible(),true,'the phone keeps Home, Recents and + in reach');
+  assert.equal(await page.locator('#menu-initials').textContent(),'BL');
   await screenshot('central-platform-mobile.png',{fullPage:false});
   await screenshot('central-platform-mobile-full.png');
   await page.setViewportSize({width:1440,height:1000});
 
   // Browse all projections without changing any saved work or authority.
-  for(const view of ['inbox','tasks','artifacts','outbox','peers','transfers','activity','overview']){
+  for(const view of ['inbox','tasks','artifacts','outbox','peers','transfers','activity','receipts','money','overview']){
     await nav(view);await noOverflow();await checkContrast();
     const route=await page.evaluate(()=>location.hash);
     await page.locator('.skip-link').focus();await page.keyboard.press('Enter');
@@ -168,9 +187,21 @@ try {
     assert.equal(await page.locator('#main').evaluate(node=>document.activeElement===node),true);
     if(view==='artifacts')await screenshot('central-platform-artifacts.png');
     if(view==='peers')await screenshot('central-platform-assistants.png');
+    if(['tasks','inbox','artifacts','outbox'].includes(view)){
+      assert.equal(await page.locator('#navigation [data-view="activity"]').getAttribute('class'),'nav-link active','work lives in Recents');
+      assert.equal(await page.locator('#section-filters [data-goto]').count(),5);
+      assert.equal(await page.locator(`#section-filters [data-goto="${view}"]`).getAttribute('aria-pressed'),'true');
+      assert.equal(await page.locator('#section-tabs [data-goto="tasks"]').getAttribute('aria-current'),'page');
+      assert.equal(await page.locator('#item-list .badge').first().evaluate(node=>getComputedStyle(node).padding),'0px 11px 0px 7px');
+    }
+    if(view==='activity'){
+      assert.deepEqual(await page.locator('#section-tabs [data-goto]').allTextContents(),['Activity','Receipts','All work']);
+      assert.equal(await page.locator('#page-title').textContent(),'Recents');
+    }
+    if(view==='receipts')assert.ok(await page.locator('#item-list .receipt-row').count()>0,'signed decisions appear as receipts');
   }
   assert.equal(writes.length,0,'navigation must never mutate owner state');
-  await page.locator('.overview-metric').filter({hasText:'Accepted tasks'}).click();
+  await page.locator('#done-line .done-all').click();
   assert.equal(await page.locator('#accepted-filter').isVisible(),true);
   assert.ok(await page.locator('#item-list article').count()>0);
   assert.equal(await page.locator('#item-list article').count(),await page.locator('#item-list article .badge.accepted').count());
@@ -304,7 +335,8 @@ try {
   assert.equal(await page.locator('#menu-toggle').evaluate(node=>node===document.activeElement),true);
   await nav('overview');await screenshot('central-platform-mobile-after-decisions.png',{fullPage:false});
   // In the evening, with nothing left to decide, a story about the day replaces the stack.
-  const pendingLeft=Number(await page.locator('#attention-count').textContent());
+  const pendingLeft=Number(await page.locator('#home-count').textContent());
+  assert.equal(await page.locator('#home-count').isVisible(),false,'nothing waiting means no count');
   if(pendingLeft===0){
     const evening=new Date();evening.setHours(19,30,0,0);if(evening<Date.now())evening.setTime(Date.now()+60000);await page.clock.setFixedTime(evening);
     await nav('inbox');await nav('overview');
@@ -323,8 +355,7 @@ try {
   assert.equal(await page.locator('#mobile-logout').isVisible(),true);
   await page.locator('#mobile-logout').click();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#item-list').textContent(),'');assert.equal(await page.locator('#review-content').textContent(),'');
-  assert.equal(await page.locator('#overview-stats').textContent(),'');
-  for(const id of ['done-rows','money-panel','keys-panel','home-cards','home-paragraph'])assert.equal(await page.locator('#'+id).textContent(),'','clear home data on sign-out: '+id);
+  for(const id of ['done-line','money-panel','mission-rows','home-cards','home-paragraph','section-tabs','section-filters','inspect-body'])assert.equal(await page.locator('#'+id).textContent(),'','clear home data on sign-out: '+id);
   for(const id of ['review-title','review-eyebrow','review-state','review-scope','review-message','review-details','review-commitments','owner-name','agent-name','owner-avatar','notice','connection-status'])assert.equal(await page.locator('#'+id).textContent(),'','clear hidden owner data: '+id);
   await page.reload();await page.locator('#login-screen').waitFor({state:'visible'});
   assert.equal(await page.locator('#workspace').isVisible(),false);

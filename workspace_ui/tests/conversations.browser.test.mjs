@@ -10,7 +10,7 @@ const screenshots=process.env.WORKSPACE_SCREENSHOT_DIR;if(screenshots)await mkdi
 const browser=await chromium.launch({headless:true});const pages={},errors=[],writes=[],tokens={},responses=[];
 const noOverflow=async p=>assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
 const screenshot=async(p,name)=>{if(screenshots){await p.evaluate(()=>document.fonts.ready.then(()=>undefined));await p.screenshot({path:path.join(screenshots,name),fullPage:true});}};
-async function nav(p){if(await p.locator('#menu-toggle').isVisible())await p.locator('#menu-toggle').click();await p.locator('[data-view=conversations]').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();}
+async function nav(p){if(await p.locator('#menu-toggle').isVisible())await p.locator('#menu-toggle').click();if(!await p.locator('[data-view=conversations]').isVisible())await p.locator('#everything-toggle').click();await p.locator('[data-view=conversations]').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();}
 async function open(p){await p.getByRole('button',{name:/^(Conversation|Group) · thread_1$/}).click();await p.getByLabel('Message to the members shown above').waitFor();}
 async function refresh(p){await p.bringToFront();await p.locator('#refresh').click();await p.getByRole('button',{name:'New conversation',exact:true}).waitFor();await open(p);}
 async function selectOld(p){const article=p.locator('.conversation-history article').filter({hasText:'Only Alice and Bob saw this earlier plan.'});await article.getByRole('checkbox').check();}
