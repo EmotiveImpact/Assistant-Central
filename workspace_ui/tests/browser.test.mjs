@@ -110,6 +110,20 @@ try {
   assert.equal(await page.locator('#password').inputValue(),'');
   assert.equal(await page.evaluate(()=>localStorage.length+sessionStorage.length),0);
   assert.match(await page.locator('#owner-name').textContent(),/blair/i);
+  // Brand rules: the wordmark is "Parlu" with a capital P, and a person and assistant pair
+  // inside a sentence sits centred on the line, never dropped below the middle of the letters.
+  assert.deepEqual(await page.locator('.wordmark>span[data-product]').evaluateAll(nodes=>nodes.map(node=>[node.textContent,getComputedStyle(node).textTransform])),
+    [['Parlu','none'],['Parlu','none'],['Parlu','none']]);
+  await page.locator('#home-paragraph .owner-pair.inline').first().waitFor();
+  const pairLine=await page.locator('#home-paragraph .owner-pair.inline').first().evaluate(pair=>{
+    const style=getComputedStyle(pair.parentElement),probe=document.createElement('span');
+    probe.style.cssText='display:inline-block;width:0;height:0';pair.after(probe);
+    const baseline=probe.getBoundingClientRect().top;probe.remove();
+    const pen=document.createElement('canvas').getContext('2d');pen.font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    const box=pair.getBoundingClientRect();
+    return {middle:baseline-(box.top+box.height/2),capital:pen.measureText('H').actualBoundingBoxAscent/2,small:pen.measureText('x').actualBoundingBoxAscent/2};
+  });
+  assert.ok(pairLine.middle>=pairLine.small&&Math.abs(pairLine.middle-pairLine.capital)<=1.5,'an inline pair sits centred on its line: '+JSON.stringify(pairLine));
   await page.locator('#overview-panel').waitFor({state:'visible'});
   assert.equal(await page.locator('#everything-list').isVisible(),false,'Everything starts folded away');
   assert.deepEqual(await page.locator('.nav-primary .nav-link').evaluateAll(nodes=>nodes.map(node=>node.textContent.replace(/\d+$/,'').trim())),['Home','Recents','Assistants','Money']);
@@ -379,6 +393,8 @@ try {
   assert.match(await page.locator('#inspect-body').textContent(),/AskedNow/);
   assert.equal(await page.locator('#inspect').getByRole('button',{name:'Review and send',exact:true}).count(),0,'a sent part no longer offers to send');
   assert.equal(await page.locator('#team-view .team-line').textContent(),'0 of 2 parts are done. One part is ready for you to send. One assistant is still deciding.');
+  // The control that opened the review is gone after the redraw, so focus returns to the panel itself.
+  await page.waitForFunction(()=>document.getElementById('inspect').contains(document.activeElement));
   await page.keyboard.press('Escape');await page.locator('#inspect').waitFor({state:'hidden'});
   await nav('money');
   assert.match(await page.locator('#mission-rows .team-row').textContent(),/Supper club app/);

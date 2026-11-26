@@ -455,7 +455,7 @@ dialog::backdrop{background:var(--backdrop);backdrop-filter:blur(6px)}
 body,.workspace{background:var(--raised)}
 .main{background:var(--bg);border-color:var(--line);box-shadow:0 1px 2px rgba(27,26,23,.06)}
 .brand-mark{display:block;width:32px;height:32px;flex:none}
-.wordmark>span[data-product]{text-transform:lowercase;font-weight:700;letter-spacing:-.045em}
+.wordmark>span[data-product]{font-weight:700;letter-spacing:-.045em}
 .brand.wordmark>span[data-product]{font-size:24px}
 .login-top .wordmark>span[data-product]{font-size:26px}
 .workspace-plan{background:var(--sun-bg);color:var(--sun-on)}
@@ -519,7 +519,8 @@ body,.workspace{background:var(--raised)}
 .home-say{display:grid;gap:22px;margin:0 0 28px;max-width:760px}
 .home-say .say{margin:0;font-size:24px;line-height:1.38;font-weight:600;letter-spacing:-.02em;color:var(--faint)}
 .home-say .say b{color:var(--text);font-weight:700}
-.owner-pair.inline{vertical-align:-6px;margin:0 2px}
+/* A pair inside a line of text sits centred on the line, never dropped below it. */
+.owner-pair.inline{vertical-align:middle;position:relative;top:-.09em;margin:0 2px}
 .owner-pair.inline .person-dot{width:24px;height:24px;font-size:10px}
 .owner-pair.inline .bot-avatar{width:24px;height:24px}
 .card-stack{display:grid;padding-top:22px}
@@ -808,7 +809,7 @@ body[data-screen=overview] .overview-primary{width:100%;max-width:680px;margin:0
 body[data-screen=overview] .home-say,body[data-screen=overview] .done-line{max-width:none}
 @media(min-width:701px){body[data-screen=overview] .home-say{margin-top:8px}}
 .done-line{display:block;line-height:1.7}
-.done-line .owner-pair{margin-right:8px;vertical-align:-6px}
+.done-line .owner-pair{margin-right:8px;vertical-align:middle;position:relative;top:-.09em}
 @media(max-width:700px){.inspect-close{display:none}}
 @media(max-width:700px){body[data-screen=overview] #new-proposal{display:none}}
 /* A card's one line of context above its title (questions, messages, drafts, invitations). */

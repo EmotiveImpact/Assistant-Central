@@ -66,12 +66,20 @@ export function createInspect(nodes, {onChange = () => {}} = {}) {
   }
   function open(key, heading, subtitle, render, {refresh = false} = {}) {
     // A refresh redraws the record that is already open from newer saved state. It never
-    // opens or closes the panel, and it leaves focus and the pin alone.
+    // opens or closes the panel, and it leaves the pin alone. Focus stays on the same control
+    // when the redraw still has it; otherwise it moves to the panel's title, so the keyboard
+    // is never left outside the panel.
     if (refresh) {
       if (panel.hidden || current !== key) return;
-      const top = body.scrollTop;
+      const top = body.scrollTop, held = body.contains(document.activeElement) ? document.activeElement : null;
       title.textContent = heading; sub.textContent = subtitle || '';
       body.replaceChildren(); render(body); body.scrollTop = top;
+      if (held) {
+        const same = [...body.querySelectorAll('button,a[href],input,select,textarea')]
+          .find(node => node.tagName === held.tagName && node.textContent === held.textContent);
+        title.tabIndex = -1;
+        (same ?? title).focus({preventScroll: true});
+      }
       return;
     }
     if (!panel.hidden && current === key && !pinned) { hide(); return; }
