@@ -192,9 +192,13 @@ class Relay:
             encoded = b64e(body)
             if count >= MAX_QUEUED or size + len(encoded) > MAX_QUEUED_BYTES:
                 raise RelayError(507, 'mailbox_full')
-            seq = tx.one('SELECT next_seq FROM relay_counters WHERE mailbox=?', (mailbox,))[0]
-            tx.execute('UPDATE relay_counters SET next_seq=? WHERE mailbox=?', (seq + 1, mailbox))
-            tx.execute('UPDATE relay_grants SET remaining=remaining-1 WHERE id=?', (grant[0],))
+            # Single conditional updates, so concurrent deliveries on separate
+            # connections can neither overspend a grant nor reuse a sequence number.
+            if tx.execute('UPDATE relay_grants SET remaining=remaining-1 WHERE id=? AND remaining>0',
+                          (grant[0],)).rowcount != 1:
+                raise RelayError(401, 'no_grant')
+            seq = tx.one('UPDATE relay_counters SET next_seq=next_seq+1 WHERE mailbox=? RETURNING next_seq',
+                         (mailbox,))[0] - 1
             packet = secrets.token_hex(16)
             tx.execute('INSERT INTO relay_packets VALUES(?,?,?,?,?,?,?)',
                        (mailbox, seq, packet, grant[0], now, now + RETENTION, encoded))

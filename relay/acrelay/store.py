@@ -9,15 +9,15 @@ import threading
 from contextlib import contextmanager
 
 SCHEMA = '''
-CREATE TABLE IF NOT EXISTS relay_mailboxes(id TEXT PRIMARY KEY, public_key TEXT NOT NULL, created INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS relay_mailboxes(id TEXT PRIMARY KEY, public_key TEXT NOT NULL, created BIGINT NOT NULL);
 CREATE TABLE IF NOT EXISTS relay_grants(id TEXT PRIMARY KEY, mailbox TEXT NOT NULL, token_hash TEXT NOT NULL UNIQUE,
-    expires INTEGER NOT NULL, remaining INTEGER NOT NULL, revoked INTEGER NOT NULL DEFAULT 0, created INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS relay_packets(mailbox TEXT NOT NULL, seq INTEGER NOT NULL, id TEXT NOT NULL UNIQUE,
-    grant_id TEXT NOT NULL, received INTEGER NOT NULL, expires INTEGER NOT NULL, body TEXT NOT NULL,
+    expires BIGINT NOT NULL, remaining BIGINT NOT NULL, revoked BIGINT NOT NULL DEFAULT 0, created BIGINT NOT NULL);
+CREATE TABLE IF NOT EXISTS relay_packets(mailbox TEXT NOT NULL, seq BIGINT NOT NULL, id TEXT NOT NULL UNIQUE,
+    grant_id TEXT NOT NULL, received BIGINT NOT NULL, expires BIGINT NOT NULL, body TEXT NOT NULL,
     PRIMARY KEY(mailbox, seq));
-CREATE TABLE IF NOT EXISTS relay_nonces(mailbox TEXT NOT NULL, nonce TEXT NOT NULL, expires INTEGER NOT NULL,
+CREATE TABLE IF NOT EXISTS relay_nonces(mailbox TEXT NOT NULL, nonce TEXT NOT NULL, expires BIGINT NOT NULL,
     PRIMARY KEY(mailbox, nonce));
-CREATE TABLE IF NOT EXISTS relay_counters(mailbox TEXT PRIMARY KEY, next_seq INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS relay_counters(mailbox TEXT PRIMARY KEY, next_seq BIGINT NOT NULL);
 '''
 
 
@@ -50,6 +50,9 @@ class SqlStore:
     @contextmanager
     def transaction(self):
         with self._lock:
+            # Serverless databases close idle connections; open a fresh one when that happens.
+            if getattr(self._conn, 'closed', False) or getattr(self._conn, 'broken', False):
+                self._conn = self._connect()
             tx = _Tx(self._conn, self._style)
             tx.begin()
             try:
