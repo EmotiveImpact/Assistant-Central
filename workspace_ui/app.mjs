@@ -251,7 +251,7 @@ function openSettingsPanel(refresh){
     const people=panelSection(body,'Assistants');
     line(people,'Assistants you work with',active===1?'1 enrolled':`${active} enrolled`,()=>go('peers'));
     if(relayEnabled(state)){line(people,'Invite someone','A link or a QR code',()=>openInviteDialog());line(people,'Join with a link','Paste an invite you were sent',()=>openJoinDialog());}
-    line(people,'Add an assistant by fingerprint','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
+    line(people,relayEnabled(state)?'Add an assistant by fingerprint':'Add an assistant','Check the fingerprint first',()=>{go('peers');openPeerDialog();});
     // Sending modes and private notes are set on a message waiting in Approvals, nowhere else.
     if(state.approvals?.enabled===true)line(people,'Sending modes and private notes','In Approvals',()=>go('approvals'));
     const device=panelSection(body,'This device');
