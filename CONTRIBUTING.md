@@ -9,8 +9,6 @@ of their information and decisions.
 - Read the [README](README.md) and the [roadmap](ROADMAP.md).
 - For anything larger than a small fix, open an issue or a draft pull request
   first so others can see what you are working on.
-- Report security problems privately, as described in [SECURITY](SECURITY.md),
-  never in a public issue.
 - Use British English in documentation.
 
 ## Sign your work (DCO)
@@ -52,8 +50,5 @@ browser and container checks.
 
 ## Licence
 
-By contributing, you agree your contribution is licensed under the licence of
-the folder you change: Apache-2.0 for everything except `relay/`, and
-AGPL-3.0-only for the relay service in `relay/` (its `client.py` and
-`protocol.py` stay Apache-2.0). You keep the copyright in your contribution;
-the DCO sign-off is all we ask.
+By contributing, you agree your contribution is licensed under Apache-2.0,
+except contributions to the future hosted relay package, which will be AGPL-3.0.

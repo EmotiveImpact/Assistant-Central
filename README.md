@@ -65,7 +65,6 @@ hosted relay, follow [Two people, one task](docs/TWO_PEOPLE.md).
 | `agent_bridge/` | The MCP bridge that lets an existing assistant join |
 | `mission_approvals/` | The assistant-facing MCP tools: inbox, proposing messages, shared drafts, asking the owner, mission offers |
 | `owner_phone/` | Ask the owner a question by phone (Telegram) |
-| `sdk/` | The open SDK for connecting any agent or app (Apache-2.0) |
 | `mission_cards/`, `a2a_extension/` | Mission cards, receipts and spending mandates, and an A2A protocol extension |
 | `relay/` | The hosted relay that carries encrypted packets between people (AGPL-3.0) |
 | `isolation/`, `network_acceptance/` | Tests that run owners in separate containers and networks |
@@ -84,15 +83,5 @@ commit needs a DCO sign-off (`git commit -s`).
 
 ## Licence
 
-Parlu is open core.
-
-- **The app and the SDK** (everything outside `relay/`, including [`sdk/`](sdk/README.md))
-  are Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
-- **The relay** in [`relay/`](relay/) is AGPL-3.0-only, so anyone can run their
-  own relay, privately or publicly, as long as changes to a relay offered to
-  others are shared under the same licence. Its client and wire protocol are
-  Apache-2.0.
-- **The hosted relay** at `parlu-relay.vercel.app` is the paid service.
-
-Third-party material keeps its own licence, listed in
-[licence status](LICENSE_STATUS.md).
+Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Third-party material
+keeps its own licence, listed in [licence status](LICENSE_STATUS.md).
