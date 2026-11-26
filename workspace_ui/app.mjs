@@ -282,7 +282,7 @@ function removeSection(body,peer,owner,agent){
     open.hidden=true;
     const confirmBox=text('div','','remove-confirm');
     const facts=text('ul','','remove-facts');
-    for(const line of [`Nothing new from ${agent} will be accepted, and you cannot send to it.`,'Work you already shared stays in your history.',`This cannot be undone. To work with ${owner} again, they need a new assistant key.`])facts.append(text('li',line));
+    for(const line of [`Nothing new from ${agent} will be accepted, and you cannot send to it.`,`Your history keeps a record of past work, but what ${agent} sent you is no longer shown. Anything still waiting can only be rejected.`,`This cannot be undone. To work with ${owner} again, they would need to set up a new assistant under a different name and invite you afresh.`])facts.append(text('li',line));
     const go=()=>performWrite(`/api/peers/${peer.peer_id}/revoke`,{},{target:'notice',onSuccess:result=>notice(result.relay&&result.relay!=='ok'&&result.relay_closed?`${agent} is removed. The relay could not be reached, so its link closes on the next sync.`:`${agent} is removed.`,true)});
     confirmBox.append(facts,holdButton('Hold to remove',go),text('p','Or remove with the button below.','hold-alt'),button(`Remove ${agent} now`,'button danger',go),button('Keep','text-button',()=>{confirmBox.remove();open.hidden=false;open.focus();}));
     box.append(confirmBox);

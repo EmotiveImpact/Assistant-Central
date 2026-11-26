@@ -559,15 +559,28 @@ class RelayLink:
         """Close the relay link to one person: their send token stops working."""
         self._owner(session)
         need(type(peer) is str and HEX64.fullmatch(peer) is not None)
-        row = self.db.execute('SELECT grant_id FROM link_peers WHERE peer=?', (peer,)).fetchone()
-        if row is None:
+        if not self._queue_forget([peer]):
             return {'closed': False, 'relay': 'ok'}
-        with self._txn():
-            self.db.execute('DELETE FROM link_peers WHERE peer=?', (peer,))
-            self.db.execute('DELETE FROM link_receipts WHERE peer=?', (peer,))
-            # Kept until the relay confirms, so an unreachable relay is retried on the next sync.
-            self.db.execute('INSERT OR IGNORE INTO link_revokes VALUES(?)', (row['grant_id'],))
         return {'closed': True, 'relay': self._finish_revokes(session)}
+
+    def _queue_forget(self, peers):
+        """Drop the local link rows and keep each grant until the relay confirms its revoke."""
+        rows = [row for peer in peers
+                for row in self.db.execute('SELECT peer,grant_id FROM link_peers WHERE peer=?', (peer,)).fetchall()]
+        if not rows:
+            return False
+        with self._txn():
+            for row in rows:
+                self.db.execute('DELETE FROM link_peers WHERE peer=?', (row['peer'],))
+                self.db.execute('DELETE FROM link_receipts WHERE peer=?', (row['peer'],))
+                self.db.execute('INSERT OR IGNORE INTO link_revokes VALUES(?)', (row['grant_id'],))
+        return True
+
+    def _close_revoked(self):
+        """A person removed while the relay was off still holds a send token; close it now."""
+        revoked = {entry['fingerprint'] for entry in self.runtime.exchange.peers() if entry['state'] == 'revoked'}
+        linked = [row['peer'] for row in self.db.execute('SELECT peer FROM link_peers').fetchall()]
+        self._queue_forget([peer for peer in linked if peer in revoked])
 
     def _finish_revokes(self, session):
         pending = [row['grant_id'] for row in self.db.execute('SELECT grant_id FROM link_revokes').fetchall()]
@@ -576,14 +589,19 @@ class RelayLink:
         client, problem = self._mailbox(session)
         if client is None:
             return problem or 'unreachable'
+        outcome = 'ok'
         for grant_id in pending:
             _, problem = self._relay(lambda: client.revoke(grant_id))
             if problem == 'unreachable':
                 return problem
-            # Done, or the relay no longer knows the grant: either way it cannot be used.
+            if problem == 'refused':
+                # Not confirmed, so the grant may still work: keep it and try again on the next sync.
+                outcome = 'refused'
+                continue
+            # Revoked, or the relay no longer knows the grant: either way it cannot be used.
             with self._txn():
                 self.db.execute('DELETE FROM link_revokes WHERE grant_id=?', (grant_id,))
-        return 'ok'
+        return outcome
 
     # Carrying packets --------------------------------------------------------------
 
@@ -693,6 +711,7 @@ class RelayLink:
         now = self._now()
         summary = {'relay': 'ok', 'received': 0, 'rejected': 0, 'joined': 0, 'connected': 0, 'sent': 0,
                    'receipts_sent': 0, 'waiting_to_send': 0, 'at': now}
+        self._close_revoked()
         if self._meta()['key'] is None:
             self.last_sync = {**summary, 'relay': 'idle'}
             return dict(self.last_sync)
@@ -727,8 +746,8 @@ class RelayLink:
                     break
         if summary['relay'] == 'ok':
             self._send_receipts(summary)
-        if summary['relay'] == 'ok' and self._finish_revokes(session) != 'ok':
-            summary['relay'] = 'unreachable'
+        if summary['relay'] == 'ok':
+            summary['relay'] = self._finish_revokes(session)
         with self._txn():
             self.db.execute('DELETE FROM link_sent WHERE stored<?', (now - SENT_MEMORY,))
         for status, row in self._unsent():
