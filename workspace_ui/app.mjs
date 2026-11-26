@@ -3,6 +3,7 @@ import {createConversations,inspectMessageOutcome} from './conversations.mjs';
 import {money,amountOf,toMicro,ownerCurrency} from './missions.mjs';
 import {homeGreeting,isEvening,budgetSummary,doneToday,doneLine,eveningSummary,shortKey} from './home.mjs';
 import {botFace,ownerPair} from './bots.mjs';
+import {SECTIONS,WORK_VIEWS,WORK_FILTERS,sectionOf,tabOf,receiptsOf,shortDigest,createInspect} from './depth.mjs';
 import {createHostDrafts} from './host_drafts.mjs';
 import {createApprovals} from './approvals.mjs';
 import {validateTransferReview,transferPath} from './transfers.mjs';
@@ -23,13 +24,14 @@ function setNavigation(open,{restoreFocus=false}={}){
   const wasOpen=document.body.classList.contains('sidebar-open');open=Boolean(open&&mobileNavigation.matches);
   document.body.classList.toggle('sidebar-open',open);sidebar.inert=mobileNavigation.matches&&!open;
   sidebar.setAttribute('aria-hidden',String(sidebar.inert));$('menu-toggle').setAttribute('aria-expanded',String(open));$('menu-toggle').setAttribute('aria-label',open?'Close navigation':'Open navigation');
-  if(open&&!wasOpen)sidebar.querySelector('[data-view]')?.focus();
+  if(open&&!wasOpen){$('everything-toggle').setAttribute('aria-expanded','true');$('everything-list').hidden=false;sidebar.querySelector('[data-view]')?.focus();}
   else if(wasOpen&&!open){if(restoreFocus&&mobileNavigation.matches)$('menu-toggle').focus();else if(sidebar.contains(document.activeElement))$('main').focus();}
 }
 mobileNavigation.addEventListener('change',()=>setNavigation(false));
 let token = null, generation = 0, busy = false, currentView = viewFromHash(location.hash), currentFilter = 'all', currentLayout = 'list', searchQuery = '';
 let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null;
 const uncertainty=inspectionLatch();
+const sectionLede={recents:'Everything that happened, every receipt and all work.',assistants:'The people you work with, beside their assistants.',money:'What your assistants may spend, and what they have.'};
 const viewCopy = {
   overview:['Home','HOME','Your workspace, in motion.','People, assistants and the work you share.','Workspace results','Search your saved work'],
   inbox:['Inbox','INCOMING WORK','Inbox','Review the requests and artifacts shared with your assistant.','All incoming','Every proposal has its own decision'],
@@ -41,6 +43,8 @@ const viewCopy = {
   conversations:['Conversations','SCOPED LOCAL HISTORY','Room for a conversation.','Persistent conversations with explicit membership and exact history consent.','Your conversations','Local coordinating host only'],
   transfers:['Transfers','EXPLICIT DELIVERY','Every handoff, deliberate.','Review an exact packet before each send or import.','Connections & transfers','No automatic delivery or retries'],
   'host-drafts':['Host drafts','INERT LOCAL DRAFTS','Inspect before anything moves.','Review exact drafts from a configured supported host.','Host task drafts','Inspection and dismissal only'],
+  money:['Money','MONEY','Money','What your assistants may spend, and what they have.','Money','Budgets and missions'],
+  receipts:['Receipts','SIGNED RECORDS','Recents','Everything that happened, every receipt and all work.','Receipts','Signed decisions and results'],
   activity:['Activity','WORKSPACE ACTIVITY','Activity','The saved history of work moving through your workspace.','Recent activity','Recorded events from this assistant']
 };
 class RequestFailure extends Error { constructor(message,{unknown=false,unauthorised=false}={}) { super(message); this.unknown=unknown;this.unauthorised=unauthorised; } }
@@ -78,7 +82,7 @@ function resetSession(message='') {
   hostDrafts.reset({sessionEnded:true});approvals.reset({sessionEnded:true});
   generation++;token=null;state=null;selected=null;selectedWorkflow=null;selectedTransfer=null;uncertainty.reset();searchQuery='';
   $('search-input').value='';setNavigation(false);
-  for(const id of ['overview-attention','overview-work','overview-network','overview-events','overview-stats','home-when','home-paragraph','home-cards','done-rows','money-panel','keys-panel'])$(id)?.replaceChildren();homeOffset=0;storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
+  for(const id of ['home-when','home-paragraph','home-cards','done-line','money-panel','mission-rows','section-tabs','section-filters','menu-initials'])$(id)?.replaceChildren();$('done-line').hidden=true;$('home-count').hidden=true;inspect.reset();setEverything(false);homeOffset=0;storyOffset=0;if($('home-ask-input'))$('home-ask-input').value='';
   document.querySelectorAll('dialog[open]').forEach(dialog=>dialog.close());
   $('account').value='';$('workspace').hidden=true;$('login-screen').hidden=false;$('password').value='';
   $('item-list').replaceChildren();$('review-content').textContent='';$('review-details').replaceChildren();$('review-commitments').replaceChildren();$('review-actions').replaceChildren();
@@ -134,28 +138,33 @@ function navigate(view,{filter='all'}={}) {
   if(busy||!VIEWS.includes(view))return;
   currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
-  setNavigation(false);render();
+  inspect.navigated();setNavigation(false);render();
 }
 function render() {
   if(!state)return;
   conversations.reset();
   hostDrafts.reset();approvals.reset();
-  const owner=state.identity;$('owner-name').textContent=owner.owner_id;$('agent-name').textContent=owner.agent_id;$('owner-avatar').textContent=owner.owner_id.slice(0,2).toUpperCase();
+  const owner=state.identity;$('owner-name').textContent=owner.owner_id;$('agent-name').textContent=`${plain(owner.agent_id,'Your assistant')} is ready`;$('owner-avatar').textContent=owner.owner_id.slice(0,2).toUpperCase();$('menu-initials').textContent=owner.owner_id.slice(0,2).toUpperCase();
   const totals=workspaceTotals(state);
   $('inbox-count').textContent=totals.pending;
   $('outbox-count').textContent=state.items.filter(item=>item.direction==='outgoing'&&!isTerminal(item)).length;
   $('pending-total').textContent=totals.pending;
   $('accepted-total').textContent=state.items.filter(item=>item.state==='accepted').length;$('peer-total').textContent=totals.peers;
   document.body.dataset.screen=currentView;const copy=viewCopy[currentView];['view-name','page-eyebrow','page-title','page-description','list-title','list-description'].forEach((id,index)=>$(id).textContent=copy[index]);
+  const section=sectionOf(currentView);document.body.dataset.section=section;
+  if(sectionLede[section]){$('page-title').textContent=SECTIONS[section].label;$('page-description').textContent=sectionLede[section];}
+  const waiting=attentionItems(state).length;$('home-count').textContent=waiting;$('home-count').hidden=!waiting;
+  renderSectionChrome(section);
   let acceptedFilter=$('accepted-filter');
   if(currentFilter==='accepted'&&!acceptedFilter){acceptedFilter=button('Accepted','selected',()=>{if(busy)return;currentFilter='accepted';render();});acceptedFilter.id='accepted-filter';acceptedFilter.dataset.filter='accepted';$('filters').append(acceptedFilter);}
   if(acceptedFilter)acceptedFilter.hidden=currentFilter!=='accepted';
   if(currentFilter==='accepted')$('list-title').textContent=currentView==='tasks'?'Accepted tasks':'Accepted proposals';
-  document.querySelectorAll('[data-view]').forEach(node=>{node.classList.toggle('active',node.dataset.view===currentView);node.setAttribute('aria-current',node.dataset.view===currentView?'page':'false');});
+  document.querySelectorAll('[data-view]').forEach(node=>{const here=node.dataset.view===currentView,lit=here||node.dataset.section===section;node.classList.toggle('active',lit);node.setAttribute('aria-current',here?'page':'false');});
+  if(document.querySelector(`#everything-list [data-view="${currentView}"]`))setEverything(true);
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
-  const overview=currentView==='overview'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals'].includes(currentView);
-  $('overview-panel').hidden=!overview;$('work-panel').hidden=overview;
+  const overview=currentView==='overview'&&!searchQuery, moneyView=currentView==='money'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals','receipts'].includes(currentView);
+  $('overview-panel').hidden=!overview;$('money-panel-view').hidden=!moneyView;$('work-panel').hidden=overview||moneyView;
   $('summary').hidden=true;$('filters').hidden=structural||overview;$('view-toggle').hidden=structural||overview;$('add-peer').hidden=currentView!=='peers';
   $('search-clear').hidden=!searchQuery;
   $('search-input').disabled=['transfers','conversations','host-drafts','approvals'].includes(currentView);
@@ -164,9 +173,81 @@ function render() {
   const provider=state.provider;
   $('provider-status').textContent=workflowEnabled(state)?'Synthetic workspace · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();$('item-list').classList.toggle('board',currentLayout==='board'&&!structural);$('item-list').classList.toggle('peers-grid',currentView==='peers');
-  if(overview)renderOverview(totals);else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
+  if(overview)renderOverview(totals);else if(moneyView)renderMoney();else if(currentView==='receipts')renderReceipts();else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
   const date=$('overview-date');if(date)date.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
 }
+// ===== Depth shell: section tabs, the Everything list and the Inspect panel =====
+const inspect=createInspect({panel:$('inspect'),title:$('inspect-title'),sub:$('inspect-sub'),body:$('inspect-body'),pin:$('inspect-pin'),close:$('inspect-close'),back:$('inspect-back')});
+function setEverything(open){$('everything-toggle').setAttribute('aria-expanded',String(open));$('everything-list').hidden=!open;}
+$('everything-toggle').addEventListener('click',()=>setEverything($('everything-list').hidden));
+$('everything-count').textContent=document.querySelectorAll('#everything-list .nav-link').length;
+function renderSectionChrome(section){
+  const tabs=$('section-tabs'),filters=$('section-filters');tabs.replaceChildren();filters.replaceChildren();
+  const config=SECTIONS[section],showTabs=Boolean(config.tabs)&&!searchQuery;tabs.hidden=!showTabs;
+  if(showTabs)for(const [view,label] of config.tabs){const on=tabOf(currentView)===view;const tab=button(label,'section-tab'+(on?' selected':''),()=>navigate(view));tab.dataset.goto=view;tab.setAttribute('aria-current',on?'page':'false');tabs.append(tab);}
+  const showFilters=WORK_VIEWS.includes(currentView)&&!searchQuery;filters.hidden=!showFilters;
+  if(showFilters)for(const [view,label] of WORK_FILTERS){const on=currentView===view;const chip=button(label,'filter-chip'+(on?' selected':''),()=>navigate(view));chip.dataset.goto=view;chip.setAttribute('aria-pressed',String(on));filters.append(chip);}
+}
+function panelSection(body,heading){const box=text('section','','inspect-card');if(heading)box.append(text('h3',heading,'inspect-label'));body.append(box);return box;}
+function panelRow(box,label,value,mono=false){const row=text('div','','inspect-row');row.append(text('span',label),text(mono?'code':'span',value,mono?'inspect-mono':'inspect-value'));box.append(row);return row;}
+function openIdentityPanel(){
+  const id=state.identity;
+  inspect.open('identity','Your identity',`${plain(id.agent_id,'Your assistant')}, ${cap(plain(id.owner_id,'you'))}'s assistant`,body=>{
+    const keys=panelSection(body,'Keys');panelRow(keys,'Fingerprint',id.fingerprint,true);
+    keys.append(text('p','Another owner compares this full fingerprint with you before enrolling your assistant.','inspect-note'));
+    const publicIdentity=id.public||Object.fromEntries(Object.entries(id).filter(([key])=>['owner_id','agent_id','signing_key','exchange_key','version'].includes(key)));
+    body.append(button('Show the public identity to share','button secondary',()=>showPublicIdentity(publicIdentity,id.fingerprint)));
+  });
+}
+function openStatusPanel(){
+  inspect.open('status','Workspace status','What this workspace can do right now',body=>{
+    const box=panelSection(body,'Status');
+    panelRow(box,'Saved state',$('connection-status').textContent||'Not checked yet');
+    panelRow(box,'Model calls',$('provider-status').textContent||'Disabled');
+    panelRow(box,'Content',state.synthetic_only?'Synthetic, fictional work only':'Owner content');
+    panelRow(box,'Exchange',state.pilot?.loopback_only?'Local loopback only':'Configured delivery');
+    const actions=text('div','','inspect-actions');actions.append(button('Refresh saved state','button secondary',()=>$('refresh').click()),button('Sync exchange','button secondary',()=>$('sync').click()));body.append(actions);
+  });
+}
+function openAssistantPanel(peer){
+  const o=cap(plain(peer.owner_id,'Owner')),a=plain(peer.agent_id,'Assistant');
+  inspect.open('peer:'+peer.peer_id,a,`${o}'s assistant`,body=>{
+    const who=text('div','','inspect-who');who.append(ownerPair(o,a,'owner-pair','idle'),text('span',isPeerActive(peer)?'Trusted. Each proposal still needs your decision.':peer.state==='revoked'?'Revoked. Nothing new is accepted from this assistant.':'Status unavailable.','inspect-note'));body.append(who);
+    const keys=panelSection(body,'Keys');panelRow(keys,'Fingerprint',peer.fingerprint,true);panelRow(keys,'Status',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Unverified');
+    const work=state.items.filter(item=>item.peer_id===peer.peer_id);
+    const shared=panelSection(body,'Shared work');
+    if(!work.length)shared.append(text('p','No shared work yet.','inspect-note'));
+    for(const item of work.slice(0,6)){const row=button('','inspect-item',()=>openReview(item));row.append(text('span',plain(item.title,'Untitled')),badge(item.state));shared.append(row);}
+    const mode=panelSection(body,'Sending mode');mode.append(text('p','Every proposal from this assistant waits for your exact decision. Sending modes and private notes for conversations live in Approvals.','inspect-note'));
+  });
+}
+function openMissionPanel(item){
+  const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
+  inspect.open('mission:'+item.id,plain(item.title,'Mission'),`Mission with ${o} · ${money(item.mission_cap.cap_micro,item.mission_cap.currency)} limit`,body=>{
+    const decide=panelSection(body);decide.classList.add('inspect-decide');decide.append(text('strong',plain(item.title,'Mission')),button(isTerminal(item)?'Inspect the exact agreement':'Review the exact agreement','button primary',()=>openReview(item)));
+    const budget=panelSection(body,'Budget');
+    const run=(state.workflow?.runs??[]).find(entry=>entry.item_id===item.id&&entry.mission_balance);
+    if(run){const [left,cur]=amountOf(run.mission_balance,'available');budget.append(text('strong',money(left,cur),'money-figure small'),text('p',`left of ${money(...amountOf(run.mission_balance,'cap'))}`,'inspect-note'));}
+    else{budget.append(text('strong',money(item.mission_cap.cap_micro,item.mission_cap.currency),'money-figure small'),text('p','Agreed limit. Spending shows here once the work runs on this workspace.','inspect-note'));}
+    const keys=panelSection(body,'Who');const who=text('div','','inspect-who');who.append(ownerPair(o,a),text('span',`${a} ${item.direction==='outgoing'?'does the work':'asked for it'}`,'inspect-note'));keys.append(who);
+    const status=panelSection(body,'Status');panelRow(status,'Agreement',stateLabel(item.historical_state??item.state));if(item.decision_digest)panelRow(status,'Receipt',shortDigest(item.decision_digest),true);
+  });
+}
+// Receipts: every signed decision and finished run in saved state.
+function renderReceipts(){
+  const receipts=receiptsOf(state).filter(r=>matchesQuery([r.item?.title,r.digest,r.kind],searchQuery));
+  if(!receipts.length){empty('✓','No receipts yet.','A signed receipt appears here each time a decision or result is saved.');return;}
+  for(const r of receipts){
+    const row=text('article','','item-row receipt-row');const main=text('div','','item-main');
+    const open=button(plain(r.item?.title,'Untitled'),'item-title item-open',()=>r.item&&openReview(r.item));open.setAttribute('aria-label','Review '+plain(r.item?.title,'receipt'));
+    const h=text('h3','','item-heading');h.append(open);main.append(h,text('div',`${r.kind==='decision'?stateLabel(r.item.historical_state??r.item.state)+' · signed decision':'Result of a run'} · ${peerName(r.item?.peer_id)}`,'item-meta'),text('p',r.digest,'peer-fingerprint'));
+    row.append(text('span','✓','receipt-mark'),main);$('item-list').append(row);
+  }
+}
+document.querySelectorAll('[data-panel]').forEach(node=>node.addEventListener('click',()=>{if(!state||busy)return;setNavigation(false);if(node.dataset.panel==='identity')openIdentityPanel();else openStatusPanel();}));
+document.querySelectorAll('[data-jump]').forEach(node=>node.addEventListener('click',()=>navigate(node.dataset.jump)));
+document.querySelector('[data-action=lock]')?.addEventListener('click',()=>$('logout').click());
+$('money-start').addEventListener('click',()=>{if(!state)return;if(state.peers.some(isPeerActive)){prepareCompose();const kind=$('compose-form').elements.kind;kind.value='mission';configureKind();}else navigate('peers');});
 function empty(symbol,title,description,action,target=$('item-list')) {
   const box=text('div','','empty-state');box.append(text('div',symbol,'empty-symbol'),text('h3',title),text('p',description));if(action)box.append(button(action.label,'button secondary',action.run));target.append(box);
 }
@@ -208,7 +289,7 @@ function overviewItem(item) {
   row.append(main,badge(item.state),text('span','↗','overview-arrow'));return row;
 }
 let homeOffset=0;
-let storyOffset=0,moneyTab='money';
+let storyOffset=0;
 function cap(value){const v=String(value??'');return v.charAt(0).toUpperCase()+v.slice(1);}
 function peerOf(item){return state.peers.find(peer=>peer.peer_id===item.peer_id);}
 // Home is a short honest paragraph (at most three sentences) and one decision per card.
@@ -255,76 +336,53 @@ function renderStory(done){
   actions.append(button(done.length>1?'Good, next':'Good','button primary home-good',()=>{storyOffset++;if(done.length>1)renderStory(done);else card.classList.add('story-seen');}));
   card.append(actions);cards.replaceChildren(card);
 }
-// Done today: work someone agreed today, newest first, with its signed receipt.
+// Done today: one quiet line on Home. "See all" opens the agreed work in Recents.
 function renderDone(){
-  const rows=$('done-rows');if(!rows)return;rows.replaceChildren();
-  const done=doneToday(state.items);$('done-count').textContent=done.length;
-  if(!done.length){rows.append(text('p','Nothing agreed yet today. Finished work appears here.','done-empty'));return;}
-  for(const item of done.slice(0,4)){
-    const p=peerOf(item),o=cap(plain(p?.owner_id,'You')),a=plain(p?.agent_id,state.identity.agent_id);
-    const row=button('','done-row',()=>openReview(item));row.dataset.itemId=item.id;
-    const main=text('span','','done-main');main.append(text('strong',plain(item.title,'Untitled')),text('span',doneLine(item,p),'done-meta'));
-    row.append(ownerPair(o,a,'owner-pair','done'),main);
-    if(item.decision_digest)row.append(text('span','Receipt','badge receipt-badge'));
-    rows.append(row);
-  }
-  if(done.length>4)rows.append(button(`See all ${done.length} in All work`,'text-button done-more',()=>navigate('tasks',{filter:'accepted'})));
+  const line=$('done-line');if(!line)return;line.replaceChildren();
+  const done=doneToday(state.items);line.hidden=!done.length;if(!done.length)return;
+  const first=done[0],p=peerOf(first);
+  const names=done.slice(0,2).map(item=>`“${plain(item.title,'Untitled')}”`),rest=done.length-names.length;
+  line.append(ownerPair(cap(plain(p?.owner_id,state.identity.owner_id)),plain(p?.agent_id,state.identity.agent_id),'owner-pair','done'),
+    text('span',`Done today: ${names.join(rest?', ':' and ')}${rest?` and ${rest} more`:''}. `),button('See all','text-button done-all',()=>navigate('tasks',{filter:'accepted'})));
 }
-// Money and keys: real mission budgets only, and who holds which signing key.
+// Money: real mission budgets only, and every mission agreement with its spending limit.
+function missionsOf(){
+  const seen=new Map();
+  for(const item of state.items){if(item.kind!=='task'||!item.mission_cap)continue;const prior=seen.get(item.context);if(!prior||item.created_at>prior.created_at)seen.set(item.context,item);}
+  return [...seen.values()].sort((a,b)=>b.created_at-a.created_at);
+}
 function renderMoney(){
-  const panel=$('money-panel'),keys=$('keys-panel');if(!panel||!keys)return;
-  panel.replaceChildren();keys.replaceChildren();
+  const panel=$('money-panel'),rows=$('mission-rows');if(!panel||!rows)return;
+  panel.replaceChildren();rows.replaceChildren();
   const totals=budgetSummary(state.workflow?.runs??[],state.items);
   if(!totals.length){
     panel.append(text('strong','No budgets yet','money-figure empty'),text('p','A budget appears here once you agree a mission with a spending limit.','money-note'));
-    panel.append(button('Set up a mission','button secondary money-start',()=>{if(state.peers.some(isPeerActive)){prepareCompose();const kind=$('compose-form').elements.kind;kind.value='mission';configureKind();}else navigate('peers');}));
   }else{
     const main=totals[0],budgets=main.budgets===1?'one budget':main.budgets+' budgets';
     if(main.unknown){
       panel.append(text('strong',money(main.cap,main.currency),'money-figure'),text('span',`Agreed across ${budgets}`,'money-label'));
       panel.append(text('p',main.unknown===main.budgets?'Spending shows here once the work runs on this workspace.':`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} where visible here`,'money-note'));
     }else{
-    panel.append(text('strong',money(main.available,main.currency),'money-figure'),text('span',`Left across ${budgets}`,'money-label'));
-    const bar=text('div','','money-bar');const fill=text('span','','money-fill');fill.style.width=`${main.cap?Math.min(100,Math.round((main.spent+main.held)/main.cap*100)):0}%`;bar.append(fill);
-    bar.setAttribute('role','img');bar.setAttribute('aria-label',`${money(main.spent+main.held,main.currency)} used or held of ${money(main.cap,main.currency)}`);
-    panel.append(bar,text('p',`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} · Limit ${money(main.cap,main.currency)}`,'money-note'));
+      panel.append(text('strong',money(main.available,main.currency),'money-figure'),text('span',`Left across ${budgets}`,'money-label'));
+      const bar=text('div','','money-bar');const fill=text('span','','money-fill');fill.style.width=`${main.cap?Math.min(100,Math.round((main.spent+main.held)/main.cap*100)):0}%`;bar.append(fill);
+      bar.setAttribute('role','img');bar.setAttribute('aria-label',`${money(main.spent+main.held,main.currency)} used or held of ${money(main.cap,main.currency)}`);
+      panel.append(bar,text('p',`Spent ${money(main.spent,main.currency)} · Held ${money(main.held,main.currency)} · Limit ${money(main.cap,main.currency)}`,'money-note'));
     }
     for(const other of totals.slice(1))panel.append(text('p',other.unknown?`Also ${money(other.cap,other.currency)} agreed in ${other.currency}`:`Also ${money(other.available,other.currency)} left in ${other.currency}`,'money-note'));
     panel.append(text('p','Simulated spending. No real payment is made.','money-note muted'));
   }
-  const holders=[{agent_id:state.identity.agent_id,owner_id:state.identity.owner_id,fingerprint:state.identity.fingerprint,you:true},...state.peers];
-  for(const h of holders){
-    const row=text('div','','key-row');const o=cap(plain(h.owner_id,'Owner')),a=plain(h.agent_id,'Assistant');
-    const main=text('span','','key-main');main.append(text('strong',h.you?`${a}, your assistant`:`${a}, ${o}'s`),text('span','Key '+shortKey(h.fingerprint),'key-print'));
-    row.append(ownerPair(o,a),main,text('span',h.you?'Yours':isPeerActive(h)?'Trusted':h.state==='revoked'?'Revoked':'Unverified','key-state'));keys.append(row);
+  const missions=missionsOf();
+  if(!missions.length)rows.append(text('p','No missions yet. A mission is a piece of work with a spending limit and checks that both owners agree.','done-empty'));
+  for(const item of missions){
+    const p=peerOf(item),o=cap(plain(p?.owner_id,'Owner')),a=plain(p?.agent_id,'Assistant');
+    const row=button('','mission-row',()=>openMissionPanel(item));row.dataset.itemId=item.id;
+    const main=text('span','','done-main');main.append(text('strong',plain(item.title,'Untitled mission')),text('span',`${money(item.mission_cap.cap_micro,item.mission_cap.currency)} limit · ${stateLabel(item.historical_state??item.state)}`,'done-meta'));
+    row.append(ownerPair(o,a),main,text('span','›','row-chevron'));rows.append(row);
   }
-  for(const tab of document.querySelectorAll('[data-money]')){const on=tab.dataset.money===moneyTab;tab.classList.toggle('selected',on);tab.setAttribute('aria-selected',String(on));}
-  panel.hidden=moneyTab!=='money';keys.hidden=moneyTab!=='keys';
 }
-function renderOverview(totals) {
-  for(const id of ['overview-stats','overview-attention','overview-work','overview-network','overview-events'])$(id).replaceChildren();
-  const stats=[['Needs your review',totals.pending,'Incoming proposals','inbox','pending'],['Accepted tasks',totals.acceptedTasks,'Work agreed by its recipient','tasks','accepted'],['Artifacts',totals.artifacts,'Drafts and received work','artifacts','all'],['Trusted assistants',totals.peers,'Individually enrolled','peers','all']];
-  const metricSymbols={inbox:'i-inbox',tasks:'i-tasks',artifacts:'i-artifacts',peers:'i-peers'};
-  for(const [label,value,note,view,filter] of stats){const tile=button('','overview-metric',()=>navigate(view,{filter}));tile.append(symbolIcon(metricSymbols[view],'metric-icon'),text('span',label,'metric-label'),text('strong',value,'metric-value'),text('span',note,'metric-note'));$('overview-stats').append(tile);}
-  const allAttention=attentionItems(state),attention=allAttention.slice(0,3);
-  renderHome(allAttention);renderDone();renderMoney();
+function renderOverview() {
+  renderHome(attentionItems(state));renderDone();
   if($('home-ask-input'))$('home-ask-input').placeholder=`Ask ${plain(state.identity.agent_id,'your assistant')} to start something…`;
-  if($('attention-count'))$('attention-count').textContent=allAttention.length;
-  if(attention.length)for(const item of attention)$('overview-attention').append(overviewItem(item));
-  else empty('✓','You’re all caught up.','New requests will appear here after you sync the exchange.',undefined,$('overview-attention'));
-  const attentionIds=new Set(attention.map(item=>item.id));
-  const work=activeTasks(state).filter(item=>!attentionIds.has(item.id)).slice(0,4);
-  if(work.length)for(const item of work)$('overview-work').append(overviewItem(item));
-  else empty('◌','Nothing else in motion.','Other active tasks will appear here as your workspace grows.',{label:'New proposal',run:prepareCompose},$('overview-work'));
-  const people=[{...state.identity,local:true},...state.peers.slice(0,3)];
-  for(const peer of people){
-    const row=button('','overview-person',()=>navigate('peers'));row.append(nameAvatar(peer.agent_id,'peer-avatar '+(peer.local?'local':'')));
-    const main=text('span','','overview-person-main');main.append(text('strong',plain(peer.agent_id,'Assistant')),text('span',plain(peer.owner_id,'Owner')));
-    row.append(main,text('span',peer.local?'Your assistant':isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable','person-status'));$('overview-network').append(row);
-  }
-  const events=state.history.slice(-4).reverse();
-  for(const event of events){const row=text('div','','overview-event');row.append(text('span','','event-dot'));const main=text('div','','event-main');main.append(text('strong',eventLabel(event)),text('time',eventWhen(event)));row.append(main);$('overview-events').append(row);}
-  if(!events.length)$('overview-events').append(text('p','Your saved activity will appear here.','overview-empty-note'));
 }
 function renderPeers() {
   const own=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(state.identity.agent_id,'Your assistant'),'item-title'),text('div',plain(state.identity.owner_id)+' · Your assistant','item-meta'),text('p',state.identity.fingerprint,'peer-fingerprint'));
@@ -337,6 +395,7 @@ function renderPeers() {
   for(const peer of peers) {
     const row=text('article','','item-row peer-row');const main=text('div','','item-main');main.append(text('h3',plain(peer.agent_id,'Assistant'),'item-title'),text('div',plain(peer.owner_id,'Owner'),'item-meta'),text('p',peer.fingerprint,'peer-fingerprint'));
     const right=text('div','','row-right');right.append(text('span',isPeerActive(peer)?'Enrolled':peer.state==='revoked'?'Revoked':'Status unavailable',isPeerActive(peer)?'badge accepted':'badge revoked'));
+    right.append(button('Open','button secondary row-action',()=>openAssistantPanel(peer)));
     row.append(peerAvatar(peer.peer_id),main,right);$('item-list').append(row);
   }
   if(!$('item-list').childElementCount)empty('⌕','No matching assistants.','Try an assistant name, owner or fingerprint.',{label:'Clear search',run:clearSearch});
@@ -518,7 +577,6 @@ $('sync').addEventListener('click',()=>performWrite('/api/exchange',{}, {onSucce
 $('new-proposal').addEventListener('click',prepareCompose);
 function setQuickMenu(open){$('quick-menu').hidden=!open;$('glass-plus').setAttribute('aria-expanded',String(open));$('glass-plus').classList.toggle('open',open);}
 $('glass-plus').addEventListener('click',()=>setQuickMenu($('quick-menu').hidden));
-$('money-card')?.addEventListener('click',event=>{const tab=event.target.closest('[data-money]')?.dataset.money;if(!tab)return;moneyTab=tab;renderMoney();});
 // The Ask bar drafts a proposal from what you typed. Nothing is sent until you review it.
 $('home-ask')?.addEventListener('submit',event=>{event.preventDefault();const typed=$('home-ask-input').value.trim();prepareCompose();const form=$('compose-form');if(!$('compose-dialog').open)return;if(typed){form.elements.title.value=typed.slice(0,120);form.elements.text.value='SYNTHETIC ONLY: '+typed;}$('home-ask-input').value='';});
 $('quick-menu').addEventListener('click',event=>{const choice=event.target.closest('[data-quick]')?.dataset.quick;if(!choice)return;setQuickMenu(false);if(choice==='proposal')prepareCompose();else if(choice==='mission')navigate('conversations');else{navigate('peers');openPeerDialog();}});$('add-peer').addEventListener('click',openPeerDialog);

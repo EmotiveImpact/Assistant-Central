@@ -12,7 +12,7 @@ const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH
 const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();
 const errors=[],writes=[];page.on('pageerror',error=>errors.push(error.message));
 page.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname.includes('/host-drafts/'))writes.push(request.url());});
-const nav=async()=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();await page.locator('[data-view="host-drafts"]').click();await page.getByRole('button',{name:'Inspect draft',exact:true}).waitFor();};
+const nav=async()=>{if(await page.locator('#menu-toggle').isVisible())await page.locator('#menu-toggle').click();if(!await page.locator('[data-view="host-drafts"]').isVisible())await page.locator('#everything-toggle').click();await page.locator('[data-view="host-drafts"]').click();await page.getByRole('button',{name:'Inspect draft',exact:true}).waitFor();};
 const inspect=async()=>{await page.getByRole('button',{name:'Inspect draft',exact:true}).click();await page.locator('#host-draft-dialog[open]').waitFor();};
 const screenshot=async(name)=>{if(!captures)return;await page.evaluate(()=>document.fonts.ready.then(()=>undefined));if(await page.locator('#menu-toggle').isVisible())await page.waitForFunction(()=>document.querySelector('.sidebar').inert&&document.querySelector('.sidebar').getBoundingClientRect().right<=0.5);await page.screenshot({path:path.join(captures,name),fullPage:true});};
 const noOverflow=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
