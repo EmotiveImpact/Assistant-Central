@@ -71,7 +71,7 @@ try{
   await shot(maya,'invite-2-join-phone.png');
   await maya.locator('#join-submit').click();
   await maya.locator('#join-dialog').waitFor({state:'hidden'});
-  assert.match(await maya.locator('#notice').textContent(),/Edem adds you/);
+  await maya.locator('#notice').filter({hasText:'Edem adds you'}).waitFor();
 
   // Edem syncs and finds Maya waiting on Home, then checks the code and adds her.
   await edem.locator('#sync').click();

@@ -1061,15 +1061,16 @@ $('join-form').addEventListener('submit',async event=>{
       factList($('join-facts'),[['Shares',`Your name, ${plain(state.identity.agent_id,'your assistant')}'s name and its public keys, with ${owner} only.`],
         ['Keeps','Everything else. Joining never agrees to any work: every proposal still needs your own yes.'],
         ['Through',`The relay at ${review.relay_host}. It carries sealed packets and cannot read them.`],
-        ...(review.known?[['Already',`${owner} is already in your assistants. Joining again refreshes the relay link.`]]:[])]);
+        ...(review.known?[['Already',`${owner} is already in your assistants. Joining adds a link through the relay.`]]:[])]);
       $('join-submit').textContent=`Join ${owner}`;$('join-submit').focus();return;
     }
     const {link,review,owner}=joinReview;
     const joined=await request('/api/invites/accept',{method:'POST',body:{link,review_digest:review.review_digest}});
     if(epoch!==generation)return;
     if(joined.joined!==true){$('join-message').textContent=joinProblem(joined.reason,owner);await refresh();return;}
-    joinReview=null;$('join-dialog').close();await refresh();
+    joinReview=null;$('join-dialog').close();
     notice(`Sent. ${owner} adds you when they see your request, and both of you will see the same code.`,true);
+    await refresh();
   }catch(error){if(epoch===generation)handleFailure(error,'join-message');}
   finally{release();}
 });
