@@ -109,8 +109,10 @@ function Avatar({ closing }: { closing: boolean }) {
   const p = useAppear(closing, gone, 200, 150);
   const style = useAnimatedStyle(() => ({ opacity: p.value, transform: [{ translateY: interpolate(p.value, [0, 1], [-8, 0]) }, { scale: interpolate(p.value, [0, 1], [0.96, 1]) }] }));
   if (!state || !backend) return null;
-  const go = (path: '/team' | '/money' | '/assistants' | '/invite' | '/settings' | '/recents') => { close(); router.push(path); };
+  const go = (path: '/rooms' | '/groups' | '/team' | '/money' | '/assistants' | '/invite' | '/settings' | '/recents') => { close(); router.push(path); };
   const lines: [string, () => void, ('danger' | undefined)?][] = [
+    ['Rooms', () => go('/rooms')],
+    ['Groups', () => go('/groups')],
     ['Team missions', () => go('/team')],
     ['Assistants', () => go('/assistants')],
     ['Money', () => go('/money')],
@@ -154,13 +156,13 @@ function Search({ closing }: { closing: boolean }) {
     if (!state) return [];
     const q = text.trim().toLowerCase();
     const has = (...words: (string | undefined)[]) => !q || words.some(w => (w ?? '').toLowerCase().includes(q));
-    const go = (path: '/recents' | '/team' | '/money' | '/assistants' | '/invite' | '/settings') => () => { close(); router.push(path); };
+    const go = (path: '/recents' | '/rooms' | '/groups' | '/team' | '/money' | '/assistants' | '/invite' | '/settings') => () => { close(); router.push(path); };
     const work = [...state.items].sort((a, b) => b.created_at - a.created_at).filter(i => has(i.title, i.context)).slice(0, q ? 6 : 4).map(i => {
       const peer = peerOf(state, i);
       return { key: 'i' + i.id, title: i.title, note: stateLabel(i.state) as string, owner: peer?.owner_id, agent: peer?.agent_id, run: () => decide('item:' + i.id) };
     });
     const people = q ? state.peers.filter(x => has(x.owner_id, x.agent_id)).slice(0, 4).map(x => ({ key: 'p' + x.peer_id, title: `${x.agent_id}, ${x.owner_id}’s assistant`, note: x.state === 'active' ? 'Connected' : 'Removed', owner: x.owner_id, agent: x.agent_id, run: go('/assistants') })) : [];
-    const places = ([['Recents', '/recents'], ['Team missions', '/team'], ['Assistants', '/assistants'], ['Money', '/money'], ['Invite someone', '/invite'], ['Settings', '/settings']] as const)
+    const places = ([['Recents', '/recents'], ['Rooms', '/rooms'], ['Groups', '/groups'], ['Team missions', '/team'], ['Assistants', '/assistants'], ['Money', '/money'], ['Invite someone', '/invite'], ['Settings', '/settings']] as const)
       .filter(([label]) => has(label)).map(([label, path]) => ({ key: 'g' + path, title: label, note: 'Go to', run: go(path) }));
     return [...work, ...people, ...places];
   }, [state, text, close, decide]);

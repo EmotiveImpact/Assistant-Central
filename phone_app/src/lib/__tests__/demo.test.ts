@@ -1,5 +1,5 @@
 import { DemoBackend } from '../demo';
-import { decisionRows, needsHold, teamsOf } from '../../shared/web';
+import { attentionItems, columnOf, decisionRows, groupsOf, needsHold, roomLine, roomsOf, teamsOf } from '../../shared/web';
 
 describe('The demo Parlu', () => {
   it('asks for a hold on money and refuses a changed review', async () => {
@@ -46,5 +46,27 @@ describe('The demo Parlu', () => {
     expect(review.ok).toBe(true);
     if (review.ok) await expect(demo.acceptInvite(made.link, review.review_digest)).resolves.toMatchObject({ joined: true });
     expect((await demo.state()).relay?.invites).toHaveLength(1);
+  });
+
+  it('shows Sam’s 40th as a room with a change of mind, a passed vote and a vote for you', async () => {
+    const demo = new DemoBackend();
+    await demo.signIn('demo');
+    const state = await demo.state();
+    expect(teamsOf(state)).toHaveLength(1);
+    const party = roomsOf(state).find(r => r.name === 'Sam’s 40th');
+    expect(party.threads).toEqual(['Venue', 'Food', 'Asks']);
+    const garden = party.entries.find((e: any) => e.type === 'note' && e.note.note === 'idea');
+    expect(columnOf(garden)).toBeNull();
+    expect(garden.replacedBy.note.why).toMatch(/Rain/);
+    const lido = party.votes.find((v: any) => !v.incoming);
+    expect(lido.result).toMatchObject({ yes: 3, total: 4, outcome: 'passed' });
+    expect(roomLine(party)).toMatch(/^3 things need your yes\./);
+    // Notes are read in the room, never queued on Home for a decision.
+    expect(attentionItems(state).some(i => i.room?.record === 'note')).toBe(false);
+    const cake = party.votes.find((v: any) => v.incoming);
+    await demo.decide(cake.items[0].id, (await demo.review(cake.items[0].id)).review_digest, 'accept');
+    const after = roomsOf(await demo.state()).find(r => r.name === 'Sam’s 40th');
+    expect(columnOf(after.votes.find((v: any) => v.incoming))).toBe('done');
+    expect(groupsOf(state)).toHaveLength(1);
   });
 });

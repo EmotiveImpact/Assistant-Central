@@ -24,6 +24,11 @@ export type TeamRecord = {
   hours?: number;
 };
 
+/** A room record riding inside a task proposal: a note (finding, idea, plan, change of mind) or a vote. */
+export type RoomRecord =
+  | { record: 'note'; room: string; thread: string; note: 'finding' | 'idea' | 'plan' | 'change'; stage: 'researching' | 'doing' | 'done'; summary: string; replaces: string | null; why: string | null }
+  | { record: 'vote'; room: string; thread: string; question: string; rule: 'most' | 'all'; stance: 'yes' | 'no' | 'abstain'; vote_id: string; why: string | null };
+
 export type Item = {
   id: string;
   kind: 'task' | 'artifact';
@@ -40,6 +45,7 @@ export type Item = {
   artifact_digest?: string;
   mission_cap?: MissionCap | null;
   team?: TeamRecord | null;
+  room?: RoomRecord | null;
   [key: string]: unknown;
 };
 
@@ -59,6 +65,8 @@ export type State = {
   relay?: Relay;
   /** Present when this Parlu has an approvals desk (conversations are set up). */
   approvals?: { enabled: boolean };
+  /** The saved audit history. It has no clock, so its sequence gives the order things happened. */
+  history?: { sequence: number; event: string; item_id?: string }[];
   [key: string]: unknown;
 };
 

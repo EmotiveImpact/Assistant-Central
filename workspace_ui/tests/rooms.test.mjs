@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {teamsOf} from '../team.mjs';
 import {roomsOf,buildRoom,tally,answerOf,columnOf,timelineOf,filterTimeline,groupsOf,roomLine,eventLine,noteText,voteText,recordTitle,NOTE,VOTE,canvasLayout} from '../rooms.mjs';
 
 const C1='a'.repeat(64),C2='b'.repeat(64);
@@ -116,4 +117,11 @@ test('one honest line per room, and the canvas gives each assistant its own colu
   assert.deepEqual(layout.lanes,['p1','p2']);
   const [a,b]=[...layout.positions.values()];
   assert.notEqual(a.x,b.x);
+});
+
+test('a note or vote sent to several members never turns a room into a team mission',()=>{
+  const v=vote();
+  const s=state([item('outgoing','p1','pending',v),item('outgoing','p2','pending',v),item('outgoing','p1','draft',note()),item('outgoing','p2','draft',note())]);
+  assert.equal(teamsOf(s).length,0);
+  assert.equal(roomsOf(s).length,1);
 });

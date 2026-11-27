@@ -43,7 +43,8 @@ export function sharedName(titles){
 export function teamsOf(state){
   const items=state?.items??[],groups=new Map();
   for(const item of items){
-    if(item.direction!=='outgoing'||item.kind!=='task'||!item.context)continue;
+    // A room note or vote sent to several members is talk, not a part of a mission.
+    if(item.direction!=='outgoing'||item.kind!=='task'||!item.context||item.room)continue;
     if(!groups.has(item.context))groups.set(item.context,[]);
     groups.get(item.context).push(item);
   }

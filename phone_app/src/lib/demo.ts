@@ -61,7 +61,31 @@ export function demoStory(now = Date.now() / 1000): Story {
     { ...base, id: hex('cinema'), kind: 'task', direction: 'outgoing', state: 'accepted', historical_state: 'accepted',
       title: 'Find a film for Friday', context: hex('context:friday'), peer_id: sam.peer_id, created_at: now - 50 * hour },
   ];
+  // Sam's 40th is a room: the assistants post findings, change their minds and vote in threads.
+  const party = hex('context:sams-40th'), room = 'Sam’s 40th';
+  const note = (thread: string, kind: 'finding' | 'idea' | 'plan' | 'change', stage: 'researching' | 'doing' | 'done', summary: string, replaces: string | null = null, why: string | null = null) =>
+    ({ record: 'note' as const, room, thread, note: kind, stage, summary, replaces, why });
+  const vote = (thread: string, question: string, rule: 'most' | 'all', voteId: string) =>
+    ({ record: 'vote' as const, room, thread, question, rule, stance: 'yes' as const, vote_id: voteId, why: null });
+  const roomItem = (seed: string, direction: Item['direction'], state: string, who: Peer, at: number, record: NonNullable<Item['room']>, title: string, taskId = seed): Item =>
+    ({ ...base, id: hex(seed), kind: 'task', direction, state, historical_state: state, title, context: party, peer_id: who.peer_id, created_at: now - at * hour, task_id: taskId, room: record });
+  const lidoVote = vote('Venue', 'Book The Lido for Saturday 14 March?', 'most', 'vote-lido');
+  const cakePlan = note('Food', 'plan', 'doing', 'Cake from Maple Bakery, collected on Saturday at 11. Juniper pays when you say yes.');
+  items.push(
+    roomItem('room:lido', 'incoming', 'pending', tom, 30, note('Venue', 'finding', 'researching', 'The Lido holds 40 inside. £120 deposit, refundable until 10 March.'), 'Venue: The Lido holds 40 inside'),
+    roomItem('room:garden', 'incoming', 'expired', riya, 29, note('Venue', 'idea', 'researching', 'A garden party at Riya’s. No venue cost, and room for the kids.'), 'Venue: A garden party at Riya’s'),
+    roomItem('room:garden-change', 'incoming', 'pending', riya, 27, note('Venue', 'change', 'done', 'Go with The Lido instead of the garden.', 'room:garden', 'Rain is forecast for the 14th, and The Lido has cover.'), 'Venue: Changed to The Lido'),
+    roomItem('vote:lido:otto', 'outgoing', 'accepted', tom, 26, lidoVote, 'Venue: Book The Lido for Saturday 14 March?'),
+    roomItem('vote:lido:wren', 'outgoing', 'accepted', riya, 26, lidoVote, 'Venue: Book The Lido for Saturday 14 March?'),
+    roomItem('vote:lido:pip', 'outgoing', 'pending', kofi, 26, lidoVote, 'Venue: Book The Lido for Saturday 14 March?'),
+    roomItem('room:menu', 'incoming', 'pending', kofi, 20, note('Food', 'finding', 'doing', 'The Lido’s kitchen can do a soft menu for Grandad at £18 a head.'), 'Food: A soft menu at £18 a head'),
+    roomItem('vote:cake', 'incoming', 'pending', kofi, 3, vote('Food', 'Chip in £15 each for the cake?', 'all', 'vote-cake'), 'Food: Chip in £15 each for the cake?'),
+    roomItem('room:cake:otto', 'outgoing', 'draft', tom, 1, cakePlan, 'Food: Cake from Maple Bakery'),
+    roomItem('room:cake:wren', 'outgoing', 'draft', riya, 1, cakePlan, 'Food: Cake from Maple Bakery'),
+    roomItem('room:cake:pip', 'outgoing', 'draft', kofi, 1, cakePlan, 'Food: Cake from Maple Bakery'),
+  );
   const content: Record<string, string> = {
+    [hex('vote:cake')]: 'Pip asks the room: chip in £15 each for the cake? Everyone has to say yes for this to pass. Your yes is a vote, not a payment.',
     [hex('lido')]: 'Deposit to The Lido for Sam’s 40th on Saturday 14 March. £120, refundable until 10 March. Tom has already agreed. Otto pays this one deposit and nothing else.',
     [hex('part:menu')]: 'Build the menu page for the supper club app: this week’s dishes, prices and allergens, from the shared menu sheet.\n\nMust: match the Parlu look.\nMust not: add tracking.',
     [hex('result:calendar')]: 'Calendar sync is ready. Bookings appear on the shared supper club calendar within a minute. Read only access, no guest emails. Tests pass.',
