@@ -13,7 +13,8 @@ import * as Haptics from 'expo-haptics';
 import { useGuard } from '../lib/guard';
 import { cardStack, failedParts, paragraph, peerOf, queueOf, type Card as HomeCard, type Segment } from '../lib/home';
 import { sayError, useSession } from '../lib/session';
-import { doneLine, doneToday, isEvening, teamLine, teamsOf } from '../shared/web';
+import { doneLine, doneToday, isEvening, roomLine, roomsOf, teamLine, teamsOf } from '../shared/web';
+import { RoomGlyph } from '../ui/Room';
 import type { Item, State } from '../lib/types';
 import { cardForward, rowIn } from '../ui/motion';
 import { useOverlay } from '../ui/overlay';
@@ -39,6 +40,7 @@ const KIND: Record<string, string> = {
 function kindOf(card: HomeCard) {
   const item = card.entry.item;
   if (card.entry.kind !== 'proposal' || !item) return KIND[card.entry.kind] ?? 'Needs you';
+  if (item.room?.record === 'vote') return `A vote in ${item.room.room}`;
   if (item.team?.record === 'result') return 'Result to check';
   if (item.team?.record === 'access') return 'Access ask';
   if (item.team) return 'Team mission part';
@@ -166,6 +168,33 @@ function Teams({ state }: { state: State }) {
   );
 }
 
+/** The rooms your assistant talks in, busiest first, with a way into all of them. */
+function Rooms({ state }: { state: State }) {
+  const rooms = roomsOf(state).slice(0, 2);
+  if (!rooms.length) return null;
+  return (
+    <View style={{ marginTop: 12, borderWidth: 1, borderColor: colour.line, borderRadius: radius.card, padding: 14, gap: 4 }}>
+      <Pressable onPress={() => router.push('/rooms')} accessibilityRole="button" accessibilityLabel="See all rooms"
+        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <T v="label">Rooms</T>
+        <Text style={{ fontFamily: font.semibold, fontSize: 13, color: colour.accentFg }}>See all ›</Text>
+      </Pressable>
+      {rooms.map(room => (
+        <Pressable key={room.context} onPress={() => router.push({ pathname: '/rooms/[context]', params: { context: room.context } })}
+          accessibilityRole="button" accessibilityLabel={`${room.name}. ${roomLine(room)}`}
+          style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8, opacity: pressed ? 0.8 : 1 })}>
+          <RoomGlyph name={room.name} tint={room.tint} size={32} />
+          <View style={{ flex: 1 }}>
+            <T v="bodyBold" numberOfLines={1}>{room.name}</T>
+            <T v="small" numberOfLines={1}>{roomLine(room)}</T>
+          </View>
+          {room.needsYou ? <Chip label="Needs you" tone="sun" /> : null}
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
 /** "Ask your assistant to start something": new work starts on the computer for now. */
 function Ask({ agent }: { agent: string }) {
   const { toast } = useOverlay();
@@ -224,7 +253,8 @@ export default function Home() {
         ) : null}
         <Animated.View entering={rowIn(2)}><DoneToday state={state} /></Animated.View>
         <Animated.View entering={rowIn(3)}><Ask agent={state.identity.agent_id} /></Animated.View>
-        <Animated.View entering={rowIn(4)}><Teams state={state} /></Animated.View>
+        <Animated.View entering={rowIn(4)}><Teams state={state} />
+          <Rooms state={state} /></Animated.View>
       </ScrollView>
     </View>
   );

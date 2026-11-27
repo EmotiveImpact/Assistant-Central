@@ -11,7 +11,8 @@ describe('Home', () => {
   it('puts the newest proposal first, then questions and messages, like the desktop', async () => {
     const { state, approvals } = await signedIn();
     const queue = queueOf(state, approvals);
-    expect(queue.map(e => e.kind)).toEqual(['proposal', 'proposal', 'question', 'message']);
+    // The third proposal is Pip's vote in Sam's 40th: a vote waits for your answer like any ask.
+    expect(queue.map(e => e.kind)).toEqual(['proposal', 'proposal', 'proposal', 'question', 'message']);
     expect(queue[0].title).toBe('Pay a £120 deposit to The Lido');
   });
 
@@ -19,7 +20,7 @@ describe('Home', () => {
     const { state, approvals } = await signedIn();
     const queue = queueOf(state, approvals);
     const segments = paragraph(state, queue, [], 15);
-    expect(plainText(segments)).toBe('Afternoon Maya. Tom’s Tom and Otto Otto sent Pay a £120 deposit to The Lido and 3 more wait for you. Nothing else needs you.');
+    expect(plainText(segments)).toBe('Afternoon Maya. Tom’s Tom and Otto Otto sent Pay a £120 deposit to The Lido and 4 more wait for you. Nothing else needs you.');
     expect(segments.some(s => 'pair' in s && s.pair.owner === 'Tom' && s.pair.agent === 'Otto')).toBe(true);
   });
 
@@ -38,11 +39,12 @@ describe('Home', () => {
   it('cycles cards with Not now and names each assistant beside its owner', async () => {
     const { state, approvals } = await signedIn();
     const queue = queueOf(state, approvals);
-    expect(cardStack(state, queue, 1).map(c => c.entry.kind)).toEqual(['proposal', 'question', 'message']);
-    expect(cardStack(state, queue, 4)[0].entry.key).toBe(queue[0].key);
+    expect(cardStack(state, queue, 1).map(c => c.entry.kind)).toEqual(['proposal', 'proposal', 'question']);
+    expect(cardStack(state, queue, 5)[0].entry.key).toBe(queue[0].key);
     const result = cardFor(state, queue[1]);
     expect(result.who).toBe('Wren, Riya’s assistant');
     expect(result.team).toBe('Result for Calendar sync, part of Supper club app');
-    expect(cardFor(state, queue[2]).who).toBe('Juniper, your assistant');
+    expect(cardFor(state, queue[2]).who).toBe('Pip, Kofi’s assistant');
+    expect(cardFor(state, queue[3]).who).toBe('Juniper, your assistant');
   });
 });

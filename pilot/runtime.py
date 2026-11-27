@@ -18,6 +18,8 @@ import time
 from .mission import CONTEXT_PREFIX, TASK_PREFIX, PROJECTION, task_details, validate_task
 from . import team
 from .team import TeamDenied
+from . import room
+from .room import RoomDenied
 from .storage import RecordStorage, StoreLease
 from .crypto import canonical, digest, fingerprint, packet_header, seal, token, TransportDenied
 from .transport import PeerExchange
@@ -276,6 +278,13 @@ class PilotRuntime:
             self._team(body, sending=sending)
         except TeamDenied as error:
             raise RuntimeDenied(str(error)) from None
+        if room.kind_of(body['text']) is not None:
+            # Notes and votes are asked, never returned: a room record rides only in a task.
+            need(body['kind'] == 'task', 'A room note or vote is sent as a task')
+            try:
+                room.read(body['text'])
+            except RoomDenied as error:
+                raise RuntimeDenied(str(error)) from None
 
     def _team(self, body, *, sending):
         """Team records are checked against the part they belong to, on both sides."""
@@ -611,6 +620,10 @@ class PilotRuntime:
         record = team.kind_of(body['text'])
         if record is not None:
             direct['team'] = self._team_summary(row, body, record)
+        if room.kind_of(body['text']) is not None:
+            # Hidden, like content, once the sender is removed.
+            hidden = row['direction'] == 'incoming' and not self._peer_active(row['peer_id'])
+            direct['room'] = {'record': 'note' if room.kind_of(body['text']) == room.NOTE else 'vote'} if hidden else room.summary(body['text'])
         return {**direct, 'id':row['id'],'direction':row['direction'],'kind':row['kind'],
                 'state':'cancelled' if row['cancelled'] else ('expired' if not active else row['state']),
                 'historical_state':row['state'],'title':body['title'],'peer_id':row['peer_id'],

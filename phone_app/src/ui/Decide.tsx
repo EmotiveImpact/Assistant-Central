@@ -98,16 +98,18 @@ function ProposalDecision({ entry, item, close, agreed }: { entry: Entry; item: 
   const limit = item.mission_cap ?? (item.team?.record === 'part' ? item.team.compute : null);
   const amount = limit ? short(exactMoney(limit.cap_micro, limit.currency) as string) : '';
   const money = !!(amount && item.mission_cap);
+  // A room vote: your yes or no is your own signed answer on your copy, counted by the asker.
+  const ballot = item.room?.record === 'vote' ? item.room : null, roomNote = item.room?.record === 'note';
 
   const decide = async (decision: 'accept' | 'reject') => {
     if (!review || busy) return;
     setBusy(true); setError('');
     try {
       const result = await act(b => b.decide(item.id, review.review_digest, decision)) as { decision_digest?: unknown } | null;
-      if (decision === 'reject') { close(`Said no. ${c.agent} will let ${c.owner} know.`); return; }
+      if (decision === 'reject') { close(ballot ? `Voted no. ${c.agent} counts your answer in ${ballot.room}.` : `Said no. ${c.agent} will let ${c.owner} know.`); return; }
       const signed = typeof result?.decision_digest === 'string' ? result.decision_digest : undefined;
       agreed({ title: item.title, owner: c.owner, agent: c.agent, amount, digest: signed, at: Date.now(),
-        line: item.team?.record === 'result' ? `You merged ${c.agent}’s result.` : money ? `${c.agent} can now pay ${amount} for this, nothing else.` : `${c.agent} has your signed yes.` });
+        line: ballot ? `You voted yes. ${c.agent} counts your answer in ${ballot.room}.` : item.team?.record === 'result' ? `You merged ${c.agent}’s result.` : money ? `${c.agent} can now pay ${amount} for this, nothing else.` : `${c.agent} has your signed yes.` });
     } catch (e) { setError(sayError(e)); setBusy(false); }
   };
   const release = async () => {
@@ -117,7 +119,7 @@ function ProposalDecision({ entry, item, close, agreed }: { entry: Entry; item: 
   };
 
   const settled = !!review && !actions.some(a => a === 'accept' || a === 'release' || a === 'reject');
-  const title = settled ? item.title : question;
+  const title = settled ? item.title : ballot ? `${c.agent} asks the room: ${ballot.question}` : question;
   return (
     <Body>
       <Head owner={c.owner} agent={c.agent} who={c.team ? `${c.who} · ${c.team}` : c.who} e={settled ? 'idle' : 'look'} close={() => close()} />
@@ -133,12 +135,12 @@ function ProposalDecision({ entry, item, close, agreed }: { entry: Entry; item: 
               title={money ? `Hold to pay ${amount} with ${c.owner}` : item.team?.record === 'access' ? 'Hold to give access' : 'Hold to agree'}
               hint={money ? `${c.agent} can pay this one amount, nothing else. Let go early and nothing happens.` : 'Let go early and nothing happens.'}
               onDone={() => decide('accept')} />
-          : <Button label={item.team?.record === 'result' ? 'Merge this result' : item.kind === 'artifact' ? 'Accept' : 'Agree'} busy={busy} onPress={() => decide('accept')} />
+          : <Button label={ballot ? 'Vote yes' : roomNote ? 'Mark as seen' : item.team?.record === 'result' ? 'Merge this result' : item.kind === 'artifact' ? 'Accept' : 'Agree'} busy={busy} onPress={() => decide('accept')} />
       ) : null}
       {review && actions.includes('release') ? <Button label={`Send to ${c.owner}`} busy={busy} onPress={release} /> : null}
       {settled ? <Notice text="Nothing to decide here. This is the saved record." /> : null}
       <Links>
-        {review && actions.includes('reject') ? <Link label="Say no" tone="danger" onPress={() => decide('reject')} /> : null}
+        {review && actions.includes('reject') ? <Link label={ballot ? 'Vote no' : 'Say no'} tone="danger" onPress={() => decide('reject')} /> : null}
         {review?.content ? <Link label={deep ? 'Hide the exact text' : 'See the exact text ›'} onPress={() => setDeep(!deep)} /> : null}
         {!settled ? <Link label="Not now" tone="quiet" onPress={() => close('Saved for later. It stays in the queue.')} /> : null}
       </Links>

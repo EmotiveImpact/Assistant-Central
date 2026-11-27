@@ -3,9 +3,12 @@
 // Inspect is everything else: four places in the sidebar, the Everything list, and a
 // side panel that can stay pinned open beside the page on desktop.
 
-// The four places. Every existing screen lives inside one of them, so nothing is lost.
+// The places. Every existing screen lives inside one of them, so nothing is lost. Rooms and
+// Groups (27 Nov 2026) show the work assistants do together.
 export const SECTIONS = Object.freeze({
   home: {label: 'Home', views: ['overview', 'approvals']},
+  rooms: {label: 'Rooms', views: ['rooms', 'room']},
+  groups: {label: 'Groups', views: ['groups']},
   recents: {label: 'Recents', views: ['activity', 'receipts', 'tasks', 'inbox', 'artifacts', 'outbox', 'host-drafts'],
     tabs: [['activity', 'Activity'], ['receipts', 'Receipts'], ['tasks', 'All work']]},
   assistants: {label: 'Assistants', views: ['peers', 'conversations', 'transfers'],

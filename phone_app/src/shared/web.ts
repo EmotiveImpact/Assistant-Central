@@ -12,6 +12,7 @@ import * as phone from '../../../workspace_ui/phone.mjs';
 import * as qr from '../../../workspace_ui/qr.mjs';
 import * as bots from '../../../workspace_ui/bots.mjs';
 import * as missions from '../../../workspace_ui/missions.mjs';
+import * as rooms from '../../../workspace_ui/rooms.mjs';
 import * as model from '../../../pilot/web/model.mjs';
 
 type Fn<A extends unknown[] = any[], R = any> = (...args: A) => R;
@@ -44,6 +45,17 @@ export const teamCounts = m<Fn<[unknown], Record<string, number>>>(team.teamCoun
 export const teamLine = m<Fn<[unknown], string>>(team.teamLine);
 export const stepShare = m<Fn<[string], number>>(team.stepShare);
 
+export const COLUMNS = m<readonly [string, string][]>(rooms.COLUMNS);
+export const NOTE_WORDS = m<Record<string, string>>(rooms.NOTE_WORDS);
+export const RULE_WORDS = m<Record<string, string>>(rooms.RULE_WORDS);
+export const TIMELINE_FILTERS = m<readonly [string, string][]>(rooms.TIMELINE_FILTERS);
+export const roomsOf = m<Fn<[unknown], any[]>>(rooms.roomsOf);
+export const roomLine = m<Fn<[unknown], string>>(rooms.roomLine);
+export const columnOf = m<Fn<[unknown], string | null>>(rooms.columnOf);
+export const filterTimeline = m<Fn<[unknown[], string], any[]>>(rooms.filterTimeline);
+export const groupsOf = m<Fn<[unknown, unknown[]?], any[]>>(rooms.groupsOf);
+export const eventLine = m<Fn<[unknown, (who: string) => string, ((entry: any) => string)?], string>>(rooms.eventLine);
+
 export const inviteFromText = m<Fn<[unknown], string>>(invites.inviteFromText);
 export const relayEnabled = m<Fn<[unknown], boolean>>(invites.relayEnabled);
 export const validateRelay = m<Fn<[unknown], unknown>>(invites.validateRelay);
@@ -72,7 +84,8 @@ const statusClass = m<Fn<[string], string>>(model.statusClass);
 
 // The same rule as attentionItems in workspace_ui/projections.mjs (newest first). That module
 // imports model.mjs by the path the desktop server serves it on, so it is restated here.
-export function attentionItems(state: { items: { direction: string; state: string }[] }) {
+export function attentionItems(state: { items: { direction: string; state: string; room?: { record: string } | null }[] }) {
   return state.items.slice().reverse().filter(item =>
-    (item.direction === 'incoming' && isPending(item)) || item.state === 'uncertain' || statusClass(item.state) === 'unknown');
+    // A room note only tells you something; it is read in its room, not queued for a decision.
+    (item.direction === 'incoming' && isPending(item) && item.room?.record !== 'note') || item.state === 'uncertain' || statusClass(item.state) === 'unknown');
 }

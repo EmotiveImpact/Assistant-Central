@@ -8,13 +8,14 @@ const modelURL=new URL('../../pilot/web/model.mjs',import.meta.url).href;
 const source=(await readFile(new URL('../projections.mjs',import.meta.url),'utf8')).replace("from './model.mjs'",`from ${JSON.stringify(modelURL)}`);
 const {VIEWS}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 
-test('every existing screen lives in exactly one of the four places', () => {
-  assert.deepEqual(Object.values(SECTIONS).map(section=>section.label),['Home','Recents','Assistants','Money']);
+test('every existing screen lives in exactly one place', () => {
+  assert.deepEqual(Object.values(SECTIONS).map(section=>section.label),['Home','Rooms','Groups','Recents','Assistants','Money']);
   const placed=Object.values(SECTIONS).flatMap(section=>section.views);
   assert.equal(new Set(placed).size,placed.length,'no screen sits in two places');
   for(const view of VIEWS)assert.ok(placed.includes(view),`${view} has a place`);
   assert.equal(sectionOf('inbox'),'recents');assert.equal(sectionOf('transfers'),'assistants');
   assert.equal(sectionOf('approvals'),'home');assert.equal(sectionOf('unknown'),'home');
+  assert.equal(sectionOf('room'),'rooms');assert.equal(sectionOf('groups'),'groups');
 });
 
 test('All work is one tab whose filters are the existing work screens', () => {

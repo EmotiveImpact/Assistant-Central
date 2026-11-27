@@ -7,7 +7,7 @@ import {readFile} from 'node:fs/promises';
 const modelURL=new URL('../../pilot/web/model.mjs',import.meta.url).href;
 const source=(await readFile(new URL('../projections.mjs',import.meta.url),'utf8'))
   .replace("from './model.mjs'",`from ${JSON.stringify(modelURL)}`);
-const {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+const {VIEWS,viewFromHash,roomFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
 
 const task=(id,state,direction='incoming',extra={})=>({id,state,direction,kind:'task',title:'Fictional design brief',task_id:'research-'+id,peer_id:'atlas',...extra});
 function fixture(){
@@ -20,8 +20,12 @@ function fixture(){
 const ids=items=>items.map(item=>item.id).sort();
 
 test('hash navigation accepts only known literal routes',()=>{
-  for(const view of VIEWS)assert.equal(viewFromHash('#'+view),view);
-  for(const hash of ['','#unknown','#%74asks','#tasks?accept=true','#<script>',null,{},'#TASKS'])assert.equal(viewFromHash(hash),'overview');
+  for(const view of VIEWS.filter(view=>view!=='room'))assert.equal(viewFromHash('#'+view),view);
+  for(const hash of ['','#unknown','#%74asks','#tasks?accept=true','#<script>',null,{},'#TASKS','#room','#room/abc','#room/'+'A'.repeat(64),'#room/'+'a'.repeat(65)])assert.equal(viewFromHash(hash),'overview');
+  // A room is addressed only by its exact 64-character context.
+  assert.equal(viewFromHash('#room/'+'a'.repeat(64)),'room');
+  assert.equal(roomFromHash('#room/'+'a'.repeat(64)),'a'.repeat(64));
+  assert.equal(roomFromHash('#rooms'),null);
 });
 
 test('task and artifact views keep their exact kind across both directions',()=>{
