@@ -15,7 +15,9 @@ import {validateTransferReview,transferPath} from './transfers.mjs';
 import {inviteFromText,joinFromHash,relayEnabled,validateRelay,linkLabel,expiresIn,joinProblem,syncLine,syncChanged,joinerCards} from './invites.mjs';
 import {qrMatrix,qrPath} from './qr.mjs';
 import {validatePhone,startLink,phoneNote,pairingOutcome,ANSWER_LIMIT} from './phone.mjs';
-import {VIEWS,viewFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
+import {roomsOf,roomLine,noteText,voteText,recordTitle,NOTE as NOTE_PREFIX,VOTE as VOTE_PREFIX} from './rooms.mjs';
+import {createRoomViews} from './room_views.mjs';
+import {VIEWS,viewFromHash,roomFromHash,matchesQuery,projectItems,boardGroups,workspaceTotals,activeTasks,attentionItems} from './projections.mjs';
 import {plain,finiteDate,stateLabel,statusClass,isTerminal,isPeerActive,validateState,validateReview,proposalBody,peerBody,workflowEnabled,workflowStateLabel,validateWorkflowStatus,validateWorkflowReview,validateWorkflowResult,workflowSummary,canPrepareWorkflow} from './model.mjs';
 // Motion is decoration only; people who ask for less motion get none.
 const calm=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -41,6 +43,7 @@ mobileNavigation.addEventListener('change',()=>setNavigation(false));
 // The relay's invite page hands an invite over after "#join=". Read it once, then take it out
 // of the address bar and the history, so the secret part does not linger.
 let pendingJoin=joinFromHash(location.hash);if(pendingJoin)history.replaceState(null,'',location.pathname+'#overview');
+let currentRoom = roomFromHash(location.hash);
 let token = null, generation = 0, busy = false, currentView = viewFromHash(location.hash), currentFilter = 'all', currentLayout = 'list', searchQuery = '';
 let state = null, selected = null, selectedWorkflow = null, selectedTransfer = null;
 const uncertainty=inspectionLatch();
@@ -59,7 +62,10 @@ const viewCopy = {
   money:['Money','MONEY','Money','What your assistants may spend, and what they have.','Money','Budgets and missions'],
   team:['Team missions','MONEY','Team missions','One piece of work, split across several people’s assistants.','Team missions','Every part is reviewed on its own'],
   receipts:['Receipts','RECORDS','Recents','Everything that happened, every receipt and all work.','Receipts','Signed decisions and result hashes'],
-  activity:['Activity','WORKSPACE ACTIVITY','Activity','The saved history of work moving through your workspace.','Recent activity','Recorded events from this assistant']
+  activity:['Activity','WORKSPACE ACTIVITY','Activity','The saved history of work moving through your workspace.','Recent activity','Recorded events from this assistant'],
+  rooms:['Rooms','ROOMS','Rooms','Each room is one piece of work. Assistants post what they find, change their minds in the open and vote. You say yes.','Rooms','Every note and vote is signed'],
+  room:['Room','ROOM','Room','','Room',''],
+  groups:['Groups','GROUPS','Groups','People and their assistants who share a room. You are in every group, and nobody sees a room they are not in.','Groups','Who works with whom']
 };
 class RequestFailure extends Error { constructor(message,{unknown=false,unauthorised=false}={}) { super(message); this.unknown=unknown;this.unauthorised=unauthorised; } }
 function text(tag,value,className) { const node=document.createElement(tag);node.textContent=String(value??'');if(className)node.className=className;return node; }
@@ -155,9 +161,18 @@ const DECISION_VIEWS=['approvals','conversations','host-drafts'];
 function leaveForHome(next){if(next==='overview'&&DECISION_VIEWS.includes(currentView))homeExtras={for:null,approvals:null,hostDrafts:null,conversations:null,failed:[]};}
 function navigate(view,{filter='all'}={}) {
   setOwnerMenu(false);
-  if(busy||!VIEWS.includes(view))return;
+  if(busy||!VIEWS.includes(view)||view==='room')return;
   leaveForHome(view);currentView=view;currentFilter=filter;searchQuery='';$('search-input').value='';
   if(location.hash!=='#'+view)history.pushState(null,'','#'+view);
+  inspect.navigated();setNavigation(false);render();
+}
+// One room, at its own address, so it can be bookmarked and the back button returns to it.
+function openRoom(context,tab){
+  setOwnerMenu(false);
+  if(busy||!/^[0-9a-f]{64}$/.test(String(context)))return;
+  if(tab)roomViews.setTab(tab);
+  leaveForHome('room');currentView='room';currentRoom=context;searchQuery='';$('search-input').value='';
+  if(location.hash!=='#room/'+context)history.pushState(null,'','#room/'+context);
   inspect.navigated();setNavigation(false);render();
 }
 // Records that are not a decision open as a full window with everything showing.
@@ -185,17 +200,24 @@ function render() {
   if(document.querySelector(`#everything-list [data-view="${currentView}"]`))setEverything(true);
   document.querySelectorAll('[data-filter]').forEach(node=>{node.classList.toggle('selected',node.dataset.filter===currentFilter);node.setAttribute('aria-pressed',String(node.dataset.filter===currentFilter));});
   document.querySelectorAll('[data-layout]').forEach(node=>{node.classList.toggle('selected',node.dataset.layout===currentLayout);node.setAttribute('aria-pressed',String(node.dataset.layout===currentLayout));});
+  const roomPlace=['rooms','room','groups'].includes(currentView);
+  for(const [view,id] of [['rooms','rooms-view'],['room','room-view'],['groups','groups-view']])$(id).hidden=currentView!==view;
   const overview=currentView==='overview'&&!searchQuery, moneyView=currentView==='money'&&!searchQuery, teamView=currentView==='team'&&!searchQuery, structural=['peers','activity','transfers','conversations','host-drafts','approvals','receipts'].includes(currentView);
-  $('overview-panel').hidden=!overview;$('money-panel-view').hidden=!moneyView;$('team-view').hidden=!teamView;$('work-panel').hidden=overview||moneyView||teamView;
+  $('overview-panel').hidden=!overview;$('money-panel-view').hidden=!moneyView;$('team-view').hidden=!teamView;$('work-panel').hidden=overview||moneyView||teamView||roomPlace;
   $('summary').hidden=true;$('filters').hidden=structural||overview;$('view-toggle').hidden=structural||overview;$('add-peer').hidden=currentView!=='peers';
   $('search-clear').hidden=!searchQuery;
   $('search-input').disabled=['transfers','conversations','host-drafts','approvals'].includes(currentView);
-  $('new-proposal').hidden=['conversations','host-drafts','approvals','team'].includes(currentView);
+  $('new-proposal').hidden=['conversations','host-drafts','approvals','team','rooms','room','groups'].includes(currentView);
   $('search-input').setAttribute('placeholder',currentView==='transfers'?'Exact transfer selection below':currentView==='peers'?'Search assistants…':currentView==='activity'?'Search activity…':'Search work…');
   const provider=state.provider;
   $('provider-status').textContent=workflowEnabled(state)?'Synthetic workspace · Live calls disabled':provider?.live_enabled===true?'Provider activation reported by server':'Live provider calls disabled';
   $('item-list').replaceChildren();$('item-list').classList.toggle('board',currentLayout==='board'&&!structural);$('item-list').classList.toggle('peers-grid',currentView==='peers');
-  if(overview)renderOverview(totals);else if(moneyView)renderMoney();else if(teamView)renderTeams();else if(currentView==='receipts')renderReceipts();else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
+  renderSidebarRooms();
+  if(roomPlace){for(const id of ['rooms-view','room-view','groups-view'])$(id).replaceChildren();
+    if(currentView==='rooms')roomViews.renderRooms($('rooms-view'));
+    else if(currentView==='groups')roomViews.renderGroups($('groups-view'));
+    else{const room=roomViews.renderRoom($('room-view'),currentRoom);$('page-title').textContent=room?room.name:'Room';$('page-description').textContent=room?roomLine(room):'';$('view-name').textContent=room?room.name:'Room';}}
+  else if(overview)renderOverview(totals);else if(moneyView)renderMoney();else if(teamView)renderTeams();else if(currentView==='receipts')renderReceipts();else if(currentView==='peers')renderPeers();else if(currentView==='activity')renderHistory();else if(currentView==='transfers')renderTransfers();else if(currentView==='conversations')conversations.mount($('item-list'),state.conversations?.enabled===true);else if(currentView==='host-drafts')hostDrafts.mount($('item-list'),state.host_drafts?.enabled===true);else if(currentView==='approvals')approvals.mount($('item-list'),state.approvals?.enabled===true);else renderItems();
   const date=$('overview-date');if(date)date.textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   // The Home count covers the whole queue wherever you are. The decision places read their own
   // lists, so Home reads them again when you come back from one.
@@ -709,7 +731,7 @@ function renderHome({deck=false}={}){
     const head=text('div','','home-card-head'),label=text('span','','home-card-who');label.append(text('strong',ask.yours?`${a}, your assistant`:`${a}, ${o}'s assistant`),text('small',`${(homeOffset+index)%n+1} of ${n}`));
     head.append(ownerPair(o,a,'owner-pair',index===0?'look':'idle'),label);card.append(head);
     if(copy.lead)card.append(text('p',copy.lead.charAt(0)===copy.lead.charAt(0).toUpperCase()?copy.lead:`${a} ${copy.lead}`,'home-card-lead'));
-    const belongs=entry.kind==='proposal'?partLead(partOf(state,entry.item)):'';if(belongs){const lead=text('p',belongs,'home-card-lead');lead.dataset.team='true';card.append(lead);}
+    const belongs=entry.kind==='proposal'?(partLead(partOf(state,entry.item))||(entry.item.room?.record==='vote'?`A vote in ${entry.item.room.room}, # ${entry.item.room.thread}`:'')):'';if(belongs){const lead=text('p',belongs,'home-card-lead');lead.dataset.team='true';card.append(lead);}
     card.append(text('p',entry.title,'home-card-title'));
     const open=()=>entry.kind==='proposal'?openReview(entry.item):entry.kind==='joiner'?openJoinerPanel(entry.joiner):navigate(entry.view);
     if(index===0){const actions=text('div','','home-card-actions');
@@ -861,6 +883,17 @@ function teamWords(content,item){
   }
   return lines.join('\n');
 }
+// A room note or vote in plain words, read from the exact signed content.
+function roomWords(content){
+  const text=String(content??''),note=text.startsWith(NOTE_PREFIX),vote=text.startsWith(VOTE_PREFIX);if(!note&&!vote)return null;
+  let v;try{v=JSON.parse(text.slice((note?NOTE_PREFIX:VOTE_PREFIX).length));}catch{return null;}
+  if(!v||typeof v!=='object')return null;
+  if(note)return [`${{finding:'Finding',idea:'Idea',plan:'Plan',change:'Changed their mind'}[v.note]??'Note'} in ${v.room}, # ${v.thread}`,'',String(v.summary??''),
+    ...(v.why?['',`Why: ${v.why}`]:[]),...(v.replaces?['',`Replaces the earlier note ${v.replaces}`]:[]),'',`On the board: ${{researching:'Researching',doing:'Doing',done:'Done'}[v.stage]??v.stage}`].join('\n');
+  return [`Vote in ${v.room}, # ${v.thread}`,'',String(v.question??''),...(v.why?['',`Why: ${v.why}`]:[]),'',
+    `Rule: ${v.rule==='all'?'all of us must agree':'most of us must agree'}. The asker votes ${v.stance==='abstain'?'nothing':v.stance}.`,
+    'Accepting this copy is your yes, signed by you. Refusing it is your no.'].join('\n');
+}
 // The helper's side of a team part: report on every rule and the compute used, or ask for access.
 let teamReply=null;
 function openTeamReply(mode,item){
@@ -919,10 +952,10 @@ async function openReview(item) {
     const permissions=review.source_permissions;
     if(permissions?.return_policy==='origin-only')detail($('review-details'),'Sharing scope','Reviewed artifact return to task originator only');
     const provider=permissions?.provider_disclosure;detail($('review-details'),'Provider permission',provider?`${plain(provider.provider)} · ${plain(provider.model)} · ${Number(provider.max_output_tokens)} output tokens`:'No provider disclosure approved');
-    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':teamWords(review.content,item)??review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
+    $('review-content').textContent=review.content===null?'Content is no longer available for review. This record preserves the original commitments and decision.':teamWords(review.content,item)??roomWords(review.content)??review.content;$('review-commitments').replaceChildren();detail($('review-commitments'),'Proposal ID',item.id);detail($('review-commitments'),'Review digest',review.review_digest);detail($('review-commitments'),'Artifact digest',review.artifact_digest);detail($('review-commitments'),'Context',review.context);
     $('review-scope').textContent=item.direction==='outgoing'?'Release shares only this exact proposal with its named recipient. The recipient makes a separate decision.':'Acceptance records this exact proposal. It does not start work or run a model. Any artifact return needs its own review and can go only to the task originator.';
     $('review-message').textContent='';$('review-actions').replaceChildren();
-    const captions={accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
+    const vote=item.room?.record==='vote',captions=vote?{accept:'Vote yes',reject:'Vote no',release:'Send this copy of the vote',cancel:'Withdraw this copy'}:{accept:'Accept exact proposal',reject:'Reject proposal',release:'Approve & release',cancel:'Withdraw proposal'};
     for(const action of ['cancel','reject','release','accept'])if(review.allowed_actions.includes(action))$('review-actions').append(button(captions[action],`button ${['accept','release'].includes(action)?'primary':'danger'}`,()=>decideSelected(action)));
     renderDecide(item,review);
     const parent=state.items.find(candidate=>candidate.id===item.parent_id);
@@ -1115,7 +1148,7 @@ $('menu-toggle').addEventListener('click',()=>setNavigation(!document.body.class
 $('sidebar-scrim')?.addEventListener('click',()=>setNavigation(false,{restoreFocus:true}));
 function restoreLocation(){
   const next=viewFromHash(location.hash);leaveForHome(next);
-  currentView=next;currentFilter='all';searchQuery='';$('search-input').value='';
+  currentView=next;currentRoom=roomFromHash(location.hash);currentFilter='all';searchQuery='';$('search-input').value='';
   inspect.navigated();setNavigation(false);render();
 }
 window.addEventListener('popstate',restoreLocation);
@@ -1356,3 +1389,86 @@ async function relaySync(send,{announce=false}={}){
 }
 setInterval(()=>{if(document.visibilityState==='visible'&&!busy&&!uncertainty.pending())relaySync(false);},15000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!busy&&!uncertainty.pending())relaySync(false);});
+
+// ===== Rooms, Groups and the sidebar =====
+const roomViews=createRoomViews({
+  state:()=>state,peer:id=>state?.peers.find(peer=>peer.peer_id===id),
+  openRoom,openReview,navigate,rerender:()=>render(),
+  showPanel:(key,heading,sub,draw,again)=>showPanel(key,heading,sub,draw,again),
+  openRoomDialog,
+});
+function renderSidebarRooms(){
+  const rooms=roomViews.renderSidebarRooms($('sidebar-rooms'),currentView==='room'?currentRoom:null);
+  const waiting=rooms.reduce((sum,room)=>sum+room.needsYou,0);$('rooms-count').textContent=waiting;$('rooms-count').hidden=!waiting;
+}
+$('rooms-fold').addEventListener('click',()=>{const open=$('rooms-fold').getAttribute('aria-expanded')!=='true';$('rooms-fold').setAttribute('aria-expanded',String(open));$('sidebar-rooms').hidden=!open;});
+$('sidebar-new-room').addEventListener('click',()=>openRoomDialog('room',null));
+
+// One dialog for three things: start a room with a first note, post a note, or ask for a vote.
+// Each becomes one draft per member; nothing leaves until each copy is reviewed and sent.
+let roomDialog={mode:'room',room:null};
+function openRoomDialog(mode,room){
+  if(!state||busy||uncertainty.pending())return;
+  const active=state.peers.filter(isPeerActive);
+  if(!active.length){navigate('peers');notice('A room needs at least one other assistant. Enrol a trusted peer first.');return;}
+  roomDialog={mode,room};const form=$('room-form');form.reset();$('room-message').textContent='';
+  const words={room:['ROOM','Start a room','What your assistant found','Prepare for review'],note:['ROOM NOTE',`Post to ${room?.name??'the room'}`,'What your assistant found or thinks','Prepare for review'],vote:['VOTE',`Ask ${room?.name??'the room'} to vote`,'The yes or no question','Prepare the vote for review']}[mode];
+  $('room-dialog-eyebrow').textContent=words[0];$('room-dialog-title').textContent=words[1];$('room-text-label').textContent=words[2];$('room-submit').textContent=words[3];
+  $('room-name-field').hidden=mode!=='room';$('room-type-field').hidden=mode==='vote';$('room-rule-field').hidden=mode!=='vote';$('room-stance-field').hidden=mode!=='vote';
+  const options=$('room-thread-options');options.replaceChildren();for(const name of room?.threads??[])options.append(Object.assign(document.createElement('option'),{value:name}));
+  if(room?.threads?.length)form.elements.room_thread.value=room.threads[0];
+  const members=$('room-members');members.querySelectorAll('label').forEach(node=>node.remove());
+  for(const peer of active){
+    const label=text('label','','member-choice');const box=document.createElement('input');box.type='checkbox';box.name='room_member';box.value=peer.peer_id;
+    box.checked=room?room.members.includes(peer.peer_id):false;box.disabled=Boolean(room);
+    label.append(box,ownerPair(cap(plain(peer.owner_id,'Owner')),plain(peer.agent_id,'Assistant'),'owner-pair small'),text('span',`${plain(peer.agent_id,'Assistant')}, ${cap(plain(peer.owner_id,'Owner'))}'s assistant`));members.append(label);
+  }
+  $('room-intro').textContent=mode==='vote'?'Each person’s assistant gets its own signed copy. Their owner’s yes or no comes back signed, and the room’s rule decides what passes. Nothing is sent until you review and send every copy.':'Your assistant posts this to each person in the room, one signed copy each. Nothing is sent until you review and send every copy.';
+  openDialog('room-dialog');
+}
+$('room-form').addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||uncertainty.pending())return;
+  const form=event.currentTarget,{mode,room}=roomDialog;
+  try{
+    if(!form.elements.room_synthetic.checked)throw new Error('Confirm that you may share this fictional content.');
+    const name=room?room.name:String(form.elements.room_name.value).trim(),thread=String(form.elements.room_thread.value).trim(),words=String(form.elements.room_text.value).trim();
+    const members=room?room.members.filter(id=>state.peers.some(peer=>peer.peer_id===id&&isPeerActive(peer))):[...form.querySelectorAll('[name=room_member]:checked')].map(node=>node.value);
+    if(!members.length)throw new Error('Choose at least one other assistant for the room.');
+    const context=room?room.context:newContext(),minutes=form.elements.minutes.value,voteId='vote-'+crypto.randomUUID();
+    const body=mode==='vote'?voteText({room:name,thread,question:words,voteId,rule:form.elements.room_rule.value,stance:form.elements.room_stance.value})
+      :noteText({room:name,thread,summary:words,note:form.elements.room_note.value});
+    const title=recordTitle(thread,words,mode==='vote'?'Vote · ':'');
+    const bodies=members.map(peer_id=>proposalBody({kind:'task',peer_id,title,text:body,context,task_id:(mode==='vote'?voteId+'-':'note-')+crypto.randomUUID().slice(0,18),minutes,synthetic:'on'}));
+    let created=0;
+    for(const proposal of bodies){const before=created;await performWrite('/api/proposals',proposal,{target:'room-message',onSuccess:()=>{created++;}});if(created===before)break;}
+    if(created===bodies.length){$('room-dialog').close();openRoom(context,'threads');notice(`${created} ${created===1?'copy':'copies'} prepared. Review and send each one from the room’s Needs a yes column.`,true);}
+    else $('room-message').textContent=`Prepared ${created} of ${bodies.length}, and nothing has been sent. `+$('room-message').textContent;
+  }catch(error){$('room-message').textContent=error.message;}
+});
+
+// The sidebar folds to a rail of icons and can be dragged wider or narrower, like Linear's.
+// Both are view preferences kept in this browser only.
+const SIDE_MIN=208,SIDE_MAX=320;
+function prefer(key,value){try{if(value===undefined)return localStorage.getItem(key);localStorage.setItem(key,String(value));}catch{}return null;}
+function setSideWidth(px){const width=Math.round(Math.min(SIDE_MAX,Math.max(SIDE_MIN,px)));document.documentElement.style.setProperty('--side-w',width+'px');$('sidebar-resize').setAttribute('aria-valuenow',String(width));return width;}
+function setCollapsed(on){document.body.classList.toggle('side-collapsed',on);$('sidebar-collapse').setAttribute('aria-pressed',String(on));$('sidebar-collapse').setAttribute('aria-label',on?'Expand sidebar':'Collapse sidebar');$('sidebar-collapse').title=on?'Expand sidebar  [':'Collapse sidebar  [';prefer('parlu.sideCollapsed',on?'1':'0');}
+{const saved=Number(prefer('parlu.sideWidth'));if(saved)setSideWidth(saved);if(prefer('parlu.sideCollapsed')==='1')setCollapsed(true);}
+$('sidebar-resize').setAttribute('aria-valuemin',String(SIDE_MIN));$('sidebar-resize').setAttribute('aria-valuemax',String(SIDE_MAX));
+$('sidebar-collapse').addEventListener('click',()=>setCollapsed(!document.body.classList.contains('side-collapsed')));
+$('sidebar-resize').addEventListener('pointerdown',event=>{
+  if(mobileNavigation.matches||document.body.classList.contains('side-collapsed'))return;
+  event.preventDefault();const handle=event.currentTarget;handle.setPointerCapture(event.pointerId);document.body.classList.add('side-resizing');
+  const move=e=>setSideWidth(e.clientX);
+  const up=()=>{handle.removeEventListener('pointermove',move);document.body.classList.remove('side-resizing');prefer('parlu.sideWidth',parseInt(getComputedStyle(document.documentElement).getPropertyValue('--side-w'))||232);};
+  handle.addEventListener('pointermove',move);handle.addEventListener('pointerup',up,{once:true});handle.addEventListener('pointercancel',up,{once:true});
+});
+$('sidebar-resize').addEventListener('dblclick',()=>{setSideWidth(232);prefer('parlu.sideWidth',232);});
+$('sidebar-resize').addEventListener('keydown',event=>{
+  const now=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--side-w'))||232;
+  if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();prefer('parlu.sideWidth',setSideWidth(now+(event.key==='ArrowRight'?16:-16)));}
+});
+document.addEventListener('keydown',event=>{
+  if(event.key!=='['||event.metaKey||event.ctrlKey||event.altKey||!token||mobileNavigation.matches||document.querySelector('dialog[open]'))return;
+  if(event.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+  event.preventDefault();setCollapsed(!document.body.classList.contains('side-collapsed'));
+});

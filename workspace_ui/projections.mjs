@@ -1,10 +1,16 @@
 // Read-only projections. Display groups and search never create authority.
 import {plain, isPending, isTerminal, isPeerActive, stateLabel, statusClass} from './model.mjs';
 
-export const VIEWS = Object.freeze(['overview','inbox','tasks','artifacts','outbox','peers','transfers','conversations','host-drafts','approvals','activity','money','receipts','team']);
+export const VIEWS = Object.freeze(['overview','inbox','tasks','artifacts','outbox','peers','transfers','conversations','host-drafts','approvals','activity','money','receipts','team','rooms','room','groups']);
 export function viewFromHash(hash) {
   const value = plain(hash).replace(/^#/, '');
-  return VIEWS.includes(value) ? value : 'overview';
+  if (roomFromHash(hash)) return 'room';
+  return VIEWS.includes(value) && value !== 'room' ? value : 'overview';
+}
+// One room's address is its exact context: #room/<64 hex characters>.
+export function roomFromHash(hash) {
+  const match = /^#?room\/([0-9a-f]{64})$/.exec(plain(hash));
+  return match ? match[1] : null;
 }
 export function matchesQuery(values, query='') {
   const terms = plain(query).trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -37,7 +43,8 @@ export function activeTasks(state) {
   return projectItems(state,'tasks').filter(item=>isPending(item)||['accepted','released','queued','delivered'].includes(item.state));
 }
 export function attentionItems(state) {
-  return projectItems(state,'overview').filter(item=>(item.direction==='incoming'&&isPending(item))||item.state==='uncertain'||statusClass(item.state)==='unknown');
+  // A room note only tells you something; it is read in its room, not queued for a decision.
+  return projectItems(state,'overview').filter(item=>((item.direction==='incoming'&&isPending(item))&&item.room?.record!=='note')||item.state==='uncertain'||statusClass(item.state)==='unknown');
 }
 export function workspaceTotals(state) {
   return {

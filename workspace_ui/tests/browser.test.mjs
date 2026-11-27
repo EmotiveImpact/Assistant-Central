@@ -126,7 +126,7 @@ try {
   assert.ok(pairLine.middle>=pairLine.small&&Math.abs(pairLine.middle-pairLine.capital)<=1.5,'an inline pair sits centred on its line: '+JSON.stringify(pairLine));
   await page.locator('#overview-panel').waitFor({state:'visible'});
   assert.equal(await page.locator('#everything-list').isVisible(),false,'Everything starts folded away');
-  assert.deepEqual(await page.locator('.nav-primary .nav-link').evaluateAll(nodes=>nodes.map(node=>node.textContent.replace(/\d+$/,'').trim())),['Home','Recents','Assistants','Money']);
+  assert.deepEqual(await page.locator('.nav-primary .nav-link').evaluateAll(nodes=>nodes.map(node=>node.textContent.replace(/\d+$/,'').trim())),['Home','Rooms','Groups','Recents','Assistants','Money']);
   const navStyle=await page.locator('#navigation [data-view="activity"]').evaluate(node=>{
     const s=getComputedStyle(node);return {font:s.fontFamily,size:s.fontSize,weight:s.fontWeight,
       radius:s.borderRadius,height:node.getBoundingClientRect().height,color:s.color,
