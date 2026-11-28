@@ -15,6 +15,11 @@ It includes third-party material under its own licences:
   NIP-44 test vector licence text.
 - workspace_ui/InterVariable.woff2: Inter typeface under the SIL Open Font
   Licence 1.1. See workspace_ui/INTER-LICENSE.txt.
+- films/studio/src/components/snap-cn and films/studio/src/lib/snap-cn-ui:
+  snapcn Remotion components under the MIT licence. See
+  films/studio/SNAPCN-LICENSE.txt.
+- films/studio/public/photos: photographs from Pexels under the Pexels licence
+  (free to use, no attribution required).
 - research/sources: pinned upstream snapshots kept for reference only, each
   under its own MIT or Apache-2.0 licence, preserved in its licences/ folder.
   They are not part of the Assistant Central software.

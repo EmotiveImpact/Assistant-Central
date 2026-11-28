@@ -1,0 +1,25 @@
+{
+  "name": "parlu-film-studio",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render src/index.ts OrbFlicker out/parlu-orb-flicker.mp4",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.547",
+    "@remotion/google-fonts": "4.0.547",
+    "@remotion/player": "4.0.547",
+    "culori": "^4.0.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.547"
+  },
+  "devDependencies": {
+    "@types/culori": "^4.0.1",
+    "@types/react": "19.1.8",
+    "typescript": "5.8.3"
+  }
+}
