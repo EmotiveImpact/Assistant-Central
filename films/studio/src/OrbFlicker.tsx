@@ -10,11 +10,13 @@ import { ChatPile } from "./scenes/ChatPile";
 
 const FONT = "Plus Jakarta Sans";
 
+// Ordered so the flicker walks from darker to brighter photos (LogoFlicker
+// picks index (step * 7) % 17), keeping each change in brightness small.
 const FACES = [
-  "px_11215202", "px_4931333", "px_13120070", "px_35659764", "px_18039499",
-  "px_7348675", "px_33323689", "px_10493844", "px_38602608", "tm_3182812",
-  "px_40663010", "px_31649111", "px_40704337", "px_34301627", "px_40899157",
-  "px_14484468", "px_8868795",
+  "px_31649111", "px_13120070", "px_35659764", "px_10493844", "px_40663010",
+  "px_40704337", "px_8868795", "px_38602608", "px_40899157", "px_11215202",
+  "px_4931333", "px_33323689", "px_14484468", "px_7348675", "px_34301627",
+  "px_18039499", "tm_3182812",
 ].map((f) => staticFile(`photos/${f}.jpg`));
 
 /** Scene lengths in frames at 30fps. */
@@ -104,6 +106,9 @@ export function OrbFlicker() {
         <Series.Sequence durationInFrames={SCENES.logo}>
           <LogoFlicker
             images={FACES}
+            // Six frames a photo (five changes a second) keeps full-screen cuts
+            // under the WCAG limit of three flashes a second.
+            flipInterval={6}
             logoSrc={MARK_SVG}
             brandName="Parlu"
             mode="light"

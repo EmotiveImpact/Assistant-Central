@@ -45,3 +45,15 @@ The registry is set in `components.json`; `@/` resolves to `src/` through
   needed).
 - Remotion is free for individuals and companies of up to three people;
   larger companies need a Remotion company licence.
+
+## Photosensitivity
+
+Full-screen photo flicker is held to at least six frames a photo at 30fps
+(five changes a second, so under three flashes a second), and photos run from
+darker to brighter. Check any new flicker against the WCAG three-flashes rule
+before sharing.
+
+## Embedding the Player
+
+`OrbFlickerPlayer` loads photos through `staticFile()`, so a host page must
+serve `films/studio/public/` at its root (or copy `public/photos/` there).
