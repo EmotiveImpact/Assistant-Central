@@ -44,8 +44,8 @@ const THREAD = [
   "??",
 ];
 
-export function ChatPile() {
-  const frame = useCurrentFrame();
+export function ChatPile({ pace = 1 }: { pace?: number }) {
+  const frame = useCurrentFrame() * pace;
   const { fps, durationInFrames } = useVideoConfig();
 
   // Phone pulls back from close up, like the reference.
@@ -61,7 +61,7 @@ export function ChatPile() {
     }),
   );
   const count = raw >= 99 ? "99+" : String(raw);
-  const exit = interpolate(frame, [durationInFrames - 6, durationInFrames], [1, 0], {
+  const exit = interpolate(useCurrentFrame(), [durationInFrames - 6, durationInFrames], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });

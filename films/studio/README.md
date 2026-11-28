@@ -11,6 +11,13 @@ project owns and can edit them.
   Hello Zoom, Drop Line, a hand-built group chat scene, Text Rewrite,
   Orb Swarm, Text Reveal and Logo Flicker, in Parlu's colours and type.
 
+- `OrbFlickerV2` (43.3s): the slower cut after Edem's feedback ("way too
+  fast", "more interaction with photos"). Real people and their assistants
+  from the start (`scenes/PeopleIntro.tsx`), Ama and Joel's assistants doing
+  the back and forth and both saying yes (`scenes/Pair.tsx`), every snapcn
+  scene slowed with its `speed` prop. Render with
+  `npx remotion render src/index.ts OrbFlickerV2 out/v2.mp4`.
+
 ## Use
 
 ```bash
