@@ -23,3 +23,8 @@ It includes third-party material under its own licences:
 - research/sources: pinned upstream snapshots kept for reference only, each
   under its own MIT or Apache-2.0 licence, preserved in its licences/ folder.
   They are not part of the Assistant Central software.
+
+Launch film portraits (films/studio/public/people, faces/{ama,joel,kemi,ken,nana,frank}.jpg):
+Pexels photos 40140398, 31374315, 32165463, 4584543, 12644998, 7322303, used
+under the Pexels licence (free to use, no attribution required), cut out and
+recoloured.

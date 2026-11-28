@@ -11,6 +11,13 @@ project owns and can edit them.
   Hello Zoom, Drop Line, a hand-built group chat scene, Text Rewrite,
   Orb Swarm, Text Reveal and Logo Flicker, in Parlu's colours and type.
 
+- `OrbFlickerV2` (43.3s): the slower cut after Edem's feedback ("way too
+  fast", "more interaction with photos"). Real people and their assistants
+  from the start (`scenes/PeopleIntro.tsx`), Ama and Joel's assistants doing
+  the back and forth and both saying yes (`scenes/Pair.tsx`), every snapcn
+  scene slowed with its `speed` prop. Render with
+  `npx remotion render src/index.ts OrbFlickerV2 out/v2.mp4`.
+
 ## Use
 
 ```bash
@@ -57,3 +64,29 @@ before sharing.
 
 `OrbFlickerPlayer` loads photos through `staticFile()`, so a host page must
 serve `films/studio/public/` at its root (or copy `public/photos/` there).
+
+## Launch film (`Launch`)
+
+The top level launch film: 62.6 seconds, nine beats on white in one typeface,
+with the Parlu app rebuilt as components (`src/launch/App.tsx`) so the camera
+can move through it. Scenes are in `src/launch/scenes.tsx` and shared pieces
+(blur-in words, the scene blur dip, the pointer) in `src/launch/kit.tsx`.
+Photo cards in `public/cards/` come from the website mock (Pexels, free licence).
+
+Music is an ElevenLabs track at 120 bpm, not stored here. To fit it: start at
+1.0s and repeat 22.04 to 30.04s once after 30.04s, so the drop lands on
+"Introducing" (frame 511) and the break lands on the hold to say yes (the beat
+returns on "Booked", frame 1233). The flash check measures at most one flash
+per second.
+
+### Launch film, second pass
+
+People are now six studio portraits from Pexels (free licence), cut out with
+rembg and set on soft tints in `public/people/` (round crops in
+`public/faces/{ama,joel,kemi,ken,nana,frank}.jpg`), shown as tall cards with
+each assistant at the shoulder (`src/launch/people.tsx`). The end ident
+(`src/launch/ident.tsx`) has the person (teal) and assistant (coral, with eyes)
+meet, the ink lens form, one yes ring ripple out, then the name rise letter by
+letter; the drop at "Introducing" uses the same ident. Avoid `rotateY` with
+`perspective` on image cards: Chrome dropped those layers on some frames,
+which the flash check caught as flicker.
