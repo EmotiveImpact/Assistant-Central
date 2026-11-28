@@ -8,8 +8,8 @@ import { Bot, Face } from "../scenes/Bot";
  * People are face photos with their assistant beside them.
  */
 
-export const AMA = "px_11215202";
-export const JOEL = "px_40704337";
+export const AMA = "ama";
+export const JOEL = "joel";
 
 const NAV: [string, string?][] = [["Home", "3"], ["Rooms", "2"], ["Groups"], ["Recents"], ["Assistants"], ["Money"]];
 

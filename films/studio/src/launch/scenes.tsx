@@ -4,6 +4,8 @@ import { MARK_SVG, PARLU } from "../brand";
 import { Bot, BOT_COLOURS, Face, blinking } from "../scenes/Bot";
 import { AMA, AppWindow, Composer, JOEL, Pairing } from "./App";
 import { BlurLine, Cursor, Scene, clamp, easeInOut, easeOut, key, words } from "./kit";
+import { Portrait, type Who } from "./people";
+import { Ident } from "./ident";
 
 const W = 1920;
 const H = 1080;
@@ -12,57 +14,64 @@ const H = 1080;
 /* 1. Everyone has an assistant now. But they can't talk to each other. */
 /* ------------------------------------------------------------------ */
 
-const CAST: { face: string; shape: "pebble" | "cloud" | "bean" | "drop" | "squircle"; colour: keyof typeof BOT_COLOURS }[] = [
-  { face: AMA, shape: "pebble", colour: "coral" },
-  { face: "px_13120070", shape: "bean", colour: "amber" },
-  { face: "px_18039499", shape: "drop", colour: "berry" },
-  { face: "px_33323689", shape: "squircle", colour: "rust" },
-  { face: JOEL, shape: "cloud", colour: "rose" },
-];
+const CAST: Who[] = ["ama", "kemi", "ken", "nana", "frank", "joel"];
 
 export const EVERYONE = 270;
 export function Everyone() {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const TRY = 168;
+  const CW = 240;
+  const STEP = 290;
+  const TOP = 560;
+  const bx = (i: number) => 960 + (i - 2.5) * STEP + CW / 2 - 7;
+  const BY = TOP + 8;
   return (
     <Scene dur={EVERYONE} inF={14}>
-      <div style={{ position: "absolute", top: 170, width: W }}>
-        <BlurLine words={words("Everyone has an assistant now.")} start={8} leave={140} size={104} />
+      <div style={{ position: "absolute", top: 150, width: W }}>
+        <BlurLine words={words("Everyone has an assistant now.")} start={8} leave={140} size={100} />
       </div>
-      <div style={{ position: "absolute", top: 170, width: W }}>
-        <BlurLine words={words("But they can't talk to each other.", { "can't": PARLU.coral })} start={152} size={104} />
+      <div style={{ position: "absolute", top: 150, width: W }}>
+        <BlurLine words={words("But they can't talk to each other.", { "can't": PARLU.coral })} start={152} size={100} />
       </div>
+      <AbsoluteFill>
+        {CAST.map((who, i) => {
+          const cx = 960 + (i - 2.5) * STEP;
+          const s = spring({ frame: f - 30 - i * 6, fps, config: { damping: 16, stiffness: 110 } });
+          const bob = Math.sin((f + i * 20) / 26) * 5;
+          const worried = f > TRY + 40;
+          const eyes = worried ? "look" : blinking(f, i) ? "blink" : "idle";
+          return (
+            <div
+              key={who}
+              style={{
+                position: "absolute",
+                left: cx - CW / 2,
+                top: TOP + bob + (1 - s) * 140,
+                opacity: Math.min(1, s * 1.6),
+              }}
+            >
+              <Portrait who={who} width={CW} eyes={eyes} glance={worried ? (i < 3 ? 1 : -1) : 0} drift={Math.sin((f + i * 30) / 45)} />
+            </div>
+          );
+        })}
+      </AbsoluteFill>
       <svg width={W} height={H} style={{ position: "absolute", inset: 0 }}>
         {CAST.slice(0, -1).map((_, i) => {
-          const x1 = 960 + (i - 2) * 350 + 100;
-          const x2 = x1 + 350;
-          const p = interpolate(f, [TRY + i * 6, TRY + 30 + i * 6], [0, 0.46], { ...clamp, easing: easeOut });
-          const fade = interpolate(f, [TRY + 52 + i * 6, TRY + 72 + i * 6], [1, 0], clamp);
+          const x1 = bx(i);
+          const x2 = bx(i + 1);
+          const p = interpolate(f, [TRY + i * 5, TRY + 30 + i * 5], [0, 0.44], { ...clamp, easing: easeOut });
+          const fade = interpolate(f, [TRY + 52 + i * 5, TRY + 72 + i * 5], [1, 0], clamp);
           return (
             <g key={i} opacity={fade}>
               <clipPath id={`c${i}`}>
-                <rect x={x1} y={380} width={(x2 - x1) * p} height={300} />
+                <rect x={x1} y={BY - 200} width={(x2 - x1) * p} height={260} />
               </clipPath>
-              <path d={`M${x1} 580 Q${(x1 + x2) / 2} 470 ${x2} 580`} stroke={PARLU.sun} strokeWidth={5} strokeDasharray="4 14" strokeLinecap="round" fill="none" clipPath={`url(#c${i})`} />
+              <path d={`M${x1} ${BY - 30} Q${(x1 + x2) / 2} ${BY - 150} ${x2} ${BY - 30}`} stroke={PARLU.sun} strokeWidth={5} strokeDasharray="4 14" strokeLinecap="round" fill="none" clipPath={`url(#c${i})`} />
             </g>
           );
         })}
       </svg>
-      {CAST.map((c, i) => {
-        const cx = 960 + (i - 2) * 350;
-        const s = spring({ frame: f - 34 - i * 7, fps, config: { damping: 14, stiffness: 140 } });
-        const bob = Math.sin((f + i * 20) / 22) * 6;
-        const eyes = f > TRY + 40 ? "look" : blinking(f, i) ? "blink" : "idle";
-        return (
-          <div key={c.face} style={{ position: "absolute", left: cx - 85, top: 615 + bob, transform: `scale(${s})`, opacity: s }}>
-            <Face name={c.face} size={170} />
-            <div style={{ position: "absolute", left: 137, top: -73 }}>
-              <Bot shape={c.shape} colour={c.colour} size={96} eyes={eyes} glance={f > TRY + 40 ? (i < 2 ? 1 : -1) : 0} />
-            </div>
-          </div>
-        );
-      })}
     </Scene>
   );
 }
@@ -85,9 +94,9 @@ const THREAD = [
 ] as const;
 
 const SHOUTS = [
-  { t: "Who's free Sunday?", face: "px_13120070", x: -1, y: 380, at: 28 },
-  { t: "Has anyone booked?", face: "px_33323689", x: 1, y: 470, at: 50 },
-  { t: "Is it step-free?", face: "px_18039499", x: -1, y: 640, at: 72 },
+  { t: "Who's free Sunday?", face: "kemi", x: -1, y: 380, at: 28 },
+  { t: "Has anyone booked?", face: "frank", x: 1, y: 470, at: 50 },
+  { t: "Is it step-free?", face: "ken", x: -1, y: 640, at: 72 },
   { t: "Who owes who?", face: JOEL, x: 1, y: 730, at: 94 },
 ];
 
@@ -216,7 +225,7 @@ export function Intro() {
     <Scene dur={INTRO} inF={1}>
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 30 }}>
         <BlurLine words={["Introducing"]} start={-4} size={40} weight={600} style={{ color: PARLU.faint, letterSpacing: "0.02em" }} />
-        <Lockup at={-3} />
+        <Ident meet={2} />
       </AbsoluteFill>
     </Scene>
   );
@@ -320,29 +329,15 @@ export function Talk() {
         <BlurLine words={words("Pip sorts it out with Joel's assistant.", { Pip: PARLU.sun })} start={4} size={76} />
       </div>
       {/* Ama and Pip */}
-      <div style={{ position: "absolute", left: 150, top: 420, display: "flex", alignItems: "center", gap: 22, opacity: pairIn(6), transform: `translateX(${(1 - pairIn(6)) * -60}px)` }}>
-        <div style={{ textAlign: "center" }}>
-          <Face name={AMA} size={220} />
-          <div style={{ fontSize: 28, fontWeight: 700, marginTop: 14 }}>Ama</div>
-        </div>
-        <div style={{ transform: `translateY(${hop(0) - 30}px)` }}>
-          <Bot shape="pebble" colour="coral" size={140} eyes={blinking(f, 1) ? "blink" : "idle"} glance={1} />
-          <div style={{ fontSize: 24, fontWeight: 600, textAlign: "center", color: PARLU.faint }}>Pip</div>
-        </div>
+      <div style={{ position: "absolute", left: 110, top: 250, opacity: pairIn(6), transform: `translateX(${(1 - pairIn(6)) * -80}px)` }}>
+        <Portrait who="ama" width={400} eyes={blinking(f, 1) ? "blink" : "idle"} glance={1} botLift={-hop(0)} drift={Math.sin(f / 50)} label={<span>Ama <span style={{ color: PARLU.faint, fontWeight: 600 }}>and Pip</span></span>} />
       </div>
       {/* Joel and Wren */}
-      <div style={{ position: "absolute", right: 150, top: 420, display: "flex", alignItems: "center", gap: 22, opacity: pairIn(12), transform: `translateX(${(1 - pairIn(12)) * 60}px)` }}>
-        <div style={{ transform: `translateY(${hop(1) - 30}px)` }}>
-          <Bot shape="cloud" colour="rose" size={140} eyes={blinking(f, 4) ? "blink" : "idle"} glance={-1} />
-          <div style={{ fontSize: 24, fontWeight: 600, textAlign: "center", color: PARLU.faint }}>Wren</div>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <Face name={JOEL} size={220} />
-          <div style={{ fontSize: 28, fontWeight: 700, marginTop: 14 }}>Joel</div>
-        </div>
+      <div style={{ position: "absolute", right: 110, top: 250, opacity: pairIn(12), transform: `translateX(${(1 - pairIn(12)) * 80}px)` }}>
+        <Portrait who="joel" width={400} eyes={blinking(f, 4) ? "blink" : "idle"} glance={-1} botLift={-hop(1)} botSide="left" drift={Math.sin(f / 50 + 2)} label={<span>Joel <span style={{ color: PARLU.faint, fontWeight: 600 }}>and Wren</span></span>} />
       </div>
       {/* The conversation between the two assistants */}
-      <div style={{ position: "absolute", left: 640, width: 640, top: 250, height: 560, overflow: "hidden", maskImage: "linear-gradient(transparent, #000 30%)", WebkitMaskImage: "linear-gradient(transparent, #000 30%)" }}>
+      <div style={{ position: "absolute", left: 620, width: 680, top: 230, height: 560, overflow: "hidden", maskImage: "linear-gradient(transparent, #000 30%)", WebkitMaskImage: "linear-gradient(transparent, #000 30%)" }}>
         {TALK.slice(0, arrived).map(([t, side], i) => {
           const age = arrived - 1 - i;
           const s = spring({ frame: f - START - i * GAP, fps, config: { damping: 18, stiffness: 170 } });
@@ -464,10 +459,10 @@ export function Yes() {
 
 const USES: { label: string; img: string; title: string; note: string; faces: string[]; len: number; team?: boolean }[] = [
   { label: "Birthdays and visits", img: "family", title: "Visit to Nana's, Saturday 2pm", note: "Both said yes", faces: [AMA, JOEL], len: 48 },
-  { label: "Trips with friends", img: "friends", title: "Cornwall cottage, £160 each", note: "4 of 4 said yes", faces: ["px_13120070", "px_18039499", "px_33323689", AMA], len: 48 },
-  { label: "Swimming and clubs", img: "school", title: "Swim club lifts, every Thursday", note: "Shared with 3 parents", faces: [JOEL, "px_40663010"], len: 48 },
-  { label: "Days out", img: "days", title: "Zoo tickets for 6, Sunday", note: "Paid and split 3 ways", faces: [AMA, "px_18039499"], len: 48 },
-  { label: "Work with a team", img: "team", title: "Launch website", note: "3 people, 3 assistants, one plan", faces: [AMA, JOEL, "px_13120070"], len: 88, team: true },
+  { label: "Trips with friends", img: "friends", title: "Cornwall cottage, £160 each", note: "4 of 4 said yes", faces: ["kemi", "ken", "frank", AMA], len: 48 },
+  { label: "Swimming and clubs", img: "school", title: "Swim club lifts, every Thursday", note: "Shared with 3 parents", faces: [JOEL, "nana"], len: 48 },
+  { label: "Days out", img: "days", title: "Zoo tickets for 6, Sunday", note: "Paid and split 3 ways", faces: [AMA, "ken"], len: 48 },
+  { label: "Work with a team", img: "team", title: "Launch website", note: "3 people, 3 assistants, one plan", faces: [AMA, JOEL, "kemi"], len: 88, team: true },
 ];
 export const USESF = USES.reduce((a, u) => a + u.len, 0);
 
@@ -591,7 +586,7 @@ export function Uses() {
 /* 8. They do the back and forth. You say yes.                         */
 /* ------------------------------------------------------------------ */
 
-export const LINEF = 110;
+export const LINEF = 86;
 export function Line() {
   return (
     <Scene dur={LINEF}>
@@ -616,17 +611,12 @@ export function Line() {
 /* 9. End card.                                                        */
 /* ------------------------------------------------------------------ */
 
-export const END_F = 180;
+export const END_F = 204;
 export function End() {
-  const f = useCurrentFrame();
-  const sub = interpolate(f, [44, 60], [0, 1], clamp);
   return (
-    <Scene dur={END_F} outF={24}>
-      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 40 }}>
-        <Lockup at={4} />
-        <div style={{ fontSize: 44, fontWeight: 600, color: PARLU.faint, letterSpacing: "-0.02em", opacity: sub, filter: `blur(${(1 - sub) * 8}px)` }}>
-          Let your assistant sort it out with theirs.
-        </div>
+    <Scene dur={END_F} inF={1} outF={24}>
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
+        <Ident meet={24} tagline="Let your assistant sort it out with theirs." />
       </AbsoluteFill>
     </Scene>
   );

@@ -78,3 +78,15 @@ Music is an ElevenLabs track at 120 bpm, not stored here. To fit it: start at
 "Introducing" (frame 511) and the break lands on the hold to say yes (the beat
 returns on "Booked", frame 1233). The flash check measures at most one flash
 per second.
+
+### Launch film, second pass
+
+People are now six studio portraits from Pexels (free licence), cut out with
+rembg and set on soft tints in `public/people/` (round crops in
+`public/faces/{ama,joel,kemi,ken,nana,frank}.jpg`), shown as tall cards with
+each assistant at the shoulder (`src/launch/people.tsx`). The end ident
+(`src/launch/ident.tsx`) has the person (teal) and assistant (coral, with eyes)
+meet, the ink lens form, one yes ring ripple out, then the name rise letter by
+letter; the drop at "Introducing" uses the same ident. Avoid `rotateY` with
+`perspective` on image cards: Chrome dropped those layers on some frames,
+which the flash check caught as flicker.
