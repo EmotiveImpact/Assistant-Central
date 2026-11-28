@@ -64,3 +64,17 @@ before sharing.
 
 `OrbFlickerPlayer` loads photos through `staticFile()`, so a host page must
 serve `films/studio/public/` at its root (or copy `public/photos/` there).
+
+## Launch film (`Launch`)
+
+The top level launch film: 62.6 seconds, nine beats on white in one typeface,
+with the Parlu app rebuilt as components (`src/launch/App.tsx`) so the camera
+can move through it. Scenes are in `src/launch/scenes.tsx` and shared pieces
+(blur-in words, the scene blur dip, the pointer) in `src/launch/kit.tsx`.
+Photo cards in `public/cards/` come from the website mock (Pexels, free licence).
+
+Music is an ElevenLabs track at 120 bpm, not stored here. To fit it: start at
+1.0s and repeat 22.04 to 30.04s once after 30.04s, so the drop lands on
+"Introducing" (frame 511) and the break lands on the hold to say yes (the beat
+returns on "Booked", frame 1233). The flash check measures at most one flash
+per second.
